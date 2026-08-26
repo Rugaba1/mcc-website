@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Product {
+  id            Int              @id @default(autoincrement())
+  name          String
+  category      String
+  categoryLabel String
+  description   String           @db.Text
+  sizes         String
+  badge         String?
+  gradient      String
+  image         String
+  colors        String           @db.Text
+  useCase       String
+  collection    String
+  featured      Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  collections   CollectionItem[]
+  projects      ProjectTile[]
+}
+
+model Collection {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  description String           @db.Text
+  image       String
+  featured    Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  items       CollectionItem[]
+}
+
+model CollectionItem {
+  id           Int        @id @default(autoincrement())
+  collectionId Int
+  productId    Int
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, productId])
+}
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  title       String
+  type        String
+  description String        @db.Text
+  gradient    String
+  image       String
+  large       Boolean       @default(false)
+  location    String
+  area        String
+  year        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tiles       ProjectTile[]
+}
+
+model ProjectTile {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  productId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, productId])
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
+  name      String
+  role      String
+  initials  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
