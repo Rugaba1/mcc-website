@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// ── GET /api/collections ──────────────────────────────────────────────────────
+// ── GET /api/collections ──────────────────────────────────────────────────────   updated
 export async function GET() {
   try {
     const rows = await prisma.collection.findMany({
