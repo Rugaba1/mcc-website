@@ -62,6 +62,20 @@ export interface Testimonial {
   initials: string;
 }
 
+export interface CatalogueDoc {
+  id:          number;
+  title:       string;
+  description: string;
+  coverImage:  string;
+  fileUrl:     string;
+  category:    string;
+  year:        string;
+  published:   boolean;
+  featured:    boolean;
+  createdAt:   string;
+  updatedAt:   string;
+}
+
 // ─── Generic fetch wrapper ────────────────────────────────────────────────────
 
 async function req<T>(url: string, options?: RequestInit): Promise<T> {
@@ -114,6 +128,15 @@ export const api = {
     req<Testimonial>(`/api/testimonials/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteTestimonial: (id: number) =>
     req<{ ok: boolean }>(`/api/testimonials/${id}`, { method: "DELETE" }),
+
+  // Catalogues
+  getCatalogues:    () => req<CatalogueDoc[]>("/api/catalogues"),
+  createCatalogue:  (d: Omit<CatalogueDoc, "id" | "createdAt" | "updatedAt">) =>
+    req<CatalogueDoc>("/api/catalogues", { method: "POST", body: JSON.stringify(d) }),
+  updateCatalogue:  (id: number, d: Partial<Omit<CatalogueDoc, "id" | "createdAt" | "updatedAt">>) =>
+    req<CatalogueDoc>(`/api/catalogues/${id}`, { method: "PUT", body: JSON.stringify(d) }),
+  deleteCatalogue:  (id: number) =>
+    req<{ ok: boolean }>(`/api/catalogues/${id}`, { method: "DELETE" }),
 };
 
 // ─── Category / Badge helpers (used by admin) ─────────────────────────────────

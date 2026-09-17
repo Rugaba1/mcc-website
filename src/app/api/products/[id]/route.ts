@@ -5,14 +5,18 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const body = await req.json();
+    const numId  = Number(id);
+    if (isNaN(numId))
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+
+    const body    = await req.json();
     const product = await prisma.product.update({
-      where: { id: Number(id) },
+      where: { id: numId },
       data: {
-        name:          body.name,
-        category:      body.category,
-        categoryLabel: body.categoryLabel,
-        description:   body.description,
+        name:          body.name          ?? "",
+        category:      body.category      ?? "floor",
+        categoryLabel: body.categoryLabel ?? "",
+        description:   body.description   ?? "",
         sizes:         body.sizes         ?? "",
         badge:         body.badge         ?? null,
         gradient:      body.gradient      ?? "",
@@ -24,8 +28,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
     return NextResponse.json({ ...product, colors: JSON.parse(product.colors) });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    console.error("PUT /api/products/[id]:", err);
+    if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2025")
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
   }
 }
@@ -36,8 +42,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
     await prisma.product.delete({ where: { id: Number(id) } });
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    console.error("DELETE /api/products/[id]:", err);
+    if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2025")
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
   }
 }

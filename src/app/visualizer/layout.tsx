@@ -1,6 +1,7 @@
+
+import TextureProvider from "@/contexts/texture-context";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-
 export const metadata: Metadata = {
   title: "Tile Visualizer — Mountain Ceramics Company",
   description: "Visualize MCC tiles on walls and floors before you buy.",
@@ -16,7 +17,10 @@ export default function VisualizerLayout({ children }: { children: React.ReactNo
         </div>
       }
     >
-      {children}
+      <TextureProvider>
+        {children}
+      </TextureProvider>
+      
     </Suspense>
   );
 }

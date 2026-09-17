@@ -14,8 +14,8 @@ model Product {
   description   String           @db.Text
   sizes         String
   badge         String?
-  gradient      String
-  image         String
+  gradient      String           @db.Text
+  image         String           @db.Text
   colors        String           @db.Text
   useCase       String
   collection    String
@@ -30,7 +30,7 @@ model Collection {
   id          Int              @id @default(autoincrement())
   name        String           @unique
   description String           @db.Text
-  image       String
+  image       String           @db.Text
   featured    Boolean          @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -52,8 +52,8 @@ model Project {
   title       String
   type        String
   description String        @db.Text
-  gradient    String
-  image       String
+  gradient    String        @db.Text
+  image       String        @db.Text
   large       Boolean       @default(false)
   location    String
   area        String
@@ -81,4 +81,37 @@ model Testimonial {
   initials  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String   @unique
+  password    String   // hashed (bcryptjs)
+  role        String   @default("staff") // "admin" | "staff"
+  active      Boolean  @default(true)
+
+  // Granular permissions — each maps to an admin section
+  canProducts     Boolean @default(true)
+  canCollections  Boolean @default(true)
+  canProjects     Boolean @default(true)
+  canTestimonials Boolean @default(true)
+  canUsers        Boolean @default(false) // only admin by default
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Catalogue {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  coverImage  String   @db.Text  // cover photo
+  fileUrl     String   @db.Text  // PDF or download link (optional)
+  category    String   @default("general") // floor, wall, outdoor, special, general
+  year        String   @default("")
+  published   Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

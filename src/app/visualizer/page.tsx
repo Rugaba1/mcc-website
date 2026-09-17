@@ -4,1154 +4,761 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useTexture } from "@/contexts/texture-context";
 import { api, type Product } from "@/lib/api";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-type Surface = "wall" | "floor";
+// ─── Types ───────────────────────────────────────────────────────────────────
+type Surface    = "wall" | "floor";
 type GroutWidth = "small" | "medium" | "large";
 type TileLayout = "straight" | "brick" | "herringbone" | "stack";
-type FilterCategory = "all" | "floor" | "wall" | "outdoor" | "special";
-type ViewMode = "grid" | "list";
+type FilterCat  = "all" | "floor" | "wall" | "outdoor" | "special";
 
-const GROUT_PRESETS = [
-  { label: "White", value: "#f5f5f5" },
-  { label: "Grey", value: "#9ca3af" },
-  { label: "Dark", value: "#4b5563" },
+// A quad is 4 corners: [topLeft, topRight, bottomRight, bottomLeft]
+// each corner is [x, y] as 0‒1 fractions of the image dimensions
+type Quad = [[number,number],[number,number],[number,number],[number,number]];
+
+const GROUT_PX: Record<GroutWidth, number> = { small: 1, medium: 3, large: 6 };
+const TILE_PX:  Record<TileLayout, number> = { straight: 96, brick: 96, herringbone: 72, stack: 96 };
+
+const GROUT_SWATCHES = [
+  { label: "White", value: "#f0ede8" },
+  { label: "Sand",  value: "#d4c5a9" },
+  { label: "Grey",  value: "#9ca3af" },
+  { label: "Dark",  value: "#4b5563" },
   { label: "Black", value: "#111827" },
 ];
 
-const GROUT_PX: Record<GroutWidth, number> = { small: 2, medium: 4, large: 7 };
-const TILE_PX: Record<TileLayout, number> = {
-  straight: 80,
-  brick: 80,
-  herringbone: 60,
-  stack: 80,
-};
+// ─── Room scene definitions ───────────────────────────────────────────────────
+// floorQuad / wallQuad: perspective-correct polygons traced on each photo
+// Coordinates are [x,y] as fractions of image width/height (0‒1)
+const ROOM_SCENES = [
+  {
+    id: "living", label: "Living Room",
+    url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&q=92",
+    // floor — the visible floor area (trapezoidal, wider at bottom)
+    floorQuad: [[0.0, 0.72],[1.0, 0.72],[1.0, 1.0],[0.0, 1.0]] as Quad,
+    // wall — back wall behind the sofa
+    wallQuad:  [[0.0, 0.0],[1.0, 0.0],[1.0, 0.60],[0.0, 0.60]] as Quad,
+    floorLabelPos: { left: "50%", bottom: "6%" },
+    wallLabelPos:  { right: "8%",  top: "6%" },
+  },
+  {
+    id: "bathroom", label: "Bathroom",
+    url: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1600&q=92",
+    floorQuad: [[0.05, 0.68],[0.95, 0.68],[1.0, 1.0],[0.0, 1.0]] as Quad,
+    wallQuad:  [[0.0, 0.0],[1.0, 0.0],[1.0, 0.62],[0.0, 0.62]] as Quad,
+    floorLabelPos: { left: "50%", bottom: "6%" },
+    wallLabelPos:  { right: "8%",  top: "6%" },
+  },
+  {
+    id: "kitchen", label: "Kitchen",
+    url: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&q=92",
+    floorQuad: [[0.0, 0.70],[1.0, 0.70],[1.0, 1.0],[0.0, 1.0]] as Quad,
+    wallQuad:  [[0.0, 0.0],[1.0, 0.0],[1.0, 0.58],[0.0, 0.58]] as Quad,
+    floorLabelPos: { left: "50%", bottom: "6%" },
+    wallLabelPos:  { right: "8%",  top: "6%" },
+  },
+  {
+    id: "bedroom", label: "Bedroom",
+    url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=92",
+    floorQuad: [[0.0, 0.66],[1.0, 0.66],[1.0, 1.0],[0.0, 1.0]] as Quad,
+    wallQuad:  [[0.0, 0.0],[1.0, 0.0],[1.0, 0.56],[0.0, 0.56]] as Quad,
+    floorLabelPos: { left: "50%", bottom: "8%" },
+    wallLabelPos:  { right: "8%",  top: "6%" },
+  },
+  {
+    id: "outdoor", label: "Outdoor",
+    url: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=1600&q=92",
+    floorQuad: [[0.0, 0.60],[1.0, 0.60],[1.0, 1.0],[0.0, 1.0]] as Quad,
+    wallQuad:  [[0.0, 0.0],[1.0, 0.0],[1.0, 0.50],[0.0, 0.50]] as Quad,
+    floorLabelPos: { left: "50%", bottom: "8%" },
+    wallLabelPos:  { right: "8%",  top: "6%" },
+  },
+] as const;
+type Scene = typeof ROOM_SCENES[number];
 
-const GENERATION_STEPS = [
-  { label: "Detecting surfaces…", duration: 1000 },
-  { label: "Applying tile texture…", duration: 1500 },
-  { label: "Rendering perspective…", duration: 1000 },
-  { label: "Adding grout lines…", duration: 800 },
-  { label: "Finalising visualization…", duration: 700 },
-];
 
-const CATEGORY_FILTERS: { key: FilterCategory; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "floor", label: "Floor" },
-  { key: "wall", label: "Wall" },
-  { key: "outdoor", label: "Outdoor" },
-  { key: "special", label: "Special" },
-];
+// ─── Canvas room renderer ─────────────────────────────────────────────────────
+// Renders: room photo base → warp floor tile into floorQuad → warp wall tile into wallQuad
+// Uses homography so the tile looks genuinely perspective-correct inside the polygon
 
-const ROOM_IMAGE = "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&q=85";
-
-// ─── Grout overlay CSS ───────────────────────────────────────────────────────
-
-function buildGroutStyle(
-  layout: TileLayout,
-  groutColor: string,
-  groutWidth: GroutWidth
-): React.CSSProperties {
-  const g = GROUT_PX[groutWidth];
-  const t = TILE_PX[layout];
-  const step = t + g;
-
-  if (layout === "straight" || layout === "stack") {
-    return {
-      background: [
-        `repeating-linear-gradient(to right, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${step}px)`,
-        `repeating-linear-gradient(to bottom, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${step}px)`,
-      ].join(", "),
-      opacity: 0.65,
-    };
-  }
-
-  if (layout === "brick") {
-    // horizontal lines every step, vertical offset rows
-    return {
-      background: [
-        `repeating-linear-gradient(to bottom, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${step}px)`,
-        `repeating-linear-gradient(to right, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${step}px)`,
-      ].join(", "),
-      backgroundSize: `${step}px ${step * 2}px, ${step}px ${step}px`,
-      opacity: 0.6,
-    };
-  }
-
-  // herringbone — diagonal grid approximation
-  return {
-    background: [
-      `repeating-linear-gradient(45deg, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${t}px)`,
-      `repeating-linear-gradient(-45deg, ${groutColor} 0px, ${groutColor} ${g}px, transparent ${g}px, transparent ${t}px)`,
-    ].join(", "),
-    opacity: 0.55,
-  };
+interface RoomCanvasProps {
+  scene:        Scene;
+  floorTile:    Product | null;
+  wallTile:     Product | null;
+  floorApplied: boolean;
+  wallApplied:  boolean;
+  layout:       TileLayout;
+  groutColor:   string;
+  groutWidth:   GroutWidth;
+  surface:      Surface;
+  onFloorClear: () => void;
+  onWallClear:  () => void;
 }
 
-// ─── Helper: badge colour ────────────────────────────────────────────────────
+function RoomCanvas({
+  scene, floorTile, wallTile, floorApplied, wallApplied,
+  layout, groutColor, groutWidth, surface, onFloorClear, onWallClear,
+}: RoomCanvasProps) {
+  const canvasRef  = useRef<HTMLCanvasElement>(null);
+  const wrapRef    = useRef<HTMLDivElement>(null);
+  const roomImgRef = useRef<HTMLImageElement | null>(null);
+  const tileImgRef = useRef<HTMLImageElement | null>(null);
+  const wallImgRef = useRef<HTMLImageElement | null>(null);
 
-function badgeClass(badge: Product["badge"]) {
-  if (badge === "New") return "bg-emerald-500 text-white";
-  if (badge === "Premium") return "bg-[#0f1117] text-[#c9a84c]";
-  return "bg-[#c9a84c] text-white";
-}
+  // Build a tiled texture onto an offscreen canvas
+  const buildTileCanvas = useCallback((
+    img: HTMLImageElement,
+    tileW: number, tileH: number,
+    gColor: string, gPx: number,
+    lay: TileLayout,
+    outSize = 1024,
+  ): HTMLCanvasElement => {
+    const c   = document.createElement("canvas");
+    c.width   = outSize; c.height = outSize;
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = gColor;
+    ctx.fillRect(0, 0, outSize, outSize);
+    const pw = tileW + gPx;
+    const ph = tileH + gPx;
+    for (let row = -1; row < Math.ceil(outSize / ph) + 2; row++) {
+      const ox = lay === "brick" && row % 2 !== 0 ? pw / 2 : 0;
+      for (let col = -1; col < Math.ceil(outSize / pw) + 2; col++) {
+        const x = col * pw + ox + gPx / 2;
+        const y = row * ph + gPx / 2;
+        ctx.drawImage(img, x, y, tileW - gPx, tileH - gPx);
+      }
+    }
+    return c;
+  }, []);
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+  // Perspective-warp a tiled texture into a quad using horizontal scanline strips.
+  // For each row, the strip spans from the left edge to the right edge of the quad.
+  // We compute the 2D affine transform that maps the texture strip to screen and
+  // use ctx.setTransform + ctx.drawImage — the same technique used by KILN.
+  const drawWarpedQuad = useCallback((
+    ctx: CanvasRenderingContext2D,
+    tex: HTMLCanvasElement,
+    quad: Quad,  // [TL, TR, BR, BL] in screen pixels, top-first
+  ) => {
+    const [tl, tr, br, bl] = quad;
+    const ROWS = 100;
+    const TW = tex.width;
+    const TH = tex.height;
 
-function HeartIcon({ filled }: { filled: boolean }) {
+    ctx.save();
+    // Clip strictly to the quad polygon
+    ctx.beginPath();
+    ctx.moveTo(tl[0], tl[1]);
+    ctx.lineTo(tr[0], tr[1]);
+    ctx.lineTo(br[0], br[1]);
+    ctx.lineTo(bl[0], bl[1]);
+    ctx.closePath();
+    ctx.clip();
+
+    for (let i = 0; i < ROWS; i++) {
+      const t0 = i       / ROWS;
+      const t1 = (i + 1) / ROWS;
+
+      // Lerp left and right edges of the quad at t0 (top of strip) and t1 (bottom)
+      const lx0 = tl[0] + (bl[0] - tl[0]) * t0;
+      const ly0 = tl[1] + (bl[1] - tl[1]) * t0;
+      const rx0 = tr[0] + (br[0] - tr[0]) * t0;
+      const ry0 = tr[1] + (br[1] - tr[1]) * t0;
+
+      const lx1 = tl[0] + (bl[0] - tl[0]) * t1;
+      const ly1 = tl[1] + (bl[1] - tl[1]) * t1;
+      const rx1 = tr[0] + (br[0] - tr[0]) * t1;
+      const ry1 = tr[1] + (br[1] - tr[1]) * t1;
+
+      // Source y-range in the texture (linear mapping — perspective comes from quad shape)
+      const srcY0 = t0 * TH;
+      const srcY1 = t1 * TH;
+      const srcH  = srcY1 - srcY0;
+      if (srcH < 0.5) continue;
+
+      // The affine transform maps texture-space [0..TW, srcY0..srcY1]
+      // to screen-space [lx0,ly0 → rx0,ry0 → lx1,ly1]:
+      //   x_screen = a * x_tex + c * y_tex + e
+      //   y_screen = b * x_tex + d * y_tex + f
+      //
+      // Constraints (3 points):
+      //   (0,     srcY0) → (lx0, ly0)   [top-left]
+      //   (TW,    srcY0) → (rx0, ry0)   [top-right]
+      //   (0,     srcY1) → (lx1, ly1)   [bottom-left]
+      //
+      // From these:
+      //   a*TW + e = rx0  →  a = (rx0 - lx0) / TW
+      //   b*TW + f = ry0  →  b = (ry0 - ly0) / TW
+      //   c*srcH = lx1 - lx0  →  c = (lx1 - lx0) / srcH
+      //   d*srcH = ly1 - ly0  →  d = (ly1 - ly0) / srcH
+      //   e = lx0 - c*srcY0
+      //   f = ly0 - d*srcY0
+
+      const a = (rx0 - lx0) / TW;
+      const b = (ry0 - ly0) / TW;
+      const c = (lx1 - lx0) / srcH;
+      const d = (ly1 - ly0) / srcH;
+      const e = lx0 - c * srcY0;
+      const f = ly0 - d * srcY0;
+
+      ctx.save();
+      ctx.setTransform(a, b, c, d, e, f);
+      // Draw just this horizontal strip from the texture
+      ctx.drawImage(tex, 0, srcY0, TW, srcH, 0, srcY0, TW, srcH);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }, []);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    const wrap   = wrapRef.current;
+    if (!canvas || !wrap || !roomImgRef.current) return;
+    const W = wrap.clientWidth;
+    const H = wrap.clientHeight;
+    if (W === 0 || H === 0) return;
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d")!;
+    ctx.clearRect(0, 0, W, H);
+
+    // Cover-fit dimensions (computed once, used for both photo and quad mapping)
+    const img = roomImgRef.current;
+    const iW  = img.naturalWidth  || W;
+    const iH  = img.naturalHeight || H;
+    const sc  = Math.max(W / iW, H / iH);
+    const dw  = iW * sc, dh = iH * sc;
+    const dx  = (W - dw) / 2, dy = (H - dh) / 2;
+
+    // Convert a scene quad (0–1 fractions) → canvas pixel coords
+    const toPixels = (q: Quad): Quad =>
+      q.map(([fx, fy]) => [dx + fx * dw, dy + fy * dh]) as Quad;
+
+    const gPx    = GROUT_PX[groutWidth];
+    const tilePx = TILE_PX[layout];
+
+    // ── Step 1: draw tiles FIRST (behind the photo) ──────────────────────────
+    // Wall tiles
+    if (wallApplied && wallTile && wallImgRef.current) {
+      const tex  = buildTileCanvas(wallImgRef.current, tilePx, tilePx, groutColor, gPx, layout);
+      const quad = toPixels(scene.wallQuad);
+      drawWarpedQuad(ctx, tex, quad);
+    }
+    // Floor tiles
+    if (floorApplied && floorTile && tileImgRef.current) {
+      const tex  = buildTileCanvas(tileImgRef.current, tilePx, tilePx, groutColor, gPx, layout);
+      const quad = toPixels(scene.floorQuad);
+      drawWarpedQuad(ctx, tex, quad);
+    }
+
+    // ── Step 2: draw room photo on top with multiply blend ───────────────────
+    // "multiply" darkens the tile wherever the photo is dark (furniture, shadows, walls)
+    // so furniture naturally appears to sit ON TOP of the tile texture.
+    // Where the photo is near-white (empty floor/wall) the tile shows through clearly.
+    if (wallApplied || floorApplied) {
+      ctx.globalCompositeOperation = "multiply";
+    }
+    ctx.drawImage(img, dx, dy, dw, dh);
+    ctx.globalCompositeOperation = "source-over"; // reset
+  }, [scene, floorTile, wallTile, floorApplied, wallApplied, layout, groutColor, groutWidth, buildTileCanvas, drawWarpedQuad]);
+
+  // Load room image
+  useEffect(() => {
+    const img   = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload  = () => { roomImgRef.current = img; draw(); };
+    img.onerror = () => { roomImgRef.current = null; };
+    img.src     = scene.url;
+  }, [scene.url, draw]);
+
+  // Load floor tile image
+  useEffect(() => {
+    if (!floorTile?.image) { tileImgRef.current = null; draw(); return; }
+    const img   = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload  = () => { tileImgRef.current = img; draw(); };
+    img.src     = floorTile.image;
+  }, [floorTile?.image, draw]);
+
+  // Load wall tile image
+  useEffect(() => {
+    if (!wallTile?.image) { wallImgRef.current = null; draw(); return; }
+    const img   = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload  = () => { wallImgRef.current = img; draw(); };
+    img.src     = wallTile.image;
+  }, [wallTile?.image, draw]);
+
+  // Redraw when grout/layout changes
+  useEffect(() => { draw(); }, [draw]);
+
+  // Resize observer
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+    const ro = new ResizeObserver(() => draw());
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, [draw]);
+
   return (
-    <svg className="w-4 h-4" fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-    </svg>
+    <div ref={wrapRef} className="relative w-full h-full">
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+
+      {/* Floor zone label */}
+      <div className="absolute z-10 pointer-events-none" style={{ ...scene.floorLabelPos, transform: "translateX(-50%)" }}>
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg select-none transition-colors ${
+          floorApplied && floorTile ? "bg-[#2563eb] text-white" : "bg-white/85 text-gray-700 backdrop-blur-sm"
+        }`}>
+          <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v16.5h16.5"/></svg>
+          {floorApplied && floorTile ? floorTile.name : "Floor"}
+          {floorApplied && (
+            <button className="pointer-events-auto ml-0.5 opacity-70 hover:opacity-100" onClick={onFloorClear}>×</button>
+          )}
+        </span>
+      </div>
+
+      {/* Wall zone label */}
+      <div className="absolute z-10 pointer-events-none" style={{ ...scene.wallLabelPos, transform: "translateX(-50%)" }}>
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg select-none transition-colors ${
+          wallApplied && wallTile ? "bg-[#2563eb] text-white" : "bg-white/85 text-gray-700 backdrop-blur-sm"
+        }`}>
+          <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><rect x="3" y="3" width="18" height="18" rx="1"/></svg>
+          {wallApplied && wallTile ? wallTile.name : "Wall"}
+          {wallApplied && (
+            <button className="pointer-events-auto ml-0.5 opacity-70 hover:opacity-100" onClick={onWallClear}>×</button>
+          )}
+        </span>
+      </div>
+
+      {/* Empty hint */}
+      {!floorApplied && !wallApplied && (
+        <div className="absolute inset-0 flex items-end justify-center pb-20 pointer-events-none z-10">
+          <div className="bg-black/55 backdrop-blur-sm text-white text-sm px-5 py-3 text-center rounded-full shadow-xl">
+            <span className="font-semibold">Tap a tile</span>
+            <span className="text-white/70 ml-1.5">to lay it on the {surface}</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-// ─── Main page ───────────────────────────────────────────────────────────────
-
+// ─── Main page ────────────────────────────────────────────────────────────────
 export default function VisualizerPage() {
   const searchParams = useSearchParams();
 
-  // ── Catalog state ──
-  const [products, setProducts] = useState<Product[]>([]);
-  const [mounted, setMounted] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState<FilterCategory>(
-    (searchParams.get("category") as FilterCategory) ?? "all"
-  );
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [favorites, setFavorites] = useState<number[]>([]);
+  // catalog
+  const [products,     setProducts]     = useState<Product[]>([]);
+  const [mounted,      setMounted]      = useState(false);
+  const [search,       setSearch]       = useState("");
+  const [filterCat,    setFilterCat]    = useState<FilterCat>("all");
+  const [favorites,    setFavorites]    = useState<number[]>([]);
+  const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
-  // ── Visualizer state ──
-  const [selectedTile, setSelectedTile] = useState<Product | null>(null);
-  const [selectedSurface, setSelectedSurface] = useState<Surface>("wall");
-  const [wallTile, setWallTile] = useState<Product | null>(null);
-  const [floorTile, setFloorTile] = useState<Product | null>(null);
-  const [groutColor, setGroutColor] = useState("#9ca3af");
-  const [groutPreset, setGroutPreset] = useState<string | null>("#9ca3af");
-  const [groutWidth, setGroutWidth] = useState<GroutWidth>("medium");
-  const [tileLayout, setTileLayout] = useState<TileLayout>("straight");
-  const [compareMode, setCompareMode] = useState(false);
-  const [comparePosition, setComparePosition] = useState(50);
-  const [isApplied, setIsApplied] = useState(false);
+  // visualizer
+  const [surface,      setSurface]      = useState<Surface>("floor");
+  const [wallTile,     setWallTile]     = useState<Product | null>(null);
+  const [floorTile,    setFloorTile]    = useState<Product | null>(null);
+  const [wallApplied,  setWallApplied]  = useState(false);
+  const [floorApplied, setFloorApplied] = useState(false);
+  const [scene,        setScene]        = useState<Scene>(ROOM_SCENES[0]);
+  const [groutColor,   setGroutColor]   = useState("#9ca3af");
+  const [groutWidth,   setGroutWidth]   = useState<GroutWidth>("medium");
+  const [layout,       setLayout]       = useState<TileLayout>("straight");
 
-  // ── Generation overlay ──
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationStep, setGenerationStep] = useState("");
-  const [generationProgress, setGenerationProgress] = useState(0);
+  // toolbar panels
+  const [groutOpen,    setGroutOpen]    = useState(false);
+  const [layoutOpen,   setLayoutOpen]   = useState(false);
+  const [appliedOpen,  setAppliedOpen]  = useState(false);
+  const [sceneOpen,    setSceneOpen]    = useState(false);
 
-  // ── Mobile drawer ──
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [controlsOpen, setControlsOpen] = useState(false);
+  // texture context sync
+  const { setTexture, setWallTexture, setWidth, setHeight, setDepth } = useTexture();
+  useEffect(() => {
+    if (floorApplied && floorTile) {
+      const m = floorTile.sizes.match(/(\d+)[×x](\d+)/i);
+      setTexture(floorTile.image);
+      setWidth(m  ? parseInt(m[1]) / 10 : 60);
+      setHeight(m ? parseInt(m[2]) / 10 : 60);
+      setDepth(1);
+    } else { setTexture(null); }
+  }, [floorApplied, floorTile, setTexture, setWidth, setHeight, setDepth]);
 
-  // ── Toast ──
-  const [toast, setToast] = useState<string | null>(null);
+  useEffect(() => {
+    setWallTexture(wallApplied && wallTile ? wallTile.image : null);
+  }, [wallApplied, wallTile, setWallTexture]);
 
-  const compareRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-
-  // ── Load products ──
+  // load products
   useEffect(() => {
     setMounted(true);
-
-    const surfaceParam    = searchParams.get("surface") as Surface | null;
-    const collectionParam = searchParams.get("collection");
-    const tileParam       = searchParams.get("tile");
-    const autoApply       = searchParams.get("autoApply") === "1";
-
-    if (surfaceParam === "wall" || surfaceParam === "floor") {
-      setSelectedSurface(surfaceParam);
-    }
-
-    // Load products first, then apply URL params
+    const sp = searchParams.get("surface") as Surface | null;
+    if (sp === "wall" || sp === "floor") setSurface(sp);
     api.getProducts().then((all) => {
       setProducts(all);
-
-      if (collectionParam) {
-        api.getCollections().then((cols) => {
-          const col = cols.find((c) => c.name === collectionParam);
-          if (col && col.tileIds.length > 0) {
-            const colTiles = all.filter((p) => col.tileIds.includes(p.id));
-            if (colTiles.length > 0) {
-              const first = colTiles[0];
-              setSelectedTile(first);
-              const surf: Surface =
-                surfaceParam ??
-                (first.category === "wall" || first.category === "special" ? "wall" : "floor");
-              setSelectedSurface(surf);
-              if (surf === "wall") setWallTile(first);
-              else setFloorTile(first);
-            }
-          }
-        }).catch(console.error);
-      } else if (tileParam) {
-        const found = all.find((p) => p.id === Number(tileParam));
-        if (found) {
-          setSelectedTile(found);
-          const surf: Surface =
-            surfaceParam ??
-            (found.category === "wall" || found.category === "special" ? "wall" : "floor");
-          setSelectedSurface(surf);
-          if (autoApply) {
-            if (surf === "wall") setWallTile(found);
-            else setFloorTile(found);
-          }
+      const tp   = searchParams.get("tile");
+      const auto = searchParams.get("autoApply") === "1";
+      if (tp) {
+        const found = all.find((p) => p.id === Number(tp));
+        if (found && auto) {
+          const s: Surface = sp ?? (found.category === "wall" || found.category === "special" ? "wall" : "floor");
+          if (s === "wall") { setWallTile(found); setWallApplied(true); }
+          else              { setFloorTile(found); setFloorApplied(true); }
         }
       }
     }).catch(console.error);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Filtered catalog ──
-  const filteredProducts = products.filter((p) => {
-    const matchCat = filterCategory === "all" || p.category === filterCategory;
-    const matchSearch =
-      !searchQuery ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCat && matchSearch;
+  const filtered = products.filter((p) => {
+    const mc = filterCat === "all" || p.category === filterCat;
+    const ms = !search || p.name.toLowerCase().includes(search.toLowerCase());
+    return mc && ms;
   });
 
-  // ── Visualize generation sequence ──
-  const handleGenerate = useCallback(async () => {
-    if (!wallTile && !floorTile) {
-      showToast("Select a tile first, then click Visualize on a tile card.");
-      return;
-    }
-    setIsGenerating(true);
-    setGenerationProgress(0);
-
-    const total = GENERATION_STEPS.reduce((s, x) => s + x.duration, 0);
-    let elapsed = 0;
-
-    for (let i = 0; i < GENERATION_STEPS.length; i++) {
-      const step = GENERATION_STEPS[i];
-      setGenerationStep(step.label);
-      await delay(step.duration);
-      elapsed += step.duration;
-      setGenerationProgress(Math.round((elapsed / total) * 100));
-    }
-
-    setIsGenerating(false);
-    setIsApplied(true);
-  }, [wallTile, floorTile]);
-
-  // ── Select tile & apply to surface ──
-  const handleSelectTile = (tile: Product) => {
-    setSelectedTile(tile);
-  };
-
-  const handleVisualizeTile = (tile: Product) => {
-    setSelectedTile(tile);
-    if (selectedSurface === "wall") {
-      setWallTile(tile);
-    } else {
-      setFloorTile(tile);
-    }
-    setIsApplied(false);
+  const applyTile = (tile: Product) => {
+    if (surface === "wall") { setWallTile(tile); setWallApplied(true); }
+    else                    { setFloorTile(tile); setFloorApplied(true); }
     setSidebarOpen(false);
   };
 
-  // ── Favorites ──
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
+  const reset = () => {
+    setWallTile(null); setFloorTile(null);
+    setWallApplied(false); setFloorApplied(false);
   };
 
-  // ── Reset ──
-  const handleReset = () => {
-    setWallTile(null);
-    setFloorTile(null);
-    setSelectedTile(null);
-    setIsApplied(false);
-    setCompareMode(false);
-  };
+  const activeTile = surface === "floor" ? (floorApplied ? floorTile : null) : (wallApplied ? wallTile : null);
 
-  // ── Toast helper ──
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  // ── Compare drag ──
-  const handleCompareDrag = useCallback(
-    (e: React.MouseEvent | React.TouchEvent) => {
-      if (!compareRef.current) return;
-      const rect = compareRef.current.getBoundingClientRect();
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const pos = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-      setComparePosition(pos);
-    },
-    []
+  if (!mounted) return (
+    <div className="min-h-screen bg-[#0a0c12] flex items-center justify-center">
+      <div className="text-white/50 text-sm animate-pulse">Loading visualizer…</div>
+    </div>
   );
 
-  const collectionName = searchParams.get("collection");
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-[#0a0c12] flex items-center justify-center">
-        <div className="text-white text-sm opacity-60">Loading visualizer…</div>
-      </div>
-    );
-  }
-
-  // ── Active tile for canvas ──
-  const canvasWallTile = isApplied ? wallTile : null;
-  const canvasFloorTile = isApplied ? floorTile : null;
-
   return (
-    <div className="min-h-screen bg-[#0a0c12] flex flex-col overflow-hidden">
+    <div className="h-screen bg-white flex overflow-hidden font-sans">
 
-      {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
-      <TopBar
-        wallTile={wallTile}
-        floorTile={floorTile}
-        collectionName={collectionName}
-        onReset={handleReset}
-        onDownload={() => showToast("Download feature coming soon.")}
-        onToggleSidebar={() => setSidebarOpen((v) => !v)}
-        onToggleControls={() => setControlsOpen((v) => !v)}
-      />
+      {/* ══════════ LEFT PANEL ══════════ */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
 
-      {/* ── MAIN LAYOUT ─────────────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden">
-
-        {/* ── LEFT SIDEBAR — tile catalog ─────────────────────────────── */}
-        <aside
-          className={`
-            fixed md:static inset-y-0 left-0 z-40 
-            w-80 bg-[#f8f7f4] flex flex-col border-r border-gray-200
-            transform transition-transform duration-300
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-            top-[56px]
-          `}
-        >
-          {/* Sidebar header */}
-          <div className="p-4 border-b border-gray-200 space-y-3 bg-white">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-[#0f1117] text-sm tracking-wide uppercase">Tile Catalog</h2>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-1.5 transition-colors ${viewMode === "grid" ? "text-[#c9a84c]" : "text-gray-400 hover:text-gray-600"}`}
-                  title="Grid view"
-                >
-                  <GridIcon />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-1.5 transition-colors ${viewMode === "list" ? "text-[#c9a84c]" : "text-gray-400 hover:text-gray-600"}`}
-                  title="List view"
-                >
-                  <ListIcon />
-                </button>
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-40
+        w-[280px] bg-white flex flex-col border-r border-gray-100
+        transition-transform duration-300
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+      `}>
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="relative w-7 h-7 flex-shrink-0">
+                <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
               </div>
-            </div>
-
-            {/* Search */}
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tiles…"
-                className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 bg-[#f8f7f4] focus:outline-none focus:border-[#c9a84c] placeholder-gray-400"
-              />
-              <svg className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              <span className="font-bold text-[#0f1117] text-sm tracking-wide">MCC Tiles</span>
+            </Link>
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-400 hover:text-gray-700 p-1">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-            </div>
-
-            {/* Category pills */}
-            <div className="flex flex-wrap gap-1">
-              {CATEGORY_FILTERS.map((f) => (
-                <button
-                  key={f.key}
-                  onClick={() => setFilterCategory(f.key)}
-                  className={`px-3 py-1 text-[10px] font-bold tracking-wider uppercase transition-all ${
-                    filterCategory === f.key
-                      ? "bg-[#0f1117] text-white"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+            </button>
           </div>
 
-          {/* Tile list */}
-          <div className="flex-1 overflow-y-auto p-3">
-            {filteredProducts.length === 0 ? (
-              <p className="text-center text-gray-400 text-sm mt-10">No tiles found.</p>
-            ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-2 gap-2">
-                {filteredProducts.map((tile) => (
-                  <TileCardGrid
-                    key={tile.id}
-                    tile={tile}
-                    isSelected={selectedTile?.id === tile.id}
-                    isFavorite={favorites.includes(tile.id)}
-                    onSelect={() => handleSelectTile(tile)}
-                    onVisualize={() => handleVisualizeTile(tile)}
-                    onToggleFavorite={() => toggleFavorite(tile.id)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {filteredProducts.map((tile) => (
-                  <TileCardList
-                    key={tile.id}
-                    tile={tile}
-                    isSelected={selectedTile?.id === tile.id}
-                    isFavorite={favorites.includes(tile.id)}
-                    onSelect={() => handleSelectTile(tile)}
-                    onVisualize={() => handleVisualizeTile(tile)}
-                    onToggleFavorite={() => toggleFavorite(tile.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Applying to surface badge */}
-          <div className="p-3 border-t border-gray-200 bg-white">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Applying to:</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setSelectedSurface("wall")}
-                className={`flex-1 py-1.5 text-xs font-bold tracking-wider uppercase transition-all ${
-                  selectedSurface === "wall" ? "bg-[#c9a84c] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                Wall
-              </button>
-              <button
-                onClick={() => setSelectedSurface("floor")}
-                className={`flex-1 py-1.5 text-xs font-bold tracking-wider uppercase transition-all ${
-                  selectedSurface === "floor" ? "bg-[#c9a84c] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                Floor
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* ── CENTER — Room canvas ─────────────────────────────────────── */}
-        <main className="flex-1 flex flex-col items-center justify-center bg-[#0a0c12] p-4 md:p-8 overflow-auto">
-          <div className="w-full max-w-3xl">
-            {/* Canvas */}
-            <div
-              ref={compareRef}
-              className="relative overflow-hidden bg-gray-900 shadow-2xl"
-              style={{ aspectRatio: "4/3" }}
-              onMouseMove={compareMode ? handleCompareDrag : undefined}
-              onTouchMove={compareMode ? handleCompareDrag : undefined}
-            >
-              {/* Room image */}
-              <Image
-                src={ROOM_IMAGE}
-                alt="Room"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 800px"
-              />
-
-              {/* Wall tile overlay */}
-              {canvasWallTile && (
-                <WallOverlay
-                  tile={canvasWallTile}
-                  groutColor={groutColor}
-                  groutWidth={groutWidth}
-                  tileLayout={tileLayout}
-                />
-              )}
-
-              {/* Floor tile overlay */}
-              {canvasFloorTile && (
-                <FloorOverlay
-                  tile={canvasFloorTile}
-                  groutColor={groutColor}
-                  groutWidth={groutWidth}
-                  tileLayout={tileLayout}
-                />
-              )}
-
-              {/* Compare slider */}
-              {compareMode && (
-                <CompareSlider position={comparePosition} onDrag={handleCompareDrag} />
-              )}
-
-              {/* No tile selected hint */}
-              {!isApplied && !isGenerating && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-black/60 text-white text-sm px-5 py-3 text-center backdrop-blur-sm">
-                    <p className="font-semibold">Select a tile &amp; click "Visualize"</p>
-                    <p className="text-xs text-gray-300 mt-1">Or click "Generate Look" below</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Generate button */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating || (!wallTile && !floorTile)}
-                className="flex-1 w-full bg-[#c9a84c] hover:bg-[#b8943e] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3.5 tracking-widest uppercase text-sm transition-colors flex items-center justify-center gap-2"
-              >
-                {isGenerating ? (
-                  <>
-                    <Spinner />
-                    Generating…
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    Generate Look
-                  </>
-                )}
-              </button>
-              <button
-                onClick={handleReset}
-                className="sm:w-auto w-full border border-gray-600 text-gray-300 hover:border-gray-400 hover:text-white font-bold py-3.5 px-6 tracking-widest uppercase text-sm transition-colors"
-              >
-                Reset
-              </button>
-            </div>
-
-            {/* Applied tiles summary */}
-            {(wallTile || floorTile) && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {wallTile && (
-                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 text-white text-xs">
-                    <span className="text-[#c9a84c] font-bold uppercase tracking-wider">Wall:</span>
-                    <span>{wallTile.name}</span>
-                    <button onClick={() => { setWallTile(null); setIsApplied(false); }} className="text-gray-400 hover:text-white ml-1">×</button>
-                  </div>
-                )}
-                {floorTile && (
-                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 text-white text-xs">
-                    <span className="text-[#c9a84c] font-bold uppercase tracking-wider">Floor:</span>
-                    <span>{floorTile.name}</span>
-                    <button onClick={() => { setFloorTile(null); setIsApplied(false); }} className="text-gray-400 hover:text-white ml-1">×</button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </main>
-
-        {/* ── RIGHT CONTROLS ───────────────────────────────────────────── */}
-        <aside
-          className={`
-            fixed md:static inset-y-0 right-0 z-40
-            w-72 bg-white flex flex-col border-l border-gray-200
-            transform transition-transform duration-300
-            ${controlsOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
-            top-[56px]
-          `}
-        >
-          <div className="flex-1 overflow-y-auto">
-            {/* Surface selector */}
-            <ControlSection title="Surface">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedSurface("wall")}
-                  className={`flex-1 py-2.5 text-xs font-bold tracking-wider uppercase border transition-all ${
-                    selectedSurface === "wall"
-                      ? "bg-[#0f1117] text-white border-[#0f1117]"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                  }`}
-                >
-                  Wall
-                </button>
-                <button
-                  onClick={() => setSelectedSurface("floor")}
-                  className={`flex-1 py-2.5 text-xs font-bold tracking-wider uppercase border transition-all ${
-                    selectedSurface === "floor"
-                      ? "bg-[#0f1117] text-white border-[#0f1117]"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                  }`}
-                >
-                  Floor
-                </button>
-              </div>
-              <div className="mt-2 space-y-1">
-                <p className="text-xs text-gray-500">
-                  Wall: <span className="font-semibold text-[#0f1117]">{wallTile?.name ?? "—"}</span>
-                </p>
-                <p className="text-xs text-gray-500">
-                  Floor: <span className="font-semibold text-[#0f1117]">{floorTile?.name ?? "—"}</span>
-                </p>
-              </div>
-            </ControlSection>
-
-            {/* Grout controls */}
-            <ControlSection title="Grout Color">
-              <div className="flex flex-wrap gap-2 mb-3">
-                {GROUT_PRESETS.map((p) => (
-                  <button
-                    key={p.value}
-                    onClick={() => { setGroutColor(p.value); setGroutPreset(p.value); }}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border transition-all ${
-                      groutPreset === p.value ? "border-[#c9a84c] bg-[#c9a84c]/10" : "border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
-                    <span className="w-3 h-3 rounded-full border border-gray-300" style={{ background: p.value }} />
-                    {p.label}
-                  </button>
-                ))}
-                <label className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border cursor-pointer transition-all ${
-                  groutPreset === "custom" ? "border-[#c9a84c] bg-[#c9a84c]/10" : "border-gray-200 hover:border-gray-400"
+          {/* Surface toggle */}
+          <div className="flex gap-1.5 mb-3">
+            {(["floor", "wall"] as Surface[]).map((s) => (
+              <button key={s} onClick={() => setSurface(s)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
+                  surface === s ? "bg-[#2563eb] text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}>
-                  <input
-                    type="color"
-                    value={groutColor}
-                    onChange={(e) => { setGroutColor(e.target.value); setGroutPreset("custom"); }}
-                    className="w-3 h-3 p-0 border-0 bg-transparent cursor-pointer"
-                  />
-                  Custom
-                </label>
+                {s === "floor"
+                  ? <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v16.5h16.5"/></svg>
+                  : <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><rect x="3" y="3" width="18" height="18" rx="1"/></svg>
+                }
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* Search */}
+          <div className="relative">
+            <svg className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+            </svg>
+            <input type="text" placeholder="Search tiles…" value={search} onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2563eb] placeholder-gray-400" />
+          </div>
+
+          {/* Category pills */}
+          <div className="flex flex-wrap gap-1 mt-2.5">
+            {(["all","floor","wall","outdoor","special"] as FilterCat[]).map((c) => (
+              <button key={c} onClick={() => setFilterCat(c)}
+                className={`px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full transition-all ${
+                  filterCat === c ? "bg-[#0f1117] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }`}>
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tile list */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.length === 0 && <p className="text-center text-gray-400 text-xs py-10">No tiles found.</p>}
+          {filtered.map((tile) => {
+            const isActive = (surface === "floor" && floorTile?.id === tile.id && floorApplied)
+                          || (surface === "wall"  && wallTile?.id  === tile.id && wallApplied);
+            return (
+              <button key={tile.id} onClick={() => applyTile(tile)}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-50 hover:bg-blue-50 transition-colors group ${
+                  isActive ? "bg-blue-50 border-l-2 border-l-[#2563eb]" : ""
+                }`}>
+                <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded border border-gray-100">
+                  <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="48px" unoptimized={tile.image.startsWith("data:") || tile.image.startsWith("/uploads/")} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-xs font-bold truncate ${isActive ? "text-[#2563eb]" : "text-[#0f1117] group-hover:text-[#2563eb]"}`}>{tile.name}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{tile.categoryLabel}</p>
+                  <p className="text-[10px] text-gray-400">{tile.sizes}</p>
+                  {tile.badge && (
+                    <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm ${
+                      tile.badge === "New" ? "bg-emerald-100 text-emerald-700"
+                      : tile.badge === "Premium" ? "bg-amber-100 text-amber-700"
+                      : "bg-blue-100 text-blue-700"}`}>
+                      {tile.badge}
+                    </span>
+                  )}
+                </div>
+                {isActive && <svg className="w-4 h-4 text-[#2563eb] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Applied summary */}
+        {(wallApplied || floorApplied) && (
+          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 space-y-1.5">
+            {floorApplied && floorTile && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-2 h-2 rounded-full bg-[#2563eb] flex-shrink-0" />
+                <span className="font-semibold text-gray-600">Floor:</span>
+                <span className="truncate text-gray-800">{floorTile.name}</span>
+                <button onClick={() => { setFloorTile(null); setFloorApplied(false); }} className="ml-auto text-gray-400 hover:text-red-500">×</button>
               </div>
+            )}
+            {wallApplied && wallTile && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-2 h-2 rounded-full bg-[#2563eb] flex-shrink-0" />
+                <span className="font-semibold text-gray-600">Wall:</span>
+                <span className="truncate text-gray-800">{wallTile.name}</span>
+                <button onClick={() => { setWallTile(null); setWallApplied(false); }} className="ml-auto text-gray-400 hover:text-red-500">×</button>
+              </div>
+            )}
+          </div>
+        )}
+      </aside>
+
+      {/* ══════════ CENTER — CANVAS ROOM ══════════ */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-[#f0ede8]">
+
+        {/* Mobile header */}
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 flex-shrink-0">
+          <button onClick={() => setSidebarOpen(true)} className="text-gray-600 hover:text-gray-900">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
+          <span className="text-sm font-bold text-[#0f1117]">Tile Visualizer</span>
+        </div>
+
+        {/* Canvas room — fills all remaining space */}
+        <div className="flex-1 relative overflow-hidden">
+          <RoomCanvas
+            scene={scene}
+            floorTile={floorTile}
+            wallTile={wallTile}
+            floorApplied={floorApplied}
+            wallApplied={wallApplied}
+            layout={layout}
+            groutColor={groutColor}
+            groutWidth={groutWidth}
+            surface={surface}
+            onFloorClear={() => { setFloorTile(null); setFloorApplied(false); }}
+            onWallClear={() => { setWallTile(null); setWallApplied(false); }}
+          />
+        </div>
+
+        {/* ── KILN-style "Now viewing" strip ─────────────────────────── */}
+        <div className="flex-shrink-0 bg-white border-t border-gray-100 px-5 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            {activeTile ? (
+              <>
+                <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
+                  <Image src={activeTile.image} alt={activeTile.name} fill className="object-cover" sizes="40px" unoptimized={activeTile.image.startsWith("data:") || activeTile.image.startsWith("/uploads/")} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Now viewing</p>
+                  <p className="text-sm font-bold text-[#0f1117] truncate">{activeTile.name}</p>
+                  <p className="text-xs text-gray-400">{activeTile.sizes} · {activeTile.categoryLabel}</p>
+                </div>
+              </>
+            ) : (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2">Width</p>
-                <div className="flex gap-2">
-                  {(["small", "medium", "large"] as GroutWidth[]).map((w) => (
-                    <button
-                      key={w}
-                      onClick={() => setGroutWidth(w)}
-                      className={`flex-1 py-1.5 text-xs font-bold capitalize tracking-wider border transition-all ${
-                        groutWidth === w
-                          ? "bg-[#0f1117] text-white border-[#0f1117]"
-                          : "bg-white text-gray-500 border-gray-200 hover:border-gray-400"
-                      }`}
-                    >
-                      {w}
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Now viewing</p>
+                <p className="text-sm text-gray-400 italic">—</p>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom-right toolbar */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+
+            {/* Scene picker */}
+            <div className="relative">
+              <button onClick={() => { setSceneOpen(v => !v); setGroutOpen(false); setLayoutOpen(false); setAppliedOpen(false); }}
+                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                {scene.label}
+              </button>
+              {sceneOpen && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl overflow-hidden flex border border-gray-100">
+                  {ROOM_SCENES.map((r) => (
+                    <button key={r.id} onClick={() => { setScene(r); setSceneOpen(false); }}
+                      className={`relative flex-shrink-0 overflow-hidden transition-all ${scene.id === r.id ? "ring-2 ring-[#2563eb]" : "opacity-60 hover:opacity-100"}`}
+                      style={{ width: 64, height: 48 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={r.url} alt={r.label} className="w-full h-full object-cover" />
+                      <div className="absolute inset-x-0 bottom-0 bg-black/60 py-0.5">
+                        <span className="block text-white text-[7px] font-bold text-center uppercase tracking-wide">{r.label}</span>
+                      </div>
                     </button>
                   ))}
                 </div>
-              </div>
-            </ControlSection>
-
-            {/* Layout controls */}
-            <ControlSection title="Tile Layout">
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { key: "straight", label: "Straight" },
-                  { key: "brick", label: "Brick / Offset" },
-                  { key: "herringbone", label: "Herringbone" },
-                  { key: "stack", label: "Stack" },
-                ] as { key: TileLayout; label: string }[]).map((opt) => (
-                  <button
-                    key={opt.key}
-                    onClick={() => setTileLayout(opt.key)}
-                    className={`py-2 text-xs font-bold tracking-wider border transition-all ${
-                      tileLayout === opt.key
-                        ? "bg-[#0f1117] text-white border-[#0f1117]"
-                        : "bg-white text-gray-500 border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </ControlSection>
-
-            {/* Compare toggle */}
-            <ControlSection title="Before / After">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Compare slider</span>
-                <button
-                  onClick={() => setCompareMode((v) => !v)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${compareMode ? "bg-[#c9a84c]" : "bg-gray-200"}`}
-                >
-                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${compareMode ? "translate-x-4" : "translate-x-0.5"}`} />
-                </button>
-              </div>
-              {compareMode && (
-                <p className="text-xs text-gray-500 mt-2">Drag the slider on the room image to compare.</p>
               )}
-            </ControlSection>
+            </div>
 
-            {/* Actions */}
-            <ControlSection title="Actions">
-              <div className="space-y-2">
-                <button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || (!wallTile && !floorTile)}
-                  className="w-full bg-[#c9a84c] hover:bg-[#b8943e] disabled:opacity-40 text-white font-bold py-2.5 tracking-widest uppercase text-xs transition-colors"
-                >
-                  Generate Look
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="w-full border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 font-bold py-2.5 tracking-widest uppercase text-xs transition-colors"
-                >
-                  Reset All
-                </button>
-                <button
-                  onClick={() => showToast("Download feature coming soon.")}
-                  className="w-full border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 font-bold py-2.5 tracking-widest uppercase text-xs transition-colors"
-                >
-                  Download
-                </button>
-                <Link
-                  href="/"
-                  className="w-full flex items-center justify-center border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 font-bold py-2.5 tracking-widest uppercase text-xs transition-colors"
-                >
-                  ← Back to Site
-                </Link>
-              </div>
-            </ControlSection>
+            {/* Reset */}
+            <button onClick={reset}
+              className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+              Reset
+            </button>
+
+            {/* Grout */}
+            <div className="relative">
+              <button onClick={() => { setGroutOpen(v => !v); setLayoutOpen(false); setAppliedOpen(false); setSceneOpen(false); }}
+                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all">
+                <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex-shrink-0" style={{ background: groutColor }} />
+                Grout
+              </button>
+              {groutOpen && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl p-3 min-w-[180px] border border-gray-100">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Grout Color</p>
+                  <div className="flex gap-2 mb-3">
+                    {GROUT_SWATCHES.map((s) => (
+                      <button key={s.value} onClick={() => setGroutColor(s.value)} title={s.label}
+                        className={`w-6 h-6 rounded-full border-2 transition-all ${groutColor === s.value ? "border-[#2563eb] scale-110" : "border-gray-200 hover:border-gray-400"}`}
+                        style={{ background: s.value }} />
+                    ))}
+                    <label className="w-6 h-6 rounded-full border-2 border-gray-200 overflow-hidden cursor-pointer hover:border-gray-400 relative">
+                      <input type="color" value={groutColor} onChange={(e) => setGroutColor(e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
+                      <div className="w-full h-full" style={{ background: groutColor }} />
+                    </label>
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Grout Width</p>
+                  <div className="flex gap-1.5">
+                    {(["small","medium","large"] as GroutWidth[]).map((w) => (
+                      <button key={w} onClick={() => setGroutWidth(w)}
+                        className={`flex-1 py-1 text-[10px] font-bold uppercase rounded transition-all ${groutWidth === w ? "bg-[#2563eb] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
+                        {w}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Layout */}
+            <div className="relative">
+              <button onClick={() => { setLayoutOpen(v => !v); setGroutOpen(false); setAppliedOpen(false); setSceneOpen(false); }}
+                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg>
+                Layout
+              </button>
+              {layoutOpen && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl p-3 min-w-[160px] border border-gray-100">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Tile Layout</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {([
+                      { key: "straight",    label: "Straight" },
+                      { key: "brick",       label: "Brick" },
+                      { key: "herringbone", label: "Herringbone" },
+                      { key: "stack",       label: "Stack" },
+                    ] as { key: TileLayout; label: string }[]).map((opt) => (
+                      <button key={opt.key} onClick={() => { setLayout(opt.key); setLayoutOpen(false); }}
+                        className={`py-1.5 text-[10px] font-bold uppercase rounded transition-all ${layout === opt.key ? "bg-[#2563eb] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Applied products */}
+            <div className="relative">
+              <button onClick={() => { setAppliedOpen(v => !v); setGroutOpen(false); setLayoutOpen(false); setSceneOpen(false); }}
+                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>
+                Applied
+                {(floorApplied || wallApplied) && (
+                  <span className="w-4 h-4 rounded-full bg-[#2563eb] text-white text-[9px] font-bold flex items-center justify-center">
+                    {(floorApplied ? 1 : 0) + (wallApplied ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+              {appliedOpen && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl p-3 min-w-[220px] border border-gray-100 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Applied Products</p>
+                  {!floorApplied && !wallApplied && <p className="text-xs text-gray-400 italic">No tiles applied yet</p>}
+                  {floorApplied && floorTile && (
+                    <div className="flex items-center gap-2">
+                      <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
+                        <Image src={floorTile.image} alt={floorTile.name} fill className="object-cover" sizes="40px" unoptimized={floorTile.image.startsWith("data:") || floorTile.image.startsWith("/uploads/")} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-gray-800 truncate">{floorTile.name}</p>
+                        <p className="text-[10px] text-gray-400">Floor · {floorTile.sizes}</p>
+                      </div>
+                      <button onClick={() => { setFloorTile(null); setFloorApplied(false); }} className="text-gray-300 hover:text-red-500 text-sm">×</button>
+                    </div>
+                  )}
+                  {wallApplied && wallTile && (
+                    <div className="flex items-center gap-2">
+                      <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
+                        <Image src={wallTile.image} alt={wallTile.name} fill className="object-cover" sizes="40px" unoptimized={wallTile.image.startsWith("data:") || wallTile.image.startsWith("/uploads/")} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-gray-800 truncate">{wallTile.name}</p>
+                        <p className="text-[10px] text-gray-400">Wall · {wallTile.sizes}</p>
+                      </div>
+                      <button onClick={() => { setWallTile(null); setWallApplied(false); }} className="text-gray-300 hover:text-red-500 text-sm">×</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </aside>
-      </div>
-
-      {/* ── MOBILE bottom buttons ───────────────────────────────────────── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0c12] border-t border-gray-800 flex z-30">
-        <button
-          onClick={() => { setSidebarOpen((v) => !v); setControlsOpen(false); }}
-          className="flex-1 py-3 text-[10px] font-bold tracking-widest uppercase text-gray-300 hover:text-white transition-colors flex flex-col items-center gap-1"
-        >
-          <GridIcon />
-          Catalog
-        </button>
-        <button
-          onClick={handleGenerate}
-          disabled={isGenerating || (!wallTile && !floorTile)}
-          className="flex-1 py-3 text-[10px] font-bold tracking-widest uppercase bg-[#c9a84c] text-white disabled:opacity-40"
-        >
-          Visualize
-        </button>
-        <button
-          onClick={() => { setControlsOpen((v) => !v); setSidebarOpen(false); }}
-          className="flex-1 py-3 text-[10px] font-bold tracking-widest uppercase text-gray-300 hover:text-white transition-colors flex flex-col items-center gap-1"
-        >
-          <SettingsIcon />
-          Controls
-        </button>
-      </div>
-
-      {/* ── GENERATION OVERLAY ────────────────────────────────────────── */}
-      {isGenerating && (
-        <GenerationOverlay step={generationStep} progress={generationProgress} />
-      )}
-
-      {/* ── TOAST ────────────────────────────────────────────────────── */}
-      {toast && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-[#0f1117] text-white text-sm px-5 py-3 shadow-2xl z-50 flex items-center gap-2 animate-fade-up">
-          <svg className="w-4 h-4 text-[#c9a84c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {toast}
         </div>
-      )}
-
-      {/* ── Sidebar backdrop (mobile) ─────────────────────────────────── */}
-      {(sidebarOpen || controlsOpen) && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-30 top-[56px]"
-          onClick={() => { setSidebarOpen(false); setControlsOpen(false); }}
-        />
-      )}
+      </main>
     </div>
-  );
-}
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function TopBar({
-  wallTile,
-  floorTile,
-  collectionName,
-  onReset,
-  onDownload,
-  onToggleSidebar,
-  onToggleControls,
-}: {
-  wallTile: Product | null;
-  floorTile: Product | null;
-  collectionName: string | null;
-  onReset: () => void;
-  onDownload: () => void;
-  onToggleSidebar: () => void;
-  onToggleControls: () => void;
-}) {
-  return (
-    <header className="h-14 bg-[#0a0c12] border-b border-gray-800 flex items-center px-4 gap-4 shrink-0 z-50 relative">
-      {/* Mobile catalog toggle */}
-      <button onClick={onToggleSidebar} className="md:hidden text-gray-400 hover:text-white p-1">
-        <GridIcon />
-      </button>
-
-      {/* Logo */}
-      <Link href="/" className="shrink-0">
-        <div className="w-7 h-7 relative">
-          <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
-        </div>
-      </Link>
-
-      <div className="hidden sm:block w-px h-5 bg-gray-700" />
-
-      <div className="hidden sm:flex flex-col leading-none">
-        <h1 className="text-white font-bold text-sm tracking-wider uppercase">Tile Visualizer</h1>
-        {collectionName && (
-          <span className="text-[#c9a84c] text-[10px] tracking-widest uppercase font-semibold mt-0.5">
-            {collectionName}
-          </span>
-        )}
-      </div>
-
-      <div className="flex-1" />
-
-      {/* Applied tiles mini summary */}
-      <div className="hidden lg:flex items-center gap-4 text-xs text-gray-400">
-        {wallTile && (
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-            Wall: <span className="text-[#c9a84c] font-semibold">{wallTile.name}</span>
-          </span>
-        )}
-        {floorTile && (
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
-            Floor: <span className="text-[#c9a84c] font-semibold">{floorTile.name}</span>
-          </span>
-        )}
-      </div>
-
-      <div className="hidden lg:block w-px h-5 bg-gray-700" />
-
-      {/* Nav links */}
-      <div className="hidden md:flex items-center gap-1">
-        <Link href="/collections" className="text-xs text-gray-400 hover:text-[#c9a84c] font-semibold uppercase tracking-wider px-3 py-1.5 hover:bg-white/5 transition-colors">
-          Collections
-        </Link>
-        <Link href="/projects" className="text-xs text-gray-400 hover:text-[#c9a84c] font-semibold uppercase tracking-wider px-3 py-1.5 hover:bg-white/5 transition-colors">
-          Projects
-        </Link>
-        <div className="w-px h-4 bg-gray-700 mx-1" />
-        <button onClick={onReset} className="text-xs text-gray-400 hover:text-white font-semibold uppercase tracking-wider px-3 py-1.5 hover:bg-white/5 transition-colors">
-          Reset
-        </button>
-        <button onClick={onDownload} className="text-xs text-gray-400 hover:text-white font-semibold uppercase tracking-wider px-3 py-1.5 hover:bg-white/5 transition-colors">
-          Download
-        </button>
-        <Link href="/" className="text-xs text-gray-400 hover:text-white font-semibold uppercase tracking-wider px-3 py-1.5 hover:bg-white/5 transition-colors">
-          ← Back
-        </Link>
-      </div>
-
-      {/* Mobile controls toggle */}
-      <button onClick={onToggleControls} className="md:hidden text-gray-400 hover:text-white p-1">
-        <SettingsIcon />
-      </button>
-    </header>
-  );
-}
-
-function ControlSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="p-4 border-b border-gray-100">
-      <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-3">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
-function TileCardGrid({
-  tile,
-  isSelected,
-  isFavorite,
-  onSelect,
-  onVisualize,
-  onToggleFavorite,
-}: {
-  tile: Product;
-  isSelected: boolean;
-  isFavorite: boolean;
-  onSelect: () => void;
-  onVisualize: () => void;
-  onToggleFavorite: () => void;
-}) {
-  return (
-    <div
-      onClick={onSelect}
-      className={`relative bg-white overflow-hidden cursor-pointer group transition-all duration-200 ${
-        isSelected ? "ring-2 ring-[#c9a84c] shadow-lg" : "hover:shadow-md"
-      }`}
-    >
-      <div className="relative h-28 overflow-hidden bg-gray-100">
-        <Image src={tile.image} alt={tile.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="140px" />
-        {tile.badge && (
-          <span className={`absolute top-1.5 left-0 text-[9px] font-bold px-2 py-0.5 tracking-wider uppercase ${badgeClass(tile.badge)}`}>
-            {tile.badge}
-          </span>
-        )}
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-          className={`absolute top-1.5 right-1.5 p-1 rounded-full bg-white/80 hover:bg-white transition-colors ${isFavorite ? "text-red-500" : "text-gray-400"}`}
-        >
-          <HeartIcon filled={isFavorite} />
-        </button>
-      </div>
-      <div className="p-2">
-        <p className="text-[9px] text-[#c9a84c] font-bold uppercase tracking-wider mb-0.5">{tile.categoryLabel}</p>
-        <p className="text-xs font-bold text-[#0f1117] leading-tight mb-1 truncate">{tile.name}</p>
-        <p className="text-[10px] text-gray-400 mb-2">{tile.sizes}</p>
-        <button
-          onClick={(e) => { e.stopPropagation(); onVisualize(); }}
-          className="w-full bg-[#0f1117] hover:bg-[#c9a84c] text-white text-[9px] font-bold py-1.5 tracking-widest uppercase transition-colors"
-        >
-          Visualize
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TileCardList({
-  tile,
-  isSelected,
-  isFavorite,
-  onSelect,
-  onVisualize,
-  onToggleFavorite,
-}: {
-  tile: Product;
-  isSelected: boolean;
-  isFavorite: boolean;
-  onSelect: () => void;
-  onVisualize: () => void;
-  onToggleFavorite: () => void;
-}) {
-  return (
-    <div
-      onClick={onSelect}
-      className={`flex items-center gap-3 bg-white p-2 cursor-pointer transition-all duration-200 ${
-        isSelected ? "ring-2 ring-[#c9a84c]" : "hover:shadow-sm"
-      }`}
-    >
-      <div className="relative h-14 w-14 shrink-0 overflow-hidden bg-gray-100">
-        <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="56px" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-[#c9a84c] font-bold uppercase tracking-wider">{tile.categoryLabel}</p>
-        <p className="text-xs font-bold text-[#0f1117] truncate">{tile.name}</p>
-        <p className="text-[10px] text-gray-400">{tile.sizes}</p>
-      </div>
-      <div className="flex flex-col items-end gap-1">
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-          className={`p-1 ${isFavorite ? "text-red-500" : "text-gray-300 hover:text-gray-500"}`}
-        >
-          <HeartIcon filled={isFavorite} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onVisualize(); }}
-          className="bg-[#0f1117] hover:bg-[#c9a84c] text-white text-[9px] font-bold px-2 py-1 tracking-widest uppercase transition-colors"
-        >
-          Use
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function WallOverlay({
-  tile,
-  groutColor,
-  groutWidth,
-  tileLayout,
-}: {
-  tile: Product;
-  groutColor: string;
-  groutWidth: GroutWidth;
-  tileLayout: TileLayout;
-}) {
-  const groutStyle = buildGroutStyle(tileLayout, groutColor, groutWidth);
-  return (
-    <div className="absolute inset-x-0 top-0" style={{ height: "58%" }}>
-      {/* Tile texture */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `url(${tile.image})`,
-          backgroundRepeat: "repeat",
-          backgroundSize: tileLayout === "herringbone" ? "60px 60px" : "80px 80px",
-          mixBlendMode: "multiply",
-          opacity: 0.85,
-        }}
-      />
-      {/* Grout overlay */}
-      <div className="absolute inset-0" style={groutStyle} />
-    </div>
-  );
-}
-
-function FloorOverlay({
-  tile,
-  groutColor,
-  groutWidth,
-  tileLayout,
-}: {
-  tile: Product;
-  groutColor: string;
-  groutWidth: GroutWidth;
-  tileLayout: TileLayout;
-}) {
-  const groutStyle = buildGroutStyle(tileLayout, groutColor, groutWidth);
-  return (
-    <div
-      className="absolute inset-x-0 bottom-0"
-      style={{
-        height: "42%",
-        perspective: "600px",
-        perspectiveOrigin: "50% 0%",
-      }}
-    >
-      <div
-        className="absolute inset-0"
-        style={{ transform: "rotateX(20deg)", transformOrigin: "top center" }}
-      >
-        {/* Tile texture */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${tile.image})`,
-            backgroundRepeat: "repeat",
-            backgroundSize: tileLayout === "herringbone" ? "60px 60px" : "80px 80px",
-            mixBlendMode: "multiply",
-            opacity: 0.8,
-          }}
-        />
-        {/* Grout overlay */}
-        <div className="absolute inset-0" style={groutStyle} />
-      </div>
-    </div>
-  );
-}
-
-function CompareSlider({
-  position,
-  onDrag,
-}: {
-  position: number;
-  onDrag: (e: React.MouseEvent | React.TouchEvent) => void;
-}) {
-  return (
-    <>
-      {/* Dim right side (before) */}
-      <div
-        className="absolute inset-0 bg-black/40 pointer-events-none"
-        style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
-      />
-      {/* Slider line */}
-      <div
-        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg cursor-ew-resize z-10 flex items-center justify-center"
-        style={{ left: `${position}%` }}
-        onMouseDown={(e) => e.preventDefault()}
-      >
-        <div
-          className="w-8 h-8 rounded-full bg-white shadow-xl flex items-center justify-center cursor-ew-resize"
-          onMouseDown={(e) => { e.preventDefault(); }}
-        >
-          <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l-3 3 3 3M16 9l3 3-3 3" />
-          </svg>
-        </div>
-      </div>
-      {/* Labels */}
-      <div className="absolute top-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">Before</div>
-      <div className="absolute top-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">After</div>
-      {/* drag capture overlay */}
-      <div className="absolute inset-0 cursor-ew-resize" onMouseMove={onDrag} onTouchMove={onDrag} />
-    </>
-  );
-}
-
-function GenerationOverlay({ step, progress }: { step: string; progress: number }) {
-  return (
-    <div className="fixed inset-0 bg-[#0a0c12]/95 z-50 flex flex-col items-center justify-center gap-6 backdrop-blur-sm">
-      {/* Animated ring */}
-      <div className="relative w-24 h-24">
-        <div className="absolute inset-0 border-4 border-gray-800 rounded-full" />
-        <div
-          className="absolute inset-0 border-4 border-transparent border-t-[#c9a84c] rounded-full animate-spin"
-          style={{ animationDuration: "1s" }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <svg className="w-8 h-8 text-[#c9a84c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-          </svg>
-        </div>
-      </div>
-
-      <div className="text-center">
-        <p className="text-white font-bold text-lg mb-1 animate-fade-in">{step}</p>
-        <p className="text-gray-500 text-sm">AI-powered tile visualizer</p>
-      </div>
-
-      {/* Progress bar */}
-      <div className="w-64 h-1 bg-gray-800 overflow-hidden">
-        <div
-          className="h-full bg-[#c9a84c] transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <p className="text-gray-500 text-xs">{progress}%</p>
-    </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
-
-function GridIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
-    </svg>
-  );
-}
-
-function ListIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-    </svg>
   );
 }
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function delay(ms: number) { return new Promise((r) => setTimeout(r, ms)); }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

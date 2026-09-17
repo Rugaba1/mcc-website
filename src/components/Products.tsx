@@ -77,9 +77,10 @@ export default function Products() {
         {/* Product grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((p) => (
-            <div
+            <Link
               key={p.id}
-              className="bg-white group overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500"
+              href={`/tiles/${p.id}`}
+              className="bg-white group overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 block"
             >
               {/* Image */}
               <div className="relative h-56 overflow-hidden bg-gray-100">
@@ -89,16 +90,13 @@ export default function Products() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized={p.image.startsWith("data:")}
+                  unoptimized={p.image.startsWith("data:") || p.image.startsWith("/uploads/")}
                 />
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-[#0f1117]/0 group-hover:bg-[#0f1117]/50 transition-all duration-500 flex items-center justify-center">
-                  <a
-                    href="#contact"
-                    className="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-[#c9a84c] text-white text-xs font-bold px-7 py-3 tracking-widest uppercase"
-                  >
-                    Get Quote
-                  </a>
+                <div className="absolute inset-0 bg-[#0f1117]/0 group-hover:bg-[#0f1117]/40 transition-all duration-500 flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 text-white text-xs font-bold tracking-widest uppercase">
+                    View Details
+                  </span>
                 </div>
                 {/* Badge */}
                 {p.badge && (
@@ -129,21 +127,18 @@ export default function Products() {
                         <span
                           key={i}
                           title={c}
-                          className="w-4 h-4 rounded-full border border-gray-200 shadow-sm hover:scale-125 transition-transform cursor-pointer"
+                          className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
                           style={{ background: c }}
                         />
                       ))}
                     </div>
-                    <Link
-                      href={`/visualizer?tile=${p.id}`}
-                      className="text-[10px] font-bold text-[#c9a84c] hover:text-[#b8943e] uppercase tracking-wider whitespace-nowrap transition-colors"
-                    >
-                      Visualize →
-                    </Link>
+                    <span className="text-[10px] font-bold text-[#c9a84c] uppercase tracking-wider whitespace-nowrap">
+                      View →
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -153,15 +148,15 @@ export default function Products() {
             Showing <strong className="text-[#0f1117]">{filtered.length}</strong> products.
             Full catalogue available on request.
           </p>
-          <a
-            href="#contact"
+          <Link
+            href="/catalogue"
             className="group bg-[#0f1117] hover:bg-[#c9a84c] text-white font-bold px-9 py-4 transition-all duration-300 shadow-lg flex items-center gap-3 text-sm tracking-widest uppercase"
           >
             View Full Catalogue
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

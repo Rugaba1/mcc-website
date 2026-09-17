@@ -5,33 +5,39 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const body   = await req.json();
-    const numId  = Number(id);
+    const body  = await req.json();
+    const numId = Number(id);
+    if (isNaN(numId))
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
-    await prisma.projectTile.deleteMany({ where: { projectId: numId } });
-
-    const project = await prisma.project.update({
-      where: { id: numId },
-      data: {
-        title:       body.title,
-        type:        body.type        ?? "Other",
-        description: body.description ?? "",
-        gradient:    body.gradient    ?? "",
-        image:       body.image       ?? "",
-        large:       body.large       ?? false,
-        location:    body.location    ?? "",
-        area:        body.area        ?? "",
-        year:        body.year        ?? "",
-        tiles: {
-          create: (body.tileIds ?? []).map((pid: number) => ({ productId: pid })),
+    // Atomic: delete old tiles + update project in a single transaction
+    const [, project] = await prisma.$transaction([
+      prisma.projectTile.deleteMany({ where: { projectId: numId } }),
+      prisma.project.update({
+        where: { id: numId },
+        data: {
+          title:       body.title       ?? "",
+          type:        body.type        ?? "Other",
+          description: body.description ?? "",
+          gradient:    body.gradient    ?? "",
+          image:       body.image       ?? "",
+          large:       body.large       ?? false,
+          location:    body.location    ?? "",
+          area:        body.area        ?? "",
+          year:        body.year        ?? "",
+          tiles: {
+            create: (body.tileIds ?? []).map((pid: number) => ({ productId: pid })),
+          },
         },
-      },
-      include: { tiles: true },
-    });
+        include: { tiles: true },
+      }),
+    ]);
 
     return NextResponse.json({ ...project, tileIds: project.tiles.map((t) => t.productId) });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    console.error("PUT /api/projects/[id]:", err);
+    if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2025")
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
   }
 }
@@ -42,8 +48,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
     await prisma.project.delete({ where: { id: Number(id) } });
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    console.error("DELETE /api/projects/[id]:", err);
+    if (typeof err === "object" && err !== null && (err as { code?: string }).code === "P2025")
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
   }
 }

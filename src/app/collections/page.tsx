@@ -182,7 +182,7 @@ function CollectionCard({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
           sizes={large ? "(max-width: 768px) 100vw, 50vw" : "33vw"}
-          unoptimized={collection.image.startsWith("data:")}
+          unoptimized={collection.image.startsWith("data:") || collection.image.startsWith("/uploads/")}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         {collection.featured && (
@@ -240,7 +240,7 @@ function CollectionCard({
                     fill
                     className="object-cover"
                     sizes="40px"
-                    unoptimized={t.image.startsWith("data:")}
+                    unoptimized={t.image.startsWith("data:") || t.image.startsWith("/uploads/")}
                   />
                 </div>
               ))}
@@ -284,3 +284,4 @@ function CollectionCard({
     </div>
   );
 }
+
