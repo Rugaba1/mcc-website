@@ -288,7 +288,7 @@ function FeaturedCard({ product: p }: { product: Product }) {
     <Link href={`/tiles/${p.id}`} className="group block bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-400">
       <div className="relative h-48 overflow-hidden bg-gray-100">
         {p.image && (
-          <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-600"
+          <Image unoptimized={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-600"
             sizes="(max-width:640px) 50vw, 25vw"
             unoptimized={p.image.startsWith("data:") || p.image.startsWith("/uploads/")} />
         )}
@@ -316,7 +316,7 @@ function GridCard({ product: p }: { product: Product }) {
     <Link href={`/tiles/${p.id}`} className="bg-white group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-400 block">
       <div className="relative h-52 overflow-hidden bg-gray-100">
         {p.image ? (
-          <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-600"
+          <Image unoptimized={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-600"
             sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
             unoptimized={p.image.startsWith("data:") || p.image.startsWith("/uploads/")} />
         ) : (
@@ -361,7 +361,7 @@ function ListCard({ product: p }: { product: Product }) {
     <Link href={`/tiles/${p.id}`} className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all group flex gap-4 p-4 block">
       <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden bg-gray-100">
         {p.image ? (
-          <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500"
+          <Image unoptimized={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="96px"
             unoptimized={p.image.startsWith("data:") || p.image.startsWith("/uploads/")} />
         ) : (

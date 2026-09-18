@@ -73,7 +73,7 @@ export default function CategoryShowcase() {
                   fill
                   className="object-cover category-img"
                   sizes="(max-width: 768px) 50vw, 33vw"
-                  unoptimized={isLocal}
+                  unoptimized
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c12]/85 via-[#0a0c12]/20 to-transparent group-hover:from-[#0a0c12]/90 transition-all duration-300" />
