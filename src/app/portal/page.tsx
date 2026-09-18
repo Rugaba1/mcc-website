@@ -161,7 +161,7 @@ function LoginScreen({ onLogin }: { onLogin: (u: SessionUser) => void }) {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="relative w-12 h-12 mx-auto mb-4">
-            <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="48px" />
+            <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="48px" />
           </div>
           <h1 className="text-white text-xl font-bold tracking-wide">MCC Staff Portal</h1>
           <p className="text-gray-400 text-sm mt-1">Sign in to manage content</p>
@@ -305,7 +305,7 @@ function PortalDashboard({ user, onLogout }: { user: SessionUser; onLogout: () =
       <aside className={`${sidebar ? "w-60" : "w-16"} bg-[#0a0c12] flex-shrink-0 flex flex-col transition-all duration-300 fixed top-0 left-0 h-full z-40`}>
         <div className="h-16 flex items-center gap-3 px-4 border-b border-white/10 flex-shrink-0">
           <div className="relative w-8 h-8 flex-shrink-0">
-            <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="32px" />
+            <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="32px" />
           </div>
           {sidebar && (
             <div className="min-w-0">

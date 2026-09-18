@@ -90,7 +90,7 @@ export default function Products() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized={p.image.startsWith("data:") || p.image.startsWith("/uploads/")}
+                  unoptimized
                 />
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-[#0f1117]/0 group-hover:bg-[#0f1117]/40 transition-all duration-500 flex items-center justify-center">

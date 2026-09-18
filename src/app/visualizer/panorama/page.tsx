@@ -549,7 +549,7 @@ function TileRow({ tile, active, onApply }: { tile: Product; active: boolean; on
     >
       {/* Swatch */}
       <div className={`relative w-11 h-11 flex-shrink-0 overflow-hidden border-2 ${active ? "border-[#c9a84c]" : "border-gray-200 group-hover:border-gray-300"}`}>
-        <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="44px" unoptimized={tile.image.startsWith("data:") || tile.image.startsWith("/uploads/")} />
+        <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="44px" unoptimized />
       </div>
       {/* Info */}
       <div className="flex-1 min-w-0">
@@ -576,7 +576,7 @@ function TileCard({ tile, active, onApply }: { tile: Product; active: boolean; o
       className={`relative overflow-hidden transition-all group ${active ? "ring-2 ring-[#c9a84c]" : "ring-1 ring-gray-200 hover:ring-[#c9a84c]/60"}`}
     >
       <div className="relative w-full aspect-square">
-        <Image src={tile.image} alt={tile.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="110px" unoptimized={tile.image.startsWith("data:") || tile.image.startsWith("/uploads/")} />
+        <Image src={tile.image} alt={tile.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="110px" unoptimized />
         {active && (
           <div className="absolute inset-0 bg-[#c9a84c]/25 flex items-center justify-center">
             <div className="w-5 h-5 bg-[#c9a84c] rounded-full flex items-center justify-center">
@@ -717,7 +717,7 @@ function PanoramaInner() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           <div className="relative w-6 h-6 flex-shrink-0">
-            <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="24px" />
+            <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="24px" />
           </div>
           <span className="text-[#0f1117] text-xs font-bold hidden sm:block tracking-wide">MCC Visualizer</span>
         </Link>
@@ -902,7 +902,7 @@ function PanoramaInner() {
                 {floorTile && (
                   <div className="flex items-center gap-2 bg-white/85 backdrop-blur-sm px-2.5 py-1.5 border-l-2 border-l-[#c9a84c] shadow-sm">
                     <div className="relative w-7 h-7 flex-shrink-0 overflow-hidden border border-gray-200">
-                      <Image src={floorTile.image} alt="" fill className="object-cover" sizes="28px" unoptimized={floorTile.image.startsWith("data:") || floorTile.image.startsWith("/uploads/")} />
+                      <Image src={floorTile.image} alt="" fill className="object-cover" sizes="28px" unoptimized />
                     </div>
                     <div>
                       <p className="text-[8px] text-gray-400 font-bold uppercase tracking-wider">Floor</p>
@@ -913,7 +913,7 @@ function PanoramaInner() {
                 {wallTile && (
                   <div className="flex items-center gap-2 bg-white/85 backdrop-blur-sm px-2.5 py-1.5 border-l-2 border-l-[#1a73e8] shadow-sm">
                     <div className="relative w-7 h-7 flex-shrink-0 overflow-hidden border border-gray-200">
-                      <Image src={wallTile.image} alt="" fill className="object-cover" sizes="28px" unoptimized={wallTile.image.startsWith("data:") || wallTile.image.startsWith("/uploads/")} />
+                      <Image src={wallTile.image} alt="" fill className="object-cover" sizes="28px" unoptimized />
                     </div>
                     <div>
                       <p className="text-[8px] text-gray-400 font-bold uppercase tracking-wider">Wall</p>
@@ -1043,7 +1043,7 @@ function PanoramaInner() {
                   {floorTile && (
                     <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200">
                       <div className="relative w-9 h-9 flex-shrink-0 overflow-hidden border border-gray-200">
-                        <Image src={floorTile.image} alt="" fill className="object-cover" sizes="36px" unoptimized={floorTile.image.startsWith("data:") || floorTile.image.startsWith("/uploads/")} />
+                        <Image src={floorTile.image} alt="" fill className="object-cover" sizes="36px" unoptimized />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Floor</p>
@@ -1055,7 +1055,7 @@ function PanoramaInner() {
                   {wallTile && (
                     <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200">
                       <div className="relative w-9 h-9 flex-shrink-0 overflow-hidden border border-gray-200">
-                        <Image src={wallTile.image} alt="" fill className="object-cover" sizes="36px" unoptimized={wallTile.image.startsWith("data:") || wallTile.image.startsWith("/uploads/")} />
+                        <Image src={wallTile.image} alt="" fill className="object-cover" sizes="36px" unoptimized />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Wall</p>

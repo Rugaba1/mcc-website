@@ -59,7 +59,7 @@ export default function ProjectsPage() {
             <div className="w-px h-5 bg-gray-700" />
             <div className="flex items-center gap-3">
               <div className="relative w-7 h-7">
-                <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
+                <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
               </div>
               <span className="text-white font-bold text-sm tracking-wide hidden sm:block">
                 Project Portfolio
@@ -154,7 +154,7 @@ export default function ProjectsPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      unoptimized={proj.image.startsWith("data:") || proj.image.startsWith("/uploads/")}
+                      unoptimized
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     {/* Type badge */}
@@ -166,7 +166,7 @@ export default function ProjectsPage() {
                       <div className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         {tiles.slice(0, 3).map((t) => (
                           <div key={t.id} className="w-8 h-8 overflow-hidden border-2 border-white/60">
-                            <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" unoptimized={t.image.startsWith("data:") || t.image.startsWith("/uploads/")} />
+                            <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" unoptimized />
                           </div>
                         ))}
                       </div>
@@ -270,7 +270,7 @@ function ProjectDrawer({
             fill
             className="object-cover"
             sizes="580px"
-            unoptimized={project.image.startsWith("data:") || project.image.startsWith("/uploads/")}
+            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <button
@@ -392,7 +392,7 @@ function TileRow({ tile, surface }: { tile: Product; surface: "wall" | "floor" }
           fill
           className="object-cover"
           sizes="48px"
-          unoptimized={tile.image.startsWith("data:") || tile.image.startsWith("/uploads/")}
+          unoptimized
         />
       </div>
       <div className="flex-1 min-w-0">

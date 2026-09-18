@@ -101,7 +101,7 @@ export default function TileDetailPage() {
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
-                  unoptimized={isLocal}
+                  unoptimized
                 />
               ) : (
                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
@@ -196,7 +196,7 @@ export default function TileDetailPage() {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="64px"
-                        unoptimized={collection.image.startsWith("/uploads/") || collection.image.startsWith("data:")}
+                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-700 flex items-center justify-center">
@@ -241,7 +241,7 @@ export default function TileDetailPage() {
                               fill
                               className="object-cover"
                               sizes="48px"
-                              unoptimized={t.image.startsWith("/uploads/") || t.image.startsWith("data:")}
+                              unoptimized
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-700" />
@@ -308,7 +308,7 @@ export default function TileDetailPage() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                           sizes="(max-width: 640px) 50vw, 25vw"
-                          unoptimized={rIsLocal}
+                          unoptimized
                         />
                       ) : (
                         <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">

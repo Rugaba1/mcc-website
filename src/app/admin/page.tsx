@@ -174,7 +174,7 @@ export default function AdminPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="bg-[#0a0c12] p-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="relative w-10 h-10"><Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="40px" /></div>
+            <div className="relative w-10 h-10"><Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="40px" /></div>
             <div className="text-left"><p className="font-bold text-white text-sm">Mountain Ceramics</p><p className="text-[#c9a84c] text-[10px] tracking-[0.2em] uppercase">Admin Portal</p></div>
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function AdminPage() {
       {/* Sidebar */}
       <aside className={`${sidebar ? "w-64" : "w-16"} bg-[#0a0c12] flex-shrink-0 flex flex-col transition-all duration-300 fixed top-0 left-0 h-full z-40`}>
         <div className="h-16 flex items-center gap-3 px-4 border-b border-white/10 flex-shrink-0">
-          <div className="relative w-8 h-8 flex-shrink-0"><Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="32px" /></div>
+          <div className="relative w-8 h-8 flex-shrink-0"><Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="32px" /></div>
           {sidebar && <div><p className="font-bold text-white text-sm truncate">MCC Admin</p><p className="text-[#c9a84c] text-[9px] tracking-widest uppercase">Portal</p></div>}
         </div>
         <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">

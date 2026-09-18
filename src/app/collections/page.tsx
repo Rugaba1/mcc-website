@@ -42,7 +42,7 @@ export default function CollectionsPage() {
             <div className="w-px h-5 bg-gray-700" />
             <div className="flex items-center gap-3">
               <div className="relative w-7 h-7">
-                <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
+                <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
               </div>
               <span className="text-white font-bold text-sm tracking-wide hidden sm:block">
                 Tile Collections
@@ -182,7 +182,7 @@ function CollectionCard({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
           sizes={large ? "(max-width: 768px) 100vw, 50vw" : "33vw"}
-          unoptimized={collection.image.startsWith("data:") || collection.image.startsWith("/uploads/")}
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         {collection.featured && (
@@ -240,7 +240,7 @@ function CollectionCard({
                     fill
                     className="object-cover"
                     sizes="40px"
-                    unoptimized={t.image.startsWith("data:") || t.image.startsWith("/uploads/")}
+                    unoptimized
                   />
                 </div>
               ))}

@@ -456,7 +456,7 @@ export default function VisualizerPage() {
           <div className="flex items-center justify-between mb-3">
             <Link href="/" className="flex items-center gap-2">
               <div className="relative w-7 h-7 flex-shrink-0">
-                <Image src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
+                <Image unoptimized src="/LOGO MOUNTAIN.png" alt="MCC" fill className="object-contain" sizes="28px" />
               </div>
               <span className="font-bold text-[#0f1117] text-sm tracking-wide">MCC Tiles</span>
             </Link>
@@ -517,7 +517,7 @@ export default function VisualizerPage() {
                   isActive ? "bg-blue-50 border-l-2 border-l-[#2563eb]" : ""
                 }`}>
                 <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded border border-gray-100">
-                  <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="48px" unoptimized={tile.image.startsWith("data:") || tile.image.startsWith("/uploads/")} />
+                  <Image src={tile.image} alt={tile.name} fill className="object-cover" sizes="48px" unoptimized />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-xs font-bold truncate ${isActive ? "text-[#2563eb]" : "text-[#0f1117] group-hover:text-[#2563eb]"}`}>{tile.name}</p>
@@ -597,7 +597,7 @@ export default function VisualizerPage() {
             {activeTile ? (
               <>
                 <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
-                  <Image src={activeTile.image} alt={activeTile.name} fill className="object-cover" sizes="40px" unoptimized={activeTile.image.startsWith("data:") || activeTile.image.startsWith("/uploads/")} />
+                  <Image unoptimized src={floorTile.image} alt={activeTile.name} fill className="object-cover" sizes="40px" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Now viewing</p>
@@ -727,7 +727,7 @@ export default function VisualizerPage() {
                   {floorApplied && floorTile && (
                     <div className="flex items-center gap-2">
                       <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
-                        <Image src={floorTile.image} alt={floorTile.name} fill className="object-cover" sizes="40px" unoptimized={floorTile.image.startsWith("data:") || floorTile.image.startsWith("/uploads/")} />
+                        <Image unoptimized src={floorTile.image} alt={floorTile.name} fill className="object-cover" sizes="40px" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-gray-800 truncate">{floorTile.name}</p>
@@ -739,7 +739,7 @@ export default function VisualizerPage() {
                   {wallApplied && wallTile && (
                     <div className="flex items-center gap-2">
                       <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded border border-gray-100">
-                        <Image src={wallTile.image} alt={wallTile.name} fill className="object-cover" sizes="40px" unoptimized={wallTile.image.startsWith("data:") || wallTile.image.startsWith("/uploads/")} />
+                        <Image src={wallTile.image} alt={wallTile.name} fill className="object-cover" sizes="40px" unoptimized />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-gray-800 truncate">{wallTile.name}</p>
