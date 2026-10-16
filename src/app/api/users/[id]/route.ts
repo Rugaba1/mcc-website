@@ -13,8 +13,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
     const body = await req.json();
-    const { name, email, password, role, active,
-            canProducts, canCollections, canProjects, canTestimonials, canUsers } = body;
+    const { name, email, password, active } = body;
 
     // Validate email if provided
     if (email !== undefined) {
@@ -33,27 +32,40 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
 
     const data: Record<string, unknown> = {};
-    if (name  !== undefined) data.name  = name.trim();
+    if (name !== undefined) {
+      const parts = name.trim().split(/\s+/);
+      data.firstName = parts[0] || name.trim();
+      data.lastName = parts.slice(1).join(" ") || null;
+    }
     if (email !== undefined) data.email = email.trim().toLowerCase();
-    if (role  !== undefined) data.role  = role;
-    if (active !== undefined) data.active = active;
-    if (canProducts     !== undefined) data.canProducts     = canProducts;
-    if (canCollections  !== undefined) data.canCollections  = canCollections;
-    if (canProjects     !== undefined) data.canProjects     = canProjects;
-    if (canTestimonials !== undefined) data.canTestimonials = canTestimonials;
-    if (canUsers        !== undefined) data.canUsers        = canUsers;
+    if (active !== undefined) data.isActive = active;
     if (password) data.password = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.update({
       where: { id: numId },
       data,
-      select: {
-        id: true, name: true, email: true, role: true, active: true,
-        canProducts: true, canCollections: true, canProjects: true,
-        canTestimonials: true, canUsers: true, createdAt: true,
+      include: {
+        permissions: {
+          include: { permission: true },
+        },
       },
     });
-    return NextResponse.json(user);
+
+    const permCodes = user.permissions.map((p) => p.permission.code);
+    return NextResponse.json({
+      id: user.id,
+      name: `${user.firstName} ${user.lastName || ""}`.trim(),
+      email: user.email,
+      role: permCodes.includes("admin") ? "admin" : "staff",
+      active: user.isActive,
+      canProducts: true,
+      canCollections: true,
+      canProjects: true,
+      canTestimonials: true,
+      canUsers: permCodes.includes("users.manage"),
+      permissions: permCodes,
+      createdAt: user.createdAt,
+    });
   } catch (err: unknown) {
     console.error("PUT /api/users/[id]:", err);
     // Prisma P2025 = record not found

@@ -1,36 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-function parseToken(token: string): { userId: number; exp: number } | null {
-  try {
-    return JSON.parse(Buffer.from(token, "base64url").toString());
-  } catch { return null; }
-}
+import { verifyToken } from "@/lib/auth/jwt";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("mcc_session")?.value;
-  if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  try {
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.startsWith("Bearer ")
+      ? authHeader.substring(7)
+      : req.cookies.get("auth_token")?.value;
 
-  const payload = parseToken(token);
-  if (!payload || payload.exp < Date.now())
-    return NextResponse.json({ error: "Session expired" }, { status: 401 });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: {
-      id: true, name: true, email: true, role: true, active: true,
-      canProducts: true, canCollections: true, canProjects: true,
-      canTestimonials: true, canUsers: true,
-    },
-  });
-  if (!user || !user.active)
-    return NextResponse.json({ error: "User not found or inactive" }, { status: 401 });
+    const userId = await verifyToken(token);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  return NextResponse.json(user);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const primaryRole = [...user.role].sort((a, b) => a.id - b.id)[0] ?? null;
+
+    return NextResponse.json({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: `${user.firstName} ${user.lastName ?? ""}`.trim(),
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
+      role: primaryRole
+        ? { id: primaryRole.id, roleName: primaryRole.roleName }
+        : { id: 8, roleName: "customer" },
+      active: user.isActive,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    console.error("GET /api/auth/me:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch session" },
+      { status: 500 },
+    );
+  }
 }
 
-export async function DELETE() {
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set("mcc_session", "", { maxAge: 0, path: "/" });
-  return res;
+export async function DELETE(req: NextRequest) {
+  try {
+    const res = NextResponse.json({ success: true });
+    res.cookies.set("auth_token", "", { path: "/", maxAge: 0 });
+    res.cookies.set("refresh_token", "", { path: "/api/auth", maxAge: 0 });
+    return res;
+  } catch (error) {
+    console.error("DELETE /api/auth/me:", error);
+    return NextResponse.json({ error: "Failed to sign out" }, { status: 500 });
+  }
 }

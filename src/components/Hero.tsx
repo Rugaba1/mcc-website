@@ -66,9 +66,8 @@ export default function Hero() {
       {slides.map((s, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            i === current ? "opacity-100 z-10" : "opacity-0 z-0"
-          }`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${i === current ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
         >
           <Image
             src={s.image}
@@ -77,7 +76,7 @@ export default function Hero() {
             priority={i === 0}
             className={`object-cover ${i === current ? "animate-hero-zoom" : ""}`}
             sizes="100vw"
-          />
+            unoptimized />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
         </div>
       ))}
@@ -87,8 +86,8 @@ export default function Hero() {
 
         {/* Tag */}
         <div key={`tag-${current}`} className="animate-fade-up mb-5">
-          <span className="inline-flex items-center gap-2 bg-[#c9a84c]/20 border border-[#c9a84c]/50 text-[#c9a84c] text-xs font-bold tracking-[0.2em] uppercase px-5 py-2 rounded-full backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] animate-pulse" />
+          <span className="inline-flex items-center gap-2 bg-primary/20  -primary/50  text-xs font-bold tracking-[0.2em] uppercase px-5 py-2 rounded-full backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             {slide.tag}
           </span>
         </div>
@@ -96,11 +95,11 @@ export default function Hero() {
         {/* Heading */}
         <h1
           key={`h-${current}`}
-          className="font-playfair text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] mb-6 max-w-4xl animate-fade-up delay-100"
+          className="font-playfair text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold  leading-[1.05] mb-6 max-w-4xl animate-fade-up delay-100"
         >
           {lines[0]}
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c9a84c] to-[#f0d080]">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#f0d080]">
             {lines[1]}
           </span>
         </h1>
@@ -108,7 +107,7 @@ export default function Hero() {
         {/* Sub */}
         <p
           key={`p-${current}`}
-          className="text-gray-300 text-lg max-w-2xl mb-10 leading-relaxed animate-fade-up delay-200"
+          className="text-ivory/70 text-lg max-w-2xl mb-10 leading-relaxed animate-fade-up delay-200"
         >
           {slide.sub}
         </p>
@@ -117,7 +116,7 @@ export default function Hero() {
         <div className="flex flex-wrap gap-4 mb-20 animate-fade-up delay-300">
           <a
             href="#products"
-            className="group bg-[#c9a84c] hover:bg-[#f0d080] text-white hover:text-[#0f1117] font-bold px-9 py-4 transition-all duration-300 shadow-lg shadow-[#c9a84c]/30 flex items-center gap-3 text-sm tracking-widest uppercase"
+            className="group bg-primary hover:bg-[#f0d080]  hover: font-bold px-9 py-4 transition-all duration-300 shadow-lg shadow-primary/30 flex items-center gap-3 text-sm tracking-widest uppercase"
           >
             Explore Products
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -126,22 +125,22 @@ export default function Hero() {
           </a>
           <a
             href="#contact"
-            className="border border-white/50 hover:border-[#c9a84c] bg-white/5 hover:bg-[#c9a84c]/10 text-white font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase backdrop-blur-sm"
+            className=" /50 hover:-primary /5 hover:bg-primary/10  font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase backdrop-blur-sm"
           >
             Get a Quote
           </a>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 border border-white/10 w-fit">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px /10  /10 w-fit">
           {stats.map((s, i) => (
             <div
               key={s.label}
               className="px-8 py-5 bg-black/30 backdrop-blur-md text-center animate-fade-up"
               style={{ animationDelay: `${300 + i * 100}ms` }}
             >
-              <div className="text-3xl font-bold text-[#c9a84c] font-playfair">{s.num}</div>
-              <div className="text-gray-400 text-xs tracking-wider uppercase mt-1">{s.label}</div>
+              <div className="text-3xl font-bold  font-playfair">{s.num}</div>
+              <div className=" text-xs tracking-wider uppercase mt-1">{s.label}</div>
             </div>
           ))}
         </div>
@@ -154,15 +153,14 @@ export default function Hero() {
             key={i}
             onClick={() => goTo(i)}
             aria-label={`Slide ${i + 1}`}
-            className={`transition-all duration-500 ${
-              i === current ? "w-10 h-1 bg-[#c9a84c]" : "w-4 h-1 bg-white/40 hover:bg-white/70"
-            }`}
+            className={`transition-all duration-500 ${i === current ? "w-10 h-1 bg-primary" : "w-4 h-1 /40 hover:/70"
+              }`}
           />
         ))}
       </div>
 
       {/* Slide counter */}
-      <div className="absolute bottom-6 right-8 z-30 text-white/40 text-xs tracking-widest font-mono">
+      <div className="absolute bottom-6 right-8 z-30 /40 text-xs tracking-widest font-mono">
         {String(current + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
       </div>
 
@@ -170,7 +168,7 @@ export default function Hero() {
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 border border-white/30 hover:border-[#c9a84c] hover:bg-[#c9a84c] text-white flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12  /30 hover:-primary hover:bg-primary  flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -178,9 +176,9 @@ export default function Hero() {
       </button>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-8 left-8 z-30 hidden md:flex flex-col items-center gap-2 text-white/40 text-xs tracking-[0.2em] uppercase">
+      <div className="absolute bottom-8 left-8 z-30 hidden md:flex flex-col items-center gap-2 /40 text-xs tracking-[0.2em] uppercase">
         <span>Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-[#c9a84c] to-transparent animate-bounce-y" />
+        <div className="w-px h-10 bg-gradient-to-b from-primary to-transparent animate-bounce-y" />
       </div>
 
     </section>

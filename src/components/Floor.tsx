@@ -360,8 +360,8 @@ function Window({ position, size }: {
   const frameTex = useTextureDrei('/textures/windows/windowframe4.jpg')
   frameTex.colorSpace = THREE.SRGBColorSpace
 
-  const isZWall = size[2] < 0.1     
-  const isXWall = size[0] < 0.1    
+  const isZWall = size[2] < 0.1
+  const isXWall = size[0] < 0.1
 
   const w = isZWall ? size[0] : size[2]
   const h = size[1]
@@ -389,7 +389,7 @@ function Window({ position, size }: {
         <meshStandardMaterial
           map={frameTex}
           transparent
-          alphaTest={0.1}       
+          alphaTest={0.1}
           side={THREE.DoubleSide}
           color="#ffffff"
         />
@@ -406,7 +406,7 @@ function Staircase() {
   const stepW = 1.2 * SCALE
   const steps = []
   for (let i = 0; i < STEPS; i++) {
-    const y = FLOOR_T+0.19 + riser * (i + 0.3)
+    const y = FLOOR_T + 0.19 + riser * (i + 0.3)
     const z = startZ + runDepth * (i + 0.5)
     steps.push(
       <mesh key={`step-${i}`} position={[-3 * SCALE, y - 0.5, z]} material={matStepTread} castShadow receiveShadow>
@@ -568,18 +568,18 @@ function House() {
         </mesh></>}
 
 
-     {[
-  { p: [-2.0 * SCALE, 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.6, 1.2, 0.06] as [number, number, number] },
-  { p: [X_LEFT - 0.08, 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
-  { p: [X_RIGHT + 0.08, 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
-  { p: [X_RIGHT + 0.08, 1.5, -1.0 * SCALE] as [number, number, number], s: [0.06, 1.0, 1.0] as [number, number, number] },
-  { p: [-2.0 * SCALE, UF_Y + 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.6, 1.2, 0.06] as [number, number, number] },
-  { p: [X_LEFT - 0.08, UF_Y + 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
-  { p: [X_RIGHT - 1.0, UF_Y + 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.0, 1.0, 0.06] as [number, number, number] },
-  { p: [X_LEFT - 0.08, UF_Y + 1.5, -2.0 * SCALE] as [number, number, number], s: [0.06, 1.0, 1.0] as [number, number, number] },
-].map((win, i) => (
-  <Window key={`win-${i}`} position={win.p} size={win.s} />
-))}
+      {[
+        { p: [-2.0 * SCALE, 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.6, 1.2, 0.06] as [number, number, number] },
+        { p: [X_LEFT - 0.08, 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
+        { p: [X_RIGHT + 0.08, 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
+        { p: [X_RIGHT + 0.08, 1.5, -1.0 * SCALE] as [number, number, number], s: [0.06, 1.0, 1.0] as [number, number, number] },
+        { p: [-2.0 * SCALE, UF_Y + 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.6, 1.2, 0.06] as [number, number, number] },
+        { p: [X_LEFT - 0.08, UF_Y + 1.5, 1.5 * SCALE] as [number, number, number], s: [0.06, 1.2, 1.4] as [number, number, number] },
+        { p: [X_RIGHT - 1.0, UF_Y + 1.5, Z_FRONT + 0.08] as [number, number, number], s: [1.0, 1.0, 0.06] as [number, number, number] },
+        { p: [X_LEFT - 0.08, UF_Y + 1.5, -2.0 * SCALE] as [number, number, number], s: [0.06, 1.0, 1.0] as [number, number, number] },
+      ].map((win, i) => (
+        <Window key={`win-${i}`} position={win.p} size={win.s} />
+      ))}
 
 
 
@@ -731,7 +731,7 @@ function TilePanel() {
 
 
 
-    </div>
+    </div >
   )
 }
 
@@ -776,11 +776,11 @@ export function House3D({
   // Camera target positions per surface + state
   const CAMERA_INIT: Record<string, [number, number, number]> = {
     floor: [18, 14, 18],
-    wall:  [1,  4.5, 22],
+    wall: [1, 4.5, 22],
   }
   const CAMERA_APPLIED: Record<string, [number, number, number]> = {
     floor: [7, 20, 7],    // top-down: see all floor tiles
-    wall:  [1, 3.2, 13],  // eye-level: see wall tiles close-up
+    wall: [1, 3.2, 13],  // eye-level: see wall tiles close-up
   }
 
   const [camTarget, setCamTarget] = useState<[number, number, number]>(CAMERA_INIT[surface])

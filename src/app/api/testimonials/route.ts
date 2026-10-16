@@ -14,8 +14,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const last = await prisma.testimonial.findFirst({ orderBy: { id: "desc" } });
+    const nextId = (last?.id || 0) + 1;
     const row  = await prisma.testimonial.create({
       data: {
+        id:       nextId,
         text:     body.text,
         name:     body.name,
         role:     body.role     ?? "",
