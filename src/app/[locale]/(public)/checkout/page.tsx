@@ -14,8 +14,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { api, apiErrorMessage } from "@/lib/api";
 import { money } from "@/lib/format";
+import { getShipping, SHIPPING_OPTIONS, ShippingId } from "@/lib/shipping";
 import { computeTotals } from "@/lib/pricing";
-import { SHIPPING_OPTIONS, getShipping, type ShippingId } from "@/lib/shipping";
 
 function CheckoutForm() {
     const { user } = useAuth();
