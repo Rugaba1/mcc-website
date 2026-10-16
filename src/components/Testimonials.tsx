@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { api, type Testimonial } from "@/lib/api";
 
 const avatarColors = [
-  "from-[#c9a84c] to-[#8b6330]",
+  "from-primary to-[#8b6330]",
   "from-[#4a6fa5] to-[#2c3e70]",
   "from-[#5a8a5a] to-[#2d5a2d]",
   "from-[#8b5a5a] to-[#5a2d2d]",
@@ -12,9 +12,9 @@ const avatarColors = [
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [current,      setCurrent]      = useState(0);
-  const [transitioning,setTransitioning]= useState(false);
-  const [mounted,      setMounted]      = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export default function Testimonials() {
 
   if (total === 0) {
     return (
-      <section className="py-24 bg-[#f8f7f4]">
-        <div className="max-w-7xl mx-auto px-6 text-center text-gray-400 text-sm">
+      <section className="py-24 ">
+        <div className="max-w-7xl mx-auto px-6 text-center  text-sm">
           No testimonials yet.
         </div>
       </section>
@@ -67,44 +67,44 @@ export default function Testimonials() {
   const t = testimonials[current] ?? testimonials[0];
 
   return (
-    <section className="py-24 bg-[#f8f7f4] overflow-hidden">
+    <section className="py-24  overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-3 text-[#c9a84c] text-xs font-bold tracking-[0.25em] uppercase mb-4">
+          <span className="inline-flex items-center gap-3  text-xs font-bold tracking-[0.25em] uppercase mb-4">
             <span className="gold-divider" />
             Testimonials
             <span className="gold-divider" />
           </span>
-          <h2 className="font-playfair text-4xl md:text-5xl font-bold text-[#0f1117]">
+          <h2 className="font-playfair text-4xl md:text-5xl font-bold ">
             What Our Clients Say
           </h2>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className={`bg-white shadow-xl p-10 md:p-14 relative transition-opacity duration-500 ${transitioning ? "opacity-0" : "opacity-100"}`}>
-            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#c9a84c] to-[#a07830]" />
-            <div className="font-playfair text-9xl text-[#c9a84c]/15 leading-none absolute top-6 right-10 select-none pointer-events-none">&rdquo;</div>
+          <div className={` shadow-xl p-10 md:p-14 relative transition-opacity duration-500 ${transitioning ? "opacity-0" : "opacity-100"}`}>
+            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-[#a07830]" />
+            <div className="font-playfair text-9xl /15 leading-none absolute top-6 right-10 select-none pointer-events-none">&rdquo;</div>
 
             <div className="flex gap-1 mb-6">
               {Array.from({ length: 5 }).map((_, i) => (
-                <svg key={i} className="w-5 h-5 text-[#c9a84c]" viewBox="0 0 24 24" fill="currentColor">
+                <svg key={i} className="w-5 h-5 " viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
             </div>
 
-            <p className="text-gray-700 text-xl md:text-2xl leading-relaxed font-light mb-10 relative z-10 italic">
+            <p className="text-foreground text-xl md:text-2xl leading-relaxed font-light mb-10 relative z-10 italic">
               &ldquo;{t.text}&rdquo;
             </p>
 
             <div className="flex items-center gap-4 relative z-10">
-              <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${avatarColors[current % avatarColors.length]} flex items-center justify-center text-white font-bold text-base flex-shrink-0`}>
+              <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${avatarColors[current % avatarColors.length]} flex items-center justify-center  font-bold text-base flex-shrink-0`}>
                 {t.initials}
               </div>
               <div>
-                <p className="font-bold text-[#0f1117] text-base">{t.name}</p>
-                <p className="text-[#c9a84c] text-sm font-medium">{t.role}</p>
+                <p className="font-bold  text-base">{t.name}</p>
+                <p className=" text-sm font-medium">{t.role}</p>
               </div>
             </div>
           </div>
@@ -113,17 +113,17 @@ export default function Testimonials() {
             <div className="flex gap-2">
               {testimonials.map((_, i) => (
                 <button key={i} onClick={() => goTo(i)} aria-label={`Testimonial ${i + 1}`}
-                  className={`transition-all duration-300 h-1 ${i === current ? "w-10 bg-[#c9a84c]" : "w-4 bg-gray-300 hover:bg-gray-400"}`}
+                  className={`transition-all duration-300 h-1 ${i === current ? "w-10 bg-primary" : "w-4 bg-muted hover:bg-muted"}`}
                 />
               ))}
             </div>
             <div className="flex gap-2">
               <button onClick={prev} aria-label="Previous"
-                className="w-12 h-12 border border-gray-300 hover:border-[#c9a84c] hover:bg-[#c9a84c] text-gray-500 hover:text-white flex items-center justify-center transition-all duration-200">
+                className="w-12 h-12  -gray-300 hover:-primary hover:bg-primary   flex items-center justify-center transition-all duration-200">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
               </button>
               <button onClick={next} aria-label="Next"
-                className="w-12 h-12 border border-gray-300 hover:border-[#c9a84c] hover:bg-[#c9a84c] text-gray-500 hover:text-white flex items-center justify-center transition-all duration-200">
+                className="w-12 h-12  -gray-300 hover:-primary hover:bg-primary   flex items-center justify-center transition-all duration-200">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -134,15 +134,15 @@ export default function Testimonials() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
           {testimonials.map((item, i) => (
             <button key={item.id} onClick={() => goTo(i)}
-              className={`text-left p-5 border transition-all duration-200 ${i === current ? "border-[#c9a84c] bg-white shadow-lg" : "border-gray-200 bg-white/60 hover:border-[#c9a84c]/50 hover:bg-white"}`}
+              className={`text-left p-5  transition-all duration-200 ${i === current ? "-primary  shadow-lg" : "-gray-200 /60 hover:-primary/50 hover:"}`}
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${avatarColors[i % avatarColors.length]} flex items-center justify-center text-white text-xs font-bold`}>
+                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${avatarColors[i % avatarColors.length]} flex items-center justify-center  text-xs font-bold`}>
                   {item.initials}
                 </div>
-                <p className="font-semibold text-[#0f1117] text-xs">{item.name}</p>
+                <p className="font-semibold  text-xs">{item.name}</p>
               </div>
-              <p className="text-gray-500 text-xs leading-relaxed line-clamp-2">{item.text}</p>
+              <p className=" text-xs leading-relaxed line-clamp-2">{item.text}</p>
             </button>
           ))}
         </div>

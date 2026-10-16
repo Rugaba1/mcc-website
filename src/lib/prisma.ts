@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@/lib/generated/prisma'
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 // Guard: fail fast with a clear message if DATABASE_URL is missing

@@ -6,7 +6,7 @@ import { api, type Project } from "@/lib/api";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [mounted,  setMounted]  = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -16,26 +16,26 @@ export default function Projects() {
   if (!mounted) return null;
 
   return (
-    <section id="projects" className="py-24 bg-white">
+    <section id="projects" className="py-24 ">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
           <div>
-            <span className="inline-flex items-center gap-3 text-[#c9a84c] text-xs font-bold tracking-[0.25em] uppercase mb-4">
+            <span className="inline-flex items-center gap-3  text-xs font-bold tracking-[0.25em] uppercase mb-4">
               <span className="gold-divider" />
               Our Work
             </span>
-            <h2 className="font-playfair text-4xl md:text-5xl font-bold text-[#0f1117] leading-tight">
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold  leading-tight">
               Featured Projects
             </h2>
           </div>
-          <p className="text-gray-500 text-base max-w-sm leading-relaxed md:text-right">
+          <p className=" text-base max-w-sm leading-relaxed md:text-right">
             Tiles shaping Rwanda&apos;s most iconic spaces — from hospitality to infrastructure.
           </p>
         </div>
 
         {projects.length === 0 ? (
-          <p className="text-gray-400 text-center py-20">No projects yet. Add some in the admin portal.</p>
+          <p className=" text-center py-20">No projects yet. Add some in the admin portal.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
 
@@ -51,11 +51,11 @@ export default function Projects() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <span className="inline-block bg-[#c9a84c] text-white text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 mb-3">
+                  <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 mb-3">
                     {projects[0].type}
                   </span>
-                  <h3 className="font-playfair text-white font-bold text-2xl mb-2">{projects[0].title}</h3>
-                  <p className="text-gray-300 text-sm leading-relaxed max-w-md">{projects[0].description}</p>
+                  <h3 className="font-playfair  font-bold text-2xl mb-2">{projects[0].title}</h3>
+                  <p className="text-ivory/70 text-sm leading-relaxed max-w-md">{projects[0].description}</p>
                 </div>
               </div>
             )}
@@ -74,10 +74,10 @@ export default function Projects() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <span className="inline-block bg-[#c9a84c] text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
+                      <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
                         {proj.type}
                       </span>
-                      <h3 className="text-white font-bold text-base">{proj.title}</h3>
+                      <h3 className=" font-bold text-base">{proj.title}</h3>
                     </div>
                   </div>
                 ))}
@@ -96,11 +96,11 @@ export default function Projects() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <span className="inline-block bg-[#c9a84c] text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
+                  <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
                     {proj.type}
                   </span>
-                  <h3 className="text-white font-bold text-lg mb-1">{proj.title}</h3>
-                  <p className="text-gray-300 text-sm line-clamp-2">{proj.description}</p>
+                  <h3 className=" font-bold text-lg mb-1">{proj.title}</h3>
+                  <p className="text-ivory/70 text-sm line-clamp-2">{proj.description}</p>
                 </div>
               </div>
             ))}
@@ -110,7 +110,7 @@ export default function Projects() {
         <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
           <a
             href="/projects"
-            className="group inline-flex items-center gap-3 bg-[#0f1117] hover:bg-[#c9a84c] text-white font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
+            className="group inline-flex items-center gap-3 bg-accent hover:bg-primary  font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
           >
             View All Projects
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -119,7 +119,7 @@ export default function Projects() {
           </a>
           <a
             href="/collections"
-            className="group inline-flex items-center gap-3 border border-[#0f1117] hover:bg-[#0f1117] text-[#0f1117] hover:text-white font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
+            className="group inline-flex items-center gap-3  -[#0f1117] hover:bg-accent   font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
           >
             Browse Collections
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
