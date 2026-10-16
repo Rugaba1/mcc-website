@@ -1,0 +1,3748 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "sermons": "Sermons",
+    "stories": "Stories",
+    "events": "Events",
+    "give": "Give",
+    "donate": "Donate",
+    "live": "Live",
+    "gallery": "Gallery",
+    "about": "About Us",
+    "contact": "Contact",
+    "services": "Services",
+    "ministries": "Ministries",
+    "courses": "Courses",
+    "privacyPolicy": "Privacy Policy",
+    "prayerRequest": "Prayer Request",
+    "resources": "Resources"
+  },
+  "metadata": {
+    "title": "Global God's Presence - Church Community in Mbarara",
+    "description": "Experience Global God's Presence through worship, prayer, and community fellowship.",
+    "author": "Global God's Presence Church",
+    "keyword1": "church",
+    "keyword2": "worship",
+    "keyword3": "prayer"
+  },
+  "auth": {
+    "confirm_email": "Confirm email",
+    "reason": "Reason",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "sendMagicLink": "Send Magic Link",
+    "magicLink": "Magic Link",
+    "password": "Password",
+    "did_not_receive_email_verification_message": "If you did not receive the email verification link, please try again.",
+    "email_not_verified_title": "The email address {email} has not been verified. Please verify it before continuing.",
+    "click_to_verify": "Verify my email",
+    "email_not_verified_message": "Click button below to receive new email verification link",
+    "check_in_box": "Check your inbox",
+    "email_sent": "Sent",
+    "magic_link_sent_message": "We sent a sign-in link. It expires in 15 minutes.",
+    "failed_to_request_email_verification_link": "Failed to request email verification link. Please try again",
+    "confirmPassword": "Confirm Password",
+    "showPassword": "Show Password",
+    "hidePassword": "Hide Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "emailPlaceholder": "email@example.com",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resetPassword": "Reset Password",
+    "sendOtp": "Send OTP",
+    "otpCode": "OTP Code",
+    "otpPlaceholder": "Enter 6-digit OTP",
+    "enterEmailForOtp": "Enter your email to receive an OTP",
+    "enterOtpAndPassword": "Enter the OTP sent to your email and your new password",
+    "otpSent": "OTP sent to your email",
+    "otpFailed": "Failed to send OTP",
+    "resetSuccess": "Password reset successful",
+    "resetFailed": "Failed to reset password",
+    "setNewPasswordDesc": "Choose a new password for your account.",
+    "resetLinkInvalid": "This reset link is invalid or has expired",
+    "resetLinkInvalidDesc": "It may have already been used, or the link expired. Request a new one below.",
+    "backToLogin": "Back to Login",
+    "backToRegister": "Back to Register",
+    "verifyEmail": "Verify Email",
+    "verifyingEmail": "Verifying your email address...",
+    "emailVerified": "Your email has been verified",
+    "emailVerifiedSuccess": "Email verified successfully!",
+    "verificationFailed": "Email verification failed",
+    "noTokenProvided": "No verification token provided",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out successfully",
+    "registerSuccess": "Registration successful! Please log in.",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "registerFailed": "Registration failed. Please try again.",
+    "profile": "Profile",
+    "panelTag": "Global God's Presence Church",
+    "panelTitle": "Grow in Faith, Together",
+    "panelSubtitle": "Sign in to access sermons, courses, giving history, and everything happening in our church community.",
+    "panelBenefits": [
+      "Watch sermons and past messages anytime",
+      "Track your giving history and receipts",
+      "Enroll in courses taught by our leaders",
+      "Join ministries and stay connected to events"
+    ],
+    "email_verification_title": "Email verification sent",
+    "email_verification_link_sent": "Check your inbox",
+    "email_verification_message": "We have sent a verification link to the provided email address. Please check your inbox or spam folder to verify your account and continue."
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be at most {max} characters",
+    "passwordMatch": "Passwords do not match",
+    "invalidCredentials": "Invalid email or password",
+    "nameMin": "Name must be at least 2 characters",
+    "emailInvalid": "Invalid email address",
+    "passwordMin": "Password must be at least 6 characters",
+    "otpLength": "OTP must be 6 digits",
+    "currentPasswordRequired": "Current password is required",
+    "newPasswordMin": "New password must be at least 6 characters"
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "server": "Server error. Please try again later.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "generic": "Something went wrong. Please try again.",
+    "failedToLoadSessions": "Failed to load sessions",
+    "failedToRevoke": "Failed to revoke session",
+    "failedToRevokeAll": "Failed to revoke all sessions",
+    "failedToCreateKey": "Failed to create API key",
+    "failedToRevokeKey": "Failed to revoke",
+    "failedToFetchUsers": "Failed to fetch users",
+    "failedToBanUser": "Failed to ban user",
+    "failedToUnbanUser": "Failed to unban user",
+    "failedToUpdateProfile": "Failed to update profile",
+    "failedToChangePassword": "Failed to change password",
+    "notFound": "Not found"
+  },
+  "common": {
+    "profileTab": "Account",
+    "donationPlanTab": "Donation Plan",
+    "donating": "Donating ...",
+    "or_continue_with": "or continue with",
+    "devotionFlyerTitle": "Devotional Flyer",
+    "dailyDevotion": "Daily Devotion",
+    "donate": "Donate",
+    "name": "Name",
+    "saving": "Saving...",
+    "email": "Email",
+    "phone": "Phone",
+    "scanToReadOnline": "Scan to read online",
+    "backgroundColor": "Background Color",
+    "fontSize": "Font size",
+    "fontFamily": "Font",
+    "fontColor": "Font Color",
+    "cornerRadius": "Corner Radius",
+    "export": "Export",
+    "donationForm": "Donation Form",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "backToHome": "Back to home",
+    "backToLogin": "Back to Login",
+    "create": "Create",
+    "revoke": "Revoke",
+    "revokeAll": "Revoke All",
+    "manage": "Manage",
+    "copied": "Copied",
+    "copy": "Copy",
+    "unknownDevice": "Unknown device",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "new": "New",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "refresh": "Refresh"
+  },
+  "home": {
+    "finish": "Finish",
+    "navigation": {
+      "all": "All",
+      "finish": "Finish",
+      "home": "Home",
+      "about": "About Us",
+      "account": "Account",
+      "manageYourAccount": "Manage your account",
+      "myAccount": "Account",
+      "myCourses": "Courses",
+      "myCommunity": "Community",
+      "signOut": "Sign out",
+      "signIn": "Sign In",
+      "search": "Search",
+      "group": "Groups",
+      "services": "Services",
+      "events": "Events",
+      "resources": "Resources",
+      "bibleReadingPlans": "Bible Reading Plans",
+      "devotionals": "Devotionals",
+      "podcast": "Podcast",
+      "faq": "FAQ",
+      "contact": "Contact Us",
+      "give": "Give",
+      "donate": "Donate",
+      "sermons": "Sermons",
+      "stories": "Stories",
+      "ministries": "Ministries",
+      "courses": "Courses",
+      "dropdown": {
+        "title": "Account",
+        "myAccount": "Account",
+        "myEvents": "Events",
+        "myCourses": "Courses",
+        "myGroups": "Groups",
+        "logout": "Logout",
+        "adminDashboard": "Admin Dashboard",
+        "myDashboard": "Dashboard"
+      },
+      "live": "Live"
+    },
+    "FilterBy": "Filter by",
+    "today": "Today",
+    "before": "Before",
+    "after": "After",
+    "customDateFilter": "Custom Date Filter",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "account": "Account",
+    "manageYourAccount": "Manage your account",
+    "myAccount": "Account",
+    "myCourses": "Courses",
+    "myCommunity": "Community",
+    "title": "Welcome Home - Global God's Presence Church",
+    "home": "Home",
+    "search": "Search",
+    "searchPlaceholder": "Search sermons, events, stories…",
+    "searchNoResults": "No results for \"{query}\"",
+    "searchResultsFor": "Results for \"{query}\"",
+    "searchLoadMore": "Load more",
+    "searchTypes": {
+      "sermon": "Sermon",
+      "event": "Event",
+      "story": "Story",
+      "course": "Course",
+      "devotional": "Devotional",
+      "bible_reading_plan": "Reading Plan"
+    },
+    "welcome": "Welcome to Global God's Presence Church",
+    "subtitle": "Your church community platform",
+    "experience": {
+      "title": "Experience the Presence of God",
+      "description": "Join us in worship, prayer, and fellowship. Stay connected with our church community.",
+      "locations": {
+        "physical": {
+          "title": "Physical Locations",
+          "description": "Visit us at our church locations for in-person services and events."
+        },
+        "online": {
+          "title": "Online Services",
+          "description": "Join our live-streamed services and events from anywhere in the world."
+        },
+        "community": {
+          "title": "Community Engagement",
+          "description": "Participate in our community programs, volunteer opportunities, and outreach initiatives."
+        }
+      },
+      "cta": {
+        "joinUs": "Join Us",
+        "learnMore": "Learn More"
+      },
+      "ways-to-connect": {
+        "title": "Ways to Connect",
+        "description": "Discover various ways to engage with our church community, both online and offline."
+      },
+      "community": {
+        "title": "Community",
+        "description": "Connect with fellow members, join groups, and participate in church activities."
+      },
+      "events": {
+        "title": "Events",
+        "description": "Stay updated with upcoming church events, workshops, and special services."
+      },
+      "resources": {
+        "title": "Resources",
+        "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey.",
+        "cta": {
+          "joinUs": "Join Us",
+          "learnMore": "Learn More"
+        }
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "description": "Hear from our members about their experiences and spiritual growth within our church community."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "description": "Have questions or need assistance? Reach out to our church staff for support and guidance.",
+        "cta": {
+          "contactUs": "Contact Us",
+          "getInTouch": "Get in Touch"
+        }
+      },
+      "footer": {
+        "title": "Stay Connected",
+        "description": "Follow us on social media and subscribe to our newsletter for the latest updates.",
+        "cta": {
+          "subscribe": "Subscribe",
+          "followUs": "Follow Us"
+        }
+      },
+      "child-support": {
+        "title": "Child Support",
+        "description": "We provide support and resources for children and families in our community.",
+        "cta": {
+          "learnMore": "Learn More",
+          "getInvolved": "Get Involved"
+        }
+      }
+    }
+  },
+  "about": {
+    "title": "About Us - Global God's Presence Church",
+    "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey.",
+    "paragraph": "Global God's Presence Church is a vibrant community of believers dedicated to worship, fellowship, and service. Our mission is to spread the love of Christ and make a positive impact in our community and beyond. We offer a variety of programs, events, and resources to support spiritual growth and engagement.",
+    "whoWeAre": "who we are",
+    "churchExperience": "church experience",
+    "leadership": "leadership",
+    "mission": "mission",
+    "vision": "vision",
+    "values": "values",
+    "whoWeAreSection": {
+      "title": "Who We Are",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "churchExperienceSection": {
+      "title": "Church Experience",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "leadershipSection": {
+      "title": "Leadership",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "missionSection": {
+      "title": "Mission",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "visionSection": {
+      "title": "Vision",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "valuesSection": {
+      "title": "Values",
+      "description": "Access sermons, devotionals, and other spiritual resources to support your faith journey."
+    },
+    "cta": {
+      "joinUs": "Join Us",
+      "learnMore": "Learn More"
+    }
+  },
+  "give": {
+    "thumnailTitle": "Giving",
+    "thumnailDescription": "Put God first in your finances. Support our church and its ministries through your generous donations.",
+    "title": "Give to Global God's Presence Church",
+    "description": "Support our church and its ministries through your generous donations. Your contributions make a difference in the lives of many.",
+    "paragraph": "Giving is an act of worship and a way to support the mission of Global God's Presence Church. Your donations help us continue our programs, outreach, and community services. We offer various ways to give, including online donations, in-person contributions, and recurring giving options.",
+    "givingCategories": {
+      "tithes": {
+        "title": "Tithes",
+        "description": "Honor God with your tithes and support the ongoing work of the church."
+      },
+      "offerings": {
+        "title": "Offerings",
+        "description": "Give above and beyond your tithes to support specific ministries and projects."
+      },
+      "missions": {
+        "title": "Missions",
+        "description": "Support our global missions efforts and help spread the gospel around the world."
+      },
+      "buildingFund": {
+        "title": "Building Fund",
+        "description": "Contribute to our building fund to help expand our facilities and accommodate our growing community."
+      }
+    },
+    "ways": {
+      "online": {
+        "title": "Online Giving",
+        "description": "Donate securely online using our giving platform."
+      },
+      "inPerson": {
+        "title": "In-Person Giving",
+        "description": "Give during our worship services or at the church office."
+      },
+      "recurring": {
+        "title": "Recurring Giving",
+        "description": "Set up automatic donations to support the church on a regular basis."
+      }
+    },
+    "cta": {
+      "giveNow": "Give Now",
+      "learnMore": "Learn More"
+    }
+  },
+  "nav": {
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "sermons": "Sermons",
+    "sermonSeries": "Sermon Series",
+    "courses": "Courses",
+    "donations": "Donations",
+    "services": "Services",
+    "stories": "Stories",
+    "fileManagement": "File Management",
+    "siteManagement": "Site Management",
+    "financialManagement": "Financial Management",
+    "adminUsers": "Users",
+    "adminLogs": "System Logs",
+    "notifications": "Notifications",
+    "skipToContent": "Skip to main content",
+    "navigationMenu": "Navigation menu",
+    "adminBadge": "Admin",
+    "bottomNav": "Primary",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "accountMenu": "Account menu",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionDesc": "Turn off animations and auto-playing transitions",
+    "language": "Language",
+    "heroSlides": "Hero Slides",
+    "playlists": "Playlists",
+    "gallery": "Gallery",
+    "prayerRequests": "Prayer Requests",
+    "contactMessages": "Contact Messages",
+    "newsletter": "Newsletter",
+    "badgeOverflow": "9+",
+    "userFallback": "U",
+    "overview": "Overview",
+    "content": "Content",
+    "community": "Community",
+    "finance": "Finance",
+    "system": "System",
+    "account": "Account",
+    "mySpace": "My Space",
+    "myDashboard": "Dashboard",
+    "myCourses": "Courses",
+    "myCertificates": "Certificates",
+    "myDonations": "Donations",
+    "auth": {
+      "logout": "Log Out"
+    },
+    "ministries": "Ministries",
+    "myMinistries": "Ministries",
+    "siteStats": "Homepage Stats",
+    "siteConfig": "Site Settings",
+    "pageContent": "Page Content",
+    "heroSection": "Hero",
+    "goLive": "Go Live",
+    "bibleReadingPlans": "Bible Reading Plans",
+    "devotionals": "Devotionals"
+  },
+  "myDashboard": {
+    "reply": "Reply",
+    "you": "You",
+
+    "replyingToMessage": "Replying to this message",
+    "resumingFrom": "Resuming from {time}",
+    "nowPlaying": "Now playing",
+    "donation": "donation",
+    "pdfTryAgain": "Try again",
+    "openInNewTab": "Open in a new tab",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "reviewsTab": "Reviews",
+    "reviews": "Reviews",
+    "noReviewsYet": "No reviews yet.",
+    "leaveReview": "Leave a review",
+    "submitReview": "Submit Review",
+    "welcome": "Welcome",
+    "welcomeDesc": "Here is an overview of your learning and giving activity.",
+    "enrolledCourses": "Enrolled Courses",
+    "activeCourses": "In Progress",
+    "completedCourses": "Completed",
+    "totalDonations": "Total Donations",
+    "recentCourses": "Recent Courses",
+    "recentDonations": "Recent Donations",
+    "viewAll": "View all",
+    "noCoursesYet": "You have not enrolled in any courses yet.",
+    "browseCourses": "Browse Courses",
+    "noDonationsYet": "You have not made any donations yet.",
+    "giveDonation": "Give Now",
+    "donations": "donations",
+    "total": "Total",
+    "myCourses": "My Courses",
+    "myCoursesDesc": "Track your learning progress across all enrolled courses.",
+    "myDonations": "My Donations",
+    "myDonationsDesc": "Your giving history and contribution summary.",
+    "donationsAfter": "After",
+    "donationsBefore": "Before",
+    "selectDate": "Select date",
+    "applyDonationDates": "Apply dates",
+    "clearDonationDates": "Clear dates",
+    "noDonationsForDates": "No donations found in this date range.",
+    "sendReceipt": "Email receipt",
+    "sendingReceipt": "Sending receipt...",
+    "receiptSent": "Receipt email sent.",
+    "receiptSendFailed": "Could not send receipt. Please try again.",
+    "donationActions": "Receipt",
+    "all": "All",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "yourProgress": "Your Progress",
+    "description": "Description",
+    "instructor": "Instructor",
+    "week": "week",
+    "lessons": "lessons",
+    "liveOnly": "Live",
+    "live": "LIVE",
+    "joinNow": "Join Now",
+    "continue": "Continue",
+    "progress": "Progress",
+    "min": "min",
+    "liveSession": "Live Session",
+    "joinLive": "Join Live Session",
+    "sessionNotStarted": "Session not started",
+    "sessionEnded": "Session ended",
+    "courseContent": "Course Content",
+    "audioContent": "Audio content will appear here.",
+    "videoContent": "Video content will appear here.",
+    "noContentYet": "Course content has not been added yet.",
+    "previewLesson": "Preview",
+    "markComplete": "Mark as Complete",
+    "saving": "Saving...",
+    "back": "Back",
+    "notEnrolled": "You are not enrolled in this course.",
+    "enrollNow": "Enroll Now",
+    "language": "Language",
+    "duration": "Duration",
+    "completedOn": "Completed on",
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "transaction": "Transaction ID",
+    "donationStatusColumn": "Status",
+    "donationStatusPending": "Pending",
+    "donationStatusCompleted": "Completed",
+    "donationStatusSuccessful": "Successful",
+    "donationStatusFailed": "Failed",
+    "loading": "Loading...",
+    "pdfLoading": "Loading PDF...",
+    "pdfLoadFailed": "The PDF could not be loaded. Try again or open it in a new tab.",
+    "pdfLoadTimeout": "The PDF is taking too long to load. Try again or open it in a new tab.",
+    "loadMore": "Load more",
+    "myGroups": "My Groups",
+    "myGroupsComingSoon": "Community groups are coming soon. Stay tuned for updates!",
+    "backToDashboard": "Back to Dashboard",
+    "myEnrolled": "My Enrolled",
+    "enroll": "Enroll",
+    "enrolling": "Enrolling...",
+    "enrolled": "Enrolled",
+    "searchCourses": "Search courses...",
+    "noCoursesFound": "No courses found.",
+    "courseProgress": "Course Progress",
+    "donationTrend": "Donation Trend",
+    "donationsByType": "Donations by Type",
+    "totalGiven": "Total Given",
+    "liveNow": "Live Now",
+    "joinLiveDesc": "A live session is available. Join now!",
+    "featured": "Featured",
+    "typeVideo": "Video",
+    "typeAudio": "Audio",
+    "typeText": "Text",
+    "allCategories": "All Categories",
+    "allLevels": "All Levels",
+    "levelBeginner": "Beginner",
+    "levelIntermediate": "Intermediate",
+    "levelAdvanced": "Advanced",
+    "courseMaterials": "Course Materials",
+    "viewMaterial": "View",
+    "noMaterials": "No materials available for this course.",
+    "upcomingLive": "Upcoming Live Sessions",
+    "scheduledFor": "Scheduled for",
+    "upcomingLiveDesc": "A live session is coming up soon — get ready to join!",
+    "courseQuizzes": "Course Quizzes",
+    "quiz": "Quiz",
+    "questions": "questions",
+    "answered": "answered",
+    "submitQuiz": "Submit Quiz",
+    "submitting": "Submitting...",
+    "quizPassed": "Passed",
+    "quizFailed": "Failed",
+    "timeLeft": "Time left",
+    "timeExpired": "Time's up! Quiz submitted automatically.",
+    "quizResultFinal": "Result is final",
+    "correctAnswers": "correct answers",
+    "progressUpdated": "Progress updated to",
+    "progressFromQuizzes": "Progress is based on your quiz scores",
+    "progressFromLessons": "Progress is based on completed lessons and quizzes",
+    "myNotes": "My Notes",
+    "notesPlaceholder": "Jot down your own private notes for this lesson...",
+    "saveNote": "Save Note",
+    "noteSaved": "Note saved",
+    "noteSaveFailed": "Could not save your note. Please try again.",
+    "highlightOverlap": "That selection overlaps a highlight you already made. Remove it first.",
+    "highlightSaveFailed": "Could not save your highlight. Please try again.",
+    "highlightDeleteFailed": "Could not remove that highlight. Please try again.",
+    "clickToRemoveHighlight": "Click to remove highlight",
+    "highlightColorLabel": "Highlight in {color}",
+    "highlightColor_yellow": "yellow",
+    "highlightColor_green": "green",
+    "highlightColor_blue": "blue",
+    "highlightColor_pink": "pink",
+    "quizAlreadyAttempted": "You've already completed this quiz. Each quiz can only be taken once.",
+    "quizSubmitted": "Quiz submitted successfully.",
+    "quizSubmitFailed": "Could not submit your quiz. Please check your connection and try again.",
+    "noAttemptYet": "Not attempted yet",
+    "community": "Community",
+    "manage": "Manage",
+    "communityDesc": "Chat with course members and stay updated",
+    "typeMessage": "Write a message...",
+    "sendMessage": "Send",
+    "announcement": "Announcement",
+    "noMessages": "No messages yet. Be the first to say something!",
+    "joinLiveFromChat": "Join Live",
+    "connectingChat": "Connecting...",
+    "chatDisconnected": "Disconnected. Reconnecting...",
+    "messageDeleteFailed": "Could not delete this message. Please try again.",
+    "messageSendFailed": "Could not send your message. Please try again.",
+    "deleteMessage": "Delete message",
+    "enrollSuccess": "You're enrolled! Happy learning.",
+    "enrollFailed": "Could not enroll in this course. Please try again.",
+    "unenrollSuccess": "You've left this course.",
+    "unenrollFailed": "Could not leave this course. Please try again.",
+    "confirmUnenrollTitle": "Leave this course?",
+    "confirmUnenrollDesc": "You'll lose access to \"{title}\" until you re-enroll. Your progress is kept and will still be there if you come back.",
+    "cancel": "Cancel",
+    "unenroll": "Leave course",
+    "materialCompleted": "Marked as complete.",
+    "materialCompleteFailed": "Could not update this material. Please try again.",
+    "myCertificates": "My Certificates",
+    "myCertificatesDesc": "View and download the certificates you've earned.",
+    "noCertificatesYet": "You haven't earned any certificates yet. Complete a course to receive one!",
+    "downloadCertificate": "Download PDF",
+    "downloadCertificateFailed": "Could not download this certificate. Please try again.",
+    "issuedOn": "Issued on"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "yourNotifications": "Your Notifications",
+    "description": "Real-time notifications from the server. Stay updated with important events.",
+    "empty": "No notifications yet. You will see real-time updates here when connected.",
+    "markAllRead": "Mark All Read",
+    "markAsRead": "Mark as read",
+    "clearAll": "Clear All",
+    "clearOne": "Clear notification",
+    "allMarkedRead": "All notifications marked as read",
+    "allCleared": "All notifications cleared",
+    "confirmClear": "Clear all notifications?",
+    "new": "New",
+    "loadFailed": "Could not load notifications.",
+    "updateFailed": "Could not update notifications. Please try again."
+  },
+  "sessions": {
+    "title": "Active Sessions",
+    "yourDevices": "Your Devices",
+    "description": "Manage your active login sessions across devices.",
+    "noSessions": "No active sessions.",
+    "device": "Device",
+    "ipAddress": "IP Address",
+    "createdAt": "Created At",
+    "action": "Action",
+    "revokeSession": "Revoke this session?",
+    "sessionRevoked": "Session revoked",
+    "confirmRevokeAll": "Revoke all sessions? You will be logged out on other devices.",
+    "allRevoked": "All sessions revoked"
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "createTitle": "Create New Key",
+    "createDescription": "Name your key to identify its purpose.",
+    "keyNamePlaceholder": "Key name (e.g., Mobile App)",
+    "yourKeys": "Your API Keys",
+    "noKeys": "No API keys yet.",
+    "confirmRevoke": "Revoke this API key?",
+    "created": "API key created",
+    "revoked": "API key revoked"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account settings",
+    "information": "Profile Information",
+    "plan_name": "Plan",
+    "change_plan": "Change Plan",
+    "plan_cancelled": "Your giving plan has been cancelled successfully.",
+    "canceled_at": "Cancelled at",
+    "plan_cancellation_failed": "We couldn't cancel your giving plan. Please try again.",
+    "failed_to_get_donation_plan": "We couldn't load your giving plan. Please try again.",
+    "plan_period_start_at": "Plan start at",
+    "plan_period_end_at": "Plan end at",
+    "plan_status": "Status",
+    "plan_last_event": "Last event",
+    "manageYourDonationPlan": "Manage your donation plan",
+    "manageYourDonationDescription": "Activate or cancel your giving plan.",
+    "donation_plan_not_found": "You don't have an active giving plan. Make a donation while signed in to start one.",
+    "informationDescription": "Update your personal information",
+    "phone": "Phone",
+    "bio": "Bio",
+    "changePassword": "Change Password",
+    "changePasswordDescription": "Update your password to keep your account secure",
+    "profileUpdated": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully",
+    "deleteAccount": "Delete Account",
+    "deleteDescription": "This action cannot be undone.",
+
+    "deleteSummary": "Deleting your account permanently removes your sign-in and signs you out. Your sessions, course enrollments and progress, messages, and other records owned by your account are deleted. Your member record, donation history, and giving plan are not deleted; your giving plan is not cancelled automatically, and contact details on retained records may remain. Cancel your giving plan separately before deleting your account. A deletion audit record containing a one-way email hash, your selected reason, and plan information is retained. Uploaded files are deleted where storage removal succeeds; files that a storage provider cannot remove may remain.",
+    "deleteLastWarning": "By selecting Delete, you confirm that you understand which records remain and that your giving plan must be cancelled separately. Your account cannot be restored after deletion."
+  },
+  "admin": {
+    "courseOverview": "Course Overview",
+    "flutterwaveBalances": "Flutterwave Balances",
+    "flutterwaveSearchLimitNote": "Search is limited to the latest transactions available from Flutterwave.",
+    "attribution": "Attribution",
+    "raisedOf": "raised of",
+    "searchLeaderPlaceholder": "Search leaders by name or email",
+    "searchByNameEmailRef": "Search By Name, Email, Ref",
+    "ledger": "Ledger",
+    "hideZeroBalances": "Hide zero balances",
+    "showAllCurrencies": "Show all {count} currencies",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "dashboard": "Dashboard",
+    "sermons": "Sermons",
+    "events": "Events",
+    "stories": "Stories",
+    "editSection": "Edit section",
+    "heroSlides": "Hero Slides",
+    "sermonSeries": "Sermon Series",
+    "newSeries": "New Series",
+    "editSeries": "Edit Series",
+    "seriesNameEn": "Series Name (EN)",
+    "seriesNameSw": "Series Name (SW)",
+    "seriesDescEn": "Description (EN)",
+    "seriesDescSw": "Description (SW)",
+    "seriesThumbnail": "Series Thumbnail",
+    "flutterwaveDonations": "Flutterwave Donations",
+    "sermonCount": "Sermons",
+    "noSeries": "No series yet — create one to organize your sermons.",
+    "confirmDeleteSeries": "This will permanently delete the series. Sermons using it will simply lose their series label, not be deleted.",
+    "seriesNameRequired": "Series name is required",
+    "noSeriesOption": "No series",
+    "prayerRequests": "Prayer Requests",
+    "contactMessages": "Contact Messages",
+    "newSermon": "New Sermon",
+    "newEvent": "New Event",
+    "newStory": "New Story",
+    "newSlide": "New Slide",
+    "editSermon": "Edit Sermon",
+    "editEvent": "Edit Event",
+    "editStory": "Edit Story",
+    "editSlide": "Edit Slide",
+    "checkingDimensions": "Checking image/video dimensions…",
+    "recommendedDimension": "Recommended size: {width}×{height} — shows the most of the frame with the least cropping.",
+    "primaryButtonLink": "Primary Button Link",
+    "linkType": "Link To",
+    "linkTypeNone": "None",
+    "linkTypeSermon": "Sermon",
+    "linkTypeStory": "Story",
+    "linkTypeEvent": "Event",
+    "linkTypeCourse": "Course",
+    "linkTypeDonation": "Donation Campaign",
+    "linkTypeCustom": "Custom URL",
+    "selectContent": "Select content…",
+    "loadingOptions": "Loading…",
+    "useThisThumbnail": "Use this thumbnail",
+    "customUrl": "URL",
+    "buttonLabelEn": "Button Label (EN)",
+    "buttonLabelSw": "Button Label (SW)",
+    "secondaryButton": "Secondary Button",
+    "title": "Title (EN)",
+    "titleSw": "Title (SW)",
+    "speaker": "Speaker",
+    "series": "Series",
+    "duration": "Duration",
+    "videoUrl": "Video URL",
+    "thumbnailUrl": "Thumbnail URL",
+    "date": "Date",
+    "category": "Category",
+    "location": "Location",
+    "startTime": "Start Time",
+    "recurrence": "Recurrence",
+    "timeLabel": "Time",
+    "nameEn": "Name (EN)",
+    "nameSw": "Name (SW)",
+    "categoryEn": "Category (EN)",
+    "categorySw": "Category (SW)",
+    "quoteEn": "Quote (EN)",
+    "quoteSw": "Quote (SW)",
+    "contentEn": "Content (EN)",
+    "contentSw": "Content (SW)",
+    "contentSwPlaceholder": "Kiswahili version (optional)",
+    "slideType": "Slide Type",
+    "src": "Image / Video URL",
+    "descEn": "Description (EN)",
+    "descSw": "Description (SW)",
+    "order": "Display Order",
+    "isPublished": "Published",
+    "isActive": "Active",
+    "published": "Published",
+    "draft": "Draft",
+    "active": "Active",
+    "inactive": "Inactive",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "confirmDelete": "Are you sure you want to delete this item? This action cannot be undone.",
+    "edit": "Edit",
+    "view": "View",
+    "moreActions": "More actions",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "page": "Page",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "close": "Close",
+    "status": "Status",
+    "pending": "Pending",
+    "prayed": "Prayed",
+    "acknowledged": "Acknowledged",
+    "unread": "Unread",
+    "read": "Read",
+    "replied": "Replied",
+    "markAs": "Mark as",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Message",
+    "locale": "Language",
+    "submittedAt": "Submitted At",
+    "noData": "No records found.",
+    "loading": "Loading…",
+    "errorLoad": "Failed to load data.",
+    "successSave": "Saved successfully.",
+    "successDelete": "Deleted successfully.",
+    "accessDenied": "Access denied. Staff or admin account required.",
+    "goHome": "Go to Homepage",
+    "totalSermons": "Total Sermons",
+    "totalEvents": "Total Events",
+    "totalStories": "Total Stories",
+    "totalPrayers": "Prayer Requests",
+    "totalContacts": "Contact Messages",
+    "image": "Image",
+    "video": "Video",
+    "audioUrl": "Audio URL",
+    "description": "Description",
+    "prayerRequest": "Prayer Request",
+    "contactMessage": "Contact Message",
+    "reply": "Reply via Email",
+    "galleryManagement": "Gallery Management",
+    "galleryManagementDesc": "Upload and manage images and videos for the public gallery page.",
+    "newGalleryItem": "Add Media",
+    "bulkAddMedia": "Add Multiple",
+    "editGalleryItem": "Edit Media",
+    "playlists": "Playlists",
+    "playlistsDesc": "Build HLS playlists from .ts segment files for fast-loading hero videos.",
+    "newPlaylist": "New Playlist",
+    "editPlaylist": "Edit Playlist",
+    "playlist": "Playlist (HLS)",
+    "youtube": "YouTube Video",
+    "youtubeUrlInvalid": "Couldn't find a video in that URL — paste a normal YouTube watch/share link.",
+    "segments": "segments",
+    "targetDuration": "Max Segment Duration (s)",
+    "noPlaylists": "No playlists yet. Create one to use HLS streaming on the hero.",
+    "noSegmentsYet": "No segments yet — click \"Add Segments\" to pick .ts files.",
+    "addSegments": "Add Segments",
+    "probingDuration": "Reading durations…",
+    "segmentTitle": "Title",
+    "selectPlaylist": "Select Playlist",
+    "changePlaylist": "Change Playlist",
+    "playlistNamePlaceholder": "e.g. Sunday Service Loop",
+    "playlistDescPlaceholder": "Optional description",
+    "caption": "Caption",
+    "captionPlaceholder": "Add a caption…",
+    "mediaType": "Media Type",
+    "mediaFile": "Media File",
+    "fileManagement": "File Management",
+    "fileManagementDesc": "Upload and organise media files for use across the site",
+    "newFolder": "New Folder",
+    "uploadFile": "Upload File",
+    "allFiles": "All Files",
+    "folders": "Folders",
+    "folderName": "Folder Name",
+    "folderNamePlaceholder": "e.g. Sermons",
+    "create": "Create",
+    "creating": "Creating…",
+    "uploading": "Uploading…",
+    "noFiles": "No files yet",
+    "noFilesDesc": "Upload files using the button above",
+    "copyUrl": "Copy URL",
+    "urlCopied": "URL copied to clipboard",
+    "googleDrive": "Google Drive",
+    "drive": "Drive",
+    "driveNotConnected": "Connect a Google account in Site Settings first.",
+    "driveImportFailed": "Failed to import file from Drive.",
+    "uploadToDrive": "Upload to Drive",
+    "uploadingToDrive": "Uploading to Drive…",
+    "uploadToDriveSuccess": "File uploaded to Drive and saved to the site",
+    "uploadToDriveFailed": "Failed to upload file to Drive",
+    "removeFromList": "Remove from list",
+    "paginationShowing": "Showing {from}–{to} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "uploadSuccess": "File uploaded successfully",
+    "uploadFailed": "Upload failed",
+    "folderCreated": "Folder created",
+    "folderCreateFailed": "Failed to create folder",
+    "fileDeleteSuccess": "File deleted",
+    "fileDeleteFailed": "Failed to delete file",
+    "dirDeleteSuccess": "Folder deleted",
+    "dirDeleteFailed": "Failed to delete folder",
+    "loadFailed": "Couldn't load files",
+    "loadFailedDesc": "Something went wrong loading your files and folders.",
+    "retry": "Try again",
+    "deleteFileTitle": "Delete file?",
+    "deleteFileDesc": "will be permanently removed from disk and cannot be recovered.",
+    "deleteFolderTitle": "Delete folder?",
+    "deleteFolderDesc": "and all files inside it will be permanently deleted from disk.",
+    "services": "Services",
+    "servicesDesc": "Manage church service schedules and details",
+    "comingSoon": "Coming Soon",
+    "servicesComingSoonDesc": "Service scheduling features are being built. Check back soon to manage weekly services, special events, and programmes.",
+    "newService": "New Service",
+    "editService": "Edit Service",
+    "dayOfWeek": "Day of Week",
+    "selectDay": "Select day",
+    "locationLabel": "Location",
+    "isOnline": "Available Online",
+    "serviceTitle": "Title (EN)",
+    "serviceTitleSw": "Title (SW)",
+    "serviceDesc": "Description (EN)",
+    "serviceDescSw": "Description (SW)",
+    "dayOfWeekSw": "Day (SW)",
+    "locationSw": "Location (SW)",
+    "dashboardDesc": "Overview of your church management system",
+    "users": "Users",
+    "chartUserGrowth": "User & Member Growth",
+    "chartUserGrowthDesc": "New registrations per month over the last 12 months",
+    "chartDonationRevenue": "Donation Revenue",
+    "chartDonationRevenueDesc": "Total monthly donations in USD over the last 12 months",
+    "chartContentActivity": "Content Activity",
+    "chartContentActivityDesc": "Sermons, events, and stories published per month",
+    "chartDonationCount": "Donation Volume",
+    "chartDonationCountDesc": "Number of individual donations per month",
+    "totalRevenue": "Total Revenue",
+    "avgMonthly": "Monthly Average",
+    "topDonors": "Top Donors",
+    "recentDonations": "Recent Donations",
+    "exportCsv": "Export CSV",
+    "financialOverview": "Financial Overview",
+    "financialDesc": "Track donations, revenue trends, and financial health",
+    "totalUsers": "Total Users",
+    "totalMembers": "Total Members",
+    "notifications": "Unread Notifications",
+    "donations": "Donations",
+    "newDonation": "New Donation",
+    "editDonation": "Edit Donation",
+    "totalDonationsUsd": "Total Donations",
+    "totalDonationsCount": "Total Donations",
+    "donationsByType": "Breakdown by Type",
+    "donor": "Donor",
+    "amount": "Amount",
+    "currency": "Currency",
+    "donationTypeLabel": "Donation Type",
+    "transactionId": "Transaction ID",
+    "actions": "Actions",
+    "filterByType": "Filter by type",
+    "allTypes": "All Types",
+    "allCategories": "All Categories",
+    "rating": "Rating",
+    "addNewCategory": "Add a new category…",
+    "addNewLanguage": "Add a new language…",
+    "manageCategories": "Manage Categories",
+    "manageLanguages": "Manage Languages",
+    "noCategoriesYet": "No categories yet.",
+    "noLanguagesYet": "No languages yet.",
+    "picklistSaveFailed": "That name could not be saved. It may already be in use.",
+    "picklistRenamed": "Renamed successfully.",
+    "picklistDeleted": "Deleted successfully.",
+    "confirmDeleteCategory": "Delete this category? Courses already using it will keep their current category, but it will no longer appear as an option.",
+    "confirmDeleteLanguage": "Delete this language? Courses already using it will keep their current language, but it will no longer appear as an option.",
+    "bibleReadingPlans": "Bible Reading Plans",
+    "newBiblePlan": "New Reading Plan",
+    "editBiblePlan": "Edit Reading Plan",
+    "searchPlaceholderBiblePlans": "Search by title…",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "descriptionSw": "Description (Swahili)",
+    "planFile": "Plan File (PDF)",
+    "selectPlanFileLabel": "Select Plan File",
+    "sortOrder": "Sort Order",
+    "readingChannel": "Reading Channel",
+    "channelType": "Channel Type",
+    "channelTypeYoutube": "YouTube Live",
+    "channelTypeWebrtc": "In-App (WebRTC)",
+    "scheduleChannel": "Schedule Channel",
+    "scheduledFor": "Scheduled For",
+    "getStreamKey": "Get Stream Key",
+    "endBroadcast": "End Broadcast",
+    "endSession": "End Session",
+    "channelLive": "LIVE",
+    "channelScheduled": "Scheduled",
+    "channelEnded": "Ended",
+    "copyJoinLink": "Copy Join Link",
+    "joinLinkCopied": "Join link copied to clipboard.",
+    "ingestionAddress": "Ingestion Address",
+    "streamKey": "Stream Key",
+    "savePlanFirst": "Save the plan first, then schedule a reading channel.",
+    "devotionals": "Devotionals",
+    "newDevotional": "New Devotional",
+    "editDevotional": "Edit Devotional",
+    "searchPlaceholderDevotionals": "Search by title or reference…",
+    "scriptureReference": "Scripture Reference",
+    "scriptureReferencePlaceholder": "e.g. John 3:16",
+    "scriptureText": "Scripture Text",
+    "scriptureTextPlaceholder": "Fetched automatically, or type your own",
+    "scriptureTextSw": "Scripture Text (Swahili)",
+    "devotionalBody": "Devotional Reflection",
+    "devotionalBodyPlaceholder": "Write the reflection for this devotional…",
+    "devotionalBodySw": "Devotional Reflection (Swahili)",
+    "fetchVerse": "Fetch Verse",
+    "fetchingVerse": "Fetching…",
+    "book": "Book",
+    "selectBook": "Select book",
+    "chapter": "Chapter",
+    "selectChapter": "Chapter",
+    "verseFrom": "Verse (from)",
+    "verseTo": "Verse (to)",
+    "wholeChapter": "Whole chapter",
+    "optional": "Optional",
+    "versionEnglish": "Version (English)",
+    "versionSwahili": "Version (Swahili)",
+    "insertAndFetch": "Insert & Fetch",
+    "verseFetched": "Verse fetched.",
+    "verseFetchFailed": "Could not fetch that verse. Check the reference and try again.",
+    "allSeries": "All Series",
+    "audio": "Audio",
+    "other": "Other",
+    "allCurrencies": "All Currencies",
+    "donationStatus": "Status",
+    "itemsRange": "{start}-{end} of {total}",
+    "donationStatusPending": "Pending",
+    "donationStatusCompleted": "Completed",
+    "donationStatusSuccessful": "Successfull",
+    "donationStatusFailed": "Failed",
+    "filterByStatus": "Filter by status",
+    "allStatuses": "All Statuses",
+    "statusUpdated": "Status updated.",
+    "statusUpdateFailed": "Could not update status.",
+    "memberId": "Member",
+    "memberIdPlaceholder": "Search by name or email…",
+    "transactionIdPlaceholder": "e.g. TX-123456",
+    "selectType": "Select type",
+    "none": "None",
+    "confirmDeleteTitle": "Delete Donation",
+    "donationMemberRequired": "Member ID is required.",
+    "sendDonationReminder": "Send donation reminder",
+    "donationReminderSent": "Donation reminder sent to the donor.",
+    "donationReminderFailed": "Could not send the donation reminder.",
+    "replyToMessage": "Reply to this message",
+    "replyPlaceholder": "Write a clear, helpful response...",
+    "sendReply": "Send reply",
+    "sending": "Sending...",
+    "replySent": "Reply sent successfully.",
+    "replyFailed": "Could not send the reply.",
+    "donationAmountInvalid": "Please enter a valid amount greater than 0.",
+    "user": "User",
+    "role": "Role",
+    "staff": "Staff",
+    "superusers": "Superusers",
+    "userManagement": "User Management",
+    "userManagementDescription": "Manage users, roles, and access permissions",
+    "allUsers": "All Users",
+    "allUsersDescription": "Browse and manage all registered users",
+    "searchPlaceholder": "Search by name or email…",
+    "searchPlaceholderContact": "Search by name, email, or subject…",
+    "searchPlaceholderPrayer": "Search by name, email, or category…",
+    "searchPlaceholderSermons": "Search by title or speaker…",
+    "searchPlaceholderEvents": "Search by title, category, or location…",
+    "searchPlaceholderStories": "Search by name or category…",
+    "searchPlaceholderGallery": "Search by title or caption…",
+    "searchPlaceholderFiles": "Search by file name…",
+    "searchPlaceholderServices": "Search by title, day, or location…",
+    "searchPlaceholderMinistries": "Search by name, category, or leader…",
+    "searchPlaceholderCourses": "Search by title, category, or instructor…",
+    "searchPlaceholderStudents": "Search by student name or email…",
+    "searchPlaceholderQuizzes": "Search by quiz name…",
+    "searchPlaceholderCommunity": "Search messages…",
+    "searchPlaceholderReviews": "Search by student name or comment…",
+    "searchPlaceholderNotes": "Search by student name or note text…",
+    "searchPlaceholderSeries": "Search by series name…",
+    "total": "Total",
+    "all": "All",
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "size": "Size",
+    "banSuccess": "User banned successfully",
+    "banUser": "Ban User",
+    "unbanSuccess": "User unbanned successfully",
+    "unbanUser": "Unban User",
+    "emailVerified": "Email Verified",
+    "manageUser": "Manage User",
+    "noUsersFound": "No users found",
+    "roleLabel": "Role",
+    "statusLabel": "Status",
+    "logsTitle": "System Logs",
+    "logsSubtitle": "Monitor security events and all user activity across the system",
+    "logsLoadError": "Failed to load logs",
+    "securityEvents": "Security Events",
+    "securityEventsDesc": "Login attempts, access violations, and other security-related events",
+    "auditLogs": "Audit Logs",
+    "auditLogsDesc": "Every create, update, and delete action performed by users in the system",
+    "userId": "User ID",
+    "eventType": "Event Type",
+    "severity": "Severity",
+    "ipAddress": "IP Address",
+    "timestamp": "Timestamp",
+    "noSecurityEvents": "No security events recorded",
+    "noAuditLogs": "No audit logs recorded",
+    "allSeverities": "All Severities",
+    "severityLow": "Low",
+    "severityMedium": "Medium",
+    "severityHigh": "High",
+    "action": "Action",
+    "table": "Table",
+    "backToUsers": "Back to Users",
+    "changeRole": "Change Role",
+    "sendPasswordReset": "Send Password Reset",
+    "verified": "Verified",
+    "bannedReason": "Ban Reason",
+    "bannedAt": "Banned At",
+    "deleteSuccess": "User deleted successfully",
+    "deleteError": "Failed to delete user",
+    "passwordResetSent": "Password reset email sent",
+    "passwordResetError": "Failed to send password reset email",
+    "roleUpdated": "Role updated successfully",
+    "roleUpdateError": "Failed to update role",
+    "permissionGranted": "Permission granted",
+    "permissionRevoked": "Permission revoked",
+    "permissionReset": "Permission reset to default",
+    "permissionError": "Failed to update permission",
+    "groupAssigned": "Permission group assigned",
+    "groupError": "Failed to assign group",
+    "effectivePermissions": "Effective Permissions",
+    "effectivePermissionsDesc": "Permissions active for this user — includes role defaults, group assignments, and individual overrides",
+    "permissionGroupsAssigned": "Assigned Groups",
+    "noGroupsAssigned": "No permission groups assigned",
+    "assignPermissionGroup": "Assign Permission Group",
+    "permissionOverrides": "Individual Permission Overrides",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "grant": "Grant",
+    "revoke": "Revoke",
+    "resetOverride": "Reset to Default",
+    "permissionsNotAvailable": "Permission data not available",
+    "permissions": "Permissions",
+    "banUserDesc": "You are about to ban this user",
+    "banReason": "Reason",
+    "banReasonPlaceholder": "Describe why this user is being banned…",
+    "deleteUserTitle": "Delete User",
+    "deleteUserDesc": "You are about to permanently delete",
+    "deleteUserWarning": "This action cannot be undone. All user data will be permanently removed from the system.",
+    "changeRoleDesc": "Select a new role for",
+    "selectRole": "Select Role",
+    "selectRolePlaceholder": "Choose a role…",
+    "avatarUpload": "Change Photo",
+    "avatarUploading": "Uploading…",
+    "avatarUpdated": "Profile photo updated",
+    "avatarError": "Failed to upload photo",
+    "pageOf": "Page {page} of {total}",
+    "donationTypes": "Donation Types",
+    "donationTypesDesc": "Manage the types of donations accepted by the church",
+    "addDonationType": "Add Type",
+    "editDonationType": "Edit Donation Type",
+    "donationTypeLabelPlaceholder": "e.g. Tithe",
+    "donationTypeDescPlaceholder": "Optional description",
+    "donationTypeImageLabel": "Campaign Image",
+    "donationTypeDescEnLabel": "Description (English)",
+    "donationTypeDescSwLabel": "Description (Swahili)",
+    "donationTypeTargetLabel": "Fundraising Target (optional)",
+    "donationTypeTargetPlaceholder": "Leave blank for no target",
+    "donationTypeTargetHint": "Set a goal amount for this giving campaign",
+    "activeDonationType": "Active (visible on donation forms)",
+    "donationTypeCreated": "Donation type created",
+    "donationTypeUpdated": "Donation type updated",
+    "donationTypeDeleted": "Donation type deleted",
+    "donationTypeEnabled": "Donation type enabled",
+    "donationTypeDisabled": "Donation type disabled",
+    "donationTypeLabelRequired": "Display label is required",
+    "noDonationTypes": "No donation types configured",
+    "confirmDeleteDonationType": "This will permanently remove the donation type. Existing donations using this type will keep their type label.",
+    "descriptionOptional": "Description (optional)",
+    "months": "Months",
+    "monthsRange": "month period",
+    "transactions": "transactions",
+    "totalIn": "Total in",
+    "only": "only",
+    "overview": "Overview",
+    "supportedCurrencies": "Supported Currencies",
+    "byCurrencyBreakdown": "By-Currency Breakdown",
+    "byCurrencyDesc": "All-time donation totals per currency",
+    "recentDonationsDesc": "Latest 15 donations across all filters",
+    "viewAll": "View All",
+    "currencySettings": "Currency Settings",
+    "currencySettingsDesc": "Add and manage the currencies accepted for donations",
+    "addCurrency": "Add Currency",
+    "editCurrency": "Edit Currency",
+    "currencyCode": "Code",
+    "currencyName": "Name",
+    "symbol": "Symbol",
+    "rateToUsd": "Exchange Rate (to USD)",
+    "maxDonation": "Max Donation",
+    "currencyFieldsRequired": "Code, name, and symbol are required.",
+    "currencyRateInvalid": "Exchange rate must be a number greater than 0.",
+    "activeCurrency": "Active (visible to donors)",
+    "optionalMaxDonation": "optional max per transaction",
+    "noLimit": "No limit",
+    "reportExport": "Export Report",
+    "generateReport": "Generate PDF Statement",
+    "generateReportDesc": "Download a branded financial statement PDF with church logo, summary KPIs, and full donation ledger.",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting…",
+    "dateFrom": "Date From",
+    "dateTo": "Date To",
+    "reportIncludes": "Report includes",
+    "reportIncludesKpis": "KPI summary — total revenue, transaction count, average",
+    "reportIncludesByType": "Breakdown by donation type",
+    "reportIncludesByCurrency": "Breakdown by currency",
+    "reportIncludesLedger": "Full donation ledger (up to 500 rows)",
+    "paymentSettings": "Payment Settings",
+    "paypalSettings": "PayPal",
+    "paypalSettingsDesc": "Connect your PayPal Business account so donors can pay online from the Give page.",
+    "paypalClientId": "Client ID",
+    "paypalClientSecret": "Client Secret",
+    "paypalSecretSet": "already set — leave blank to keep it",
+    "paypalSecretPlaceholderSet": "••••••••••••",
+    "paypalSecretPlaceholderUnset": "Paste your PayPal Client Secret",
+    "paypalMode": "Mode",
+    "paypalModeSandbox": "Sandbox (testing)",
+    "paypalModeLive": "Live (real payments)",
+    "paypalActive": "Enable PayPal on the Give page",
+    "paypalLiveWarning": "Live mode will process real payments. Make sure you've tested this fully in Sandbox mode first.",
+    "paymentSettingsSaved": "Payment settings saved",
+    "paymentSettingsSaveFailed": "Couldn't save payment settings",
+    "storageSettings": "Storage Settings",
+    "firebaseSettings": "Firebase Storage",
+    "firebaseSettingsDesc": "Connect a Firebase Storage bucket so newly uploaded files are stored in the cloud instead of the server's local disk. If this isn't configured, active, or an upload fails, files are saved to local disk automatically.",
+    "firebaseBucket": "Storage Bucket",
+    "firebaseBucketPlaceholder": "your-project.appspot.com",
+    "firebaseCredentials": "Service Account Credentials (JSON)",
+    "firebaseCredentialsSet": "already set — leave blank to keep it",
+    "firebaseCredentialsPlaceholderSet": "•••••••••••••••••••••• (leave blank to keep the existing key)",
+    "firebaseCredentialsPlaceholderUnset": "Paste the full service-account JSON from Firebase Console",
+    "firebaseActive": "Use Firebase Storage for new uploads",
+    "firebaseInactiveNote": "While disabled, uploads always go to local disk regardless of the settings above.",
+    "storageSettingsSaved": "Storage settings saved",
+    "storageSettingsSaveFailed": "Couldn't save storage settings",
+    "coursesManagement": "Courses Management",
+    "coursesManagementDesc": "Create and manage courses, enrollments, and live sessions.",
+    "addCourse": "Add Course",
+    "editCourse": "Edit Course",
+    "courseTitle": "Title",
+    "courseTitlePlaceholder": "Enter course title",
+    "courseDescPlaceholder": "Course description",
+    "courseType": "Type",
+    "typeText": "Text",
+    "typeAudio": "Audio",
+    "typeVideo": "Video",
+    "typeLive": "Live",
+    "durationMinutes": "Duration (minutes)",
+    "scheduledStart": "Scheduled Start",
+    "endTime": "End Time",
+    "featured": "Featured course",
+    "noCourses": "No courses yet. Create your first course.",
+    "allStatus": "All Status",
+    "viewEnrollments": "View Enrollments",
+    "getLiveLink": "Get Live Link",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "confirmDeleteCourse": "Delete this course and all its enrollments?",
+    "liveCourseLink": "Live Course Link",
+    "shareLiveLinkDesc": "Share this link with participants to join the live session.",
+    "roomCode": "Room Code",
+    "enrollments": "Enrollments",
+    "totalEnrolled": "Total Enrolled",
+    "avgProgress": "Avg. Progress",
+    "noEnrollments": "No one has enrolled in this course yet.",
+    "courseNameRequired": "Course title is required",
+    "saveFailed": "Failed to save",
+    "thumbnail": "Thumbnail",
+    "chooseThumbnail": "Choose image",
+    "uploadingThumbnail": "Uploading thumbnail…",
+    "thumbnailUploaded": "Thumbnail uploaded",
+    "thumbnailUploadFailed": "Failed to upload thumbnail",
+    "courseLanguage": "Language",
+    "courseLanguagePlaceholder": "e.g. English",
+    "selectCourseType": "Select type",
+    "featuredCourse": "Featured",
+    "publishToggled": "Course status updated",
+    "publishToggleFailed": "Failed to update status",
+    "courseCreated": "Course created",
+    "courseUpdated": "Course updated",
+    "courseDeleted": "Course deleted",
+    "courseCreateFailed": "Failed to create course",
+    "courseUpdateFailed": "Failed to update course",
+    "courseDeleteFailed": "Failed to delete course",
+    "selectCourse": "Select a course",
+    "selectCourseHint": "Choose a course to manage its students or quizzes",
+    "courseOverviewDesc": "Review the course details, availability, and learning format.",
+    "courseFormat": "Format",
+    "courseSchedule": "Schedule",
+    "courseStatus": "Publication status",
+    "publishedStatus": "Published",
+    "draftStatus": "Draft",
+    "noCourseDescription": "No course description has been added yet.",
+    "noThumbnail": "No course thumbnail",
+    "notSpecified": "Not specified",
+    "notScheduled": "No schedule set",
+    "tryAgain": "Try again",
+    "replyingToMessage": "Replying to this message",
+    "flutterwaveDonation": "Flutterwave",
+    "allSources": "All Sources",
+    "localDonation": "Local",
+    "studentsTab": "Students",
+    "quizzesTab": "Quizzes",
+    "coursesTab": "Courses",
+    "studentName": "Student Name",
+    "studentEmail": "Email",
+    "progress": "Progress",
+    "enrolledAt": "Enrolled",
+    "completedAt": "Completed At",
+    "completionStatus": "Status",
+    "completed": "Completed",
+    "notCompleted": "In Progress",
+    "revokeEnrollment": "Revoke",
+    "revokeEnrollmentConfirm": "Remove this student from the course?",
+    "enrollmentRevoked": "Enrollment revoked",
+    "enrollmentRevokeFailed": "Failed to revoke enrollment",
+    "issueCertificate": "Issue Certificate",
+    "certificateIssued": "Certificate issued",
+    "certificateAlreadyIssued": "Certificate already exists",
+    "certificateIssueFailed": "Failed to issue certificate",
+    "viewCertificate": "View Certificate",
+    "noStudents": "No students enrolled yet.",
+    "loadStudentsFailed": "Failed to load students",
+    "viewAnswers": "View Answers",
+    "studentAnswers": "Student Answers",
+    "loadAnswersFailed": "Failed to load this student's answers",
+    "noAttemptsYet": "No students have attempted this quiz yet.",
+    "selectQuizForAnswers": "Select a quiz above to review student answers",
+    "yourAnswer": "Student's answer",
+    "correctAnswer": "Correct answer",
+    "quizManagement": "Quiz Management",
+    "addQuiz": "Add Quiz",
+    "editQuiz": "Edit Quiz",
+    "quizName": "Quiz Name",
+    "quizNamePlaceholder": "e.g. Week 1 Quiz",
+    "quizDuration": "Duration (minutes)",
+    "quizTotalMarks": "Total Marks",
+    "quizActive": "Active",
+    "quizQuestions": "Questions",
+    "noQuizzes": "No quizzes yet. Add the first quiz.",
+    "quizCreated": "Quiz created",
+    "quizUpdated": "Quiz updated",
+    "quizDeleted": "Quiz deleted",
+    "quizCreateFailed": "Failed to create quiz",
+    "quizDeleteFailed": "Failed to delete quiz",
+    "addQuestion": "Add Question",
+    "questionText": "Question",
+    "questionTextPlaceholder": "Enter the question",
+    "optionText": "Option",
+    "optionTextPlaceholder": "Enter option text",
+    "isCorrect": "Correct answer",
+    "addOption": "Add Option",
+    "removeOption": "Remove",
+    "saveQuestion": "Save Question",
+    "questionAdded": "Question added",
+    "questionAddFailed": "Failed to add question",
+    "deleteQuestion": "Delete Question",
+    "questionDeleted": "Question deleted",
+    "questionDeleteFailed": "Failed to delete question",
+    "noQuestions": "No questions yet",
+    "options": "Options",
+    "liveManagement": "Live Session",
+    "copyLiveLink": "Copy Link",
+    "liveLinkCopied": "Live link copied",
+    "startLive": "Open Live Room",
+    "regenerateLink": "Regenerate Link",
+    "linkRegenerated": "Live link regenerated",
+    "linkRegenerateFailed": "Failed to regenerate link",
+    "curriculumTab": "Curriculum",
+    "certificateTab": "Certificate",
+    "certificateBuilder": {
+      "loading": "Loading…",
+      "backgroundLabel": "Certificate Background",
+      "backgroundHint": "Upload your own designed certificate image, or use a solid color background instead.",
+      "backgroundRequired": "Set a background image or color first.",
+      "backgroundImage": "Image",
+      "backgroundColorOption": "Solid Color",
+      "noBackground": "Choose a background image or color to start designing.",
+      "fieldLabel": {
+        "name": "Recipient Name",
+        "course": "Course Title",
+        "date": "Issue Date",
+        "signature": "Signature",
+        "logo": "Logo"
+      },
+      "imageSize": "Size",
+      "remove": "Remove",
+      "fontFamily": "Font",
+      "fontSize": "Font size",
+      "color": "Color",
+      "bold": "Bold",
+      "italic": "Italic",
+      "addMessage": "Add Text",
+      "messageText": "Text",
+      "messageTextPlaceholder": "e.g. We proudly present this certificate to",
+      "newMessagePlaceholder": "New text",
+      "align": {
+        "left": "Left",
+        "center": "Center",
+        "right": "Right"
+      },
+      "preview": "Preview PDF",
+      "previewing": "Generating…",
+      "previewFailed": "Failed to generate preview.",
+      "save": "Save Template",
+      "saving": "Saving…",
+      "saveFailed": "Failed to save certificate template.",
+      "saved": "Certificate template saved."
+    },
+    "sectionTitlePlaceholder": "e.g. Week 1: Getting Started",
+    "addSection": "Add Section",
+    "noSections": "No sections yet. Add one to start building the curriculum.",
+    "sectionAdded": "Section added",
+    "sectionAddFailed": "Failed to add section",
+    "sectionDeleted": "Section deleted",
+    "sectionDeleteFailed": "Failed to delete section",
+    "addLesson": "Add Lesson",
+    "lessonTitle": "Lesson Title",
+    "lessonTitlePlaceholder": "e.g. Introduction to the Topic",
+    "lessonType": "Lesson Type",
+    "lessonType_video": "Video",
+    "lessonType_audio": "Audio",
+    "lessonType_text": "Text",
+    "lessonType_pdf": "PDF",
+    "lessonType_file": "File",
+    "lessonType_quiz": "Quiz",
+    "lessonDescription": "Description (optional)",
+    "lessonTextContent": "Lesson text",
+    "selectQuiz": "Select a quiz",
+    "createQuizFirst": "Create a quiz in the Quizzes tab first, then link it here.",
+    "lessonDuration": "Duration (minutes)",
+    "isPreviewLesson": "Free preview (visible without enrolling)",
+    "previewLesson": "Preview",
+    "lessonAdded": "Lesson added",
+    "sectionUpdated": "Section updated",
+    "sectionUpdateFailed": "Failed to update section",
+    "lessonUpdated": "Lesson updated",
+    "lessonUpdateFailed": "Failed to update lesson",
+    "editLesson": "Edit lesson",
+    "lessonTypeLocked": "The lesson type cannot be changed after the lesson is created.",
+    "lessonQuizLocked": "The quiz linked to this lesson cannot be changed after it is created.",
+    "courseNotfound": "Course not found",
+    "lessonAddFailed": "Failed to add lesson",
+    "lessonDeleted": "Lesson deleted",
+    "lessonDeleteFailed": "Failed to delete lesson",
+    "selectQuizForLesson": "Select a quiz for this lesson first",
+    "courseCategory": "Category",
+    "courseCategoryPlaceholder": "e.g. Bible Study",
+    "courseLevel": "Level",
+    "courseLevelNone": "No level",
+    "levelBeginner": "Beginner",
+    "levelIntermediate": "Intermediate",
+    "levelAdvanced": "Advanced",
+    "instructor": "Instructor",
+    "searchInstructorPlaceholder": "Search by name or email...",
+    "searching": "Searching...",
+    "instructorBio": "Instructor Bio",
+    "instructorBioPlaceholder": "A short bio shown on the instructor's public profile",
+    "saveInstructorBio": "Save Bio",
+    "instructorBioSaved": "Instructor bio saved",
+    "instructorBioSaveFailed": "Failed to save instructor bio",
+    "uploadMaterial": "Upload File",
+    "viewMaterial": "View",
+    "durationPlaceholder": "e.g. 45 min",
+    "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "videoUrlInvalid": "Please enter a valid URL (must start with http:// or https://)",
+    "selectVideoFromLibrary": "Select from file library",
+    "orEnterUrlManually": "or enter URL manually",
+    "enterUrlManually": "Enter URL manually",
+    "amountPlaceholder": "0.00",
+    "selectThumbnailLabel": "Select Thumbnail",
+    "selectAudioLabel": "Select Audio File",
+    "selectVideoLabel": "Select Video File",
+    "communityTab": "Community",
+    "courseCommunityTitle": "Course Community",
+    "courseCommunityDesc": "View and post messages to course members",
+    "postAnnouncement": "Post Announcement",
+    "postMessage": "Post Message",
+    "typeAnnouncementPlaceholder": "Write an announcement for all course members...",
+    "typeMessagePlaceholder": "Write a message...",
+    "noMessagesYet": "No messages yet in this community",
+    "announcementPosted": "Announcement posted",
+    "messagePosted": "Message posted",
+    "postFailed": "Failed to post message",
+    "deleteMessage": "Delete message",
+    "deleteFailed": "Failed to delete message",
+    "reviewsTab": "Reviews",
+    "courseReviewsTitle": "Ratings & Reviews",
+    "courseReviewsDesc": "Feedback students have left on this course.",
+    "noReviews": "No reviews yet.",
+    "loadReviewsFailed": "Failed to load reviews",
+    "deleteReview": "Delete",
+    "deleteReviewConfirm": "Delete this review? This cannot be undone.",
+    "reviewDeleted": "Review deleted",
+    "reviewDeleteFailed": "Failed to delete review",
+    "lessonNotesTitle": "Student Lesson Notes",
+    "lessonNotesDesc": "Private notes students have taken while watching each lesson — read-only.",
+    "noLessonNotes": "No lesson notes yet.",
+    "loadLessonNotesFailed": "Failed to load lesson notes",
+    "noteForLesson": "Note on: {lesson}",
+    "adminDashboard": "Admin Dashboard",
+    "myDashboardLink": "My Dashboard",
+    "ministries": "Ministries",
+    "newMinistry": "New Ministry",
+    "editMinistry": "Edit Ministry",
+    "leader": "Leader",
+    "meetingSchedule": "Meeting Schedule",
+    "members": "Members",
+    "selectCategory": "Select category",
+    "gallery": "Gallery"
+  },
+  "roles": {
+    "superuser": "Superuser",
+    "staff": "Staff",
+    "user": "User"
+  },
+  "verifyMlPage": {
+    "verifying": "verifying ...",
+    "failed_verify_ml": "Failed to verify your magic token. Please try ain."
+  },
+  "api": {
+    "messages": {
+      "password_changed": "User changed password",
+      "score_submitted": "Score saved. Badge processing started.",
+      "account_deactivated": "Account deactivated successfully",
+      "profile_updated": "Profile updated successfully",
+      "password_changed_success": "Password changed successfully"
+    },
+    "onboarding": {
+      "missing_user_not_found": "User not found",
+      "missing_phone": "Phone",
+      "missing_bio": "Bio",
+      "onboarding_complete": "Onboarding complete",
+      "onboarding_incomplete": "Onboarding incomplete"
+    },
+    "fields": {
+      "phone": "Phone",
+      "bio": "Bio",
+      "email": "Email",
+      "avatar": "Avatar"
+    },
+    "upload": {
+      "avatar_uploaded": "Avatar uploaded successfully",
+      "file_deleted": "File deleted successfully",
+      "upload_failed": "Upload failed"
+    }
+  },
+  "components": {
+    "mdeEditor": {
+      "insertImage": "Insert image",
+      "insertLink": "Insert link",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com",
+      "text": "Text",
+      "linkTextPlaceholder": "Link text",
+      "cancel": "Cancel",
+      "linkErrors": {
+        "empty": "Enter a URL.",
+        "spaces": "The URL can't contain spaces.",
+        "disallowed": "This type of link isn't allowed.",
+        "email": "Enter a valid email address.",
+        "phone": "Enter a valid phone number.",
+        "webOnly": "Only web, email and phone links are allowed.",
+        "domain": "Enter a full address, like example.com.",
+        "invalid": "Enter a valid URL."
+      }
+    },
+    "hlsVideoPlayer": {
+      "play": "Play",
+      "pause": "Pause",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit fullscreen"
+    },
+    "about": {
+      "welcome": "Welcome to Global God's Presence Church",
+      "description": "At Global God's Presence Church, you will be welcomed by friendly people who are glad to see you. In addition to high energy worship and Bible-based messages, you will find a fun kids program and a community to call home. Join us this Sunday at 10am.",
+      "pastor": "— Prof. Bishop Frank Namegabe. Nuru tv bible college USA. Missionaries Senior Leader",
+      "address": "Mbarara, Uganda",
+      "phone": "+1 502 510 0613",
+      "email": "info@globalgodspresencechurch.org",
+      "learnMore": "Learn More About Us"
+    },
+    "gallery": {
+      "tag": "Moments",
+      "title": "Life at Our Church",
+      "description": "A glimpse into our services, ministries, and community in action.",
+      "viewAll": "View Full Gallery",
+      "noItems": "Gallery coming soon. Check back after our next service!",
+      "alts": [
+        "Sunday worship service",
+        "Youth night event",
+        "Church gathering",
+        "Community outreach",
+        "Prayer meeting",
+        "Worship night",
+        "Sunday service"
+      ]
+    },
+    "dailyDevotion": {
+      "tag": "Daily Devotion",
+      "readDevotion": "Read Full Devotion"
+    },
+    "hero": {
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "pauseSlideshow": "Pause slideshow",
+      "playSlideshow": "Play slideshow",
+      "previous": "Previous slide",
+      "goal": "Goal",
+      "online": "Online",
+      "next": "Next slide",
+      "watchSermon": "Watch Latest Sermon",
+      "planVisit": "Plan Your Visit",
+      "readStory": "Read Story",
+      "viewEvent": "View Event",
+      "viewCourse": "View Course",
+      "donateNow": "Donate Now",
+      "categoryFeatured": "Featured",
+      "categorySermon": "Sermon",
+      "categoryStory": "Our Story",
+      "categoryEvent": "Upcoming Event",
+      "categoryCourse": "Course",
+      "categoryDonation": "Give",
+      "slides": [
+        {
+          "title": "Welcome to Global God's Presence Church",
+          "description": "Experience Spirit-filled worship, powerful teaching, and a community that cares."
+        },
+        {
+          "title": "Community & Fellowship",
+          "description": "Building relationships that transform lives and glorify God."
+        },
+        {
+          "title": "Connect & Grow",
+          "description": "Join believers achieving extraordinary things together in faith."
+        },
+        {
+          "title": "Your Faith Journey Starts Here",
+          "description": "Everything you need to grow in faith, in one community."
+        }
+      ]
+    },
+    "churchExperience": {
+      "title": "Sunday Morning Experience",
+      "description": "Join us every Sunday morning at 10am for our Sunday Morning Experience! We have programs for the whole family. You can join us in-person or online on Facebook or YouTube by looking up @globalgodspresencechurch.",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "churchName": "Global God's Presence Church",
+      "address1": "Mbarara City",
+      "address2": "Mbarara District, Uganda",
+      "watchOnline": "Available to watch online",
+      "allServices": "View all services"
+    },
+    "communitySupport": {
+      "title": "Serving Our Community",
+      "description": "From helping children grow to building spaces that last, see how we're putting faith into action across our community.",
+      "learnMore": "Learn more",
+      "viewAllEvents": "View all events",
+      "cards": [
+        {
+          "label": "Children's Outreach",
+          "title": "Helping children thrive in our community."
+        },
+        {
+          "label": "Building Projects",
+          "title": "Constructing spaces that serve our community."
+        },
+        {
+          "label": "Food Distribution",
+          "title": "Feeding families in need."
+        },
+        {
+          "label": "Medical Outreach",
+          "title": "Providing care where it's needed most."
+        },
+        {
+          "label": "Youth Mentorship",
+          "title": "Guiding the next generation."
+        }
+      ]
+    },
+    "inviteGuests": {
+      "tag": "Bring a Friend",
+      "title": "Invite Someone This Sunday",
+      "description": "Inviting a friend, neighbor, or family member is easier than you think. Here's what they can expect when they walk through our doors.",
+      "readyText": "Ready to bring someone along?",
+      "cta": "Plan Your Visit Together",
+      "learnMore": "Learn more",
+      "cards": [
+        {
+          "title": "A Warm Welcome",
+          "description": "Friendly faces will greet you at the door and help you find your way around — no awkward first steps."
+        },
+        {
+          "title": "Relaxed Atmosphere",
+          "description": "Come as you are. Service runs about 90 minutes, with plenty of time to connect before and after."
+        },
+        {
+          "title": "Uplifting Worship",
+          "description": "Enjoy live, high-energy worship and a Bible-based message that speaks to everyday life."
+        },
+        {
+          "title": "Programs for the Family",
+          "description": "Kids' programs and a special needs respite program mean the whole family is cared for."
+        },
+        {
+          "title": "Coffee & Connection",
+          "description": "Grab a coffee and meet new people in our lobby before service — conversation, not pressure."
+        },
+        {
+          "title": "No Strings Attached",
+          "description": "You won't be asked to stand up, introduce yourself, or give anything. Just come and experience it."
+        }
+      ]
+    },
+    "prayerBanner": {
+      "title": "Need Prayer?",
+      "description": "Fill out our request form.",
+      "cta": "Click Here"
+    },
+    "latestMessage": {
+      "tag": "Discover a Message",
+      "title": "Watch Our Latest Message",
+      "scrollLeft": "Scroll messages left",
+      "scrollRight": "Scroll messages right",
+      "count": "messages in our sermon library",
+      "watchMessage": "Watch Message",
+      "viewPast": "View Past Messages",
+      "series": "Presence of God",
+      "messageTitle": "Walking in His Presence",
+      "speaker": "Prof. Bishop Frank Namegabe",
+      "date": "June 2026",
+      "passage": "Psalm 16:11",
+      "pastMessages": [
+        {
+          "title": "Faith That Moves Mountains",
+          "series": "Unshakeable Faith"
+        },
+        {
+          "title": "The Power of Community",
+          "series": "Together"
+        },
+        {
+          "title": "Grace Upon Grace",
+          "series": "Unshakeable Faith"
+        },
+        {
+          "title": "Purpose Over Pressure",
+          "series": "Together"
+        }
+      ]
+    },
+    "featuredStories": {
+      "watchStory": "Watch Story",
+      "watchMore": "Watch More Stories",
+      "featuredName": "Marie's Story",
+      "featuredCategory": "Hope & Transformation Through Jesus",
+      "featuredQuote": "Today, I wake up in prayer. I know I have something bigger than me that I can lean on and rely on.",
+      "stories": [
+        {
+          "name": "Renee's Story",
+          "category": "Finding Community"
+        },
+        {
+          "name": "Men's Retreat",
+          "category": "Brotherhood & Prayer"
+        },
+        {
+          "name": "Marcus & Elena's Story",
+          "category": "Healing Together"
+        }
+      ]
+    },
+    "liveRoom": {
+      "micAccessDenied": "Camera/microphone access denied. Please allow access and reload.",
+      "connectionFailed": "Connection to live room failed.",
+      "leave": "Leave",
+      "liveSession": "Live Session",
+      "sharingScreen": "Sharing screen",
+      "pinned": "Pinned",
+      "unpin": "Unpin",
+      "pin": "Pin",
+      "copied": "Copied!",
+      "shareLink": "Share link",
+      "leaveSessionTitle": "Leave session?",
+      "leaveSessionDesc": "You will be disconnected. Others will remain in the session.",
+      "stay": "Stay",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "camOff": "Cam off",
+      "camOn": "Cam on",
+      "shareScreen": "Share screen",
+      "stopShare": "Stop share",
+      "switchCamera": "Switch camera",
+      "camera": "Camera",
+      "clickToUnpin": "Click to unpin",
+      "clickToPin": "Click to pin to main view",
+      "youSuffix": "(You)",
+      "connected": "Connected",
+      "connecting": "Connecting…",
+      "peerJoined": "{name} joined the call",
+      "peerLeft": "{name} left the call"
+    },
+    "filePicker": {
+      "searchPlaceholder": "Search by file name…",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "uploadingIndexed": "Uploading file {current} of {total}…",
+      "uploadedOne": "File uploaded",
+      "uploadedMany": "{count} files uploaded",
+      "uploadFailed": "Upload failed",
+      "noneSelected": "Click a file to select",
+      "selectedOne": "Selected: {name}",
+      "selectedMany": "{count} files selected",
+      "useOne": "Use this file",
+      "useMany": "Use {count} files",
+      "allFiles": "All files",
+      "noFiles": "No files here yet. Upload one above.",
+      "selectFile": "Select File",
+      "selectFiles": "Select Files",
+      "change": "Change",
+      "remove": "Remove file",
+      "preview": "File preview",
+      "loadFailed": "Couldn't load files",
+      "retry": "Try again",
+      "googleDrive": "Google Drive",
+      "drive": "Drive",
+      "driveNotConnected": "Connect a Google account in Site Settings first.",
+      "driveImportFailed": "Failed to import file from Drive."
+    },
+    "youtubePicker": {
+      "pickFromChannel": "Pick from YouTube",
+      "dialogTitle": "Select a video from your YouTube channel",
+      "noVideos": "No videos found on the connected channel.",
+      "loadFailed": "Couldn't load channel videos — check the Google connection in Site Settings.",
+      "loadMore": "Load more"
+    },
+    "fab": {
+      "scrollToTop": "Scroll to top",
+      "lightMode": "Switch to light mode",
+      "darkMode": "Switch to dark mode",
+      "language": "Switch language",
+      "open": "Open quick actions",
+      "close": "Close quick actions"
+    },
+    "footer": {
+      "stayConnected": "Stay Connected",
+      "stayConnectedDesc": "Sign up to stay in the loop with everything happening at Global God's Presence Church.",
+      "newsletter": "Join Our Newsletter",
+      "churchName": "Global God's Presence Church",
+      "visitUs": "Visit Us",
+      "address1": "Mbarara City",
+      "address2": "Mbarara District, Uganda",
+      "sunday": "Sunday",
+      "serviceTime": "10:00 AM",
+      "quickLinks": "Quick Links",
+      "contactHeading": "Contact",
+      "links": {
+        "about": "About Us",
+        "sunday": "Sunday Experience",
+        "ministries": "Ministries",
+        "stories": "Stories",
+        "prayer": "Prayer Request",
+        "give": "Give"
+      },
+      "phoneRwanda": "Rwanda: +250 783 389 668",
+      "phoneUganda": "Uganda: +256 776 747 545",
+      "phoneUsa": "USA: +1 502 510 0613",
+      "email": "info@globalgodspresencechurch.org",
+      "contactUs": "Contact Us",
+      "aboutUs": "About Us",
+      "privacyPolicy": "Privacy Policy",
+      "copyright": "Global God's Presence Church. All rights reserved."
+    },
+    "stats": {
+      "members": "Members",
+      "yearsOfMinistry": "Years of Ministry",
+      "prayerAnswered": "Prayers Answered",
+      "sermonsPreached": "Sermons Preached"
+    },
+    "upcomingEvents": {
+      "tag": "Upcoming",
+      "title": "Upcoming Events",
+      "seeAll": "See all events"
+    },
+    "shareButtons": {
+      "share": "Share",
+      "copyLink": "Copy Link",
+      "copied": "Copied",
+      "facebook": "Facebook",
+      "whatsapp": "WhatsApp",
+      "twitter": "X / Twitter"
+    }
+  },
+  "aboutPage": {
+    "heroTag": "Who We Are",
+    "heroTitle": "About Us",
+    "storyTag": "Our Story",
+    "storyTitle": "Welcome to Global God's Presence Church",
+    "storyP1": "Global God's Presence Church is a vibrant community of believers dedicated to worship, fellowship, and service. Founded in Mbarara, Uganda, we have grown into a family united by faith and a desire to see God's kingdom come in our city and beyond.",
+    "storyP2": "Our mission is to spread the love of Christ and make a positive impact in our community and beyond. We offer a variety of programs, events, and resources to support spiritual growth and engagement — both in-person and online.",
+    "pastor": "— Prof. Bishop Frank Namegabe",
+    "missionTag": "Our Mission",
+    "missionTitle": "Why We Exist",
+    "missionText": "To lead people into a growing relationship with Jesus Christ through Spirit-filled worship, Word-based teaching, and whole-life discipleship, so that every person discovers their God-given purpose and lives it out in the world.",
+    "visionTag": "Our Vision",
+    "visionTitle": "Where We're Going",
+    "visionText": "To be a transformative, multigenerational church that reaches every neighbourhood of Mbarara, Uganda and beyond — raising up disciples who carry the presence of God into every sphere of society.",
+    "valuesTag": "What We Believe",
+    "valuesTitle": "Our Core Values",
+    "values": [
+      {
+        "title": "Love",
+        "description": "We love God and love our neighbours as ourselves, making hospitality and care the heart of everything we do."
+      },
+      {
+        "title": "Vision",
+        "description": "We believe every person has God-given potential and we exist to help people discover and live out their purpose."
+      },
+      {
+        "title": "Excellence",
+        "description": "We pursue excellence in worship, teaching, and community life — not for perfection, but as an offering to God."
+      },
+      {
+        "title": "Community",
+        "description": "We are better together. Life is meant to be lived in authentic, Christ-centred relationships."
+      }
+    ],
+    "ctaTitle": "Come As You Are",
+    "ctaDesc": "Join us every Sunday at 10:00 AM — in person at Mbarara City, Uganda, or online.",
+    "ctaButton": "Get in Touch"
+  },
+  "eventsPage": {
+    "heroTag": "What's Happening",
+    "heroTitle": "Events",
+    "heroDesc": "Stay connected with everything happening at Global God's Presence Church.",
+    "sectionTag": "Upcoming",
+    "sectionTitle": "All Events",
+    "allCategories": "All Categories",
+    "sortBy": "Sort by",
+    "sortSoonest": "Soonest First",
+    "sortFurthest": "Furthest First",
+    "sortTitleAz": "Title A–Z",
+    "ctaTitle": "Have a Special Request?",
+    "ctaDesc": "Need prayer, want to host an event, or have a question? We'd love to hear from you.",
+    "ctaButton": "Contact Us",
+    "noEvents": "No upcoming events at this time. Check back soon.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "calendarView": "Calendar",
+    "listView": "List",
+    "more": "more",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "weekday": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "events": [
+      {
+        "title": "Sunday Morning Worship",
+        "date": "Every Sunday",
+        "time": "10:00 AM",
+        "location": "Main Sanctuary — Mbarara City, Uganda",
+        "category": "Worship",
+        "description": "Join us for an uplifting Sunday morning service filled with Spirit-led worship and powerful teaching from God's Word."
+      },
+      {
+        "title": "Youth Night",
+        "date": "Every Friday",
+        "time": "6:00 PM",
+        "location": "Youth Hall — Mbarara City, Uganda",
+        "category": "Youth",
+        "description": "A high-energy evening designed for teenagers and young adults to connect, grow in faith, and have fun."
+      },
+      {
+        "title": "Women's Prayer Breakfast",
+        "date": "First Saturday of the Month",
+        "time": "8:00 AM",
+        "location": "Fellowship Hall — Mbarara City, Uganda",
+        "category": "Prayer",
+        "description": "A time for women to gather, share, pray, and encourage one another over breakfast. All women welcome."
+      },
+      {
+        "title": "Community Outreach Day",
+        "date": "Last Saturday of the Month",
+        "time": "9:00 AM",
+        "location": "Various Locations, Mbarara, Uganda",
+        "category": "Outreach",
+        "description": "We go into our city to serve, share hope, and demonstrate the love of Jesus in practical ways."
+      },
+      {
+        "title": "Men's Bible Study",
+        "date": "Every Wednesday",
+        "time": "7:00 PM",
+        "location": "Room 3 — Mbarara City, Uganda",
+        "category": "Bible Study",
+        "description": "An in-depth study of Scripture for men who want to grow deeper in their faith and fellowship with other men."
+      },
+      {
+        "title": "Family Movie Night",
+        "date": "Second Friday of the Month",
+        "time": "7:00 PM",
+        "location": "Main Hall — Mbarara City, Uganda",
+        "category": "Family",
+        "description": "Bring the whole family for a faith-inspired movie and fun activities for kids and adults alike."
+      }
+    ]
+  },
+  "planVisitPage": {
+    "meta": {
+      "title": "Plan Your Visit",
+      "description": "Learn what to expect before you visit Global God's Presence Church, including service times, location details, and how to get connected."
+    },
+    "heroTag": "Plan Your Visit",
+    "heroTitle": "We would love to welcome you",
+    "heroDesc": "Whether you are visiting for the first time or returning this weekend, here is everything you need to know before you arrive.",
+    "quickDetails": "Quick Details",
+    "stats": [
+      {
+        "label": "Service Time",
+        "value": "Sunday at 10:00 AM"
+      },
+      {
+        "label": "Location",
+        "value": "Mbarara City, Uganda"
+      },
+      {
+        "label": "Dress Code",
+        "value": "Come as you are"
+      },
+      {
+        "label": "Kids",
+        "value": "Family-friendly"
+      }
+    ],
+    "visitStepsTitle": "Your first visit with us",
+    "visitSteps": [
+      {
+        "title": "Arrive early",
+        "description": "We recommend arriving 10–15 minutes before the service begins so you can settle in and meet someone new."
+      },
+      {
+        "title": "Check in",
+        "description": "Our welcome team will help you find the right place, answer questions, and point you to our kids and youth programs."
+      },
+      {
+        "title": "Worship with us",
+        "description": "Expect joyful worship, practical teaching from God's Word, and a warm environment where everyone is welcome."
+      },
+      {
+        "title": "Stay connected",
+        "description": "After service, enjoy fellowship, prayer, and opportunities to grow with our church family."
+      }
+    ],
+    "expectTitle": "What to expect",
+    "expectItems": [
+      {
+        "title": "Warm welcome",
+        "description": "You will be greeted by friendly people who are excited to help you feel at home."
+      },
+      {
+        "title": "Spirit-filled worship",
+        "description": "We believe in heartfelt worship that helps us focus on Jesus and encounter His presence."
+      },
+      {
+        "title": "Bible-based teaching",
+        "description": "Every message is grounded in Scripture and designed to encourage your faith and daily life."
+      },
+      {
+        "title": "For the whole family",
+        "description": "Whether you are single, married, a parent, or young in faith, there is a place for you here."
+      },
+      {
+        "title": "Live online",
+        "description": "If you cannot join in person, you can also watch live on Facebook or YouTube."
+      },
+      {
+        "title": "Simple next steps",
+        "description": "You can connect with a pastor, ask questions, or learn how to get more involved after the service."
+      }
+    ],
+    "ctaTitle": "Ready to join us?",
+    "ctaText": "Come as you are and experience a church family that is excited to welcome you.",
+    "primaryButton": "Contact us",
+    "secondaryButton": "View services"
+  },
+  "servicesPage": {
+    "heroTag": "Weekly Gatherings",
+    "heroTitle": "Church Services & Gatherings",
+    "heroDesc": "Join us for worship, prayer, teaching, and community throughout our church calendar.",
+    "joinTag": "Come Worship With Us",
+    "joinTitle": "A Place to Grow in Faith",
+    "joinDesc": "Throughout the week, we gather to worship, pray, study God's Word, and build meaningful community together. Whether you are new to church or have been walking with God for years, there is a place for you here.",
+    "timeLabel": "Time",
+    "timeValue": "Multiple weekly gatherings",
+    "locationLabel": "Location",
+    "locationValue": "Mbarara District, Uganda",
+    "onlineLabel": "Online",
+    "onlineValue": "Facebook & YouTube — @globalgodspresencechurch",
+    "watchFacebook": "Watch on Facebook",
+    "watchYoutube": "Watch on YouTube",
+    "expectTag": "First Time?",
+    "expectTitle": "What to Expect",
+    "expectDesc": "We want your first visit to be comfortable, meaningful, and memorable.",
+    "expect": [
+      {
+        "title": "Worship",
+        "description": "Spirit-filled contemporary worship that draws you into the presence of God."
+      },
+      {
+        "title": "Teaching",
+        "description": "Practical, Bible-based messages that equip you for everyday life."
+      },
+      {
+        "title": "Kids Ministry",
+        "description": "Safe, fun, and age-appropriate programs for children during the service."
+      },
+      {
+        "title": "Community",
+        "description": "Warm, welcoming people who are genuinely glad you are here."
+      },
+      {
+        "title": "Online",
+        "description": "Watch our live service on Facebook or YouTube from anywhere in the world."
+      },
+      {
+        "title": "Duration",
+        "description": "Our service runs approximately 90 minutes, starting at 10:00 AM."
+      }
+    ],
+    "ctaTitle": "Ready to Join Us?",
+    "ctaDesc": "We'd love to meet you. Come as you are — grace is extended to everyone.",
+    "ctaButton": "Get Directions"
+  },
+  "resourcesPage": {
+    "heroTag": "Grow Your Faith",
+    "heroTitle": "Resources",
+    "heroDesc": "Sermons, devotionals, and tools to support your spiritual journey.",
+    "quickLinksTitle": "Quick Resource Links",
+    "bibleTitle": "Bible Reading Plans",
+    "bibleDesc": "Follow a structured plan to read through Scripture. New plans every quarter.",
+    "podcastTitle": "Podcast",
+    "podcastDesc": "Listen to our weekly messages on your favourite podcast platform.",
+    "devotionalsTitle": "Devotionals",
+    "devotionalsDesc": "Download printable daily devotionals for personal or family use.",
+    "sermonsTag": "Messages",
+    "sermonsTitle": "Recent Sermons",
+    "sermonsDesc": "Catch up on messages you may have missed or revisit ones that impacted you.",
+    "noSermons": "No sermons available yet. Check back soon.",
+    "viewAllSermons": "View all sermons",
+    "ctaTitle": "Want to Go Deeper?",
+    "ctaDesc": "Join one of our weekly Bible studies or small groups.",
+    "ctaButton": "View Events",
+    "sermons": [
+      {
+        "title": "Walking in the Presence of God",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "June 22, 2026",
+        "series": "Presence",
+        "duration": "45 min"
+      },
+      {
+        "title": "Faith That Moves Mountains",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "June 15, 2026",
+        "series": "Unshakeable Faith",
+        "duration": "52 min"
+      },
+      {
+        "title": "The Power of Community",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "June 8, 2026",
+        "series": "Together",
+        "duration": "48 min"
+      },
+      {
+        "title": "Grace Upon Grace",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "June 1, 2026",
+        "series": "Unshakeable Faith",
+        "duration": "41 min"
+      },
+      {
+        "title": "Renewed by the Spirit",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "May 25, 2026",
+        "series": "Presence",
+        "duration": "39 min"
+      },
+      {
+        "title": "Purpose Over Pressure",
+        "speaker": "Prof. Bishop Frank Namegabe",
+        "date": "May 18, 2026",
+        "series": "Together",
+        "duration": "55 min"
+      }
+    ]
+  },
+  "bibleReadingPlansPage": {
+    "metaTitle": "Bible Reading Plans | Global God's Presence Church",
+    "metaDescription": "Follow a structured plan to read through Scripture, with new plans published every quarter.",
+    "heroTag": "Grow Your Faith",
+    "heroTitle": "Bible Reading Plans",
+    "heroDesc": "Follow a structured plan to read through Scripture. New plans every quarter.",
+    "noPlans": "No reading plans available yet. Check back soon.",
+    "downloadPlan": "Download Plan",
+    "calendarView": "Calendar",
+    "listView": "List",
+    "more": "more",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "channelLiveNow": "Live now",
+    "liveStartsAt": "Live at {time}",
+    "joinLive": "Join Live",
+    "weekday": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    }
+  },
+  "devotionalsPage": {
+    "metaTitle": "Devotionals | Global God's Presence Church",
+    "metaDescription": "Daily devotionals with scripture and reflection to support your spiritual journey.",
+    "heroTag": "Grow Your Faith",
+    "heroTitle": "Devotionals",
+    "heroDesc": "Daily devotionals for personal or family use, with real scripture and reflection.",
+    "noDevotionals": "No devotionals available yet. Check back soon.",
+    "calendarView": "Calendar",
+    "listView": "List",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "more": "more",
+    "weekday": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    }
+  },
+  "podcastPage": {
+    "metaTitle": "Podcast | Global God's Presence Church",
+    "metaDescription": "Listen to our weekly messages on your favourite podcast platform.",
+    "heroTag": "Listen Anywhere",
+    "heroTitle": "Podcast",
+    "heroDesc": "Listen to our weekly messages on your favourite podcast platform.",
+    "listenOn": "Listen On",
+    "noPlatforms": "Podcast links coming soon.",
+    "spotify": "Spotify",
+    "apple": "Apple Podcasts",
+    "youtube": "YouTube"
+  },
+  "faqPage": {
+    "metaTitle": "Frequently Asked Questions | Global God's Presence Church",
+    "metaDescription": "Answers to what visitors and members ask us most.",
+    "heroTag": "Got Questions?",
+    "heroTitle": "Frequently Asked Questions",
+    "heroDesc": "Answers to what visitors and members ask us most.",
+    "noFaqs": "No questions have been added yet. Check back soon.",
+    "uncategorized": "General",
+    "stillHaveQuestions": "Still Have Questions?",
+    "stillHaveQuestionsDesc": "Can't find what you're looking for? Reach out and we'll get back to you.",
+    "contactUs": "Contact Us"
+  },
+  "donatePage": {
+    "errorLoad": "Failed to submit your donation try again",
+    "flutterwaveMonthlyOnly": "Direct Flutterwave checkout supports one-time donations only. Choose One time to continue.",
+    "completeFlutterwave": "Choose a payment method in Flutterwave's secure checkout.",
+    "continueToFlutterwave": "Continue to Flutterwave checkout",
+    "flutterwaveSuccess": "Payment confirmed. Thank you for your donation.",
+    "flutterwavePending": "Flutterwave has not confirmed this payment yet. Please wait and check again.",
+    "flutterwaveFailed": "Flutterwave could not complete the payment. Please try again.",
+    "flutterwaveClosed": "Checkout closed. No payment was confirmed.",
+    "flutterwaveVerifyError": "Payment could not be verified. Please contact the church before retrying.",
+    "phoneCountry": "Phone country",
+    "mobilePhonePlaceholder": "Enter mobile number",
+    "mobilePhoneRequired": "Enter the mobile money phone number.",
+    "mobilePhoneInvalid": "Enter a valid mobile phone number.",
+    "manualPaymentInstructions": "View manual payment instructions",
+
+    "seoTitle": "Donate | Support Our Mission",
+    "seoDescription": "Make a donation to support our work. Choose a giving category and pay conveniently via mobile money, card, bank transfer, PayPal, and more.",
+    "channelsHeading": "Give your donations via the following channels",
+    "selectPaymentMethod": "Select a payment method to continue.",
+    "title": "Make a Donation",
+    "subtitle": "Your generosity supports every area of ministry at Global God's Presence Church.",
+    "backToGive": "Back to Giving",
+    "selectTypeTitle": "Select Giving Category",
+    "amountTitle": "Enter Amount",
+    "amountLabel": "Amount",
+    "amountPlaceholder": "0.00",
+    "currencyLabel": "Currency",
+    "paymentMethodTitle": "How Would You Like to Give?",
+    "continue": "Continue",
+    "donateButton": "Donate Now",
+    "processing": "Processing…",
+    "momo": "Mobile Money",
+    "momoDesc": "Pay with MTN Mobile Money",
+    "oneTime": "One time",
+    "onetime": "One time",
+    "status_active": "Active",
+    "status_cancelled": "Cancelled",
+    "no_event": "No event",
+    "last_event": "Last Event",
+    "monthly": "Monthly",
+    "paypal": "PayPal",
+    "paypalDesc": "Pay securely online with PayPal",
+    "paypalDialogTitle": "Complete your donation with PayPal",
+    "paypalDonorInfoDesc": "Optional — leave blank to give anonymously.",
+    "paypalDonorNamePlaceholder": "Your name (optional)",
+    "paypalDonorEmailPlaceholder": "Your email (optional)",
+    "paypalSuccessTitle": "Thank you for your donation!",
+    "paypalSuccessDesc": "Your PayPal payment was received successfully.",
+    "paypalErrorDesc": "Something went wrong with PayPal. Please try again.",
+    "card": "Card Payment",
+    "cardDesc": "Visa, Mastercard, or other cards",
+    "bank": "Bank Transfer",
+    "bankDesc": "Wire transfer to our church account",
+    "demoNotice": "",
+    "selectTypeFirst": "Please select a giving category first.",
+    "enterAmountFirst": "Please enter an amount greater than 0.",
+    "selectMethodFirst": "Please select a payment method.",
+    "noGivingCategories": "No giving categories available.",
+    "maximumAmount": "Maximum: {symbol} {amount}",
+    "exceedsMaxError": "Maximum donation is {symbol} {amount}.",
+    "momoDialogTitle": "Pay via Mobile Money",
+    "momoStep1": "Dial *182# (MTN) or your mobile money code",
+    "momoStep2": "Select \"Send Money\"",
+    "momoStep3": "Number: {number}",
+    "momoStep4": "Amount: {amount} {currency}",
+    "momoStep5": "Reference / Note: {type}",
+    "momoNumber": "+250783389668",
+    "cardDialogTitle": "Card Payment — Coming Soon",
+    "cardNotice": "Online card payment is not yet available. Please use Mobile Money or Bank Transfer for now.",
+    "cardContact": "For urgent giving, email us at info@globalgodspresencechurch.org",
+    "bankDialogTitle": "Bank Transfer Details",
+    "bankName": "I&M Bank Rwanda",
+    "bankAccountNumber": "20160241001",
+    "bank1Name": "I&M Bank Rwanda",
+    "bank1Account": "20160241001",
+    "bank2Name": "Chase Bank (USA)",
+    "bank2Account": "2900222608",
+    "bankAccountName": "Global God's Presence Church",
+    "bankRow1": "Bank: {bank}",
+    "bankRow2": "Account: {account}",
+    "bankRow3": "Name: {name}",
+    "bankRow4": "Reference: {type} — {amount} {currency}",
+    "close": "Close",
+    "donationSummary": "Donation Summary",
+    "summaryType": "Category",
+    "summaryAmount": "Amount",
+    "summaryMethod": "Method",
+    "recordFailed": "Could not record your donation. Please try again.",
+    "donationRecordedTitle": "Thank you — your donation is recorded!",
+    "donationRecordedDesc": "We've marked it as pending. Our team will confirm receipt once the payment arrives, following the steps above.",
+    "viewMyDonations": "View My Donations",
+    "giveAnother": "Give Another Donation"
+  },
+  "givePage": {
+    "heroTag": "Support the Mission",
+    "heroTitle": "Give",
+    "heroDesc": "Giving is an act of worship. Your generosity makes a difference in the lives of many.",
+    "scripture": "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.",
+    "scriptureRef": "2 Corinthians 9:7",
+    "categoriesTag": "How You Can Give",
+    "categoriesTitle": "Giving Categories",
+    "categoriesDesc": "Your donations support every area of ministry at Global God's Presence Church.",
+    "noDonationTypes": "No giving categories available at this time.",
+    "waysTag": "Options",
+    "waysTitle": "Ways to Give",
+    "ways": [
+      {
+        "title": "Mobile Money",
+        "description": "Send your offering via MoMo or any mobile payment to our church account.",
+        "detail": "MTN MoMo: +250783389668"
+      },
+      {
+        "title": "In Person",
+        "description": "Give during our Sunday worship service at the offering point.",
+        "detail": "Every Sunday — 10:00 AM"
+      },
+      {
+        "title": "Bank Transfer",
+        "description": "Transfer directly to our church bank account — I&M Bank Rwanda or Chase Bank (USA).",
+        "detail": "I&M Bank Rwanda: 20160241001 · Chase Bank (USA): 2900222608"
+      },
+      {
+        "title": "PayPal",
+        "description": "Give securely online with PayPal from anywhere in the world.",
+        "detail": "Available on our Donate page"
+      }
+    ],
+    "stewardshipTag": "Transparency",
+    "stewardshipTitle": "Your Gift, Faithfully Stewarded",
+    "stewardshipP1": "We are committed to being responsible stewards of every gift entrusted to us. Every offering is directed toward ministry, outreach, and the care of our community here in Mbarara, Uganda.",
+    "stewardshipP2": "For questions about our finances or giving, please reach out to us directly — we are an open book.",
+    "stewardshipButton": "Contact Finance Team",
+    "donateNowButton": "Donate Now",
+    "donateButton": "Give",
+    "viewCampaign": "View Campaign",
+    "raised": "raised",
+    "goal": "goal",
+    "fundedPercent": "{percent}% funded"
+  },
+  "contactPage": {
+    "heroTag": "We'd Love to Hear From You",
+    "heroTitle": "Contact Us",
+    "heroDesc": "Have a question, need prayer, or want to get connected? Reach out — our team is here for you.",
+    "getInTouchTitle": "Get in Touch",
+    "getInTouchDesc": "Whether you're looking for directions, have a ministry question, or just want to say hello — we're happy to connect.",
+    "addressLabel": "Address",
+    "addressValue": "Mbarara District, Uganda",
+    "phoneLabel": "Phone (Rwanda)",
+    "phoneValue": "+250783389668",
+    "phoneFieldLabel": "Phone Number",
+    "phoneLabelUganda": "Phone (Uganda)",
+    "phoneValueUganda": "+256 776 747 545",
+    "phoneLabelUsa": "Phone (USA)",
+    "phoneValueUsa": "+1 502 510 0613",
+    "emailLabel": "Email",
+    "emailValue": "info@globalgodspresencechurch.org",
+    "timesLabel": "Service Times",
+    "timesValue": "Sunday at 10:00 AM",
+    "mapPlaceholder": "Mbarara District, Uganda",
+    "mapTitle": "Church location map",
+    "formTitle": "Send a Message",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailFormLabel": "Email",
+    "emailPlaceholder": "Your email",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What is this about?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your message...",
+    "phonePlaceholder": "Your phone number (optional)",
+    "send": "Send Message",
+    "sending": "Sending…",
+    "successTitle": "Message Sent!",
+    "successDesc": "Thank you for reaching out. We'll get back to you soon.",
+    "sendAnother": "Send another message",
+    "errorSend": "Failed to send. Please try again later."
+  },
+  "giveCampaign": {
+    "backToGive": "Back to Giving",
+    "donate": "Donate to This Campaign",
+    "raised": "raised",
+    "goal": "goal",
+    "progressLabel": "{percent}% funded",
+    "notFound": "Campaign not found",
+    "defaultDesc": "Your gift to this ministry area makes a direct impact.",
+    "donateNow": "Give Now"
+  },
+  "storiesPage": {
+    "heroTag": "Changed Lives",
+    "heroTitle": "Stories",
+    "heroDesc": "Real people, real change. Hear how God has moved in the lives of our community.",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest First",
+    "sortOldest": "Oldest First",
+    "sortNameAz": "Name A–Z",
+    "watchStory": "Watch Story",
+    "ctaTitle": "Has God Moved in Your Life?",
+    "ctaDesc": "We'd love to share your story and encourage others in the community.",
+    "ctaButton": "Share Your Story",
+    "shareEmail": "info@globalgodspresencechurch.org",
+    "shareSubject": "My Story",
+    "backToStories": "Back to Stories",
+    "relatedTitle": "More Stories",
+    "relatedTag": "Watch Next",
+    "watchFull": "Watch Full Story",
+    "readMore": "Read More",
+    "allCategories": "All",
+    "listenToStory": "Listen to Story",
+    "noStories": "No stories available yet. Check back soon.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "stories": [
+      {
+        "name": "Marie's Story",
+        "category": "Hope & Transformation Through Jesus",
+        "quote": "Today, I wake up in prayer. I know I have something bigger than me that I can lean on and rely on."
+      },
+      {
+        "name": "Renee's Story",
+        "category": "Finding Community",
+        "quote": "I walked in as a stranger and left as part of a family. This church changed everything for me."
+      },
+      {
+        "name": "Men's Retreat",
+        "category": "Brotherhood & Prayer",
+        "quote": "We prayed together, cried together, and left stronger than we arrived. God showed up."
+      },
+      {
+        "name": "Jean & Amina's Story",
+        "category": "Healing Together",
+        "quote": "Our marriage was broken. Through the church's counsel and God's grace, we were restored."
+      },
+      {
+        "name": "Youth Night",
+        "category": "Next Generation",
+        "quote": "For the first time in my life, I felt like my generation had a place in the house of God."
+      },
+      {
+        "name": "Sunday Outreach",
+        "category": "Serving the Community",
+        "quote": "We went to feed others, but we were the ones who left full. Service is its own reward."
+      }
+    ]
+  },
+  "prayerRequestPage": {
+    "heroTag": "We're Here for You",
+    "heroTitle": "Prayer Request",
+    "heroDesc": "No request is too big or too small. Our prayer team is committed to lifting you up before God.",
+    "scripture": "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.",
+    "scriptureRef": "Philippians 4:6",
+    "formTitle": "Submit a Prayer Request",
+    "formDesc": "Your request is kept in confidence by our prayer team.",
+    "anonymous": "Submit anonymously",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email (optional)",
+    "emailPlaceholder": "For follow-up",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Select a category",
+    "requestLabel": "Your Request",
+    "requestPlaceholder": "Share what is on your heart...",
+    "submit": "Submit Prayer Request",
+    "sending": "Submitting…",
+    "successTitle": "We Received Your Request",
+    "successDesc": "Our prayer team has received your request and we will be covering you in prayer. You are not alone.",
+    "sendAnother": "Submit another request",
+    "errorSend": "Failed to submit. Please try again later.",
+    "categories": [
+      "Personal / Health",
+      "Family",
+      "Work / Career",
+      "Relationships",
+      "Financial",
+      "Spiritual Growth",
+      "Other"
+    ]
+  },
+  "eventDetailPage": {
+    "backToEvents": "Back to Events",
+    "registerCta": "Contact Us to Attend",
+    "relatedTag": "More Events",
+    "relatedTitle": "Upcoming Events"
+  },
+  "coursesPage": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "backToCourses": "Back to Courses",
+    "instructor": "Instructor",
+    "language": "Language",
+    "enrollButton": "Enroll Now",
+    "enrolling": "Enrolling...",
+    "continueCourse": "Continue Course",
+    "loginToEnroll": "Sign In to Enroll",
+    "enrollSuccess": "You are now enrolled!",
+    "enrollFailed": "Could not enroll in this course. Please try again.",
+    "relatedTag": "More Courses",
+    "relatedTitle": "Other Courses",
+    "noCourses": "No courses available yet. Check back soon.",
+    "level_beginner": "Beginner",
+    "level_intermediate": "Intermediate",
+    "level_advanced": "Advanced",
+    "reviewsCount": "reviews",
+    "noReviewsYet": "No reviews yet.",
+    "curriculum": "Curriculum",
+    "freePreview": "Free preview",
+    "reviews": "Reviews",
+    "leaveReview": "Leave a review",
+    "reviewCommentPlaceholder": "Share your thoughts about this course (optional)",
+    "submitReview": "Submit Review",
+    "reviewSubmitted": "Thanks for your review!",
+    "reviewSubmitFailed": "Could not submit your review. Please try again.",
+    "selectRatingFirst": "Please tap a star rating before submitting.",
+    "heroTag": "Grow & Learn",
+    "heroTitle": "Courses",
+    "heroDesc": "Deepen your faith and grow in ministry through live classes and self-paced courses taught by our leaders.",
+    "sectionTag": "All Courses",
+    "sectionTitle": "Explore Our Courses",
+    "sectionDesc": "From foundational Bible studies to leadership training — find a course that fits where you are.",
+    "typeAll": "All",
+    "typeLive": "Live Classes",
+    "typeSelfPaced": "Self-Paced",
+    "startsLabel": "Starts",
+    "viewCourse": "View Course",
+    "categoryLabel": "Category:",
+    "allCategories": "All Categories",
+    "levelLabel": "Level:",
+    "allLevels": "All Levels",
+    "clearFilters": "Clear filters"
+  },
+  "instructorPage": {
+    "backHome": "Back to Home",
+    "notFound": "Instructor not found.",
+    "instructorTag": "Instructor",
+    "coursesTaught": "Courses Taught",
+    "noCourses": "This instructor has no published courses yet."
+  },
+  "sermonsPage": {
+    "heroTag": "God's Word",
+    "heroTitle": "Sermons",
+    "heroDesc": "Powerful messages from Scripture to strengthen your faith and transform your life.",
+    "filterAll": "All Series",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest First",
+    "sortOldest": "Oldest First",
+    "sortTitleAz": "Title A–Z",
+    "sectionTag": "Latest Messages",
+    "sectionTitle": "Recent Sermons",
+    "sectionDesc": "Watch or listen to messages you may have missed, or revisit ones that impacted you.",
+    "ctaTitle": "Never Miss a Message",
+    "ctaDesc": "Subscribe to our YouTube channel and follow us on Facebook to get notified of every new message.",
+    "ctaYoutube": "Subscribe on YouTube",
+    "ctaFacebook": "Follow on Facebook",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "backToSermons": "Back to Sermons",
+    "relatedTitle": "More Sermons",
+    "relatedTag": "Continue Watching",
+    "shareLabel": "Share this sermon",
+    "watchNow": "Watch Now",
+    "noSermons": "No sermons available yet. Check back soon.",
+    "all": "All"
+  },
+  "stepUpGate": {
+    "title": "Verify it's you",
+    "description": "This area is sensitive. We'll send a one-time code to your email before you can continue.",
+    "requestButton": "Send code",
+    "requestingButton": "Sending…",
+    "codeSentTitle": "Enter the code",
+    "codeSentDescription": "We sent a 6-digit code to your email. It expires in 10 minutes.",
+    "codePlaceholder": "6-digit code",
+    "verifyButton": "Verify",
+    "verifyingButton": "Verifying…",
+    "resendButton": "Resend code",
+    "requestFailed": "Couldn't send the code. Please try again.",
+    "verifyFailed": "That code is invalid or expired.",
+    "codeSent": "Code sent — check your email."
+  },
+  "cookieConsent": {
+    "title": "Cookie preferences",
+    "message": "Choose which cookies we can use. You can change this anytime from the privacy policy page.",
+    "necessaryLabel": "Necessary",
+    "necessaryDesc": "Keeps you signed in and remembers your language. Always on — the site can't function without these.",
+    "analyticsLabel": "Analytics",
+    "analyticsDesc": "Helps us understand how visitors use the site (Google Analytics). Off by default.",
+    "thirdPartyLabel": "Third-party embeds",
+    "thirdPartyDesc": "YouTube video, PayPal donations, and Google sign-in may set their own cookies when you use those features. We don't control these — see each provider's own privacy policy.",
+    "learnMore": "Learn more",
+    "necessaryOnly": "Necessary only",
+    "savePreferences": "Save preferences",
+    "accept": "Accept all"
+  },
+  "profilePage": {
+    "not_using_it": "Not using it",
+    "missing_feature": "Missing Feature",
+    "too_annoying": "Too anoying",
+    "too_hard_to_use": "Too hard to use",
+    "found_alternative": "Found alternative",
+    "privacy": "Privacy",
+    "other": "Other"
+  },
+  "privacyPage": {
+    "heroTag": "Legal",
+    "heroTitle": "Privacy Policy",
+    "heroDesc": "How we collect, use, and protect your information.",
+    "contactUs": "Contact Us",
+    "lastUpdated": "Last updated: June 2026",
+    "intro": "Global God's Presence Church (\"we,\" \"us,\" or \"our\") is committed to protecting your privacy. This policy explains what information we collect when you visit our website or use our services, how we use it, and your rights regarding your data.",
+    "section1Title": "1. Information We Collect",
+    "section1Text": "We may collect personal information you voluntarily provide, including your name, email address, and prayer requests when you submit forms on our website. We also collect non-personal, aggregate information such as browser type, pages visited, and time spent on pages through Cloudflare Web Analytics, a cookieless page-analytics tool that does not track you across other websites.",
+    "section2Title": "2. How We Use Your Information",
+    "section2Text": "We use the information you provide to respond to your enquiries, send you our newsletter (only with your consent), process prayer requests confidentially, and improve our website and services. We never sell or share your personal information with third parties for marketing purposes.",
+    "section3Title": "3. Prayer Request Confidentiality",
+    "section3Text": "All prayer requests submitted through our website are kept strictly confidential and are only accessible to our designated prayer team. We take the trust you place in us very seriously.",
+    "section4Title": "4. Cookies",
+    "section4Text": "We use a small number of strictly necessary cookies: one keeps you signed in, and one remembers your language preference. We do not use analytics, advertising, or tracking cookies — the page-analytics tool we use, Cloudflare Web Analytics, is cookieless and does not set anything on your device or track you across other sites. If visiting from the EU, EEA, or UK, you'll see a cookie notice on your first visit; your choice is stored for 180 days. You can also control cookies through your browser at any time, though disabling the necessary ones will sign you out and reset your language preference.",
+    "section5Title": "5. Data Security",
+    "section5Text": "We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction.",
+    "section6Title": "6. Third-Party Services",
+    "section6Text": "Our website may include links to third-party platforms (Facebook, YouTube, etc.). These services have their own privacy policies, and we are not responsible for their practices.",
+    "section7Title": "7. Your Rights",
+    "section7Text": "You have the right to access, correct, or request deletion of your personal data at any time. To exercise these rights, please contact us at info@globalgodspresencechurch.org.",
+    "section8Title": "8. Changes to This Policy",
+    "section8Text": "We may update this privacy policy from time to time. Changes will be posted on this page with an updated date. We encourage you to review this policy periodically.",
+    "contactTitle": "Questions?",
+    "contactText": "If you have any questions about this privacy policy, please contact us:",
+    "contactEmail": "info@globalgodspresencechurch.org",
+    "contactAddress": "Mbarara District, Uganda"
+  },
+  "seo": {
+    "home": {
+      "title": "Global God's Presence Church | Church in Mbarara, Uganda",
+      "description": "Join Global God's Presence Church in Mbarara, Uganda for Spirit-filled worship, Bible-based teaching and community. Sundays 10:00 AM, plus online services.",
+      "keywords": "church in Mbarara, Uganda, Spirit-filled church, Sunday service Mbarara, Bible teaching, online church Uganda"
+    },
+    "emailNotVerified": {
+      "title": "Email not verified | Church in Mbarara, Uganda",
+      "description": "Please verify your email to continue",
+      "keywords": "Email not verified, verify your email"
+    },
+    "bibleReadingPlans": {
+      "title": "Bible Reading Plans | Global God's Presence Church",
+      "description": "Follow guided Bible reading plans from Global God's Presence Church in Mbarara, Uganda. Build a daily habit in God's Word with simple plans for every season of life.",
+      "keywords": "Bible reading plan, daily Bible reading, guided Bible study, church Bible plan Uganda"
+    },
+    "devotionals": {
+      "title": "Daily Devotionals | Global God's Presence Church",
+      "description": "Read daily devotionals from Global God's Presence Church in Mbarara, Uganda. Short, Bible-based reflections to encourage your faith and start each day with God.",
+      "keywords": "daily devotional, Christian devotionals, Bible devotional Uganda, morning devotion, church devotionals"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions | Global God's Presence Church",
+      "description": "Find answers to common questions about Global God's Presence Church in Mbarara, Uganda: service times, visiting, giving, online classes, prayer and your account.",
+      "keywords": "church FAQ, visit church Mbarara, service times Uganda, online giving questions, church questions"
+    },
+    "ministries": {
+      "title": "Our Ministries | Global God's Presence Church",
+      "description": "Discover the ministries of Global God's Presence Church in Mbarara, Uganda. Find a place to serve, grow and belong in worship, prayer, youth and outreach.",
+      "keywords": "church ministries Mbarara, youth ministry Uganda, women's ministry, church volunteer, outreach ministry Uganda"
+    },
+    "podcast": {
+      "title": "Podcast | Global God's Presence Church",
+      "description": "Listen to the Global God's Presence Church podcast from Mbarara, Uganda. Sermons and teaching to help you grow in faith, wherever you are and on any device.",
+      "keywords": "church podcast, Christian podcast Uganda, sermon podcast, listen to sermons, Bible teaching podcast"
+    },
+    "sermonDetail": {
+      "title": "Sermon | Global God's Presence Church",
+      "description": "Watch or listen to this message from Global God's Presence Church in Mbarara, Uganda, and be encouraged in your faith through Bible-based teaching.",
+      "keywords": "sermon, church message, Christian sermon Uganda"
+    },
+    "eventDetail": {
+      "title": "Church Event | Global God's Presence Church",
+      "description": "See the date, time and details of this event at Global God's Presence Church in Mbarara, Uganda, and plan to join us.",
+      "keywords": "church event Mbarara, Uganda, church program"
+    },
+    "storyDetail": {
+      "title": "Testimony | Global God's Presence Church",
+      "description": "Read or watch this testimony from a member of Global God's Presence Church in Mbarara, Uganda, and be encouraged by what God is doing in people's lives.",
+      "keywords": "church testimony, changed life, faith story Uganda"
+    },
+    "courseDetail": {
+      "title": "Course | Global God's Presence Church",
+      "description": "Learn about this course from Global God's Presence Church in Mbarara, Uganda: what you will study, who teaches it, and how to enrol and start learning.",
+      "keywords": "church course, Bible course Uganda, discipleship class"
+    },
+    "devotionalDetail": {
+      "title": "Devotional | Global God's Presence Church",
+      "description": "Read today's devotional from Global God's Presence Church in Mbarara, Uganda. A short, Bible-based reflection to encourage your walk with God.",
+      "keywords": "devotional, daily devotion, Bible reflection"
+    },
+    "bibleReadingPlanDetail": {
+      "title": "Bible Reading Plan | Global God's Presence Church",
+      "description": "See the daily readings in this Bible reading plan from Global God's Presence Church in Mbarara, Uganda, and start reading God's Word day by day.",
+      "keywords": "Bible reading plan, daily readings, read the Bible"
+    },
+    "instructorDetail": {
+      "title": "Instructor | Global God's Presence Church",
+      "description": "Meet an instructor at Global God's Presence Church in Mbarara, Uganda, and see the Bible courses and classes they teach.",
+      "keywords": "church instructor, Bible teacher, course teacher Uganda"
+    },
+    "campaignDetail": {
+      "title": "Giving Campaign | Global God's Presence Church",
+      "description": "Support this giving campaign at Global God's Presence Church in Mbarara, Uganda. See the goal, the progress so far and how your gift makes a difference.",
+      "keywords": "church giving campaign, fundraising Uganda, support church project"
+    },
+    "login": {
+      "title": "Sign In | Global God's Presence Church",
+      "description": "Sign in to your Global God's Presence Church account to access your courses, giving history and community."
+    },
+    "register": {
+      "title": "Create Account | Global God's Presence Church",
+      "description": "Create a free Global God's Presence Church account to join courses, follow ministries and manage your giving."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password | Global God's Presence Church",
+      "description": "Enter your email and we will send you a link to reset your password."
+    },
+    "resetPassword": {
+      "title": "Reset Password | Global God's Presence Church",
+      "description": "Reset your Global God's Presence Church account password."
+    },
+    "resetPasswordConfirm": {
+      "title": "Set New Password | Global God's Presence Church",
+      "description": "Choose a new password for your Global God's Presence Church account."
+    },
+    "verifyEmail": {
+      "title": "Verify Email | Global God's Presence Church",
+      "description": "Confirming your email address for your Global God's Presence Church account."
+    },
+    "emailVerificationRequired": {
+      "title": "Verify Your Email | Global God's Presence Church",
+      "description": "Check your inbox and confirm your email address to finish setting up your account."
+    },
+    "unauthorized": {
+      "title": "Access Denied | Global God's Presence Church",
+      "description": "You do not have permission to view this page."
+    },
+    "notFound": {
+      "title": "Page Not Found | Global God's Presence Church",
+      "description": "The page you are looking for could not be found. Return to the Global God's Presence Church home page."
+    },
+    "liveRoom": {
+      "title": "Live Room | Global God's Presence Church",
+      "description": "Join the live session at Global God's Presence Church."
+    },
+    "donateMethod": {
+      "title": "Complete Your Gift | Global God's Presence Church",
+      "description": "Complete your gift to Global God's Presence Church securely."
+    },
+    "notifications": {
+      "title": "Notifications | Global God's Presence Church",
+      "description": "Your notifications from Global God's Presence Church."
+    },
+    "profile": {
+      "title": "My Profile | Global God's Presence Church",
+      "description": "Manage your profile and account details."
+    },
+    "profileApiKeys": {
+      "title": "API Keys | Global God's Presence Church",
+      "description": "Manage your API keys."
+    },
+    "profileSessions": {
+      "title": "Active Sessions | Global God's Presence Church",
+      "description": "Review and manage the devices signed in to your account."
+    },
+    "myDashboard": {
+      "title": "My Dashboard | Global God's Presence Church",
+      "description": "Your personal space: courses, certificates, giving and ministries."
+    },
+    "myCertificates": {
+      "title": "My Certificates | Global God's Presence Church",
+      "description": "View and download the certificates you have earned."
+    },
+    "myCourses": {
+      "title": "My Courses | Global God's Presence Church",
+      "description": "Continue the courses you are enrolled in."
+    },
+    "myCourseDetail": {
+      "title": "Course | Global God's Presence Church",
+      "description": "Your course lessons and progress."
+    },
+    "myCourseManage": {
+      "title": "Manage Course | Global God's Presence Church",
+      "description": "Manage your course content, students and settings."
+    },
+    "myDonations": {
+      "title": "My Giving | Global God's Presence Church",
+      "description": "Your giving history and receipts."
+    },
+    "myGroups": {
+      "title": "My Groups | Global God's Presence Church",
+      "description": "The groups you belong to."
+    },
+    "myMinistries": {
+      "title": "My Ministries | Global God's Presence Church",
+      "description": "The ministries you serve in or follow."
+    },
+    "myMinistryDetail": {
+      "title": "Ministry | Global God's Presence Church",
+      "description": "Your ministry space."
+    },
+    "myMinistryCommunity": {
+      "title": "Ministry Community | Global God's Presence Church",
+      "description": "Conversations and updates from your ministry."
+    },
+    "myMinistryManage": {
+      "title": "Manage Ministry | Global God's Presence Church",
+      "description": "Manage your ministry members, content and settings."
+    },
+    "adminDashboard": {
+      "title": "Admin Dashboard | Global God's Presence Church",
+      "description": "Overview of the Global God's Presence Church site."
+    },
+    "adminBibleReadingPlans": {
+      "title": "Admin: Bible Reading Plans | Global God's Presence Church",
+      "description": "Manage Bible reading plans."
+    },
+    "adminContact": {
+      "title": "Admin: Contact Messages | Global God's Presence Church",
+      "description": "Read and reply to contact messages."
+    },
+    "adminCourses": {
+      "title": "Admin: Courses | Global God's Presence Church",
+      "description": "Manage courses, lessons and enrolments."
+    },
+    "adminDevotionals": {
+      "title": "Admin: Devotionals | Global God's Presence Church",
+      "description": "Manage daily devotionals."
+    },
+    "adminDonations": {
+      "title": "Admin: Donations | Global God's Presence Church",
+      "description": "Review and manage donations."
+    },
+    "adminEvents": {
+      "title": "Admin: Events | Global God's Presence Church",
+      "description": "Manage church events and programs."
+    },
+    "adminFileManagement": {
+      "title": "Admin: File Management | Global God's Presence Church",
+      "description": "Manage uploaded files and media."
+    },
+    "adminFinancialManagement": {
+      "title": "Admin: Financial Management | Global God's Presence Church",
+      "description": "Manage finances, balances and reports."
+    },
+    "adminGallery": {
+      "title": "Admin: Gallery | Global God's Presence Church",
+      "description": "Manage gallery photos and videos."
+    },
+    "adminHeroSlides": {
+      "title": "Admin: Hero Slides | Global God's Presence Church",
+      "description": "Manage the home page hero slides."
+    },
+    "adminLogs": {
+      "title": "Admin: System Logs | Global God's Presence Church",
+      "description": "Review system activity logs."
+    },
+    "adminMinistries": {
+      "title": "Admin: Ministries | Global God's Presence Church",
+      "description": "Manage ministries and their members."
+    },
+    "adminNewsletter": {
+      "title": "Admin: Newsletter | Global God's Presence Church",
+      "description": "Write and send newsletters."
+    },
+    "adminPageContent": {
+      "title": "Admin: Page Content | Global God's Presence Church",
+      "description": "Edit website page content."
+    },
+    "adminPlaylists": {
+      "title": "Admin: Playlists | Global God's Presence Church",
+      "description": "Manage media playlists."
+    },
+    "adminPrayerRequests": {
+      "title": "Admin: Prayer Requests | Global God's Presence Church",
+      "description": "Review and follow up prayer requests."
+    },
+    "adminSermonSeries": {
+      "title": "Admin: Sermon Series | Global God's Presence Church",
+      "description": "Manage sermon series."
+    },
+    "adminSermons": {
+      "title": "Admin: Sermons | Global God's Presence Church",
+      "description": "Manage sermons and messages."
+    },
+    "adminServices": {
+      "title": "Admin: Services | Global God's Presence Church",
+      "description": "Manage service times and details."
+    },
+    "adminSiteConfig": {
+      "title": "Admin: Site Settings | Global God's Presence Church",
+      "description": "Manage website settings."
+    },
+    "adminSiteStats": {
+      "title": "Admin: Homepage Stats | Global God's Presence Church",
+      "description": "Manage the statistics shown on the home page."
+    },
+    "adminStories": {
+      "title": "Admin: Testimonies | Global God's Presence Church",
+      "description": "Manage testimonies and stories."
+    },
+    "adminUsers": {
+      "title": "Admin: Users | Global God's Presence Church",
+      "description": "Manage user accounts and roles."
+    },
+    "adminUserDetail": {
+      "title": "Admin: User | Global God's Presence Church",
+      "description": "View and manage a user account."
+    },
+    "donate": {
+      "title": "Make a Donation | Global God's Presence Church",
+      "description": "Give securely to Global God's Presence Church via mobile money, card, or bank transfer — your generosity supports every area of ministry in Mbarara, Uganda.",
+      "keywords": "donate to church Mbarara, Uganda, church mobile money donation, online church giving Uganda, tithe payment"
+    },
+    "gallery": {
+      "title": "Photo & Video Gallery | Global God's Presence Church",
+      "description": "Browse photos and videos from worship services, community events, and ministry life at Global God's Presence Church in Mbarara, Uganda.",
+      "keywords": "church gallery Mbarara, Uganda, church photos, worship photos, church events gallery Uganda"
+    },
+    "live": {
+      "title": "Watch Live | Global God's Presence Church",
+      "description": "Join Global God's Presence Church for live worship, streamed straight from Mbarara, Uganda — no matter where you are.",
+      "keywords": "church live stream Mbarara, Uganda, watch church online, live worship Uganda"
+    },
+    "about": {
+      "title": "About Us | Global God's Presence Church",
+      "description": "Discover Global God's Presence Church in Mbarara District, Uganda — our story, mission, vision, and core values as a Christ-centred community dedicated to transforming lives.",
+      "keywords": "about Global God's Presence Church, Mbarara church, church mission vision, Christian community Uganda, Presence of God Church"
+    },
+    "events": {
+      "title": "Events & Programs | Global God's Presence Church",
+      "description": "Explore upcoming events at Global God's Presence Church in Mbarara, Uganda — Sunday worship services, youth nights, women's prayer breakfasts, community outreach days, and more.",
+      "keywords": "church events Mbarara Uganda, Sunday worship Uganda, youth night Uganda, community outreach Mbarara, Uganda, church programs Uganda"
+    },
+    "services": {
+      "title": "Sunday Services | Global God's Presence Church",
+      "description": "Join us every Sunday at 10:00 AM at Mbarara City, Uganda for Spirit-filled worship, Bible-based teaching, children's ministry, and online streaming.",
+      "keywords": "Sunday service Mbarara, Uganda, church service Uganda, worship 10AM, online church stream, church Uganda"
+    },
+    "resources": {
+      "title": "Resources & Devotionals | Global God's Presence Church",
+      "description": "Access sermons, Bible reading plans, podcast episodes, and daily devotionals from Global God's Presence Church to support your spiritual growth.",
+      "keywords": "church resources, Bible reading plan, church devotionals, spiritual growth, Christian podcast Mbarara, Uganda"
+    },
+    "sermons": {
+      "title": "Sermons & Messages | Global God's Presence Church",
+      "description": "Watch and listen to powerful messages from Prof. Bishop Frank Namegabe at Global God's Presence Church in Mbarara, Uganda — covering faith, prayer, purpose, and community.",
+      "keywords": "sermons Mbarara, Uganda, church messages Uganda, Prof. Bishop Frank Namegabe, Christian sermons Uganda, Presence Church messages"
+    },
+    "courses": {
+      "title": "Courses | Global God's Presence Church",
+      "description": "Grow in faith and ministry with live classes and self-paced courses from Global God's Presence Church in Mbarara, Uganda — Bible studies, discipleship, and leadership training.",
+      "keywords": "church courses Mbarara, Uganda, Bible study classes, discipleship training, Christian leadership course, online church classes Uganda"
+    },
+    "give": {
+      "title": "Give & Support | Global God's Presence Church",
+      "description": "Support the mission of Global God's Presence Church through tithes, offerings, missions giving, or building fund contributions. Your generosity impacts lives in Mbarara, Uganda.",
+      "keywords": "give to church Mbarara, Uganda, church donation Uganda, tithe offering, church missions giving, support church Uganda"
+    },
+    "contact": {
+      "title": "Contact Us | Global God's Presence Church",
+      "description": "Reach out to Global God's Presence Church at Mbarara District, Uganda. Sunday services at 10:00 AM. We'd love to connect with you.",
+      "keywords": "contact church Mbarara, Uganda, church address Uganda, Global God's Presence Church location, church phone email Uganda"
+    },
+    "stories": {
+      "title": "Changed Lives & Testimonies | Global God's Presence Church",
+      "description": "Watch video testimonies of real transformation from members of Global God's Presence Church in Mbarara, Uganda — stories of hope, healing, and community through faith.",
+      "keywords": "church testimonies Mbarara, Uganda, changed lives Uganda, faith stories, church transformation, Christian testimonials Uganda"
+    },
+    "prayerRequest": {
+      "title": "Prayer Request | Global God's Presence Church",
+      "description": "Submit a prayer request to Global God's Presence Church. Our dedicated prayer team is committed to lifting you before God, whatever your need.",
+      "keywords": "prayer request church, intercessory prayer Mbarara, Uganda, church prayer team, prayer support Uganda"
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy | Global God's Presence Church",
+      "description": "Read the privacy policy for Global God's Presence Church website — how we collect, use, store, and protect your personal information.",
+      "keywords": "privacy policy church, data protection website, Global God's Presence Church privacy"
+    }
+  },
+  "pages": {
+    "gallery": {
+      "tag": "Moments",
+      "title": "Our Gallery",
+      "description": "Photos and videos from worship services, community events, and ministry life at Global God's Presence Church.",
+      "noItems": "Gallery coming soon. Check back after our next service!",
+      "closeLightbox": "Close",
+      "previousItem": "Previous",
+      "nextItem": "Next",
+      "viewItem": "View full size",
+      "loadMore": "Load More",
+      "loadingMore": "Loading…"
+    }
+  },
+  "newsletter": {
+    "subscribeTitle": "Stay Connected",
+    "subscribeDesc": "Get notified when we publish new stories and sermons.",
+    "namePlaceholder": "Your name (optional)",
+    "emailPlaceholder": "Your email address",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "successSubscribe": "You're subscribed! We'll be in touch.",
+    "alreadySubscribed": "You're already subscribed.",
+    "errorSubscribe": "Failed to subscribe. Please try again.",
+    "promptTitle": "Send Newsletter?",
+    "promptDesc": "Would you like to notify your newsletter subscribers about this?",
+    "promptSubjectPlaceholder": "e.g. New Story: Changed by Grace",
+    "promptSend": "Send to Subscribers",
+    "promptSkip": "Skip",
+    "promptSending": "Sending...",
+    "promptSent": "Newsletter sent to {count} subscriber(s)!",
+    "promptError": "Failed to send newsletter.",
+    "admin": {
+      "flutterwaveDonations": "Flutterwave Donations",
+      "title": "Newsletter",
+      "sendNewsletter": "Send Newsletter",
+      "totalSubscribers": "Total Subscribers",
+      "activeSubscribers": "Active Subscribers",
+      "subscribers": "Subscribers",
+      "email": "Email",
+      "name": "Name",
+      "subscribedAt": "Subscribed",
+      "status": "Status",
+      "active": "Active",
+      "unsubscribed": "Unsubscribed",
+      "noSubscribers": "No subscribers yet.",
+      "searchPlaceholder": "Search by email or name…",
+      "loading": "Loading…",
+      "confirmRemove": "Are you sure you want to remove this subscriber?",
+      "remove": "Remove subscriber",
+      "removed": "Subscriber removed.",
+      "contentType": "Content Type",
+      "story": "Story",
+      "sermon": "Sermon",
+      "custom": "Custom",
+      "selectStory": "Select Story",
+      "selectSermon": "Select Sermon",
+      "chooseStory": "Choose a story...",
+      "chooseSermon": "Choose a sermon...",
+      "customTitle": "Title",
+      "customTitlePlaceholder": "e.g. Christmas Service Schedule",
+      "customBody": "Message",
+      "customBodyPlaceholder": "Write the newsletter content here...",
+      "customImage": "Image (optional)",
+      "customCtaLabel": "Button Label (optional)",
+      "customCtaLabelPlaceholder": "e.g. Learn More",
+      "customCtaUrl": "Button Link (optional)",
+      "subject": "Email Subject",
+      "subjectPlaceholder": "e.g. New Story: Changed by Grace",
+      "selectRecipients": "Recipients",
+      "allSubscribers": "All Active",
+      "selectSpecific": "Select Specific",
+      "willSendTo": "Will send to {count} subscriber(s)",
+      "sending": "Sending...",
+      "sendNow": "Send Now",
+      "sent": "Newsletter sent to {count} subscriber(s)!",
+      "queued": "Newsletter queued for {count} subscriber(s) — sending shortly.",
+      "errorLoad": "Failed to load subscribers.",
+      "errorSend": "Failed to send newsletter."
+    }
+  },
+  "livePage": {
+    "liveTag": "Live Now",
+    "title": "Join Us Live",
+    "subtitle": "Worship with us in real time — wherever you are.",
+    "embedTitle": "Live Service",
+    "liveNow": "Live Now",
+    "openInNewTab": "Open in a new tab",
+    "alsoOnFacebook": "Also streaming on Facebook:",
+    "noLiveStream": "No live stream available at the moment.",
+    "checkSocials": "Check our social channels for live updates.",
+    "watchYoutube": "Watch on YouTube",
+    "watchFacebook": "Watch on Facebook",
+    "watchOnFacebook": "Watch on Facebook",
+    "facebookLiveReady": "Facebook Live is active.",
+    "facebookLiveDesc": "Click below to watch on Facebook.",
+    "youtubeLiveReady": "YouTube Live is active.",
+    "youtubeLiveDesc": "This stream can't be embedded here — click below to watch on YouTube.",
+    "scheduleTag": "Service Schedule",
+    "scheduleTitle": "Join Us Every Sunday",
+    "scheduleDesc": "We gather to worship, hear the Word, and build community together."
+  },
+  "liveRoomPage": {
+    "pageTitle": "Live Session | Global God's Presence Church",
+    "guestName": "Guest",
+    "signInRequiredTitle": "Live Session",
+    "signInRequiredDesc": "You need to be signed in to join this live session.",
+    "signInToJoin": "Sign In to Join",
+    "liveTag": "Live",
+    "joinTitle": "Join Live Session",
+    "room": "Room: {code}",
+    "host": "Host",
+    "participant": "Participant",
+    "hostNotice": "You are joining as host. Share the room link so students can join.",
+    "joinNow": "Join Now",
+    "goBack": "Go back",
+    "setupTitle": "Set Up Your Broadcast",
+    "setupDesc": "Check your camera and microphone before you go live.",
+    "preparingPreview": "Preparing preview…",
+    "cameraLabel": "Camera",
+    "micLabel": "Microphone",
+    "camera": "Camera",
+    "microphone": "Microphone",
+    "deviceAccessDenied": "Couldn't access your camera/microphone. Check your browser permissions and try again.",
+    "goLive": "Go Live"
+  },
+  "adminGoogle": {
+    "title": "Google Account",
+    "description": "Connect a Google account to enable the Drive file picker and YouTube Live broadcasting.",
+    "connected": "Connected",
+    "connect": "Connect Google Account",
+    "disconnect": "Disconnect",
+    "connectSuccess": "Google account connected.",
+    "connectFailed": "Failed to connect Google account.",
+    "disconnected": "Google account disconnected.",
+    "disconnectFailed": "Failed to disconnect Google account.",
+    "testingModeNotice": "This connection is in Google's Testing mode and expires after 7 days — just reconnect when that happens."
+  },
+  "adminYoutube": {
+    "title": "YouTube Live",
+    "description": "Create a YouTube Live broadcast and stream to it from OBS — no need to set it up manually in YouTube Studio.",
+    "active": "Active",
+    "broadcastTitleLabel": "Broadcast Title",
+    "broadcastTitlePlaceholder": "e.g. Sunday Morning Service",
+    "titleRequired": "Enter a title for the broadcast first.",
+    "startBroadcast": "Start Broadcast",
+    "broadcastCreated": "Broadcast created — paste the details below into OBS.",
+    "broadcastFailed": "Failed to create the YouTube broadcast.",
+    "obsInstructions": "In OBS: Settings → Stream → Service: Custom, then paste these in.",
+    "ingestionUrl": "Server (Ingestion URL)",
+    "streamKey": "Stream Key",
+    "viewOnYoutube": "View on YouTube",
+    "viewPublicLivePage": "View Public Live Page",
+    "endBroadcast": "End Broadcast",
+    "broadcastEnded": "Broadcast ended.",
+    "endFailed": "Failed to end the broadcast."
+  },
+  "ministriesPage": {
+    "metaTitle": "Ministries | Global God's Presence Church",
+    "metaDesc": "Discover our church ministries and join a community serving God together.",
+    "heroTag": "Our Ministries",
+    "heroTitle": "Serve Together",
+    "heroDesc": "Find your place in ministry and grow in faith with others who share your calling.",
+    "filterAll": "All",
+    "noMinistries": "No ministries found.",
+    "members": "members",
+    "join": "Join",
+    "joined": "Joined",
+    "leave": "Leave",
+    "myMinistriesTitle": "My Ministries",
+    "myMinistries": "My Ministries",
+    "discoverMinistries": "Discover Ministries",
+    "notJoinedYet": "You have not joined any ministry yet. Explore below.",
+    "joinedSuccess": "Joined ministry successfully.",
+    "leftSuccess": "Left ministry successfully.",
+    "errorLoad": "Failed to load ministries.",
+    "manage": "Manage",
+    "community": "Community"
+  },
+  "adminSiteConfig": {
+    "title": "Site Settings",
+    "description": "Manage runtime configuration for the website. Changes take effect immediately without redeploying.",
+    "newConfig": "New Setting",
+    "editConfig": "Edit Setting",
+    "key": "Key",
+    "label": "Label",
+    "labelPlaceholder": "e.g. My Custom Setting",
+    "value": "Value",
+    "valuePlaceholder": "Enter value...",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What this setting controls",
+    "publicLabel": "Public (accessible without login)",
+    "public": "Public",
+    "private": "Private",
+    "notSet": "Not set",
+    "noConfigs": "No settings configured yet.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirmDelete": "Delete Setting",
+    "deleteWarning": "Are you sure you want to delete the \"{key}\" setting? This cannot be undone.",
+    "validationError": "Key and label are required.",
+    "errorLoad": "Failed to load settings.",
+    "errorSave": "Failed to save setting.",
+    "successSave": "Setting saved.",
+    "successDelete": "Setting deleted."
+  },
+  "adminPageContent": {
+    "title": "Page Content",
+    "description": "Edit the marketing copy shown across the public website, in English and Swahili. Changes go live immediately.",
+    "save": "Save",
+    "saving": "Saving...",
+    "item": "Item",
+    "english": "English",
+    "swahili": "Swahili",
+    "preview": "Preview",
+    "livePreview": "Live Preview",
+    "errorLoad": "Failed to load page content.",
+    "errorSave": "Failed to save content.",
+    "successSave": "Content saved.",
+    "pages": {
+      "home": "Homepage",
+      "footer": "Footer",
+      "contact": "Contact Page",
+      "prayer_request": "Prayer Request Page",
+      "privacy_policy": "Privacy Policy Page",
+      "about": "About Page",
+      "events": "Events Page",
+      "services": "Services Page",
+      "resources": "Resources Page",
+      "give": "Give Page",
+      "stories": "Stories Page",
+      "courses": "Courses Page",
+      "sermons": "Sermons Page",
+      "gallery": "Gallery Page",
+      "live": "Live Page",
+      "ministries": "Ministries Page",
+      "bible_reading_plans": "Bible Reading Plans Page",
+      "devotionals": "Devotionals Page",
+      "podcast": "Podcast Page",
+      "faq": "FAQ Page",
+      "global": "Global"
+    },
+    "sections": {
+      "home": {
+        "about": "About Section",
+        "invite_guests": "Invite Guests",
+        "prayer_banner": "Prayer Banner",
+        "church_experience": "Sunday Experience Section",
+        "upcoming_events": "Upcoming Events Section",
+        "community_support": "Community Support Section",
+        "gallery_section": "Gallery Section"
+      },
+      "footer": {
+        "main": "Footer Content",
+        "newsletter": "Newsletter Signup"
+      },
+      "contact": {
+        "header": "Page Header",
+        "info": "Contact Details"
+      },
+      "prayer_request": {
+        "header": "Page Header"
+      },
+      "privacy_policy": {
+        "header": "Page Header",
+        "body": "Policy Sections"
+      },
+      "about": {
+        "hero": "Hero",
+        "story": "Our Story",
+        "mission_vision": "Mission & Vision",
+        "values": "Core Values",
+        "cta": "Call to Action"
+      },
+      "events": {
+        "header": "Page Header",
+        "cta": "Call to Action"
+      },
+      "services": {
+        "header": "Page Header",
+        "join": "Join Us Section",
+        "cta": "Call to Action"
+      },
+      "resources": {
+        "header": "Page Header",
+        "sermons": "Sermons Section"
+      },
+      "give": {
+        "header": "Page Header",
+        "categories": "Giving Categories"
+      },
+      "stories": {
+        "header": "Page Header",
+        "cta": "Call to Action"
+      },
+      "courses": {
+        "header": "Page Header"
+      },
+      "sermons": {
+        "header": "Page Header",
+        "cta": "Call to Action"
+      },
+      "gallery": {
+        "header": "Page Header"
+      },
+      "live": {
+        "header": "Page Header",
+        "schedule": "Schedule Section"
+      },
+      "ministries": {
+        "header": "Page Header"
+      },
+      "bible_reading_plans": {
+        "header": "Page Header"
+      },
+      "devotionals": {
+        "header": "Page Header"
+      },
+      "podcast": {
+        "header": "Page Header"
+      },
+      "faq": {
+        "header": "Page Header",
+        "items": "Questions & Answers"
+      },
+      "global": {
+        "cookie_consent": "Cookie Consent Banner"
+      }
+    }
+  },
+  "adminSiteStats": {
+    "title": "Homepage Stats",
+    "description": "Manage the statistics displayed on the homepage. Active stats are shown to visitors.",
+    "newStat": "New Stat",
+    "editStat": "Edit Stat",
+    "value": "Value",
+    "labelEn": "Label (English)",
+    "labelSw": "Label (Swahili)",
+    "order": "Order",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noStats": "No stats yet. Add your first one.",
+    "addFirst": "Add First Stat",
+    "valuePlaceholder": "e.g. 200+",
+    "labelEnPlaceholder": "e.g. Members",
+    "labelSwPlaceholder": "e.g. Wanachama",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirmDelete": "Delete Stat",
+    "deleteWarning": "Are you sure you want to delete the \"{value}\" stat? This cannot be undone.",
+    "validationError": "Value and English label are required.",
+    "errorLoad": "Failed to load stats.",
+    "errorSave": "Failed to save stat.",
+    "successSave": "Stat saved.",
+    "successDelete": "Stat deleted."
+  },
+  "ministryManage": {
+    "backToMinistries": "My Ministries",
+    "leaderBadge": "Leader",
+    "tabOverview": "Overview",
+    "tabMembers": "Members",
+    "tabCommunity": "Community",
+    "statMembers": "Members",
+    "statMessages": "Messages",
+    "statStatus": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "meetingSchedule": "Meeting Schedule",
+    "viewMembers": "View Members",
+    "postAnnouncement": "Post Announcement",
+    "membersCount": "{count} members",
+    "noMembers": "No members in this ministry yet.",
+    "joinedOn": "Joined",
+    "remove": "Remove",
+    "noMessages": "No messages yet. Start the conversation.",
+    "deleteMessage": "Delete message",
+    "you": "You",
+    "announcement": "Announcement",
+    "message": "Message",
+    "messagePlaceholder": "Write a message to your ministry...",
+    "announcementPlaceholder": "Write an announcement for your ministry...",
+    "sendMessage": "Send",
+    "sendAnnouncement": "Post Announcement",
+    "confirmRemoveTitle": "Remove Member",
+    "confirmRemoveDesc": "Are you sure you want to remove {name} from this ministry?",
+    "cancel": "Cancel",
+    "errorLoad": "Failed to load data.",
+    "errorSend": "Failed to send message.",
+    "memberRemoved": "Member removed."
+  },
+  "notFound": {
+    "heading": "Page Not Found",
+    "message": "The page you are looking for does not exist or has been moved.",
+    "goHome": "Go Home",
+    "sermons": "Sermons",
+    "contact": "Contact"
+  },
+  "errorPage": {
+    "heading": "Something Went Wrong",
+    "message": "An unexpected error occurred on our end. Please try again, or head back home.",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home",
+    "contact": "Contact"
+  },
+  "donateMethods": {
+    "backToDonate": "Back to donation methods",
+    "metaTitleTemplate": "How to Donate via {method} | Global God's Presence Church",
+    "howToTitle": "How to Donate via {method}",
+    "breadcrumbGive": "Give",
+    "breadcrumbDonate": "Donate",
+    "stepsHeading": "Steps",
+    "notesHeading": "Good to know",
+    "faqHeading": "Frequently asked questions",
+    "confirmContact": "Amounts and account details change occasionally. If anything here looks out of date, please confirm with the church office at info@globalgodspresencechurch.org before sending your gift.",
+    "manualCountryInstructionsUnavailable": "We don't have verified {method} instructions for {country} yet. Please contact the church before sending a manual payment.",
+    "selectedCountry": "your country",
+    "contactFinanceTeam": "Contact the church office",
+    "goToDonateForm": "Give via Flutterwave",
+    "methods": {
+      "mtn-momo": {
+        "name": "MTN Mobile Money",
+        "metaDescription": "Step-by-step instructions for donating to Global God's Presence Church using MTN Mobile Money (MoMo) from your phone.",
+        "intro": "MTN Mobile Money lets you send your gift directly from your phone in a few minutes, without needing a bank account. This is the fastest option for givers in Rwanda.",
+        "introUganda": "Send your gift from your MTN Uganda line using MTN Mobile Money.",
+        "steps": [
+          "Dial *182# on your MTN line.",
+          "Select \"Send Money\", then \"Send to Mobile Number\".",
+          "Enter +250783389668 as the recipient number and the amount you wish to give.",
+          "In the reference or reason field, write the donation type (e.g. Tithe, Building Fund) and confirm the transaction with your PIN."
+        ],
+        "stepsUganda": [
+          "Open MTN Mobile Money on your MTN Uganda phone or dial *165#.",
+          "Choose Send Money, then select the option for sending to a mobile money number.",
+          "Enter +256 776 747 545 as the recipient and enter your donation amount.",
+          "Add your donation type as the reference, check the recipient details, and confirm with your MTN MoMo PIN."
+        ],
+        "notes": [
+          "Keep the MTN confirmation SMS as your receipt until we mark your gift as received.",
+          "Network charges from MTN may apply depending on your plan."
+        ],
+        "faq": [
+          {
+            "q": "Do I need to be registered with MTN MoMo to give this way?",
+            "a": "Yes, you need an active MTN Mobile Money account with sufficient balance to send the amount."
+          },
+          {
+            "q": "How long until my donation is confirmed?",
+            "a": "Our team verifies MoMo gifts against the church account within 1–2 business days and updates your donation history."
+          }
+        ]
+      },
+      "airtel-money": {
+        "name": "Airtel Money",
+        "metaDescription": "How to send a donation to Global God's Presence Church using Airtel Money.",
+        "intro": "If you use Airtel as your network, you can send your gift directly through Airtel Money using the church's Airtel Money number.",
+        "steps": [
+          "Dial *185# on your Airtel line.",
+          "Select \"Send Money\" and choose \"To Airtel Number\" or \"To Any Network\".",
+          "Enter [ADD_AIRTEL_MONEY_NUMBER] as the recipient and the amount you wish to give.",
+          "Add the donation type as your reference and confirm with your Airtel Money PIN."
+        ],
+        "notes": [
+          "Keep your Airtel confirmation message as proof of payment.",
+          "Standard Airtel Money transfer fees may apply."
+        ],
+        "faq": [
+          {
+            "q": "Can I use Airtel Money from outside Uganda?",
+            "a": "Airtel Money works across Airtel's network in East Africa; check with your local Airtel provider for cross-border transfer support."
+          },
+          {
+            "q": "What if I don't have Airtel Money installed?",
+            "a": "You can use the  USSD code on any basic phone without installing an app."
+          }
+        ]
+      },
+      "sendwave": {
+        "name": "Sendwave",
+        "metaDescription": "Instructions for giving to Global God's Presence Church from abroad using the Sendwave app.",
+        "intro": "Sendwave is a popular option for members of our diaspora community who want to send a gift home quickly, using just a phone number and the Sendwave app.",
+        "steps": [
+          "Open the Sendwave app and select Rwanda as the destination country.",
+          "Choose \"Send to Mobile Money\" and enter +250783389668 as the recipient number.",
+          "Enter the amount you wish to give and confirm the recipient name matches Umumararungu Margueritte.",
+          "Add the donation type in the notes field, if the app allows it, and complete the transfer."
+        ],
+        "notes": [
+          "Sendwave typically delivers funds to Rwandan mobile money accounts within minutes.",
+          "Screenshot your Sendwave receipt in case we need it to match your gift to your donor record."
+        ],
+        "faq": [
+          {
+            "q": "Which countries can send via Sendwave?",
+            "a": "Sendwave supports transfers from the US, UK, and several EU countries to Rwanda; check the app for the current list."
+          },
+          {
+            "q": "Are there fees on Sendwave transfers?",
+            "a": "Sendwave's fees vary by sending country and amount — the app shows the exact fee before you confirm."
+          }
+        ]
+      },
+      "western-union": {
+        "name": "Western Union",
+        "metaDescription": "How to send a donation to Global God's Presence Church through Western Union, in person or online.",
+        "intro": "Western Union is a reliable option if you prefer sending your gift through an agent location or the Western Union website, especially for larger one-time gifts.",
+        "steps": [
+          "Visit westernunion.com or a nearby Western Union agent location.",
+          "Choose \"Send Money\" to Rwanda and select mobile wallet or cash pickup as the delivery method.",
+          "Enter the recipient as Umumararungu Margueritte with phone number +250783389668.",
+          "Enter your gift amount, note the donation type as the purpose, and complete the transfer with the tracking (MTCN) number."
+        ],
+        "notes": [
+          "Save your Western Union tracking number (MTCN) — we may ask for it to confirm your gift.",
+          "Fees and delivery times vary by country and payout method."
+        ],
+        "faq": [
+          {
+            "q": "Can I send from the Western Union app?",
+            "a": "Yes, the mobile app supports the same send-to-mobile-wallet option as the website."
+          },
+          {
+            "q": "How long does a Western Union transfer take to arrive?",
+            "a": "Most digital transfers to mobile wallets arrive within minutes to a few hours."
+          }
+        ]
+      },
+      "moneygram": {
+        "name": "MoneyGram",
+        "metaDescription": "Step-by-step guide to donating to Global God's Presence Church via MoneyGram.",
+        "intro": "MoneyGram offers another trusted way to send your gift from abroad, either online or through a local agent, directly to our church's mobile wallet.",
+        "steps": [
+          "Go to moneygram.com or visit a MoneyGram agent near you.",
+          "Select Rwanda as the destination and choose mobile wallet transfer.",
+          "Enter the recipient as  Umumararungu Margueritte with phone number +250783389668.",
+          "Enter the amount, list the donation type as the reason for transfer, and complete the payment."
+        ],
+        "notes": [
+          "Keep your MoneyGram reference number as your receipt.",
+          "MoneyGram's exchange rate and fees are shown before you confirm the transfer."
+        ],
+        "faq": [
+          {
+            "q": "Is MoneyGram available in my country?",
+            "a": "MoneyGram operates in most countries — check availability and fees on moneygram.com before sending."
+          },
+          {
+            "q": "Can I pay cash at a MoneyGram agent?",
+            "a": "Yes, most MoneyGram agent locations accept cash for outgoing international transfers."
+          }
+        ]
+      },
+      "im-bank": {
+        "name": "I&M Bank Transfer",
+        "metaDescription": "Bank details and instructions for donating to Global God's Presence Church via I&M Bank Rwanda.",
+        "intro": "For donors banking within Rwanda, a direct transfer to our I&M Bank account is a straightforward way to give, especially for larger or recurring gifts.",
+        "steps": [
+          "Log in to your I&M Bank or other Rwandan bank's mobile or internet banking.",
+          "Choose \"Bank Transfer\" and enter I&M Bank Rwanda, account number 20160241001, account name Umumararungu Margueritte.",
+          "Enter the amount you wish to give.",
+          "In the reference field, note the donation type (e.g. Tithe, Missions) and confirm the transfer."
+        ],
+        "notes": [
+          "Keep your bank's transfer confirmation or receipt for your records.",
+          "Transfers between different banks in Rwanda may take up to 1 business day to reflect."
+        ],
+        "faq": [
+          {
+            "q": "Can I transfer from a bank outside Rwanda?",
+            "a": "International transfers usually require SWIFT details — please contact the church office for those before sending."
+          },
+          {
+            "q": "Is there a minimum amount for bank transfers?",
+            "a": "No minimum is required; any amount is welcome."
+          }
+        ]
+      },
+      "chase-bank": {
+        "name": "Chase Bank (USA) Transfer",
+        "metaDescription": "How US-based donors can give to Global God's Presence Church via a Chase Bank transfer.",
+        "intro": "Donors based in the United States can give directly through our Chase Bank account, which avoids international transfer fees on gifts sent within the US banking system.",
+        "steps": [
+          "Log in to your bank's online or mobile banking and select \"Send Money\" or \"External Transfer\".",
+          "Enter Chase Bank as the recipient bank and account number 2900222608, account name Matabishi Frank Namegabe.",
+          "Enter the amount you wish to give.",
+          "Add the donation type as the memo or reference and confirm the transfer."
+        ],
+        "notes": [
+          "Domestic US transfers to Chase typically post within 1–3 business days.",
+          "Keep your bank's confirmation as your receipt."
+        ],
+        "faq": [
+          {
+            "q": "Do I need Chase Bank myself to send this way?",
+            "a": "No — you can send from any US bank using standard ACH or wire transfer to our Chase account."
+          },
+          {
+            "q": "Are Chase transfers tax-deductible?",
+            "a": "Please contact the church office regarding donation receipts for tax purposes in your country."
+          }
+        ]
+      },
+      "flutterwave": {
+        "name": "Flutterwave",
+        "metaDescription": "Give online by card or mobile money to Global God's Presence Church using Flutterwave's secure checkout.",
+        "intro": "Flutterwave lets you give online using a debit or credit card, or mobile money, through a secure checkout page — useful if you prefer not to use USSD codes or bank transfers.",
+        "steps": [
+          "Go to https://flutterwave.com/donate/jahg3nmqjgrs.",
+          "Enter the amount you wish to give and your email address for a receipt.",
+          "Choose your preferred payment option: card, mobile money, or bank transfer via Flutterwave.",
+          "Complete the secure checkout to finish your donation."
+        ],
+        "notes": [
+          "Flutterwave sends an automatic email receipt once your payment succeeds.",
+          "Your card details are processed securely by Flutterwave and are never seen by the church."
+        ],
+        "faq": [
+          {
+            "q": "Which cards does Flutterwave accept?",
+            "a": "Flutterwave accepts Visa, Mastercard, and several regional card networks."
+          },
+          {
+            "q": "Is my card information safe?",
+            "a": "Yes — Flutterwave is PCI-DSS compliant and handles all card data on its own secure servers."
+          }
+        ]
+      }
+    }
+  },
+  "unauthorizedPage": {
+    "seoTitle": "Unauthorized Access | 401",
+    "seoDescription": "You don't have permission to access this page. Please log in or contact support if you believe this is an error.",
+    "heading": "Access denied",
+    "message": "You don't have permission to view this page. If you think this is a mistake, please contact support or try logging in with a different account.",
+    "login": "Log in",
+    "goHome": "Go home",
+    "contact": "Contact us"
+  }
+}

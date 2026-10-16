@@ -1,0 +1,751 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/lib/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ════════════════════════════════════════════════════════════
+//  ENUMS
+// ════════════════════════════════════════════════════════════
+
+enum OrderStatus {
+  PENDING          // created, awaiting payment
+  PAID
+  PROCESSING       // picking / packing
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  MTN_MOMO
+  AIRTEL_MONEY
+  CARD
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum FulfillmentMethod {
+  DELIVERY
+  PICKUP
+}
+
+enum StockMovementType {
+  PURCHASE         // stock received from supplier
+  SALE             // order shipped / confirmed
+  RETURN
+  ADJUSTMENT       // manual correction / breakage
+  RESERVE          // held for pending order
+  RELEASE          // reservation released
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+// ════════════════════════════════════════════════════════════
+//  USERS & PERMISSIONS (permission-based access, no roles)
+//  Customers and staff are the same table. What a user can do
+//  is decided ONLY by the rows in user_permissions.
+//  Example codes: products.manage, inventory.manage,
+//  orders.view, orders.manage, payments.view, payments.refund,
+//  users.manage, coupons.manage, content.manage, reports.view
+// ════════════════════════════════════════════════════════════
+
+model User {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(255)
+  phoneNumber     String?   @unique @map("phone_number") @db.VarChar(20)
+  firstName       String    @map("first_name") @db.VarChar(255)
+  lastName        String?   @map("last_name") @db.VarChar(255)
+  password        String    @db.Text
+  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  isActive        Boolean   @default(true) @map("is_active")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  lastLogin       DateTime? @map("last_login")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  permissions     UserPermission[]  @relation("UserPermissions")
+  grantedPerms    UserPermission[]  @relation("PermissionGrantor")
+  permissionLogs  PermissionLog[]   @relation("PermissionLogTarget")
+  addresses       Address[]
+  refreshTokens   RefreshToken[]
+  cart            Cart?
+  orders          Order[]
+  reviews         Review[]
+  wishlist        WishlistItem[]
+  designs         VisualizerDesign[]
+  stockMovements  StockMovement[]
+  orderHistory    OrderStatusHistory[]
+
+  @@map("users")
+  forgetPasswordRequests ForgetPasswordRequest[]
+  role Role[]
+}
+
+// Refresh tokens are NEVER stored in plain text: only a SHA-256 hash.
+// Each refresh rotates the token; all tokens from one login share a familyId
+// so reuse of an old token can revoke the whole family.
+model RefreshToken {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  tokenHash    String    @unique @map("token_hash") @db.VarChar(64)
+  familyId     String    @map("family_id") @db.VarChar(36)
+  expiresAt    DateTime  @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  replacedById Int?      @map("replaced_by_id")
+  userAgent    String?   @map("user_agent") @db.VarChar(255)
+  ip           String?   @db.VarChar(45)
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(100) // e.g. "orders.manage"
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users       UserPermission[]
+
+  @@map("permissions")
+}
+
+model UserPermission {
+  userId       Int      @map("user_id")
+  permissionId Int      @map("permission_id")
+  grantedById  Int?     @map("granted_by_id")
+  grantedAt    DateTime @default(now()) @map("granted_at")
+
+  user         User       @relation("UserPermissions", fields: [userId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  grantedBy    User?      @relation("PermissionGrantor", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, permissionId])
+  @@map("user_permissions")
+}
+
+model PermissionLog {
+  id             Int      @id @default(autoincrement())
+  targetUserId   Int      @map("target_user_id")
+  actorUserId    Int?     @map("actor_user_id")
+  permissionCode String   @map("permission_code") @db.VarChar(100)
+  action         String   @db.VarChar(20) // GRANTED | REVOKED
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  target         User     @relation("PermissionLogTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  @@index([targetUserId])
+  @@map("permission_logs")
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  label      String?  @db.VarChar(50) // Home, Site, Office
+  fullName   String   @map("full_name") @db.VarChar(255)
+  phone      String   @db.VarChar(20)
+  country    String   @default("Rwanda") @db.VarChar(100)
+  province   String?  @db.VarChar(100)
+  district   String   @db.VarChar(100)
+  sector     String?  @db.VarChar(100)
+  street     String   @db.VarChar(255)
+  notes      String?  @db.Text
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+// ════════════════════════════════════════════════════════════
+//  CATALOG
+// ════════════════════════════════════════════════════════════
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(150)
+  slug        String     @unique @db.VarChar(160)
+  description String?    @db.Text
+  image       String?    @db.Text
+  parentId    Int?       @map("parent_id")
+  sortOrder   Int        @default(0) @map("sort_order")
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryTree")
+  products    Product[]
+
+  @@map("category")
+}
+
+// A "product" is a tile design (e.g. "Carrara Marble Look").
+// Each size / finish / shade you can actually buy is a ProductVariant.
+model Product {
+  id            Int              @id @default(autoincrement())
+  name          String
+  slug          String?           @unique @db.VarChar(200)
+  categoryId    Int?
+  category      String           // legacy slug, kept for existing pages
+  categoryLabel String
+  description   String           @db.Text
+  sizes         String           // legacy display string, e.g. "60x60, 30x60"
+  badge         String?
+  gradient      String           @db.Text
+  image         String           @db.Text
+  colors        String           @db.Text
+  useCase       String           // floor | wall | outdoor | bathroom ...
+  collection    String
+
+  // tile specs shared by all variants
+  material      String?          @db.VarChar(100)  // ceramic, porcelain, ...
+  origin        String?          @db.VarChar(100)
+  slipRating    String?          @db.VarChar(50)   // R9, R10, ...
+  waterAbsorption String?        @db.VarChar(50)
+  isRectified   Boolean          @default(false)
+
+  status        String           @default("ACTIVE") @db.VarChar(20) // ACTIVE | DRAFT | ARCHIVED
+  featured      Boolean          @default(false)
+  seoTitle      String?          @db.VarChar(255)
+  seoDescription String?         @db.VarChar(500)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  categoryRef   Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants      ProductVariant[]
+  images        ProductImage[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  collections   CollectionItem[]
+  projects      ProjectTile[]
+
+  @@index([categoryId])
+  @@index([status, featured])
+  @@map("product")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  url       String  @db.Text
+  alt       String? @db.VarChar(255)
+  sortOrder Int     @default(0)
+  isPrimary Boolean @default(false)
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("productimage")
+}
+
+model ProductVariant {
+  id             Int       @id @default(autoincrement())
+  productId      Int
+  sku            String    @unique @db.VarChar(64)
+  size           String    @db.VarChar(50)             // "60x60"
+  finish         String?   @db.VarChar(50)             // matt, polished, glossy
+  color          String?   @db.VarChar(80)
+  thicknessMm    Decimal?  @db.Decimal(4, 1)
+  shadeCode      String?   @db.VarChar(50)             // batch / shade, avoid mixing batches
+  piecesPerBox   Int       @default(1)
+  sqmPerBox      Decimal   @db.Decimal(8, 3)           // coverage per box
+  weightKgPerBox Decimal?  @db.Decimal(8, 2)
+
+  pricePerSqm    Decimal   @db.Decimal(12, 2)          // RWF
+  pricePerBox    Decimal   @db.Decimal(12, 2)          // RWF (what the cart charges)
+  compareAtPrice Decimal?  @db.Decimal(12, 2)          // strike-through price
+  currency       String    @default("RWF") @db.VarChar(3)
+
+  image          String?   @db.Text                    // swatch / variant image
+  textureUrl     String?   @db.Text                    // seamless texture for visualizer
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  product        Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventory      Inventory?
+  stockMovements StockMovement[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  designItems    VisualizerDesignItem[]
+ 
+
+
+  @@index([productId])
+  @@map("productvariant")
+}
+
+ 
+
+ 
+model Collection {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  slug        String?          @unique @db.VarChar(160)
+  description String           @db.Text
+  image       String           @db.Text
+  featured    Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  items       CollectionItem[]
+
+  @@map("collection")
+}
+
+model CollectionItem {
+  id           Int        @id @default(autoincrement())
+  collectionId Int
+  productId    Int
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, productId])
+  @@map("collectionitem")
+}
+
+// ════════════════════════════════════════════════════════════
+//  INVENTORY
+// ════════════════════════════════════════════════════════════
+
+model Inventory {
+  id           Int            @id @default(autoincrement())
+  variantId    Int            @unique
+  onHandBoxes  Int            @default(0)  // physically in stock
+  reservedBoxes Int           @default(0)  // held by unpaid orders
+  reorderLevel Int            @default(0)
+  allowBackorder Boolean      @default(false)
+  updatedAt    DateTime       @updatedAt
+
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("inventory")
+}
+
+// Append-only ledger: every stock change gets a row.
+model StockMovement {
+  id          Int               @id @default(autoincrement())
+  variantId   Int
+  type        StockMovementType
+  quantity    Int               // positive or negative, in boxes
+  reference   String?           @db.VarChar(100) // order number, PO number
+  note        String?           @db.VarChar(255)
+  createdById Int?
+  createdAt   DateTime          @default(now())
+
+  variant     ProductVariant    @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  createdBy   User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([variantId, createdAt])
+  @@map("stockmovement")
+}
+
+// ════════════════════════════════════════════════════════════
+//  CART & WISHLIST
+// ════════════════════════════════════════════════════════════
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int?       @unique
+  sessionId String?    @unique @db.VarChar(100) // guest carts
+  couponId  Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon    Coupon?    @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  items     CartItem[]
+
+  @@map("cart")
+}
+
+model CartItem {
+  id        Int            @id @default(autoincrement())
+  cartId    Int
+  variantId Int
+  quantity  Int            @default(1) // boxes
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, variantId])
+  @@map("cartitem")
+}
+
+model WishlistItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("wishlistitem")
+}
+
+// ════════════════════════════════════════════════════════════
+//  ORDERS, PAYMENTS, DELIVERY
+// ════════════════════════════════════════════════════════════
+
+model DeliveryZone {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(150)          // "Kigali - Gasabo"
+  districts    String   @db.Text                  // comma-separated or JSON list
+  baseFee      Decimal  @db.Decimal(12, 2)
+  feePerBox    Decimal  @default(0) @db.Decimal(12, 2) // tiles are heavy
+  freeOverAmount Decimal? @db.Decimal(12, 2)
+  estimatedDays Int     @default(2)
+  active       Boolean  @default(true)
+
+  orders       Order[]
+
+  @@map("deliveryzone")
+}
+
+model Coupon {
+  id            Int          @id @default(autoincrement())
+  code          String       @unique @db.VarChar(50)
+  description   String?      @db.VarChar(255)
+  type          DiscountType
+  value         Decimal      @db.Decimal(12, 2)
+  minOrderAmount Decimal?    @db.Decimal(12, 2)
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  startsAt      DateTime?
+  expiresAt     DateTime?
+  active        Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+
+  carts         Cart[]
+  orders        Order[]
+
+  @@map("coupon")
+}
+
+model Order {
+  id              Int               @id @default(autoincrement())
+  orderNumber     String            @unique @db.VarChar(30) // "MC-2026-000123"
+  userId          Int?
+  guestEmail      String?           @db.VarChar(255)
+  guestPhone      String?           @db.VarChar(20)
+
+  status          OrderStatus       @default(PENDING)
+  paymentStatus   PaymentStatus     @default(PENDING)
+  fulfillment     FulfillmentMethod @default(DELIVERY)
+
+  subtotal        Decimal           @db.Decimal(12, 2)
+  discountTotal   Decimal           @default(0) @db.Decimal(12, 2)
+  shippingFee     Decimal           @default(0) @db.Decimal(12, 2)
+  taxTotal        Decimal           @default(0) @db.Decimal(12, 2)
+  grandTotal      Decimal           @db.Decimal(12, 2)
+  currency        String            @default("RWF") @db.VarChar(3)
+
+  couponId        Int?
+  deliveryZoneId  Int?
+  // address snapshot (so later edits don't change old orders)
+  shipFullName    String?           @db.VarChar(255)
+  shipPhone       String?           @db.VarChar(20)
+  shipDistrict    String?           @db.VarChar(100)
+  shipSector      String?           @db.VarChar(100)
+  shipStreet      String?           @db.VarChar(255)
+  shipNotes       String?           @db.Text
+
+  customerNote    String?           @db.Text
+  internalNote    String?           @db.Text
+  placedAt        DateTime          @default(now())
+  paidAt          DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  updatedAt       DateTime          @updatedAt
+  user            User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  coupon          Coupon?           @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  deliveryZone    DeliveryZone?     @relation(fields: [deliveryZoneId], references: [id], onDelete: SetNull)
+  items           OrderItem[]
+  payments        Payment[]
+  history         OrderStatusHistory[]
+
+  @@index([userId])
+  @@index([status, placedAt])
+  @@map("order")
+}
+
+// Snapshot of what was bought, price and names frozen at purchase time.
+model OrderItem {
+  id           Int            @id @default(autoincrement())
+  orderId      Int
+  variantId    Int?
+  productName  String         @db.VarChar(255)
+  sku          String         @db.VarChar(64)
+  size         String         @db.VarChar(50)
+  finish       String?        @db.VarChar(50)
+  shadeCode    String?        @db.VarChar(50)
+  image        String?        @db.Text
+  quantity     Int            // boxes
+  sqmPerBox    Decimal        @db.Decimal(8, 3)
+  unitPrice    Decimal        @db.Decimal(12, 2) // per box
+  lineTotal    Decimal        @db.Decimal(12, 2)
+
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant      ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("orderitem")
+}
+
+model OrderStatusHistory {
+  id          Int         @id @default(autoincrement())
+  orderId     Int
+  status      OrderStatus
+  note        String?     @db.VarChar(255)
+  changedById Int?
+  createdAt   DateTime    @default(now())
+
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy   User?       @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("orderstatushistory")
+}
+
+model Payment {
+  id            Int           @id @default(autoincrement())
+  orderId       Int
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  amount        Decimal       @db.Decimal(12, 2)
+  currency      String        @default("RWF") @db.VarChar(3)
+  provider      String?       @db.VarChar(50)   // gateway name (e.g. Flutterwave, Paypack)
+  providerRef   String?       @unique @db.VarChar(150) // gateway transaction id
+  payerPhone    String?       @db.VarChar(20)   // mobile money number
+  failureReason String?       @db.VarChar(255)
+  rawResponse   Json?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payment")
+}
+
+// ════════════════════════════════════════════════════════════
+//  REVIEWS
+// ════════════════════════════════════════════════════════════
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Int      // 1–5
+  title     String?  @db.VarChar(150)
+  body      String?  @db.Text
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@map("review")
+}
+
+// ════════════════════════════════════════════════════════════
+//  VISUALIZER (try tiles in a room)
+// ════════════════════════════════════════════════════════════
+
+model VisualizerScene {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(150)       // "Modern Bathroom"
+  roomType   String   @db.VarChar(50)        // bathroom | kitchen | living | outdoor
+  image      String   @db.Text               // base room image
+  thumbnail  String?  @db.Text
+  // surfaces the customer can tile: polygons / masks for floor, wall, backsplash...
+  surfaces   Json
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  designs    VisualizerDesign[]
+
+  @@map("visualizerscene")
+}
+
+model VisualizerDesign {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  sessionId  String?  @db.VarChar(100)       // guests
+  sceneId    Int?
+  name       String?  @db.VarChar(150)
+  shareToken String?  @unique @db.VarChar(64) // public share link
+  previewImage String? @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scene      VisualizerScene?  @relation(fields: [sceneId], references: [id], onDelete: SetNull)
+  items      VisualizerDesignItem[]
+
+  @@index([userId])
+  @@map("visualizerdesign")
+}
+
+model ForgetPasswordRequest {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+// One row per surface in the design (floor = variant A, wall = variant B...)
+model VisualizerDesignItem {
+  id         Int      @id @default(autoincrement())
+  designId   Int
+  variantId  Int
+  surfaceKey String   @db.VarChar(50)        // "floor", "wall", "backsplash"
+  groutColor String?  @db.VarChar(20)
+  rotation   Int      @default(0)
+  layout     String?  @db.VarChar(30)        // straight, brick, herringbone
+
+  design     VisualizerDesign @relation(fields: [designId], references: [id], onDelete: Cascade)
+  variant    ProductVariant   @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([designId, surfaceKey])
+  @@map("visualizerdesignitem")
+}
+
+// ════════════════════════════════════════════════════════════
+//  MARKETING / CONTENT (unchanged from before)
+// ════════════════════════════════════════════════════════════
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  title       String
+  type        String
+  description String        @db.Text
+  gradient    String        @db.Text
+  image       String        @db.Text
+  large       Boolean       @default(false)
+  location    String
+  area        String
+  year        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tiles       ProjectTile[]
+
+  @@map("project")
+}
+
+model ProjectTile {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  productId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, productId])
+  @@map("projecttile")
+}
+
+model Testimonial {
+    id Int @id @default(autoincrement())
+  text      String   @db.Text
+  name      String
+  role      String
+  initials  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("testimonial")
+}
+
+model Catalogue {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  coverImage  String   @db.Text
+  fileUrl     String   @db.Text
+  category    String   @default("general")
+  year        String   @default("")
+  published   Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("catalogue")
+}
+
+
+model Role {
+  id       Int    @id // fixed IDs, kept in sync with ROLE_IDS in constants.ts
+  roleName String @unique
+  users    User[]
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model ContactMessage {
+  id          Int           @id @default(autoincrement())
+  firstName   String        @db.VarChar(80)
+  lastName    String        @db.VarChar(80)
+  email       String        @db.VarChar(254)
+  phone       String?       @db.VarChar(20)
+  projectType String?       @db.VarChar(40)
+  message     String        @db.Text
+  status      ContactStatus @default(NEW)
+  ackSentAt   DateTime?
+  replyText   String?       @db.Text
+  repliedAt   DateTime?
+  repliedById Int?
+  ipHash      String?       @db.VarChar(64) // hashed, for rate limiting only
+  createdAt   DateTime      @default(now())
+
+  @@index([status, createdAt])
+  @@index([email, createdAt])
+  @@index([ipHash, createdAt])
+  @@map("contact_message")
+}
