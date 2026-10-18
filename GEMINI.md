@@ -122,7 +122,7 @@ Do not install or use `next-auth`, `@auth/*`, or any auth SDK. Auth is custom, b
 
 ## AI-agent-friendly commerce (agents must be able to buy easily)
 - Guest checkout is always available. No forced signup, no CAPTCHA wall on the buying path
-- Server-render the buying path with plain semantic forms: real `<form>`, `<button type="submit">`, proper `name`, `autocomplete`, and `<label>` on every field, so browsing agents can read and fill them
+- Server-render the buying path with plain semantic forms: real `<form>`, `<Button type="submit">`, proper `name`, `autocomplete`, and `<label>` on every field, so browsing agents can read and fill them
 - Stable, descriptive identifiers on key controls: `data-testid` and clear `aria-label`s (e.g. `add-to-cart`, `quantity-boxes`, `checkout-submit`, `shipping-district`)
 - Show price, availability, size, finish, m² per box, and boxes needed as visible TEXT, not only inside images or canvases
 - Provide a clean public JSON API with an OpenAPI spec at `/api/openapi.json`:
@@ -139,7 +139,7 @@ Do not install or use `next-auth`, `@auth/*`, or any auth SDK. Auth is custom, b
 - m² calculator: enter room size, get boxes needed with a waste allowance
 - Command palette search (shadcn `Command`, press Ctrl+K) across products and collections
 - Quick-view dialog, compare tiles side by side, wishlist, "complete the look" suggestions, product image zoom
-- Request a free sample button; WhatsApp "order or ask us" button on product pages
+- Request a free sample Button; WhatsApp "order or ask us" Button on product pages
 - Skeleton loaders, optimistic cart updates, subtle animations, dark mode, order tracking page
 - Dynamic Open Graph images for products and shared visualizer designs
 
