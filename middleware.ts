@@ -1,10 +1,10 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { verifyToken } from "./lib/auth/jwt";
+import { routing } from "./app/i18n/routing";
 import createMiddleware from "next-intl/middleware";
-import { routing } from "@/app/i18n/routing";
-import { verifyAccessPayload } from "@/lib/auth/jwt";
 import { isGdprCountry } from "@/lib/gdpr-regions";
 import {
-  adminRoutes,
   API_ORIGIN,
   CDN,
   CONNECT_HOSTS,
@@ -15,36 +15,24 @@ import {
   GCS,
   IMG_HOSTS,
   IS_PROD,
-  loginPath,
-  protectedRoutes,
-  STAFF_ROLES,
+  publicRoutes,
+  ROLE_IDS,
   SCRIPT_HOSTS,
   WS_ORIGIN,
-} from "@/lib/constants";
-
+} from "./lib/constants";
 const intlMiddleware = createMiddleware(routing);
-
-const join = (...parts: (string | false | null | undefined)[]) =>
-  [...new Set(parts.filter((p): p is string => Boolean(p)))].join(" ");
-
-function stripLocale(pathname: string) {
-  return pathname.replace(EXPLICIT_LOCALE_PREFIX, "/") || "/";
-}
-
-function matchesPrefix(path: string, prefixes: string[]) {
-  return prefixes.some((p) => path === p || path.startsWith(`${p}/`));
-}
 
 function redirectLocale(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
+  console.log(EXPLICIT_LOCALE_PREFIX.test(pathname));
   if (EXPLICIT_LOCALE_PREFIX.test(pathname)) return null;
-
-  const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
   const url = request.nextUrl.clone();
+  const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
+  console.log(locale);
   url.pathname = pathname === "/" ? `/${locale}` : `/${locale}${pathname}`;
 
   const response = NextResponse.redirect(url);
-  response.cookies.set("NEXT_LOCALE", locale, {
+  response.cookies.set("NEXT_LOCALE", defaultLocale, {
     path: "/",
     maxAge: DAY * 365,
     sameSite: "lax",
@@ -80,6 +68,9 @@ function resolveSignalingOrigin(wsOrigin?: string): string | null {
 const { ws } = resolveApiOrigins();
 const SIGNALING_ORIGIN = resolveSignalingOrigin(ws);
 
+const join = (...parts: (string | false | null | undefined)[]) =>
+  [...new Set(parts.filter((p): p is string => Boolean(p)))].join(" ");
+
 function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
@@ -103,64 +94,20 @@ function buildCsp(nonce: string): string {
 
 export async function middleware(request: NextRequest) {
   const redirect = redirectLocale(request);
+
   if (redirect) return redirect;
 
-  const { pathname, search } = request.nextUrl;
-  const locale = pathname.split("/")[1] || defaultLocale;
-  const path = stripLocale(pathname);
-  const isAdminRoute = matchesPrefix(path, adminRoutes);
-  const isAdminLogin = path === "/admin/login";
-
-  // --- Auth (pages only; /api is excluded by the matcher and checks auth itself)
-  const needsAuth =
-    !isAdminLogin && (matchesPrefix(path, protectedRoutes) || isAdminRoute);
-
-  let userId: number | null = null;
-  if (needsAuth) {
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.substring(7)
-      : request.cookies.get("auth_token")?.value;
-
-    const claims = token ? await verifyAccessPayload(token) : null;
-    userId = claims?.userId ?? null;
-    if (isAdminRoute && (!claims?.role || !STAFF_ROLES.includes(claims.role as (typeof STAFF_ROLES)[number]))) {
-      userId = null;
-    }
-
-    if (!userId) {
-      const url = request.nextUrl.clone();
-      url.pathname = isAdminRoute ? `/${locale}/admin/login` : `/${locale}${loginPath}`;
-      url.search = isAdminRoute ? "" : `?next=${encodeURIComponent(pathname + search)}`;
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // --- Request headers (these are what server components actually see)
+  const { pathname } = request.nextUrl;
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const csp = buildCsp(nonce);
-
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.delete("x-user-id"); // never trust a client-supplied value
-  requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("Content-Security-Policy", csp);
-  if (userId) requestHeaders.set("x-user-id", String(userId));
-
-  const response = intlMiddleware(
-    new NextRequest(request, { headers: requestHeaders }),
-  );
-
-  // --- Response headers
-  response.headers.set("Content-Security-Policy", csp);
+  request.headers.set("x-nonce", nonce);
+  const response = intlMiddleware(request);
+  response.headers.set("Content-Security-Policy", buildCsp(nonce));
   response.headers.set(
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  // --- GDPR / visitor country (Cloudflare header)
   const headerCountry = request.headers.get("cf-ipcountry");
+
   const requiresConsent =
     request.nextUrl.searchParams.get("gdpr") === "1" ||
     isGdprCountry(headerCountry);
@@ -172,6 +119,44 @@ export async function middleware(request: NextRequest) {
     cookieOptions,
   );
   response.cookies.set("visitor_country", headerCountry ?? "", cookieOptions);
+
+  // Allow public routes
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // Check authentication
+  const authHeader =
+    request.headers.get("authorization") ||
+    request.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.substring(7)
+    : request.cookies.get("auth_token")?.value;
+
+  if (!token) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Unauthorized",
+        message: "Authentication required",
+      },
+      { status: 401 },
+    );
+  }
+
+  const userId = await verifyToken(token);
+  if (!userId) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Unauthorized",
+        message: "Invalid or expired token",
+      },
+      { status: 401 },
+    );
+  }
+
+  response.headers.set("x-user-id", String(userId));
 
   return response;
 }
