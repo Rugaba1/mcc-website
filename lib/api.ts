@@ -18,7 +18,24 @@ import { CollectionItem } from "./generated/prisma/client";
 
 export type Badge = "Bestseller" | "New" | "Premium" | null;
 export type Category = "floor" | "wall" | "outdoor" | "special";
-
+export interface MediaFile {
+  id: number;
+  name: string;
+  originalName: string;
+  url: string;
+  kind: "image" | "file";
+  mimeType: string;
+  size: number;
+  alt: string | null;
+  createdAt: string;
+}
+export interface AdminVariant extends ProductVariant {
+  stockBoxes: number;
+  lowStockThreshold: number;
+}
+export type VariantInput = Partial<
+  Omit<ProductVariant, "id" | "productId" | "currency">
+>;
 export interface ProductVariant {
   id: number;
   productId: number;
@@ -351,6 +368,224 @@ export interface CheckoutInput {
   street?: string;
   note?: string;
 }
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+export type CardFormat = "currency" | "number" | "percent";
+
+/** One KPI card. `previous` and `change` (%) exist only on period-compared cards. */
+export interface StatCard {
+  key: string;
+  label: string;
+  value: number;
+  format: CardFormat;
+  previous?: number;
+  change?: number;
+}
+
+export interface PieSlice {
+  label: string;
+  value: number;
+  percentage: number;
+}
+
+interface AnalyticsBase {
+  range: { days: number; from: string; to: string };
+  generatedAt: string;
+  currency: string;
+  cards: StatCard[];
+}
+
+// ── Admin ──
+
+export interface AdminAnalytics extends AnalyticsBase {
+  charts: {
+    revenueDaily: { label: string; revenue: number; orders: number }[];
+    revenueMonthly: { label: string; revenue: number; orders: number }[];
+    customersDaily: { label: string; customers: number }[];
+    topProducts: { label: string; quantity: number; revenue: number }[];
+  };
+  pies: {
+    ordersByStatus: PieSlice[];
+    ordersByFulfillment: PieSlice[];
+    paymentsByMethod: PieSlice[];
+    paymentsByStatus: PieSlice[];
+    revenueByCategory: PieSlice[];
+    productsByCategory: PieSlice[];
+    stockHealth: PieSlice[];
+  };
+  tables: {
+    recentOrders: {
+      id: number;
+      orderNumber: string;
+      customer: string;
+      email: string | null;
+      status: string;
+      paymentStatus: string;
+      fulfillment: string;
+      items: number;
+      total: number;
+      currency: string;
+      placedAt: string;
+    }[];
+    topProducts: {
+      rank: number;
+      product: string;
+      boxesSold: number;
+      revenue: number;
+    }[];
+    lowStock: {
+      variantId: number;
+      sku: string;
+      product: string;
+      image: string;
+      size: string;
+      finish: string | null;
+      onHandBoxes: number;
+      reservedBoxes: number;
+      availableBoxes: number;
+      reorderLevel: number;
+      state: "LOW" | "OUT_OF_STOCK";
+    }[];
+    recentCustomers: {
+      id: number;
+      name: string;
+      email: string;
+      phone: string | null;
+      joinedAt: string;
+      lastLogin: string | null;
+    }[];
+    recentPayments: {
+      id: number;
+      orderNumber: string;
+      method: string;
+      status: string;
+      provider: string | null;
+      amount: number;
+      currency: string;
+      createdAt: string;
+    }[];
+    recentMessages: {
+      id: number;
+      name: string;
+      email: string;
+      projectType: string | null;
+      status: ContactStatus;
+      createdAt: string;
+    }[];
+    pendingReviews: {
+      id: number;
+      product: string;
+      customer: string;
+      rating: number;
+      title: string | null;
+      createdAt: string;
+    }[];
+  };
+}
+
+// ── Customer ──
+
+export interface CustomerAnalytics extends AnalyticsBase {
+  customer: { id: number; name: string; email: string };
+  charts: {
+    spendMonthly: { label: string; spent: number; orders: number }[];
+  };
+  pies: {
+    ordersByStatus: PieSlice[];
+    ordersByFulfillment: PieSlice[];
+    spendByPaymentMethod: PieSlice[];
+    spendByCategory: PieSlice[];
+  };
+  tables: {
+    activeOrders: {
+      id: number;
+      orderNumber: string;
+      status: string;
+      paymentStatus: string;
+      fulfillment: string;
+      total: number;
+      placedAt: string;
+      estimatedDays: number | null;
+      lastUpdate: {
+        status: string;
+        note: string | null;
+        createdAt: string;
+      } | null;
+    }[];
+    recentOrders: {
+      id: number;
+      orderNumber: string;
+      status: string;
+      paymentStatus: string;
+      fulfillment: string;
+      items: number;
+      total: number;
+      currency: string;
+      placedAt: string;
+    }[];
+    recentPayments: {
+      id: number;
+      orderNumber: string;
+      method: string;
+      status: string;
+      amount: number;
+      currency: string;
+      createdAt: string;
+    }[];
+    cart: {
+      items: {
+        id: number;
+        product: string;
+        image: string | null;
+        sku: string;
+        size: string;
+        finish: string | null;
+        quantity: number;
+        unitPrice: number;
+        lineTotal: number;
+        coverageSqm: number;
+      }[];
+      subtotal: number;
+      coupon: { code: string; type: "PERCENT" | "FIXED"; value: number } | null;
+    };
+    wishlist: {
+      id: number;
+      productId: number;
+      name: string;
+      slug: string | null;
+      image: string;
+      category: string;
+      addedAt: string;
+    }[];
+    designs: {
+      id: number;
+      name: string;
+      previewImage: string | null;
+      shareToken: string | null;
+      scene: string | null;
+      roomType: string | null;
+      surfaces: number;
+      updatedAt: string;
+    }[];
+    recentReviews: {
+      id: number;
+      product: string;
+      rating: number;
+      title: string | null;
+      approved: boolean;
+      createdAt: string;
+    }[];
+  };
+}
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "admin" | "staff";
+  active: boolean;
+  permissions: string[];
+  createdAt: string;
+}
 
 // ─── Request helpers ──────────────────────────────────────────────────────────
 
@@ -364,6 +599,16 @@ const put = <T>(url: string, body?: unknown) =>
   apiClient.put<T>(url, body).then((r) => r.data);
 const del = <T = Ok>(url: string) =>
   apiClient.delete<T>(url).then((r) => r.data);
+
+/** Builds "?a=1&b=2", skipping undefined, null and empty values. */
+const qs = (o: Record<string, string | number | boolean | null | undefined>) => {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(o)) {
+    if (v !== undefined && v !== null && v !== "") p.set(k, String(v));
+  }
+  const s = p.toString();
+  return s ? `?${s}` : "";
+};
 
 /** Readable message from any error thrown by the api, for toasts. */
 export function apiErrorMessage(
@@ -382,12 +627,42 @@ export function apiErrorMessage(
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const api = {
-  // Products
-    // Products
+
+getUsers: () => get<AdminUser[]>("/api/users"),
+createUser: (d: { name: string; email: string; password: string; active: boolean }) => post<AdminUser>("/api/users", d),
+updateUser: (id: number, d: { name?: string; email?: string; password?: string; active?: boolean }) => put<AdminUser>(`/api/users/${id}`, d),
+deleteUser: (id: number) => del(`/api/users/${id}`),
+  getFiles: (p: { q?: string; kind?: string; page?: number; limit?: number }) =>
+    get<{ files: MediaFile[]; total: number; totalPages: number }>(
+      `/api/files${qs(p)}`,
+    ),
+  uploadFiles: (files: File[], onProgress?: (pct: number) => void) => {
+    const fd = new FormData();
+    files.forEach((f) => fd.append("file", f));
+    return apiClient
+      .post<{ files: MediaFile[] }>("/api/upload", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (e) =>
+          e.total && onProgress?.(Math.round((e.loaded * 100) / e.total)),
+      })
+      .then((r) => r.data.files);
+  },
+  renameFile: (id: number, d: { name?: string; alt?: string | null }) =>
+    apiClient.patch<MediaFile>(`/api/files/${id}`, d).then((r) => r.data),
+  deleteFile: (id: number) => del(`/api/files/${id}`),
+  getVariants: (productId: number) =>
+    get<AdminVariant[]>(`/api/products/${productId}/variants`),
+  createVariant: (
+    productId: number,
+    d: VariantInput & { stockBoxes: number; lowStockThreshold: number },
+  ) => post<AdminVariant>(`/api/products/${productId}/variants`, d),
+  updateVariant: (id: number, d: VariantInput) =>
+    put<AdminVariant>(`/api/variants/${id}`, d),
+  deleteVariant: (id: number) => del(`/api/variants/${id}`),
   getProducts: ({
     search,
-    skip,
-    limit,
+    skip = 0,
+    limit = 12,
     status,
     category,
     type,
@@ -399,10 +674,28 @@ export const api = {
     category?: string;
     status?: string;
     type?: string;
-  }) =>
-    get<{ products: Product[]; totalPages: number }>(
-      `/api/products `,
+  }) => {
+    const p = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+    if (search) p.set("query", search);
+    if (status) p.set("status", status);
+    if (category) p.set("category", category);
+    if (type) p.set("type", type);
+    return get<{
+      products: Product[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>(`/api/products?${p}`);
+  },
+  // Analytics
+  getAdminAnalytics: (days = 30) =>
+    get<{ data: AdminAnalytics }>(`/api/admin/analytics?days=${days}`).then(
+      (r) => r.data,
     ),
+  getCustomerAnalytics: (days = 30) =>
+    get<{ data: CustomerAnalytics }>(
+      `/api/customer/analytics?days=${days}`,
+    ).then((r) => r.data),
   createProduct: (d: Omit<Product, "id">) => post<Product>("/api/products", d),
   updateProduct: (id: number, d: Omit<Product, "id">) =>
     put<Product>(`/api/products/${id}`, d),

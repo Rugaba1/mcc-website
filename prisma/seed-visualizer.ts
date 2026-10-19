@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { PrismaClient } from "../src/lib/generated/prisma";
+import { PrismaClient } from "../lib/generated/prisma";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { ALL_ROOM_SCENES } from "../src/data/scenes";
 

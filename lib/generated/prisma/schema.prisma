@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  output        = "../src/lib/generated/prisma"
+  output        = "../lib/generated/prisma"
   binaryTargets = ["native", "debian-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
@@ -743,4 +743,20 @@ model ContactMessage {
   @@index([email, createdAt])
   @@index([ipHash, createdAt])
   @@map("contact_message")
+}
+
+model MediaFile {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  originalName String   @map("original_name") @db.VarChar(255)
+  url          String   @unique @db.VarChar(500)
+  kind         String   @db.VarChar(10) // image | file
+  mimeType     String   @map("mime_type") @db.VarChar(100)
+  size         Int
+  alt          String?  @db.VarChar(255)
+  uploadedById Int?     @map("uploaded_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([kind, createdAt])
+  @@map("media_file")
 }
