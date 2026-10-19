@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import bcrypt from "bcryptjs";
+import { getApiUser, hasApiPermission } from "@/lib/auth/api-access";
 
 // GET /api/users — list all users (password excluded)
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const user = await getApiUser(req);
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // if (!hasApiPermission(user, "users.manage"))
+    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const users = await prisma.user.findMany({
       include: {
         permissions: {

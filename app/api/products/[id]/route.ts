@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { productData, uniqueSlug } from "@/lib/products/payload";
+import { requireStaff } from "@/lib/auth/require-staff";
 
 // ── GET /api/products/:id ─────────────────────────────────────────────────────
 
@@ -15,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
     const product = await prisma.product.findFirst({
-      where: { id: numId },
+      where: Number.isNaN(Number(id)) ? { slug: id } : { id: Number(id) },
 
       include: {
         variants: {
@@ -45,7 +47,6 @@ export async function GET(
           select: {
             collection: {
               include: { items: { include: { product: true } } },
-            
             },
           },
         },
@@ -107,6 +108,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { error } = await requireStaff(req);
+    if (error) return error;
     const { id } = await params;
     const numId = Number(id);
     if (isNaN(numId))
@@ -116,18 +119,8 @@ export async function PUT(
     const product = await prisma.product.update({
       where: { id: numId },
       data: {
-        name: body.name ?? "",
-        category: body.category ?? "floor",
-        categoryLabel: body.categoryLabel ?? "",
-        description: body.description ?? "",
-        sizes: body.sizes ?? "",
-        badge: body.badge ?? null,
-        gradient: body.gradient ?? "",
-        image: body.image ?? "",
-        colors: JSON.stringify(body.colors ?? []),
-        useCase: body.useCase ?? "",
-        collection: body.collection ?? "",
-        featured: body.featured ?? false,
+        ...productData(body),
+        ...(body.slug ? { slug: await uniqueSlug(body.slug, numId) } : {}),
       },
     });
     return NextResponse.json({

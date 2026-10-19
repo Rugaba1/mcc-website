@@ -79,7 +79,7 @@ export default async function LocaleLayout({
     const messages = await getMessages();
 
     return (
-        <html lang={locale} className={`${centuryGothic.variable} ${glovar.variable}`}>
+        <html lang={locale} className={`${centuryGothic.variable} ${glovar.variable}`} suppressHydrationWarning>
             <body className="font-sans h-full antialiased">
                 <Suspense
                     fallback={

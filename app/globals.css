@@ -43,7 +43,8 @@
   --font-serif: var(--font-glovar);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
-
+.react-colorful, .react-colorful__saturation, .react-colorful__hue,
+.react-colorful__last-control, .react-colorful__pointer { border-radius: 0 !important; }
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

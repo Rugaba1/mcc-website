@@ -48,7 +48,8 @@ export const adminNav: NavItem[] = [
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/customers", icon: UserRoundCheck },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
-  { name: "Visualizer", href: "/admin/visualizer", icon: Palette },
+  // { name: "Visualizer", href: "/admin/visualizer", icon: Palette },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Messages", href: "/admin/messages", icon: Mail },
+  { name: "Files", href: "/admin/files", icon:  FolderKanban, },
 ];
