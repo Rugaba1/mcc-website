@@ -923,4 +923,4 @@ export const ALL_ROOM_SCENES: SceneDefinition[] = [
   }
 ];
 
-export const DEFAULT_SCENE: SceneDefinition = ALL_ROOM_SCENES.find(s => s.id === "bathroom_5") || ALL_ROOM_SCENES[0];
+export const DEFAULT_SCENE: SceneDefinition = ALL_ROOM_SCENES.find(s => s.id === "bathroom_3") || ALL_ROOM_SCENES[0];
