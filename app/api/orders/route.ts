@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import { getApiUser, hasApiPermission } from "../../../lib/auth/api-access";
+import { invoicePath } from "@/lib/invoices/invoice";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,6 +17,10 @@ export async function GET(req: NextRequest) {
       include: {
         user: true,
         items: true,
+        invoices: {
+          select: { id: true, kind: true, number: true, issuedAt: true },
+          orderBy: { issuedAt: "asc" },
+        },
       },
     });
 
@@ -33,6 +38,13 @@ export async function GET(req: NextRequest) {
         phone: order.user?.phoneNumber ?? order.guestPhone ?? null,
         placedAt: order.placedAt,
         itemCount: order.items.length,
+        invoices: order.invoices.map((inv) => ({
+          id: inv.id,
+          kind: inv.kind,  
+          number: inv.number,
+          issuedAt: inv.issuedAt,
+          url: inv.number ? invoicePath(inv.number) : null,
+        })),
       })),
     );
   } catch (error) {

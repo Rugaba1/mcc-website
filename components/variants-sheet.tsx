@@ -18,13 +18,19 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const money = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const qty = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
-type F = Record<"sku" | "size" | "finish" | "color" | "thicknessMm" | "shadeCode" | "piecesPerBox" | "sqmPerBox" | "weightKgPerBox" | "pricePerSqm" | "pricePerBox" | "compareAtPrice" | "image" | "textureUrl" | "stockBoxes" | "lowStockThreshold", string> & { active: boolean };
+type F = Record<
+  | "sku" | "size" | "finish" | "color" | "thicknessMm" | "shadeCode"
+  | "pricePerSqm" | "containerPricePerSqm" | "sqmPerContainer" | "compareAtPrice"
+  | "image" | "textureUrl" | "stockSqm" | "reorderLevel",
+  string
+> & { active: boolean };
 
 const EMPTY: F = {
-  sku: "", size: "", finish: "", color: "", thicknessMm: "", shadeCode: "", piecesPerBox: "1", sqmPerBox: "",
-  weightKgPerBox: "", pricePerSqm: "", pricePerBox: "", compareAtPrice: "", image: "", textureUrl: "",
-  stockBoxes: "0", lowStockThreshold: "0", active: true,
+  sku: "", size: "", finish: "", color: "", thicknessMm: "", shadeCode: "",
+  pricePerSqm: "", containerPricePerSqm: "", sqmPerContainer: "", compareAtPrice: "",
+  image: "", textureUrl: "", stockSqm: "0", reorderLevel: "0", active: true,
 };
 
 const s = (v: unknown) => (v == null ? "" : String(v));
@@ -32,16 +38,17 @@ const num = (v: string) => (v.trim() === "" ? null : Number(v));
 
 const fromVariant = (v: AdminVariant): F => ({
   sku: v.sku, size: v.size, finish: s(v.finish), color: s(v.color), thicknessMm: s(v.thicknessMm), shadeCode: s(v.shadeCode),
-  piecesPerBox: s(v.piecesPerBox), sqmPerBox: s(v.sqmPerBox), weightKgPerBox: s(v.weightKgPerBox), pricePerSqm: s(v.pricePerSqm),
-  pricePerBox: s(v.pricePerBox), compareAtPrice: s(v.compareAtPrice), image: s(v.image), textureUrl: s(v.textureUrl),
-  stockBoxes: "0", lowStockThreshold: s(v.lowStockThreshold), active: v.active,
+  pricePerSqm: s(v.pricePerSqm), containerPricePerSqm: s(v.containerPricePerSqm), sqmPerContainer: s(v.sqmPerContainer),
+  compareAtPrice: s(v.compareAtPrice), image: s(v.image), textureUrl: s(v.textureUrl),
+  stockSqm: "0", reorderLevel: s(v.reorderLevel), active: v.active, // stock itself is changed on the Inventory page
 });
 
-function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
+function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">{label}</Label>
       {children}
+      {hint && !error && <p className="text-xs text-muted-foreground">{hint}</p>}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
@@ -52,7 +59,6 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<F | null>(null); // null = list view
   const [editId, setEditId] = useState<number | null>(null);
-  const [manualBoxPrice, setManualBoxPrice] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<AdminVariant | null>(null);
@@ -77,20 +83,11 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
 
   const set = <K extends keyof F>(k: K, v: F[K]) => {
     setErrors((e) => ({ ...e, [k]: "" }));
-    setForm((f) => {
-      if (!f) return f;
-      const next = { ...f, [k]: v };
-      // price per box follows price per m² × m² per box until it is edited by hand
-      if ((k === "pricePerSqm" || k === "sqmPerBox") && !manualBoxPrice) {
-        const p = Number(next.pricePerSqm), q = Number(next.sqmPerBox);
-        next.pricePerBox = p > 0 && q > 0 ? String(Math.round(p * q)) : "";
-      }
-      return next;
-    });
+    setForm((f) => (f ? { ...f, [k]: v } : f));
   };
 
-  const startNew = () => { setEditId(null); setManualBoxPrice(false); setErrors({}); setForm(EMPTY); };
-  const startEdit = (v: AdminVariant) => { setEditId(v.id); setManualBoxPrice(true); setErrors({}); setForm(fromVariant(v)); };
+  const startNew = () => { setEditId(null); setErrors({}); setForm(EMPTY); };
+  const startEdit = (v: AdminVariant) => { setEditId(v.id); setErrors({}); setForm(fromVariant(v)); };
 
   const makeSku = () =>
     set("sku", [product?.name, form?.size, form?.finish, form?.shadeCode].filter(Boolean).join("-").toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64));
@@ -100,24 +97,44 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
     const e: Record<string, string> = {};
     if (form.sku.trim().length < 2) e.sku = "Enter a SKU";
     if (!form.size.trim()) e.size = "Enter a size";
-    if (!(Number(form.sqmPerBox) > 0)) e.sqmPerBox = "Must be above 0";
-    if (!(Number(form.pricePerSqm) >= 0) || form.pricePerSqm === "") e.pricePerSqm = "Enter a price";
-    if (!(Number(form.pricePerBox) >= 0) || form.pricePerBox === "") e.pricePerBox = "Enter a price";
-    if (!(Number(form.piecesPerBox) >= 1)) e.piecesPerBox = "At least 1";
+    if (form.pricePerSqm.trim() === "" || !(Number(form.pricePerSqm) > 0)) e.pricePerSqm = "Enter a price above 0";
+
+    // container selling: both fields together, or neither
+    const hasCP = form.containerPricePerSqm.trim() !== "";
+    const hasCA = form.sqmPerContainer.trim() !== "";
+    if (hasCP && !(Number(form.containerPricePerSqm) > 0)) e.containerPricePerSqm = "Must be above 0";
+    if (hasCA && !(Number(form.sqmPerContainer) > 0)) e.sqmPerContainer = "Must be above 0";
+    if (hasCP && !hasCA) e.sqmPerContainer = "Required when a container price is set";
+    if (hasCA && !hasCP) e.containerPricePerSqm = "Required when m² per container is set";
+
+    if (!editId) {
+      if (Number(form.stockSqm) < 0 || Number.isNaN(Number(form.stockSqm))) e.stockSqm = "Can't be negative";
+      if (Number(form.reorderLevel) < 0 || Number.isNaN(Number(form.reorderLevel))) e.reorderLevel = "Can't be negative";
+    }
     setErrors(e);
     if (Object.keys(e).length) return;
 
     const payload: VariantInput = {
       sku: form.sku.trim(), size: form.size.trim(), finish: form.finish.trim(), color: form.color, shadeCode: form.shadeCode.trim(),
-      thicknessMm: num(form.thicknessMm), piecesPerBox: Number(form.piecesPerBox), sqmPerBox: Number(form.sqmPerBox),
-      weightKgPerBox: num(form.weightKgPerBox), pricePerSqm: Number(form.pricePerSqm), pricePerBox: Number(form.pricePerBox),
-      compareAtPrice: num(form.compareAtPrice), image: form.image, textureUrl: form.textureUrl, active: form.active,
+      thicknessMm: num(form.thicknessMm),
+      pricePerSqm: Number(form.pricePerSqm),
+      containerPricePerSqm: num(form.containerPricePerSqm),
+      sqmPerContainer: num(form.sqmPerContainer),
+      compareAtPrice: num(form.compareAtPrice),
+      image: form.image, textureUrl: form.textureUrl, active: form.active,
     };
 
     setSaving(true);
     try {
       if (editId) await api.updateVariant(editId, payload);
-      else await api.createVariant(product.id, { ...payload, stockBoxes: Number(form.stockBoxes) || 0, lowStockThreshold: Number(form.lowStockThreshold) || 0 });
+      else {
+        const createPayload = {
+          ...payload,
+          stockBoxes: Number(form.stockSqm) || 0,
+          lowStockThreshold: Number(form.reorderLevel) || 0,
+        };
+        await api.createVariant(product.id, createPayload);
+      }
       toast.success(editId ? "Variant updated" : "Variant added");
       setForm(null);
       await load();
@@ -131,7 +148,16 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
 
   const toggleActive = async (v: AdminVariant, active: boolean) => {
     setRows((r) => r.map((x) => (x.id === v.id ? { ...x, active } : x)));
-    try { await api.updateVariant(v.id, { active }); onChanged(); }
+    try {
+      await api.updateVariant(v.id, {
+        sku: v.sku, size: v.size, finish: v.finish ?? "", color: v.color ?? "",
+        shadeCode: v.shadeCode ?? "", thicknessMm: v.thicknessMm,
+        pricePerSqm: Number(v.pricePerSqm), containerPricePerSqm: v.containerPricePerSqm,
+        sqmPerContainer: v.sqmPerContainer, compareAtPrice: v.compareAtPrice,
+        image: v.image ?? "", textureUrl: v.textureUrl ?? "", active,
+      });
+      onChanged();
+    }
     catch (err) { toast.error(apiErrorMessage(err, "Could not update")); load(); }
   };
 
@@ -146,7 +172,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
       <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-3xl">
         <SheetHeader className="border-b">
           <SheetTitle>Variants · {product?.name}</SheetTitle>
-          <SheetDescription>Each size, finish or shade customers can buy, with its price and stock.</SheetDescription>
+          <SheetDescription>Each size, finish or shade customers can buy, with its price per m² and stock in m².</SheetDescription>
         </SheetHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
@@ -157,7 +183,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>SKU</TableHead><TableHead>Spec</TableHead><TableHead>Price / box</TableHead>
+                      <TableHead>SKU</TableHead><TableHead>Spec</TableHead><TableHead>Price / m²</TableHead>
                       <TableHead>Stock</TableHead><TableHead>Active</TableHead><TableHead className="w-20" />
                     </TableRow>
                   </TableHeader>
@@ -166,32 +192,50 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                       <TableRow><TableCell colSpan={6} className="py-10 text-center"><Loader2 className="mx-auto animate-spin" /></TableCell></TableRow>
                     ) : rows.length === 0 ? (
                       <TableRow><TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">No variants yet. Add one so this product can be bought.</TableCell></TableRow>
-                    ) : rows.map((v) => (
-                      <TableRow key={v.id} className={v.active ? "" : "opacity-60"}>
-                        <TableCell className="font-medium">{v.sku}</TableCell>
-                        <TableCell>
-                          <span className="flex items-center gap-1.5">
-                            {v.color && <Swatch value={v.color} />}{v.size}{v.finish ? ` · ${v.finish}` : ""}
-                          </span>
-                          <span className="text-xs capitalize text-muted-foreground">{v.color ? colorName(v.color) : "No color"}{v.shadeCode ? ` · shade ${v.shadeCode}` : ""}</span>
-                        </TableCell>
-                        <TableCell className="tabular-nums">{money.format(v.pricePerBox)} RWF<span className="block text-xs text-muted-foreground">{v.sqmPerBox} m² per box</span></TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={`rounded-none ${v.stockBoxes === 0 ? "border-red-500/40 text-red-600" : v.stockBoxes <= v.lowStockThreshold ? "border-amber-500/40 text-amber-600" : ""}`}>{v.stockBoxes} boxes</Badge>
-                        </TableCell>
-                        <TableCell><Checkbox className="rounded-none" checked={v.active} onCheckedChange={(c) => toggleActive(v, c === true)} aria-label="Active" /></TableCell>
-                        <TableCell>
-                          <div className="flex justify-end">
-                            <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => startEdit(v)} aria-label="Edit"><Pencil /></Button>
-                            <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(v)} aria-label="Delete"><Trash2 /></Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    ) : rows.map((v) => {
+                      const onHand = Number(v.stockSqm ?? 0);
+                      const reserved = Number(v.reservedSqm ?? 0);
+                      const available = onHand - reserved;
+                      const low = onHand <= Number(v.reorderLevel ?? 0);
+                      const container = Number(v.containerPricePerSqm);
+                      return (
+                        <TableRow key={v.id} className={v.active ? "" : "opacity-60"}>
+                          <TableCell className="font-medium">{v.sku}</TableCell>
+                          <TableCell>
+                            <span className="flex items-center gap-1.5">
+                              {v.color && <Swatch value={v.color} />}{v.size}{v.finish ? ` · ${v.finish}` : ""}
+                            </span>
+                            <span className="text-xs capitalize text-muted-foreground">{v.color ? colorName(v.color) : "No color"}{v.shadeCode ? ` · shade ${v.shadeCode}` : ""}</span>
+                          </TableCell>
+                          <TableCell className="tabular-nums">
+                            {money.format(Number(v.pricePerSqm))} RWF
+                            <span className="block text-xs text-muted-foreground">
+                              {container > 0 ? `Container: ${money.format(container)} RWF/m²` : "Not sold by container"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={`rounded-none ${available <= 0 ? "border-red-500/40 text-red-600" : low ? "border-amber-500/40 text-amber-600" : ""}`}
+                            >
+                              {qty.format(available)} m²
+                            </Badge>
+                            {reserved > 0 && <span className="block text-xs text-muted-foreground">{qty.format(reserved)} m² reserved</span>}
+                          </TableCell>
+                          <TableCell><Checkbox className="rounded-none" checked={v.active} onCheckedChange={(c) => toggleActive(v, c === true)} aria-label="Active" /></TableCell>
+                          <TableCell>
+                            <div className="flex justify-end">
+                              <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => startEdit(v)} aria-label="Edit"><Pencil /></Button>
+                              <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(v)} aria-label="Delete"><Trash2 /></Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
-              <p className="text-xs text-muted-foreground">To change stock on an existing variant, use the Inventory page.</p>
+              <p className="text-xs text-muted-foreground">Stock is in m². To change stock on an existing variant, use the Inventory page.</p>
             </div>
           ) : (
             <div className="space-y-5">
@@ -206,25 +250,42 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                 <div className="flex items-end"><Button type="button" variant="outline" className="rounded-none" onClick={makeSku}><Wand2 /> Generate</Button></div>
               </div>
               <Field label="Color"><ColorField value={form.color} onChange={(v) => set("color", v)} /></Field>
-              <div className="grid gap-4 sm:grid-cols-4">
-                <Field label="Pieces per box" error={errors.piecesPerBox}><Input className="rounded-none" type="number" min={1} value={form.piecesPerBox} onChange={(e) => set("piecesPerBox", e.target.value)} /></Field>
-                <Field label="m² per box" error={errors.sqmPerBox}><Input className="rounded-none" type="number" step="0.001" value={form.sqmPerBox} onChange={(e) => set("sqmPerBox", e.target.value)} /></Field>
-                <Field label="Thickness (mm)"><Input className="rounded-none" type="number" step="0.1" value={form.thicknessMm} onChange={(e) => set("thicknessMm", e.target.value)} /></Field>
-                <Field label="Weight / box (kg)"><Input className="rounded-none" type="number" step="0.01" value={form.weightKgPerBox} onChange={(e) => set("weightKgPerBox", e.target.value)} /></Field>
-              </div>
+
               <div className="grid gap-4 sm:grid-cols-3">
-                <Field label="Price per m² (RWF)" error={errors.pricePerSqm}><Input className="rounded-none" type="number" value={form.pricePerSqm} onChange={(e) => set("pricePerSqm", e.target.value)} /></Field>
-                <Field label="Price per box (RWF)" error={errors.pricePerBox}>
-                  <Input className="rounded-none" type="number" value={form.pricePerBox} onChange={(e) => { setManualBoxPrice(true); set("pricePerBox", e.target.value); }} />
+                <Field label="Price per m² (RWF)" error={errors.pricePerSqm}>
+                  <Input className="rounded-none" type="number" min={1} value={form.pricePerSqm} onChange={(e) => set("pricePerSqm", e.target.value)} />
                 </Field>
-                <Field label="Compare-at price"><Input className="rounded-none" type="number" value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} placeholder="Strike-through" /></Field>
+                <Field label="Compare-at price / m²" hint="Strike-through price">
+                  <Input className="rounded-none" type="number" min={0} value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} />
+                </Field>
+                <Field label="Thickness (mm)">
+                  <Input className="rounded-none" type="number" step="0.1" value={form.thicknessMm} onChange={(e) => set("thicknessMm", e.target.value)} />
+                </Field>
               </div>
-              {!editId && (
+
+              <div className="space-y-3 border-t pt-4">
+                <p className="text-sm font-medium">Container sale (optional)</p>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Starting stock (boxes)"><Input className="rounded-none" type="number" min={0} value={form.stockBoxes} onChange={(e) => set("stockBoxes", e.target.value)} /></Field>
-                  <Field label="Low stock alert at (boxes)"><Input className="rounded-none" type="number" min={0} value={form.lowStockThreshold} onChange={(e) => set("lowStockThreshold", e.target.value)} /></Field>
+                  <Field label="Container price per m² (RWF)" error={errors.containerPricePerSqm} hint="Leave empty if not sold by container">
+                    <Input className="rounded-none" type="number" min={0} value={form.containerPricePerSqm} onChange={(e) => set("containerPricePerSqm", e.target.value)} />
+                  </Field>
+                  <Field label="m² in one container" error={errors.sqmPerContainer}>
+                    <Input className="rounded-none" type="number" min={0} step="0.01" value={form.sqmPerContainer} onChange={(e) => set("sqmPerContainer", e.target.value)} />
+                  </Field>
+                </div>
+              </div>
+
+              {!editId && (
+                <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
+                  <Field label="Starting stock (m²)" error={errors.stockSqm}>
+                    <Input className="rounded-none" type="number" min={0} step="0.01" value={form.stockSqm} onChange={(e) => set("stockSqm", e.target.value)} />
+                  </Field>
+                  <Field label="Low stock alert at (m²)" error={errors.reorderLevel}>
+                    <Input className="rounded-none" type="number" min={0} step="0.01" value={form.reorderLevel} onChange={(e) => set("reorderLevel", e.target.value)} />
+                  </Field>
                 </div>
               )}
+
               <Field label="Swatch image"><ImageField value={form.image} onChange={(v) => set("image", v)} /></Field>
               <Field label="Seamless texture (for the room visualizer)"><ImageField value={form.textureUrl} onChange={(v) => set("textureUrl", v)} /></Field>
               <label className="flex cursor-pointer items-center gap-2 text-sm">

@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Stock is in m². Prisma returns Decimals, so convert to numbers for JSON.
     return NextResponse.json(
       variants.map((v) => ({
         id: v.id,
@@ -26,8 +27,9 @@ export async function GET(request: NextRequest) {
         size: v.size,
         finish: v.finish,
         color: v.color,
-        stockBoxes: v.inventory?.onHandBoxes ?? 0,
-        lowStockThreshold: v.inventory?.reorderLevel ?? 0,
+        stockSqm: Number(v.inventory?.onHandSqm ?? 0),
+        reservedSqm: Number(v.inventory?.reservedSqm ?? 0), // held by unpaid orders
+        lowStockThreshold: Number(v.inventory?.reorderLevel ?? 0),
       })),
     );
   } catch (e) {

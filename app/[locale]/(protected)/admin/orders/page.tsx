@@ -1,10 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { api, apiErrorMessage, type OrderDetail, type OrderSummary } from "@/lib/api";
 import { ResourcePage } from "@/components/admin/resource-page";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -12,16 +10,24 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { fmtDate, fmtDateTime, money, options, pretty } from "@/lib/format";
+import { FileText, Loader2 } from "lucide-react";
+import { api, apiErrorMessage, type InvoiceRef, type OrderDetail, type OrderSummary } from "@/lib/api";
+import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
 
 const STATUSES = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"];
 const PAYMENT_STATUSES = ["PENDING", "AUTHORIZED", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"];
 
+const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
+  PROFORMA: "Proforma invoice",
+  INVOICE: "Invoice",
+  CREDIT_NOTE: "Credit note",
+};
 function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<void> }) {
   const [o, setO] = useState<OrderDetail | null>(null);
   const [status, setStatus] = useState(row.status);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
-
+  const [invoice, setInvoice] = useState<InvoiceRef | null>(null);
   const load = useCallback(async () => {
     const d = await api.getOrder(row.id);
     setO(d);
@@ -96,6 +102,24 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
           <div key={p.id} className="flex items-center justify-between border p-3 text-sm"><span>{pretty(p.method)}</span><span className="flex items-center gap-2"><StatusBadge status={p.status} /><span className="tabular-nums">{money(p.amount, p.currency)}</span></span></div>
         ))}
       </section>
+      <section className="space-y-2">
+        <h3 className="text-sm font-semibold">Documents</h3>
+        {!o.invoices?.length ? (
+          <p className="text-sm text-muted-foreground">No invoice issued yet.</p>
+        ) : (
+          o.invoices.map((inv) => (
+            <div key={inv.id} className="flex items-center justify-between gap-3 border p-3 text-sm">
+              <div className="min-w-0">
+                <p className="font-medium">{KIND_LABEL[inv.kind]}</p>
+                <p className="truncate text-xs text-muted-foreground">{inv.number} · {fmtDate(inv.issuedAt)}</p>
+              </div>
+              <Button variant="outline" size="sm" className="rounded-none" onClick={() => setInvoice(inv)}>
+                <FileText />View
+              </Button>
+            </div>
+          ))
+        )}
+      </section>
 
       <section className="space-y-2">
         <h3 className="text-sm font-semibold">History</h3>
@@ -105,6 +129,7 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
           ))}
         </ol>
       </section>
+      <InvoiceViewerDialog invoice={invoice} onClose={() => setInvoice(null)} />
     </div>
   );
 }

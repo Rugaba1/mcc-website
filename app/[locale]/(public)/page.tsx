@@ -12,6 +12,7 @@ import CtaBand from "@/components/CtaBand";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
+import { TeamSection } from "@/components/team-section";
 
 export default function Home() {
   return (
@@ -29,6 +30,7 @@ export default function Home() {
         <Testimonials />
         <Process />
         <CtaBand />
+        <TeamSection />
         <Contact />
       </main>
       

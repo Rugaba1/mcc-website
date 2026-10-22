@@ -1,44 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
 import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 import { getApiUser, hasApiPermission } from "@/lib/auth/api-access";
+import { USER_INCLUDE, formatUser, splitName } from "@/lib/users/format";
+import { syncPermissions } from "@/lib/auth/permissions";
 
-// GET /api/users — list all users (password excluded)
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const canManage = (u: Parameters<typeof hasApiPermission>[0]) =>
+  hasApiPermission(u, "users.manage") || hasApiPermission(u, "admin");
+
 export async function GET(req: NextRequest) {
   try {
-    const user = await getApiUser(req);
-    if (!user)
+    const me = await getApiUser(req);
+    if (!me)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!hasApiPermission(user, "users.manage"))
+    // if (!canManage(me))
     //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     const users = await prisma.user.findMany({
-      include: {
-        permissions: {
-          include: { permission: true },
-        },
-      },
+      include: USER_INCLUDE,
       orderBy: { createdAt: "asc" },
     });
-
-    const formatted = users.map((u) => {
-      const permCodes = u.permissions.map((p) => p.permission.code);
-      return {
-        id: u.id,
-        name: `${u.firstName} ${u.lastName || ""}`.trim(),
-        email: u.email,
-        role: permCodes.includes("admin") ? "admin" : "staff",
-        active: u.isActive,
-        canProducts: true,
-        canCollections: true,
-        canProjects: true,
-        canTestimonials: true,
-        canUsers: permCodes.includes("users.manage"),
-        permissions: permCodes,
-        createdAt: u.createdAt,
-      };
-    });
-
-    return NextResponse.json(formatted);
+    return NextResponse.json(users.map(formatUser));
   } catch (err) {
     console.error("GET /api/users:", err);
     return NextResponse.json(
@@ -48,73 +32,77 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/users — create user
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { name, email, password, active } = body;
+    const me = await getApiUser(req);
+    if (!me)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!canManage(me))
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // Required field validation
-    if (!name?.trim())
+    const b = await req.json();
+    const name = String(b.name ?? "").trim();
+    const email = String(b.email ?? "")
+      .trim()
+      .toLowerCase();
+    const jobTitle = String(b.jobTitle ?? "").trim() || null;
+
+    if (!name)
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    if (!email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    if (!EMAIL.test(email))
       return NextResponse.json(
         { error: "A valid email is required" },
         { status: 400 },
       );
-    if (!password || password.length < 6)
+    if (!b.password || b.password.length < 6)
       return NextResponse.json(
         { error: "Password must be at least 6 characters" },
         { status: 400 },
       );
+    if (b.showOnHomepage && !jobTitle)
+      return NextResponse.json(
+        { error: "A job title is required to show on the homepage" },
+        { status: 400 },
+      );
 
-    const existing = await prisma.user.findUnique({
-      where: { email: email.trim().toLowerCase() },
-    });
-    if (existing)
+    if (await prisma.user.findUnique({ where: { email } }))
       return NextResponse.json(
         { error: "Email already in use" },
         { status: 409 },
       );
 
-    const hashed = await bcrypt.hash(password, 12);
-    const parts = name.trim().split(/\s+/);
-    const firstName = parts[0] || name.trim();
-    const lastName = parts.slice(1).join(" ") || null;
+    const { firstName, lastName } = splitName(name);
+    const hashed = await bcrypt.hash(b.password, 12);
 
-    const user = await prisma.user.create({
-      data: {
-        firstName,
-        lastName,
-        email: email.trim().toLowerCase(),
-        password: hashed,
-        isActive: active ?? true,
-      },
-      include: {
-        permissions: {
-          include: { permission: true },
+    const created = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          password: hashed,
+          isActive: b.active ?? true,
+          profilePicture: b.profilePicture || null,
+          jobTitle,
+          bio:
+            String(b.bio ?? "")
+              .trim()
+              .slice(0, 500) || null,
+          showOnHomepage: !!b.showOnHomepage,
+          displayOrder: Number.isFinite(b.displayOrder)
+            ? Number(b.displayOrder)
+            : 0,
         },
-      },
+      });
+      if (Array.isArray(b.permissions))
+        await syncPermissions(tx, u.id, b.permissions, me.id);
+      return tx.user.findUniqueOrThrow({
+        where: { id: u.id },
+        include: USER_INCLUDE,
+      });
     });
 
-    const permCodes = user.permissions.map((p) => p.permission.code);
-    return NextResponse.json(
-      {
-        id: user.id,
-        name: `${user.firstName} ${user.lastName || ""}`.trim(),
-        email: user.email,
-        role: permCodes.includes("admin") ? "admin" : "staff",
-        active: user.isActive,
-        canProducts: true,
-        canCollections: true,
-        canProjects: true,
-        canTestimonials: true,
-        canUsers: permCodes.includes("users.manage"),
-        permissions: permCodes,
-        createdAt: user.createdAt,
-      },
-      { status: 201 },
-    );
+    return NextResponse.json(formatUser(created), { status: 201 });
   } catch (err) {
     console.error("POST /api/users:", err);
     return NextResponse.json(

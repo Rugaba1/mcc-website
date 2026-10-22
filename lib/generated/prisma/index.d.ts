@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model BlogPost
+ * 
+ */
+export type BlogPost = $Result.DefaultSelection<Prisma.$BlogPostPayload>
+/**
  * Model RefreshToken
  * 
  */
@@ -119,6 +124,11 @@ export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
  */
 export type OrderItem = $Result.DefaultSelection<Prisma.$OrderItemPayload>
 /**
+ * Model Invoice
+ * 
+ */
+export type Invoice = $Result.DefaultSelection<Prisma.$InvoicePayload>
+/**
  * Model OrderStatusHistory
  * 
  */
@@ -206,6 +216,14 @@ export namespace $Enums {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
+export const SaleType: {
+  SQM: 'SQM',
+  CONTAINER: 'CONTAINER'
+};
+
+export type SaleType = (typeof SaleType)[keyof typeof SaleType]
+
+
 export const PaymentStatus: {
   PENDING: 'PENDING',
   AUTHORIZED: 'AUTHORIZED',
@@ -257,6 +275,24 @@ export const DiscountType: {
 export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
 
+export const BlogStatus: {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+export type BlogStatus = (typeof BlogStatus)[keyof typeof BlogStatus]
+
+
+export const InvoiceKind: {
+  PROFORMA: 'PROFORMA',
+  INVOICE: 'INVOICE',
+  CREDIT_NOTE: 'CREDIT_NOTE'
+};
+
+export type InvoiceKind = (typeof InvoiceKind)[keyof typeof InvoiceKind]
+
+
 export const ContactStatus: {
   NEW: 'NEW',
   READ: 'READ',
@@ -271,6 +307,10 @@ export type ContactStatus = (typeof ContactStatus)[keyof typeof ContactStatus]
 export type OrderStatus = $Enums.OrderStatus
 
 export const OrderStatus: typeof $Enums.OrderStatus
+
+export type SaleType = $Enums.SaleType
+
+export const SaleType: typeof $Enums.SaleType
 
 export type PaymentStatus = $Enums.PaymentStatus
 
@@ -291,6 +331,14 @@ export const StockMovementType: typeof $Enums.StockMovementType
 export type DiscountType = $Enums.DiscountType
 
 export const DiscountType: typeof $Enums.DiscountType
+
+export type BlogStatus = $Enums.BlogStatus
+
+export const BlogStatus: typeof $Enums.BlogStatus
+
+export type InvoiceKind = $Enums.InvoiceKind
+
+export const InvoiceKind: typeof $Enums.InvoiceKind
 
 export type ContactStatus = $Enums.ContactStatus
 
@@ -426,6 +474,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.blogPost`: Exposes CRUD operations for the **BlogPost** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BlogPosts
+    * const blogPosts = await prisma.blogPost.findMany()
+    * ```
+    */
+  get blogPost(): Prisma.BlogPostDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.refreshToken`: Exposes CRUD operations for the **RefreshToken** model.
@@ -626,6 +684,16 @@ export class PrismaClient<
     * ```
     */
   get orderItem(): Prisma.OrderItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.invoice`: Exposes CRUD operations for the **Invoice** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Invoices
+    * const invoices = await prisma.invoice.findMany()
+    * ```
+    */
+  get invoice(): Prisma.InvoiceDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.orderStatusHistory`: Exposes CRUD operations for the **OrderStatusHistory** model.
@@ -1214,6 +1282,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    BlogPost: 'BlogPost',
     RefreshToken: 'RefreshToken',
     Permission: 'Permission',
     UserPermission: 'UserPermission',
@@ -1234,6 +1303,7 @@ export namespace Prisma {
     Coupon: 'Coupon',
     Order: 'Order',
     OrderItem: 'OrderItem',
+    Invoice: 'Invoice',
     OrderStatusHistory: 'OrderStatusHistory',
     Payment: 'Payment',
     Review: 'Review',
@@ -1263,7 +1333,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "refreshToken" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "orderItem" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "mediaFile"
+      modelProps: "user" | "blogPost" | "refreshToken" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "orderItem" | "invoice" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "mediaFile"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1330,6 +1400,72 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      BlogPost: {
+        payload: Prisma.$BlogPostPayload<ExtArgs>
+        fields: Prisma.BlogPostFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BlogPostFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BlogPostFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          findFirst: {
+            args: Prisma.BlogPostFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BlogPostFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          findMany: {
+            args: Prisma.BlogPostFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>[]
+          }
+          create: {
+            args: Prisma.BlogPostCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          createMany: {
+            args: Prisma.BlogPostCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.BlogPostDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          update: {
+            args: Prisma.BlogPostUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          deleteMany: {
+            args: Prisma.BlogPostDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BlogPostUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.BlogPostUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostPayload>
+          }
+          aggregate: {
+            args: Prisma.BlogPostAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBlogPost>
+          }
+          groupBy: {
+            args: Prisma.BlogPostGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BlogPostGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BlogPostCountArgs<ExtArgs>
+            result: $Utils.Optional<BlogPostCountAggregateOutputType> | number
           }
         }
       }
@@ -2653,6 +2789,72 @@ export namespace Prisma {
           }
         }
       }
+      Invoice: {
+        payload: Prisma.$InvoicePayload<ExtArgs>
+        fields: Prisma.InvoiceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InvoiceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InvoiceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          findFirst: {
+            args: Prisma.InvoiceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InvoiceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          findMany: {
+            args: Prisma.InvoiceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+          }
+          create: {
+            args: Prisma.InvoiceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          createMany: {
+            args: Prisma.InvoiceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.InvoiceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          update: {
+            args: Prisma.InvoiceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          deleteMany: {
+            args: Prisma.InvoiceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InvoiceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.InvoiceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          aggregate: {
+            args: Prisma.InvoiceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInvoice>
+          }
+          groupBy: {
+            args: Prisma.InvoiceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InvoiceCountArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceCountAggregateOutputType> | number
+          }
+        }
+      }
       OrderStatusHistory: {
         payload: Prisma.$OrderStatusHistoryPayload<ExtArgs>
         fields: Prisma.OrderStatusHistoryFieldRefs
@@ -3701,6 +3903,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    blogPost?: BlogPostOmit
     refreshToken?: RefreshTokenOmit
     permission?: PermissionOmit
     userPermission?: UserPermissionOmit
@@ -3721,6 +3924,7 @@ export namespace Prisma {
     coupon?: CouponOmit
     order?: OrderOmit
     orderItem?: OrderItemOmit
+    invoice?: InvoiceOmit
     orderStatusHistory?: OrderStatusHistoryOmit
     payment?: PaymentOmit
     review?: ReviewOmit
@@ -3828,6 +4032,8 @@ export namespace Prisma {
     orderHistory: number
     forgetPasswordRequests: number
     role: number
+    payments: number
+    blogPosts: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3844,6 +4050,8 @@ export namespace Prisma {
     orderHistory?: boolean | UserCountOutputTypeCountOrderHistoryArgs
     forgetPasswordRequests?: boolean | UserCountOutputTypeCountForgetPasswordRequestsArgs
     role?: boolean | UserCountOutputTypeCountRoleArgs
+    payments?: boolean | UserCountOutputTypeCountPaymentsArgs
+    blogPosts?: boolean | UserCountOutputTypeCountBlogPostsArgs
   }
 
   // Custom InputTypes
@@ -3946,6 +4154,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountRoleArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PaymentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBlogPostsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BlogPostWhereInput
   }
 
 
@@ -4295,12 +4517,14 @@ export namespace Prisma {
     items: number
     payments: number
     history: number
+    invoices: number
   }
 
   export type OrderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     items?: boolean | OrderCountOutputTypeCountItemsArgs
     payments?: boolean | OrderCountOutputTypeCountPaymentsArgs
     history?: boolean | OrderCountOutputTypeCountHistoryArgs
+    invoices?: boolean | OrderCountOutputTypeCountInvoicesArgs
   }
 
   // Custom InputTypes
@@ -4333,6 +4557,13 @@ export namespace Prisma {
    */
   export type OrderCountOutputTypeCountHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrderStatusHistoryWhereInput
+  }
+
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceWhereInput
   }
 
 
@@ -4478,10 +4709,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     id: number | null
+    displayOrder: number | null
   }
 
   export type UserSumAggregateOutputType = {
     id: number | null
+    displayOrder: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -4497,6 +4730,10 @@ export namespace Prisma {
     lastLogin: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    jobTitle: string | null
+    bio: string | null
+    showOnHomepage: boolean | null
+    displayOrder: number | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4512,6 +4749,10 @@ export namespace Prisma {
     lastLogin: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    jobTitle: string | null
+    bio: string | null
+    showOnHomepage: boolean | null
+    displayOrder: number | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4527,16 +4768,22 @@ export namespace Prisma {
     lastLogin: number
     createdAt: number
     updatedAt: number
+    jobTitle: number
+    bio: number
+    showOnHomepage: number
+    displayOrder: number
     _all: number
   }
 
 
   export type UserAvgAggregateInputType = {
     id?: true
+    displayOrder?: true
   }
 
   export type UserSumAggregateInputType = {
     id?: true
+    displayOrder?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -4552,6 +4799,10 @@ export namespace Prisma {
     lastLogin?: true
     createdAt?: true
     updatedAt?: true
+    jobTitle?: true
+    bio?: true
+    showOnHomepage?: true
+    displayOrder?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4567,6 +4818,10 @@ export namespace Prisma {
     lastLogin?: true
     createdAt?: true
     updatedAt?: true
+    jobTitle?: true
+    bio?: true
+    showOnHomepage?: true
+    displayOrder?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4582,6 +4837,10 @@ export namespace Prisma {
     lastLogin?: true
     createdAt?: true
     updatedAt?: true
+    jobTitle?: true
+    bio?: true
+    showOnHomepage?: true
+    displayOrder?: true
     _all?: true
   }
 
@@ -4684,6 +4943,10 @@ export namespace Prisma {
     lastLogin: Date | null
     createdAt: Date
     updatedAt: Date
+    jobTitle: string | null
+    bio: string | null
+    showOnHomepage: boolean
+    displayOrder: number
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -4718,6 +4981,10 @@ export namespace Prisma {
     lastLogin?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    jobTitle?: boolean
+    bio?: boolean
+    showOnHomepage?: boolean
+    displayOrder?: boolean
     permissions?: boolean | User$permissionsArgs<ExtArgs>
     grantedPerms?: boolean | User$grantedPermsArgs<ExtArgs>
     permissionLogs?: boolean | User$permissionLogsArgs<ExtArgs>
@@ -4732,6 +4999,8 @@ export namespace Prisma {
     orderHistory?: boolean | User$orderHistoryArgs<ExtArgs>
     forgetPasswordRequests?: boolean | User$forgetPasswordRequestsArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
+    payments?: boolean | User$paymentsArgs<ExtArgs>
+    blogPosts?: boolean | User$blogPostsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4750,9 +5019,13 @@ export namespace Prisma {
     lastLogin?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    jobTitle?: boolean
+    bio?: boolean
+    showOnHomepage?: boolean
+    displayOrder?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phoneNumber" | "firstName" | "lastName" | "password" | "profilePicture" | "isActive" | "emailVerifiedAt" | "lastLogin" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phoneNumber" | "firstName" | "lastName" | "password" | "profilePicture" | "isActive" | "emailVerifiedAt" | "lastLogin" | "createdAt" | "updatedAt" | "jobTitle" | "bio" | "showOnHomepage" | "displayOrder", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     permissions?: boolean | User$permissionsArgs<ExtArgs>
     grantedPerms?: boolean | User$grantedPermsArgs<ExtArgs>
@@ -4768,6 +5041,8 @@ export namespace Prisma {
     orderHistory?: boolean | User$orderHistoryArgs<ExtArgs>
     forgetPasswordRequests?: boolean | User$forgetPasswordRequestsArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
+    payments?: boolean | User$paymentsArgs<ExtArgs>
+    blogPosts?: boolean | User$blogPostsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -4788,6 +5063,8 @@ export namespace Prisma {
       orderHistory: Prisma.$OrderStatusHistoryPayload<ExtArgs>[]
       forgetPasswordRequests: Prisma.$ForgetPasswordRequestPayload<ExtArgs>[]
       role: Prisma.$RolePayload<ExtArgs>[]
+      payments: Prisma.$PaymentPayload<ExtArgs>[]
+      blogPosts: Prisma.$BlogPostPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -4802,6 +5079,10 @@ export namespace Prisma {
       lastLogin: Date | null
       createdAt: Date
       updatedAt: Date
+      jobTitle: string | null
+      bio: string | null
+      showOnHomepage: boolean
+      displayOrder: number
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -5156,6 +5437,8 @@ export namespace Prisma {
     orderHistory<T extends User$orderHistoryArgs<ExtArgs> = {}>(args?: Subset<T, User$orderHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     forgetPasswordRequests<T extends User$forgetPasswordRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$forgetPasswordRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ForgetPasswordRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     role<T extends User$roleArgs<ExtArgs> = {}>(args?: Subset<T, User$roleArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    payments<T extends User$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    blogPosts<T extends User$blogPostsArgs<ExtArgs> = {}>(args?: Subset<T, User$blogPostsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5197,6 +5480,10 @@ export namespace Prisma {
     readonly lastLogin: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly jobTitle: FieldRef<"User", 'String'>
+    readonly bio: FieldRef<"User", 'String'>
+    readonly showOnHomepage: FieldRef<"User", 'Boolean'>
+    readonly displayOrder: FieldRef<"User", 'Int'>
   }
     
 
@@ -5876,6 +6163,54 @@ export namespace Prisma {
   }
 
   /**
+   * User.payments
+   */
+  export type User$paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    where?: PaymentWhereInput
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    cursor?: PaymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * User.blogPosts
+   */
+  export type User$blogPostsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    where?: BlogPostWhereInput
+    orderBy?: BlogPostOrderByWithRelationInput | BlogPostOrderByWithRelationInput[]
+    cursor?: BlogPostWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BlogPostScalarFieldEnum | BlogPostScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5891,6 +6226,1144 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BlogPost
+   */
+
+  export type AggregateBlogPost = {
+    _count: BlogPostCountAggregateOutputType | null
+    _avg: BlogPostAvgAggregateOutputType | null
+    _sum: BlogPostSumAggregateOutputType | null
+    _min: BlogPostMinAggregateOutputType | null
+    _max: BlogPostMaxAggregateOutputType | null
+  }
+
+  export type BlogPostAvgAggregateOutputType = {
+    id: number | null
+    readingMinutes: number | null
+    authorId: number | null
+  }
+
+  export type BlogPostSumAggregateOutputType = {
+    id: number | null
+    readingMinutes: number | null
+    authorId: number | null
+  }
+
+  export type BlogPostMinAggregateOutputType = {
+    id: number | null
+    slug: string | null
+    locale: string | null
+    title: string | null
+    excerpt: string | null
+    content: string | null
+    coverImage: string | null
+    coverAlt: string | null
+    tags: string | null
+    readingMinutes: number | null
+    status: $Enums.BlogStatus | null
+    featured: boolean | null
+    seoTitle: string | null
+    seoDescription: string | null
+    authorId: number | null
+    publishedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BlogPostMaxAggregateOutputType = {
+    id: number | null
+    slug: string | null
+    locale: string | null
+    title: string | null
+    excerpt: string | null
+    content: string | null
+    coverImage: string | null
+    coverAlt: string | null
+    tags: string | null
+    readingMinutes: number | null
+    status: $Enums.BlogStatus | null
+    featured: boolean | null
+    seoTitle: string | null
+    seoDescription: string | null
+    authorId: number | null
+    publishedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BlogPostCountAggregateOutputType = {
+    id: number
+    slug: number
+    locale: number
+    title: number
+    excerpt: number
+    content: number
+    coverImage: number
+    coverAlt: number
+    tags: number
+    readingMinutes: number
+    status: number
+    featured: number
+    seoTitle: number
+    seoDescription: number
+    authorId: number
+    publishedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BlogPostAvgAggregateInputType = {
+    id?: true
+    readingMinutes?: true
+    authorId?: true
+  }
+
+  export type BlogPostSumAggregateInputType = {
+    id?: true
+    readingMinutes?: true
+    authorId?: true
+  }
+
+  export type BlogPostMinAggregateInputType = {
+    id?: true
+    slug?: true
+    locale?: true
+    title?: true
+    excerpt?: true
+    content?: true
+    coverImage?: true
+    coverAlt?: true
+    tags?: true
+    readingMinutes?: true
+    status?: true
+    featured?: true
+    seoTitle?: true
+    seoDescription?: true
+    authorId?: true
+    publishedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BlogPostMaxAggregateInputType = {
+    id?: true
+    slug?: true
+    locale?: true
+    title?: true
+    excerpt?: true
+    content?: true
+    coverImage?: true
+    coverAlt?: true
+    tags?: true
+    readingMinutes?: true
+    status?: true
+    featured?: true
+    seoTitle?: true
+    seoDescription?: true
+    authorId?: true
+    publishedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BlogPostCountAggregateInputType = {
+    id?: true
+    slug?: true
+    locale?: true
+    title?: true
+    excerpt?: true
+    content?: true
+    coverImage?: true
+    coverAlt?: true
+    tags?: true
+    readingMinutes?: true
+    status?: true
+    featured?: true
+    seoTitle?: true
+    seoDescription?: true
+    authorId?: true
+    publishedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BlogPostAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BlogPost to aggregate.
+     */
+    where?: BlogPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPosts to fetch.
+     */
+    orderBy?: BlogPostOrderByWithRelationInput | BlogPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BlogPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BlogPosts
+    **/
+    _count?: true | BlogPostCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BlogPostAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BlogPostSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BlogPostMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BlogPostMaxAggregateInputType
+  }
+
+  export type GetBlogPostAggregateType<T extends BlogPostAggregateArgs> = {
+        [P in keyof T & keyof AggregateBlogPost]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBlogPost[P]>
+      : GetScalarType<T[P], AggregateBlogPost[P]>
+  }
+
+
+
+
+  export type BlogPostGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BlogPostWhereInput
+    orderBy?: BlogPostOrderByWithAggregationInput | BlogPostOrderByWithAggregationInput[]
+    by: BlogPostScalarFieldEnum[] | BlogPostScalarFieldEnum
+    having?: BlogPostScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BlogPostCountAggregateInputType | true
+    _avg?: BlogPostAvgAggregateInputType
+    _sum?: BlogPostSumAggregateInputType
+    _min?: BlogPostMinAggregateInputType
+    _max?: BlogPostMaxAggregateInputType
+  }
+
+  export type BlogPostGroupByOutputType = {
+    id: number
+    slug: string
+    locale: string
+    title: string
+    excerpt: string | null
+    content: string
+    coverImage: string | null
+    coverAlt: string | null
+    tags: string | null
+    readingMinutes: number
+    status: $Enums.BlogStatus
+    featured: boolean
+    seoTitle: string | null
+    seoDescription: string | null
+    authorId: number | null
+    publishedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BlogPostCountAggregateOutputType | null
+    _avg: BlogPostAvgAggregateOutputType | null
+    _sum: BlogPostSumAggregateOutputType | null
+    _min: BlogPostMinAggregateOutputType | null
+    _max: BlogPostMaxAggregateOutputType | null
+  }
+
+  type GetBlogPostGroupByPayload<T extends BlogPostGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BlogPostGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BlogPostGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BlogPostGroupByOutputType[P]>
+            : GetScalarType<T[P], BlogPostGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BlogPostSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    slug?: boolean
+    locale?: boolean
+    title?: boolean
+    excerpt?: boolean
+    content?: boolean
+    coverImage?: boolean
+    coverAlt?: boolean
+    tags?: boolean
+    readingMinutes?: boolean
+    status?: boolean
+    featured?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    authorId?: boolean
+    publishedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    author?: boolean | BlogPost$authorArgs<ExtArgs>
+  }, ExtArgs["result"]["blogPost"]>
+
+
+
+  export type BlogPostSelectScalar = {
+    id?: boolean
+    slug?: boolean
+    locale?: boolean
+    title?: boolean
+    excerpt?: boolean
+    content?: boolean
+    coverImage?: boolean
+    coverAlt?: boolean
+    tags?: boolean
+    readingMinutes?: boolean
+    status?: boolean
+    featured?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    authorId?: boolean
+    publishedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BlogPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "locale" | "title" | "excerpt" | "content" | "coverImage" | "coverAlt" | "tags" | "readingMinutes" | "status" | "featured" | "seoTitle" | "seoDescription" | "authorId" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["blogPost"]>
+  export type BlogPostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    author?: boolean | BlogPost$authorArgs<ExtArgs>
+  }
+
+  export type $BlogPostPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BlogPost"
+    objects: {
+      author: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      slug: string
+      locale: string
+      title: string
+      excerpt: string | null
+      content: string
+      coverImage: string | null
+      coverAlt: string | null
+      tags: string | null
+      readingMinutes: number
+      status: $Enums.BlogStatus
+      featured: boolean
+      seoTitle: string | null
+      seoDescription: string | null
+      authorId: number | null
+      publishedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["blogPost"]>
+    composites: {}
+  }
+
+  type BlogPostGetPayload<S extends boolean | null | undefined | BlogPostDefaultArgs> = $Result.GetResult<Prisma.$BlogPostPayload, S>
+
+  type BlogPostCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BlogPostFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BlogPostCountAggregateInputType | true
+    }
+
+  export interface BlogPostDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BlogPost'], meta: { name: 'BlogPost' } }
+    /**
+     * Find zero or one BlogPost that matches the filter.
+     * @param {BlogPostFindUniqueArgs} args - Arguments to find a BlogPost
+     * @example
+     * // Get one BlogPost
+     * const blogPost = await prisma.blogPost.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BlogPostFindUniqueArgs>(args: SelectSubset<T, BlogPostFindUniqueArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BlogPost that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BlogPostFindUniqueOrThrowArgs} args - Arguments to find a BlogPost
+     * @example
+     * // Get one BlogPost
+     * const blogPost = await prisma.blogPost.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BlogPostFindUniqueOrThrowArgs>(args: SelectSubset<T, BlogPostFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BlogPost that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostFindFirstArgs} args - Arguments to find a BlogPost
+     * @example
+     * // Get one BlogPost
+     * const blogPost = await prisma.blogPost.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BlogPostFindFirstArgs>(args?: SelectSubset<T, BlogPostFindFirstArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BlogPost that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostFindFirstOrThrowArgs} args - Arguments to find a BlogPost
+     * @example
+     * // Get one BlogPost
+     * const blogPost = await prisma.blogPost.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BlogPostFindFirstOrThrowArgs>(args?: SelectSubset<T, BlogPostFindFirstOrThrowArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BlogPosts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BlogPosts
+     * const blogPosts = await prisma.blogPost.findMany()
+     * 
+     * // Get first 10 BlogPosts
+     * const blogPosts = await prisma.blogPost.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const blogPostWithIdOnly = await prisma.blogPost.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BlogPostFindManyArgs>(args?: SelectSubset<T, BlogPostFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BlogPost.
+     * @param {BlogPostCreateArgs} args - Arguments to create a BlogPost.
+     * @example
+     * // Create one BlogPost
+     * const BlogPost = await prisma.blogPost.create({
+     *   data: {
+     *     // ... data to create a BlogPost
+     *   }
+     * })
+     * 
+     */
+    create<T extends BlogPostCreateArgs>(args: SelectSubset<T, BlogPostCreateArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BlogPosts.
+     * @param {BlogPostCreateManyArgs} args - Arguments to create many BlogPosts.
+     * @example
+     * // Create many BlogPosts
+     * const blogPost = await prisma.blogPost.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BlogPostCreateManyArgs>(args?: SelectSubset<T, BlogPostCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a BlogPost.
+     * @param {BlogPostDeleteArgs} args - Arguments to delete one BlogPost.
+     * @example
+     * // Delete one BlogPost
+     * const BlogPost = await prisma.blogPost.delete({
+     *   where: {
+     *     // ... filter to delete one BlogPost
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BlogPostDeleteArgs>(args: SelectSubset<T, BlogPostDeleteArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BlogPost.
+     * @param {BlogPostUpdateArgs} args - Arguments to update one BlogPost.
+     * @example
+     * // Update one BlogPost
+     * const blogPost = await prisma.blogPost.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BlogPostUpdateArgs>(args: SelectSubset<T, BlogPostUpdateArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BlogPosts.
+     * @param {BlogPostDeleteManyArgs} args - Arguments to filter BlogPosts to delete.
+     * @example
+     * // Delete a few BlogPosts
+     * const { count } = await prisma.blogPost.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BlogPostDeleteManyArgs>(args?: SelectSubset<T, BlogPostDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BlogPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BlogPosts
+     * const blogPost = await prisma.blogPost.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BlogPostUpdateManyArgs>(args: SelectSubset<T, BlogPostUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BlogPost.
+     * @param {BlogPostUpsertArgs} args - Arguments to update or create a BlogPost.
+     * @example
+     * // Update or create a BlogPost
+     * const blogPost = await prisma.blogPost.upsert({
+     *   create: {
+     *     // ... data to create a BlogPost
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BlogPost we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BlogPostUpsertArgs>(args: SelectSubset<T, BlogPostUpsertArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BlogPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostCountArgs} args - Arguments to filter BlogPosts to count.
+     * @example
+     * // Count the number of BlogPosts
+     * const count = await prisma.blogPost.count({
+     *   where: {
+     *     // ... the filter for the BlogPosts we want to count
+     *   }
+     * })
+    **/
+    count<T extends BlogPostCountArgs>(
+      args?: Subset<T, BlogPostCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BlogPostCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BlogPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BlogPostAggregateArgs>(args: Subset<T, BlogPostAggregateArgs>): Prisma.PrismaPromise<GetBlogPostAggregateType<T>>
+
+    /**
+     * Group by BlogPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BlogPostGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BlogPostGroupByArgs['orderBy'] }
+        : { orderBy?: BlogPostGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BlogPostGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBlogPostGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BlogPost model
+   */
+  readonly fields: BlogPostFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BlogPost.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BlogPostClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    author<T extends BlogPost$authorArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$authorArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BlogPost model
+   */
+  interface BlogPostFieldRefs {
+    readonly id: FieldRef<"BlogPost", 'Int'>
+    readonly slug: FieldRef<"BlogPost", 'String'>
+    readonly locale: FieldRef<"BlogPost", 'String'>
+    readonly title: FieldRef<"BlogPost", 'String'>
+    readonly excerpt: FieldRef<"BlogPost", 'String'>
+    readonly content: FieldRef<"BlogPost", 'String'>
+    readonly coverImage: FieldRef<"BlogPost", 'String'>
+    readonly coverAlt: FieldRef<"BlogPost", 'String'>
+    readonly tags: FieldRef<"BlogPost", 'String'>
+    readonly readingMinutes: FieldRef<"BlogPost", 'Int'>
+    readonly status: FieldRef<"BlogPost", 'BlogStatus'>
+    readonly featured: FieldRef<"BlogPost", 'Boolean'>
+    readonly seoTitle: FieldRef<"BlogPost", 'String'>
+    readonly seoDescription: FieldRef<"BlogPost", 'String'>
+    readonly authorId: FieldRef<"BlogPost", 'Int'>
+    readonly publishedAt: FieldRef<"BlogPost", 'DateTime'>
+    readonly createdAt: FieldRef<"BlogPost", 'DateTime'>
+    readonly updatedAt: FieldRef<"BlogPost", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BlogPost findUnique
+   */
+  export type BlogPostFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPost to fetch.
+     */
+    where: BlogPostWhereUniqueInput
+  }
+
+  /**
+   * BlogPost findUniqueOrThrow
+   */
+  export type BlogPostFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPost to fetch.
+     */
+    where: BlogPostWhereUniqueInput
+  }
+
+  /**
+   * BlogPost findFirst
+   */
+  export type BlogPostFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPost to fetch.
+     */
+    where?: BlogPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPosts to fetch.
+     */
+    orderBy?: BlogPostOrderByWithRelationInput | BlogPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BlogPosts.
+     */
+    cursor?: BlogPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPosts.
+     */
+    distinct?: BlogPostScalarFieldEnum | BlogPostScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPost findFirstOrThrow
+   */
+  export type BlogPostFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPost to fetch.
+     */
+    where?: BlogPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPosts to fetch.
+     */
+    orderBy?: BlogPostOrderByWithRelationInput | BlogPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BlogPosts.
+     */
+    cursor?: BlogPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPosts.
+     */
+    distinct?: BlogPostScalarFieldEnum | BlogPostScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPost findMany
+   */
+  export type BlogPostFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPosts to fetch.
+     */
+    where?: BlogPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPosts to fetch.
+     */
+    orderBy?: BlogPostOrderByWithRelationInput | BlogPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BlogPosts.
+     */
+    cursor?: BlogPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPosts.
+     */
+    distinct?: BlogPostScalarFieldEnum | BlogPostScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPost create
+   */
+  export type BlogPostCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BlogPost.
+     */
+    data: XOR<BlogPostCreateInput, BlogPostUncheckedCreateInput>
+  }
+
+  /**
+   * BlogPost createMany
+   */
+  export type BlogPostCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BlogPosts.
+     */
+    data: BlogPostCreateManyInput | BlogPostCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BlogPost update
+   */
+  export type BlogPostUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BlogPost.
+     */
+    data: XOR<BlogPostUpdateInput, BlogPostUncheckedUpdateInput>
+    /**
+     * Choose, which BlogPost to update.
+     */
+    where: BlogPostWhereUniqueInput
+  }
+
+  /**
+   * BlogPost updateMany
+   */
+  export type BlogPostUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BlogPosts.
+     */
+    data: XOR<BlogPostUpdateManyMutationInput, BlogPostUncheckedUpdateManyInput>
+    /**
+     * Filter which BlogPosts to update
+     */
+    where?: BlogPostWhereInput
+    /**
+     * Limit how many BlogPosts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BlogPost upsert
+   */
+  export type BlogPostUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BlogPost to update in case it exists.
+     */
+    where: BlogPostWhereUniqueInput
+    /**
+     * In case the BlogPost found by the `where` argument doesn't exist, create a new BlogPost with this data.
+     */
+    create: XOR<BlogPostCreateInput, BlogPostUncheckedCreateInput>
+    /**
+     * In case the BlogPost was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BlogPostUpdateInput, BlogPostUncheckedUpdateInput>
+  }
+
+  /**
+   * BlogPost delete
+   */
+  export type BlogPostDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
+    /**
+     * Filter which BlogPost to delete.
+     */
+    where: BlogPostWhereUniqueInput
+  }
+
+  /**
+   * BlogPost deleteMany
+   */
+  export type BlogPostDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BlogPosts to delete
+     */
+    where?: BlogPostWhereInput
+    /**
+     * Limit how many BlogPosts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BlogPost.author
+   */
+  export type BlogPost$authorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * BlogPost without action
+   */
+  export type BlogPostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPost
+     */
+    select?: BlogPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPost
+     */
+    omit?: BlogPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostInclude<ExtArgs> | null
   }
 
 
@@ -14450,24 +15923,28 @@ export namespace Prisma {
     id: number | null
     productId: number | null
     thicknessMm: Decimal | null
+    pricePerSqm: Decimal | null
+    containerPricePerSqm: Decimal | null
+    sqmPerContainer: Decimal | null
+    compareAtPrice: Decimal | null
     piecesPerBox: number | null
     sqmPerBox: Decimal | null
-    weightKgPerBox: Decimal | null
-    pricePerSqm: Decimal | null
     pricePerBox: Decimal | null
-    compareAtPrice: Decimal | null
+    weightKgPerBox: Decimal | null
   }
 
   export type ProductVariantSumAggregateOutputType = {
     id: number | null
     productId: number | null
     thicknessMm: Decimal | null
+    pricePerSqm: Decimal | null
+    containerPricePerSqm: Decimal | null
+    sqmPerContainer: Decimal | null
+    compareAtPrice: Decimal | null
     piecesPerBox: number | null
     sqmPerBox: Decimal | null
-    weightKgPerBox: Decimal | null
-    pricePerSqm: Decimal | null
     pricePerBox: Decimal | null
-    compareAtPrice: Decimal | null
+    weightKgPerBox: Decimal | null
   }
 
   export type ProductVariantMinAggregateOutputType = {
@@ -14479,13 +15956,15 @@ export namespace Prisma {
     color: string | null
     thicknessMm: Decimal | null
     shadeCode: string | null
-    piecesPerBox: number | null
-    sqmPerBox: Decimal | null
-    weightKgPerBox: Decimal | null
     pricePerSqm: Decimal | null
-    pricePerBox: Decimal | null
+    containerPricePerSqm: Decimal | null
+    sqmPerContainer: Decimal | null
     compareAtPrice: Decimal | null
     currency: string | null
+    piecesPerBox: number | null
+    sqmPerBox: Decimal | null
+    pricePerBox: Decimal | null
+    weightKgPerBox: Decimal | null
     image: string | null
     textureUrl: string | null
     active: boolean | null
@@ -14502,13 +15981,15 @@ export namespace Prisma {
     color: string | null
     thicknessMm: Decimal | null
     shadeCode: string | null
-    piecesPerBox: number | null
-    sqmPerBox: Decimal | null
-    weightKgPerBox: Decimal | null
     pricePerSqm: Decimal | null
-    pricePerBox: Decimal | null
+    containerPricePerSqm: Decimal | null
+    sqmPerContainer: Decimal | null
     compareAtPrice: Decimal | null
     currency: string | null
+    piecesPerBox: number | null
+    sqmPerBox: Decimal | null
+    pricePerBox: Decimal | null
+    weightKgPerBox: Decimal | null
     image: string | null
     textureUrl: string | null
     active: boolean | null
@@ -14525,13 +16006,15 @@ export namespace Prisma {
     color: number
     thicknessMm: number
     shadeCode: number
-    piecesPerBox: number
-    sqmPerBox: number
-    weightKgPerBox: number
     pricePerSqm: number
-    pricePerBox: number
+    containerPricePerSqm: number
+    sqmPerContainer: number
     compareAtPrice: number
     currency: number
+    piecesPerBox: number
+    sqmPerBox: number
+    pricePerBox: number
+    weightKgPerBox: number
     image: number
     textureUrl: number
     active: number
@@ -14545,24 +16028,28 @@ export namespace Prisma {
     id?: true
     productId?: true
     thicknessMm?: true
+    pricePerSqm?: true
+    containerPricePerSqm?: true
+    sqmPerContainer?: true
+    compareAtPrice?: true
     piecesPerBox?: true
     sqmPerBox?: true
-    weightKgPerBox?: true
-    pricePerSqm?: true
     pricePerBox?: true
-    compareAtPrice?: true
+    weightKgPerBox?: true
   }
 
   export type ProductVariantSumAggregateInputType = {
     id?: true
     productId?: true
     thicknessMm?: true
+    pricePerSqm?: true
+    containerPricePerSqm?: true
+    sqmPerContainer?: true
+    compareAtPrice?: true
     piecesPerBox?: true
     sqmPerBox?: true
-    weightKgPerBox?: true
-    pricePerSqm?: true
     pricePerBox?: true
-    compareAtPrice?: true
+    weightKgPerBox?: true
   }
 
   export type ProductVariantMinAggregateInputType = {
@@ -14574,13 +16061,15 @@ export namespace Prisma {
     color?: true
     thicknessMm?: true
     shadeCode?: true
-    piecesPerBox?: true
-    sqmPerBox?: true
-    weightKgPerBox?: true
     pricePerSqm?: true
-    pricePerBox?: true
+    containerPricePerSqm?: true
+    sqmPerContainer?: true
     compareAtPrice?: true
     currency?: true
+    piecesPerBox?: true
+    sqmPerBox?: true
+    pricePerBox?: true
+    weightKgPerBox?: true
     image?: true
     textureUrl?: true
     active?: true
@@ -14597,13 +16086,15 @@ export namespace Prisma {
     color?: true
     thicknessMm?: true
     shadeCode?: true
-    piecesPerBox?: true
-    sqmPerBox?: true
-    weightKgPerBox?: true
     pricePerSqm?: true
-    pricePerBox?: true
+    containerPricePerSqm?: true
+    sqmPerContainer?: true
     compareAtPrice?: true
     currency?: true
+    piecesPerBox?: true
+    sqmPerBox?: true
+    pricePerBox?: true
+    weightKgPerBox?: true
     image?: true
     textureUrl?: true
     active?: true
@@ -14620,13 +16111,15 @@ export namespace Prisma {
     color?: true
     thicknessMm?: true
     shadeCode?: true
-    piecesPerBox?: true
-    sqmPerBox?: true
-    weightKgPerBox?: true
     pricePerSqm?: true
-    pricePerBox?: true
+    containerPricePerSqm?: true
+    sqmPerContainer?: true
     compareAtPrice?: true
     currency?: true
+    piecesPerBox?: true
+    sqmPerBox?: true
+    pricePerBox?: true
+    weightKgPerBox?: true
     image?: true
     textureUrl?: true
     active?: true
@@ -14730,13 +16223,15 @@ export namespace Prisma {
     color: string | null
     thicknessMm: Decimal | null
     shadeCode: string | null
-    piecesPerBox: number
-    sqmPerBox: Decimal
-    weightKgPerBox: Decimal | null
     pricePerSqm: Decimal
-    pricePerBox: Decimal
+    containerPricePerSqm: Decimal | null
+    sqmPerContainer: Decimal | null
     compareAtPrice: Decimal | null
     currency: string
+    piecesPerBox: number
+    sqmPerBox: Decimal
+    pricePerBox: Decimal
+    weightKgPerBox: Decimal | null
     image: string | null
     textureUrl: string | null
     active: boolean
@@ -14772,13 +16267,15 @@ export namespace Prisma {
     color?: boolean
     thicknessMm?: boolean
     shadeCode?: boolean
-    piecesPerBox?: boolean
-    sqmPerBox?: boolean
-    weightKgPerBox?: boolean
     pricePerSqm?: boolean
-    pricePerBox?: boolean
+    containerPricePerSqm?: boolean
+    sqmPerContainer?: boolean
     compareAtPrice?: boolean
     currency?: boolean
+    piecesPerBox?: boolean
+    sqmPerBox?: boolean
+    pricePerBox?: boolean
+    weightKgPerBox?: boolean
     image?: boolean
     textureUrl?: boolean
     active?: boolean
@@ -14804,13 +16301,15 @@ export namespace Prisma {
     color?: boolean
     thicknessMm?: boolean
     shadeCode?: boolean
-    piecesPerBox?: boolean
-    sqmPerBox?: boolean
-    weightKgPerBox?: boolean
     pricePerSqm?: boolean
-    pricePerBox?: boolean
+    containerPricePerSqm?: boolean
+    sqmPerContainer?: boolean
     compareAtPrice?: boolean
     currency?: boolean
+    piecesPerBox?: boolean
+    sqmPerBox?: boolean
+    pricePerBox?: boolean
+    weightKgPerBox?: boolean
     image?: boolean
     textureUrl?: boolean
     active?: boolean
@@ -14818,7 +16317,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProductVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "sku" | "size" | "finish" | "color" | "thicknessMm" | "shadeCode" | "piecesPerBox" | "sqmPerBox" | "weightKgPerBox" | "pricePerSqm" | "pricePerBox" | "compareAtPrice" | "currency" | "image" | "textureUrl" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
+  export type ProductVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "sku" | "size" | "finish" | "color" | "thicknessMm" | "shadeCode" | "pricePerSqm" | "containerPricePerSqm" | "sqmPerContainer" | "compareAtPrice" | "currency" | "piecesPerBox" | "sqmPerBox" | "pricePerBox" | "weightKgPerBox" | "image" | "textureUrl" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
   export type ProductVariantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     product?: boolean | ProductDefaultArgs<ExtArgs>
     inventory?: boolean | ProductVariant$inventoryArgs<ExtArgs>
@@ -14848,13 +16347,15 @@ export namespace Prisma {
       color: string | null
       thicknessMm: Prisma.Decimal | null
       shadeCode: string | null
-      piecesPerBox: number
-      sqmPerBox: Prisma.Decimal
-      weightKgPerBox: Prisma.Decimal | null
       pricePerSqm: Prisma.Decimal
-      pricePerBox: Prisma.Decimal
+      containerPricePerSqm: Prisma.Decimal | null
+      sqmPerContainer: Prisma.Decimal | null
       compareAtPrice: Prisma.Decimal | null
       currency: string
+      piecesPerBox: number
+      sqmPerBox: Prisma.Decimal
+      pricePerBox: Prisma.Decimal
+      weightKgPerBox: Prisma.Decimal | null
       image: string | null
       textureUrl: string | null
       active: boolean
@@ -15243,13 +16744,15 @@ export namespace Prisma {
     readonly color: FieldRef<"ProductVariant", 'String'>
     readonly thicknessMm: FieldRef<"ProductVariant", 'Decimal'>
     readonly shadeCode: FieldRef<"ProductVariant", 'String'>
-    readonly piecesPerBox: FieldRef<"ProductVariant", 'Int'>
-    readonly sqmPerBox: FieldRef<"ProductVariant", 'Decimal'>
-    readonly weightKgPerBox: FieldRef<"ProductVariant", 'Decimal'>
     readonly pricePerSqm: FieldRef<"ProductVariant", 'Decimal'>
-    readonly pricePerBox: FieldRef<"ProductVariant", 'Decimal'>
+    readonly containerPricePerSqm: FieldRef<"ProductVariant", 'Decimal'>
+    readonly sqmPerContainer: FieldRef<"ProductVariant", 'Decimal'>
     readonly compareAtPrice: FieldRef<"ProductVariant", 'Decimal'>
     readonly currency: FieldRef<"ProductVariant", 'String'>
+    readonly piecesPerBox: FieldRef<"ProductVariant", 'Int'>
+    readonly sqmPerBox: FieldRef<"ProductVariant", 'Decimal'>
+    readonly pricePerBox: FieldRef<"ProductVariant", 'Decimal'>
+    readonly weightKgPerBox: FieldRef<"ProductVariant", 'Decimal'>
     readonly image: FieldRef<"ProductVariant", 'String'>
     readonly textureUrl: FieldRef<"ProductVariant", 'String'>
     readonly active: FieldRef<"ProductVariant", 'Boolean'>
@@ -17736,25 +19239,25 @@ export namespace Prisma {
   export type InventoryAvgAggregateOutputType = {
     id: number | null
     variantId: number | null
-    onHandBoxes: number | null
-    reservedBoxes: number | null
-    reorderLevel: number | null
+    onHandSqm: Decimal | null
+    reservedSqm: Decimal | null
+    reorderLevel: Decimal | null
   }
 
   export type InventorySumAggregateOutputType = {
     id: number | null
     variantId: number | null
-    onHandBoxes: number | null
-    reservedBoxes: number | null
-    reorderLevel: number | null
+    onHandSqm: Decimal | null
+    reservedSqm: Decimal | null
+    reorderLevel: Decimal | null
   }
 
   export type InventoryMinAggregateOutputType = {
     id: number | null
     variantId: number | null
-    onHandBoxes: number | null
-    reservedBoxes: number | null
-    reorderLevel: number | null
+    onHandSqm: Decimal | null
+    reservedSqm: Decimal | null
+    reorderLevel: Decimal | null
     allowBackorder: boolean | null
     updatedAt: Date | null
   }
@@ -17762,9 +19265,9 @@ export namespace Prisma {
   export type InventoryMaxAggregateOutputType = {
     id: number | null
     variantId: number | null
-    onHandBoxes: number | null
-    reservedBoxes: number | null
-    reorderLevel: number | null
+    onHandSqm: Decimal | null
+    reservedSqm: Decimal | null
+    reorderLevel: Decimal | null
     allowBackorder: boolean | null
     updatedAt: Date | null
   }
@@ -17772,8 +19275,8 @@ export namespace Prisma {
   export type InventoryCountAggregateOutputType = {
     id: number
     variantId: number
-    onHandBoxes: number
-    reservedBoxes: number
+    onHandSqm: number
+    reservedSqm: number
     reorderLevel: number
     allowBackorder: number
     updatedAt: number
@@ -17784,24 +19287,24 @@ export namespace Prisma {
   export type InventoryAvgAggregateInputType = {
     id?: true
     variantId?: true
-    onHandBoxes?: true
-    reservedBoxes?: true
+    onHandSqm?: true
+    reservedSqm?: true
     reorderLevel?: true
   }
 
   export type InventorySumAggregateInputType = {
     id?: true
     variantId?: true
-    onHandBoxes?: true
-    reservedBoxes?: true
+    onHandSqm?: true
+    reservedSqm?: true
     reorderLevel?: true
   }
 
   export type InventoryMinAggregateInputType = {
     id?: true
     variantId?: true
-    onHandBoxes?: true
-    reservedBoxes?: true
+    onHandSqm?: true
+    reservedSqm?: true
     reorderLevel?: true
     allowBackorder?: true
     updatedAt?: true
@@ -17810,8 +19313,8 @@ export namespace Prisma {
   export type InventoryMaxAggregateInputType = {
     id?: true
     variantId?: true
-    onHandBoxes?: true
-    reservedBoxes?: true
+    onHandSqm?: true
+    reservedSqm?: true
     reorderLevel?: true
     allowBackorder?: true
     updatedAt?: true
@@ -17820,8 +19323,8 @@ export namespace Prisma {
   export type InventoryCountAggregateInputType = {
     id?: true
     variantId?: true
-    onHandBoxes?: true
-    reservedBoxes?: true
+    onHandSqm?: true
+    reservedSqm?: true
     reorderLevel?: true
     allowBackorder?: true
     updatedAt?: true
@@ -17917,9 +19420,9 @@ export namespace Prisma {
   export type InventoryGroupByOutputType = {
     id: number
     variantId: number
-    onHandBoxes: number
-    reservedBoxes: number
-    reorderLevel: number
+    onHandSqm: Decimal
+    reservedSqm: Decimal
+    reorderLevel: Decimal
     allowBackorder: boolean
     updatedAt: Date
     _count: InventoryCountAggregateOutputType | null
@@ -17946,8 +19449,8 @@ export namespace Prisma {
   export type InventorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     variantId?: boolean
-    onHandBoxes?: boolean
-    reservedBoxes?: boolean
+    onHandSqm?: boolean
+    reservedSqm?: boolean
     reorderLevel?: boolean
     allowBackorder?: boolean
     updatedAt?: boolean
@@ -17959,14 +19462,14 @@ export namespace Prisma {
   export type InventorySelectScalar = {
     id?: boolean
     variantId?: boolean
-    onHandBoxes?: boolean
-    reservedBoxes?: boolean
+    onHandSqm?: boolean
+    reservedSqm?: boolean
     reorderLevel?: boolean
     allowBackorder?: boolean
     updatedAt?: boolean
   }
 
-  export type InventoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "variantId" | "onHandBoxes" | "reservedBoxes" | "reorderLevel" | "allowBackorder" | "updatedAt", ExtArgs["result"]["inventory"]>
+  export type InventoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "variantId" | "onHandSqm" | "reservedSqm" | "reorderLevel" | "allowBackorder" | "updatedAt", ExtArgs["result"]["inventory"]>
   export type InventoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }
@@ -17979,9 +19482,9 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       variantId: number
-      onHandBoxes: number
-      reservedBoxes: number
-      reorderLevel: number
+      onHandSqm: Prisma.Decimal
+      reservedSqm: Prisma.Decimal
+      reorderLevel: Prisma.Decimal
       allowBackorder: boolean
       updatedAt: Date
     }, ExtArgs["result"]["inventory"]>
@@ -18356,9 +19859,9 @@ export namespace Prisma {
   interface InventoryFieldRefs {
     readonly id: FieldRef<"Inventory", 'Int'>
     readonly variantId: FieldRef<"Inventory", 'Int'>
-    readonly onHandBoxes: FieldRef<"Inventory", 'Int'>
-    readonly reservedBoxes: FieldRef<"Inventory", 'Int'>
-    readonly reorderLevel: FieldRef<"Inventory", 'Int'>
+    readonly onHandSqm: FieldRef<"Inventory", 'Decimal'>
+    readonly reservedSqm: FieldRef<"Inventory", 'Decimal'>
+    readonly reorderLevel: FieldRef<"Inventory", 'Decimal'>
     readonly allowBackorder: FieldRef<"Inventory", 'Boolean'>
     readonly updatedAt: FieldRef<"Inventory", 'DateTime'>
   }
@@ -18742,14 +20245,14 @@ export namespace Prisma {
   export type StockMovementAvgAggregateOutputType = {
     id: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
     createdById: number | null
   }
 
   export type StockMovementSumAggregateOutputType = {
     id: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
     createdById: number | null
   }
 
@@ -18757,7 +20260,7 @@ export namespace Prisma {
     id: number | null
     variantId: number | null
     type: $Enums.StockMovementType | null
-    quantity: number | null
+    quantity: Decimal | null
     reference: string | null
     note: string | null
     createdById: number | null
@@ -18768,7 +20271,7 @@ export namespace Prisma {
     id: number | null
     variantId: number | null
     type: $Enums.StockMovementType | null
-    quantity: number | null
+    quantity: Decimal | null
     reference: string | null
     note: string | null
     createdById: number | null
@@ -18926,7 +20429,7 @@ export namespace Prisma {
     id: number
     variantId: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal
     reference: string | null
     note: string | null
     createdById: number | null
@@ -18994,7 +20497,7 @@ export namespace Prisma {
       id: number
       variantId: number
       type: $Enums.StockMovementType
-      quantity: number
+      quantity: Prisma.Decimal
       reference: string | null
       note: string | null
       createdById: number | null
@@ -19373,7 +20876,7 @@ export namespace Prisma {
     readonly id: FieldRef<"StockMovement", 'Int'>
     readonly variantId: FieldRef<"StockMovement", 'Int'>
     readonly type: FieldRef<"StockMovement", 'StockMovementType'>
-    readonly quantity: FieldRef<"StockMovement", 'Int'>
+    readonly quantity: FieldRef<"StockMovement", 'Decimal'>
     readonly reference: FieldRef<"StockMovement", 'String'>
     readonly note: FieldRef<"StockMovement", 'String'>
     readonly createdById: FieldRef<"StockMovement", 'Int'>
@@ -20838,21 +22341,22 @@ export namespace Prisma {
     id: number | null
     cartId: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
   }
 
   export type CartItemSumAggregateOutputType = {
     id: number | null
     cartId: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
   }
 
   export type CartItemMinAggregateOutputType = {
     id: number | null
     cartId: number | null
     variantId: number | null
-    quantity: number | null
+    saleType: $Enums.SaleType | null
+    quantity: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -20861,7 +22365,8 @@ export namespace Prisma {
     id: number | null
     cartId: number | null
     variantId: number | null
-    quantity: number | null
+    saleType: $Enums.SaleType | null
+    quantity: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -20870,6 +22375,7 @@ export namespace Prisma {
     id: number
     cartId: number
     variantId: number
+    saleType: number
     quantity: number
     createdAt: number
     updatedAt: number
@@ -20895,6 +22401,7 @@ export namespace Prisma {
     id?: true
     cartId?: true
     variantId?: true
+    saleType?: true
     quantity?: true
     createdAt?: true
     updatedAt?: true
@@ -20904,6 +22411,7 @@ export namespace Prisma {
     id?: true
     cartId?: true
     variantId?: true
+    saleType?: true
     quantity?: true
     createdAt?: true
     updatedAt?: true
@@ -20913,6 +22421,7 @@ export namespace Prisma {
     id?: true
     cartId?: true
     variantId?: true
+    saleType?: true
     quantity?: true
     createdAt?: true
     updatedAt?: true
@@ -21009,7 +22518,8 @@ export namespace Prisma {
     id: number
     cartId: number
     variantId: number
-    quantity: number
+    saleType: $Enums.SaleType
+    quantity: Decimal
     createdAt: Date
     updatedAt: Date
     _count: CartItemCountAggregateOutputType | null
@@ -21037,6 +22547,7 @@ export namespace Prisma {
     id?: boolean
     cartId?: boolean
     variantId?: boolean
+    saleType?: boolean
     quantity?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -21050,12 +22561,13 @@ export namespace Prisma {
     id?: boolean
     cartId?: boolean
     variantId?: boolean
+    saleType?: boolean
     quantity?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CartItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "cartId" | "variantId" | "quantity" | "createdAt" | "updatedAt", ExtArgs["result"]["cartItem"]>
+  export type CartItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "cartId" | "variantId" | "saleType" | "quantity" | "createdAt" | "updatedAt", ExtArgs["result"]["cartItem"]>
   export type CartItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cart?: boolean | CartDefaultArgs<ExtArgs>
     variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
@@ -21071,7 +22583,8 @@ export namespace Prisma {
       id: number
       cartId: number
       variantId: number
-      quantity: number
+      saleType: $Enums.SaleType
+      quantity: Prisma.Decimal
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["cartItem"]>
@@ -21448,7 +22961,8 @@ export namespace Prisma {
     readonly id: FieldRef<"CartItem", 'Int'>
     readonly cartId: FieldRef<"CartItem", 'Int'>
     readonly variantId: FieldRef<"CartItem", 'Int'>
-    readonly quantity: FieldRef<"CartItem", 'Int'>
+    readonly saleType: FieldRef<"CartItem", 'SaleType'>
+    readonly quantity: FieldRef<"CartItem", 'Decimal'>
     readonly createdAt: FieldRef<"CartItem", 'DateTime'>
     readonly updatedAt: FieldRef<"CartItem", 'DateTime'>
   }
@@ -22801,7 +24315,7 @@ export namespace Prisma {
   export type DeliveryZoneAvgAggregateOutputType = {
     id: number | null
     baseFee: Decimal | null
-    feePerBox: Decimal | null
+    feePerSqm: Decimal | null
     freeOverAmount: Decimal | null
     estimatedDays: number | null
   }
@@ -22809,7 +24323,7 @@ export namespace Prisma {
   export type DeliveryZoneSumAggregateOutputType = {
     id: number | null
     baseFee: Decimal | null
-    feePerBox: Decimal | null
+    feePerSqm: Decimal | null
     freeOverAmount: Decimal | null
     estimatedDays: number | null
   }
@@ -22819,7 +24333,7 @@ export namespace Prisma {
     name: string | null
     districts: string | null
     baseFee: Decimal | null
-    feePerBox: Decimal | null
+    feePerSqm: Decimal | null
     freeOverAmount: Decimal | null
     estimatedDays: number | null
     active: boolean | null
@@ -22830,7 +24344,7 @@ export namespace Prisma {
     name: string | null
     districts: string | null
     baseFee: Decimal | null
-    feePerBox: Decimal | null
+    feePerSqm: Decimal | null
     freeOverAmount: Decimal | null
     estimatedDays: number | null
     active: boolean | null
@@ -22841,7 +24355,7 @@ export namespace Prisma {
     name: number
     districts: number
     baseFee: number
-    feePerBox: number
+    feePerSqm: number
     freeOverAmount: number
     estimatedDays: number
     active: number
@@ -22852,7 +24366,7 @@ export namespace Prisma {
   export type DeliveryZoneAvgAggregateInputType = {
     id?: true
     baseFee?: true
-    feePerBox?: true
+    feePerSqm?: true
     freeOverAmount?: true
     estimatedDays?: true
   }
@@ -22860,7 +24374,7 @@ export namespace Prisma {
   export type DeliveryZoneSumAggregateInputType = {
     id?: true
     baseFee?: true
-    feePerBox?: true
+    feePerSqm?: true
     freeOverAmount?: true
     estimatedDays?: true
   }
@@ -22870,7 +24384,7 @@ export namespace Prisma {
     name?: true
     districts?: true
     baseFee?: true
-    feePerBox?: true
+    feePerSqm?: true
     freeOverAmount?: true
     estimatedDays?: true
     active?: true
@@ -22881,7 +24395,7 @@ export namespace Prisma {
     name?: true
     districts?: true
     baseFee?: true
-    feePerBox?: true
+    feePerSqm?: true
     freeOverAmount?: true
     estimatedDays?: true
     active?: true
@@ -22892,7 +24406,7 @@ export namespace Prisma {
     name?: true
     districts?: true
     baseFee?: true
-    feePerBox?: true
+    feePerSqm?: true
     freeOverAmount?: true
     estimatedDays?: true
     active?: true
@@ -22990,7 +24504,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal
-    feePerBox: Decimal
+    feePerSqm: Decimal
     freeOverAmount: Decimal | null
     estimatedDays: number
     active: boolean
@@ -23020,7 +24534,7 @@ export namespace Prisma {
     name?: boolean
     districts?: boolean
     baseFee?: boolean
-    feePerBox?: boolean
+    feePerSqm?: boolean
     freeOverAmount?: boolean
     estimatedDays?: boolean
     active?: boolean
@@ -23035,13 +24549,13 @@ export namespace Prisma {
     name?: boolean
     districts?: boolean
     baseFee?: boolean
-    feePerBox?: boolean
+    feePerSqm?: boolean
     freeOverAmount?: boolean
     estimatedDays?: boolean
     active?: boolean
   }
 
-  export type DeliveryZoneOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "districts" | "baseFee" | "feePerBox" | "freeOverAmount" | "estimatedDays" | "active", ExtArgs["result"]["deliveryZone"]>
+  export type DeliveryZoneOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "districts" | "baseFee" | "feePerSqm" | "freeOverAmount" | "estimatedDays" | "active", ExtArgs["result"]["deliveryZone"]>
   export type DeliveryZoneInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     orders?: boolean | DeliveryZone$ordersArgs<ExtArgs>
     _count?: boolean | DeliveryZoneCountOutputTypeDefaultArgs<ExtArgs>
@@ -23057,7 +24571,7 @@ export namespace Prisma {
       name: string
       districts: string
       baseFee: Prisma.Decimal
-      feePerBox: Prisma.Decimal
+      feePerSqm: Prisma.Decimal
       freeOverAmount: Prisma.Decimal | null
       estimatedDays: number
       active: boolean
@@ -23435,7 +24949,7 @@ export namespace Prisma {
     readonly name: FieldRef<"DeliveryZone", 'String'>
     readonly districts: FieldRef<"DeliveryZone", 'String'>
     readonly baseFee: FieldRef<"DeliveryZone", 'Decimal'>
-    readonly feePerBox: FieldRef<"DeliveryZone", 'Decimal'>
+    readonly feePerSqm: FieldRef<"DeliveryZone", 'Decimal'>
     readonly freeOverAmount: FieldRef<"DeliveryZone", 'Decimal'>
     readonly estimatedDays: FieldRef<"DeliveryZone", 'Int'>
     readonly active: FieldRef<"DeliveryZone", 'Boolean'>
@@ -24999,6 +26513,7 @@ export namespace Prisma {
     deliveryZoneId: number | null
     shipFullName: string | null
     shipPhone: string | null
+    shipProvince: string | null
     shipDistrict: string | null
     shipSector: string | null
     shipStreet: string | null
@@ -25032,6 +26547,7 @@ export namespace Prisma {
     deliveryZoneId: number | null
     shipFullName: string | null
     shipPhone: string | null
+    shipProvince: string | null
     shipDistrict: string | null
     shipSector: string | null
     shipStreet: string | null
@@ -25065,6 +26581,7 @@ export namespace Prisma {
     deliveryZoneId: number
     shipFullName: number
     shipPhone: number
+    shipProvince: number
     shipDistrict: number
     shipSector: number
     shipStreet: number
@@ -25124,6 +26641,7 @@ export namespace Prisma {
     deliveryZoneId?: true
     shipFullName?: true
     shipPhone?: true
+    shipProvince?: true
     shipDistrict?: true
     shipSector?: true
     shipStreet?: true
@@ -25157,6 +26675,7 @@ export namespace Prisma {
     deliveryZoneId?: true
     shipFullName?: true
     shipPhone?: true
+    shipProvince?: true
     shipDistrict?: true
     shipSector?: true
     shipStreet?: true
@@ -25190,6 +26709,7 @@ export namespace Prisma {
     deliveryZoneId?: true
     shipFullName?: true
     shipPhone?: true
+    shipProvince?: true
     shipDistrict?: true
     shipSector?: true
     shipStreet?: true
@@ -25309,7 +26829,8 @@ export namespace Prisma {
     couponId: number | null
     deliveryZoneId: number | null
     shipFullName: string | null
-    shipPhone: string | null
+    shipPhone: string
+    shipProvince: string | null
     shipDistrict: string | null
     shipSector: string | null
     shipStreet: string | null
@@ -25362,6 +26883,7 @@ export namespace Prisma {
     deliveryZoneId?: boolean
     shipFullName?: boolean
     shipPhone?: boolean
+    shipProvince?: boolean
     shipDistrict?: boolean
     shipSector?: boolean
     shipStreet?: boolean
@@ -25380,6 +26902,7 @@ export namespace Prisma {
     items?: boolean | Order$itemsArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     history?: boolean | Order$historyArgs<ExtArgs>
+    invoices?: boolean | Order$invoicesArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -25404,6 +26927,7 @@ export namespace Prisma {
     deliveryZoneId?: boolean
     shipFullName?: boolean
     shipPhone?: boolean
+    shipProvince?: boolean
     shipDistrict?: boolean
     shipSector?: boolean
     shipStreet?: boolean
@@ -25418,7 +26942,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "userId" | "guestEmail" | "guestPhone" | "status" | "paymentStatus" | "fulfillment" | "subtotal" | "discountTotal" | "shippingFee" | "taxTotal" | "grandTotal" | "currency" | "couponId" | "deliveryZoneId" | "shipFullName" | "shipPhone" | "shipDistrict" | "shipSector" | "shipStreet" | "shipNotes" | "customerNote" | "internalNote" | "placedAt" | "paidAt" | "shippedAt" | "deliveredAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "userId" | "guestEmail" | "guestPhone" | "status" | "paymentStatus" | "fulfillment" | "subtotal" | "discountTotal" | "shippingFee" | "taxTotal" | "grandTotal" | "currency" | "couponId" | "deliveryZoneId" | "shipFullName" | "shipPhone" | "shipProvince" | "shipDistrict" | "shipSector" | "shipStreet" | "shipNotes" | "customerNote" | "internalNote" | "placedAt" | "paidAt" | "shippedAt" | "deliveredAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Order$userArgs<ExtArgs>
     coupon?: boolean | Order$couponArgs<ExtArgs>
@@ -25426,6 +26950,7 @@ export namespace Prisma {
     items?: boolean | Order$itemsArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     history?: boolean | Order$historyArgs<ExtArgs>
+    invoices?: boolean | Order$invoicesArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -25438,6 +26963,7 @@ export namespace Prisma {
       items: Prisma.$OrderItemPayload<ExtArgs>[]
       payments: Prisma.$PaymentPayload<ExtArgs>[]
       history: Prisma.$OrderStatusHistoryPayload<ExtArgs>[]
+      invoices: Prisma.$InvoicePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -25457,7 +26983,8 @@ export namespace Prisma {
       couponId: number | null
       deliveryZoneId: number | null
       shipFullName: string | null
-      shipPhone: string | null
+      shipPhone: string
+      shipProvince: string | null
       shipDistrict: string | null
       shipSector: string | null
       shipStreet: string | null
@@ -25816,6 +27343,7 @@ export namespace Prisma {
     items<T extends Order$itemsArgs<ExtArgs> = {}>(args?: Subset<T, Order$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments<T extends Order$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Order$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     history<T extends Order$historyArgs<ExtArgs> = {}>(args?: Subset<T, Order$historyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    invoices<T extends Order$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, Order$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -25863,6 +27391,7 @@ export namespace Prisma {
     readonly deliveryZoneId: FieldRef<"Order", 'Int'>
     readonly shipFullName: FieldRef<"Order", 'String'>
     readonly shipPhone: FieldRef<"Order", 'String'>
+    readonly shipProvince: FieldRef<"Order", 'String'>
     readonly shipDistrict: FieldRef<"Order", 'String'>
     readonly shipSector: FieldRef<"Order", 'String'>
     readonly shipStreet: FieldRef<"Order", 'String'>
@@ -26352,6 +27881,30 @@ export namespace Prisma {
   }
 
   /**
+   * Order.invoices
+   */
+  export type Order$invoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    where?: InvoiceWhereInput
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    cursor?: InvoiceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
    * Order without action
    */
   export type OrderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -26386,7 +27939,8 @@ export namespace Prisma {
     id: number | null
     orderId: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
+    containers: number | null
     sqmPerBox: Decimal | null
     unitPrice: Decimal | null
     lineTotal: Decimal | null
@@ -26396,7 +27950,8 @@ export namespace Prisma {
     id: number | null
     orderId: number | null
     variantId: number | null
-    quantity: number | null
+    quantity: Decimal | null
+    containers: number | null
     sqmPerBox: Decimal | null
     unitPrice: Decimal | null
     lineTotal: Decimal | null
@@ -26412,7 +27967,9 @@ export namespace Prisma {
     finish: string | null
     shadeCode: string | null
     image: string | null
-    quantity: number | null
+    saleType: $Enums.SaleType | null
+    quantity: Decimal | null
+    containers: number | null
     sqmPerBox: Decimal | null
     unitPrice: Decimal | null
     lineTotal: Decimal | null
@@ -26428,7 +27985,9 @@ export namespace Prisma {
     finish: string | null
     shadeCode: string | null
     image: string | null
-    quantity: number | null
+    saleType: $Enums.SaleType | null
+    quantity: Decimal | null
+    containers: number | null
     sqmPerBox: Decimal | null
     unitPrice: Decimal | null
     lineTotal: Decimal | null
@@ -26444,7 +28003,9 @@ export namespace Prisma {
     finish: number
     shadeCode: number
     image: number
+    saleType: number
     quantity: number
+    containers: number
     sqmPerBox: number
     unitPrice: number
     lineTotal: number
@@ -26457,6 +28018,7 @@ export namespace Prisma {
     orderId?: true
     variantId?: true
     quantity?: true
+    containers?: true
     sqmPerBox?: true
     unitPrice?: true
     lineTotal?: true
@@ -26467,6 +28029,7 @@ export namespace Prisma {
     orderId?: true
     variantId?: true
     quantity?: true
+    containers?: true
     sqmPerBox?: true
     unitPrice?: true
     lineTotal?: true
@@ -26482,7 +28045,9 @@ export namespace Prisma {
     finish?: true
     shadeCode?: true
     image?: true
+    saleType?: true
     quantity?: true
+    containers?: true
     sqmPerBox?: true
     unitPrice?: true
     lineTotal?: true
@@ -26498,7 +28063,9 @@ export namespace Prisma {
     finish?: true
     shadeCode?: true
     image?: true
+    saleType?: true
     quantity?: true
+    containers?: true
     sqmPerBox?: true
     unitPrice?: true
     lineTotal?: true
@@ -26514,7 +28081,9 @@ export namespace Prisma {
     finish?: true
     shadeCode?: true
     image?: true
+    saleType?: true
     quantity?: true
+    containers?: true
     sqmPerBox?: true
     unitPrice?: true
     lineTotal?: true
@@ -26617,8 +28186,10 @@ export namespace Prisma {
     finish: string | null
     shadeCode: string | null
     image: string | null
-    quantity: number
-    sqmPerBox: Decimal
+    saleType: $Enums.SaleType
+    quantity: Decimal
+    containers: number | null
+    sqmPerBox: Decimal | null
     unitPrice: Decimal
     lineTotal: Decimal
     _count: OrderItemCountAggregateOutputType | null
@@ -26652,7 +28223,9 @@ export namespace Prisma {
     finish?: boolean
     shadeCode?: boolean
     image?: boolean
+    saleType?: boolean
     quantity?: boolean
+    containers?: boolean
     sqmPerBox?: boolean
     unitPrice?: boolean
     lineTotal?: boolean
@@ -26672,13 +28245,15 @@ export namespace Prisma {
     finish?: boolean
     shadeCode?: boolean
     image?: boolean
+    saleType?: boolean
     quantity?: boolean
+    containers?: boolean
     sqmPerBox?: boolean
     unitPrice?: boolean
     lineTotal?: boolean
   }
 
-  export type OrderItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "variantId" | "productName" | "sku" | "size" | "finish" | "shadeCode" | "image" | "quantity" | "sqmPerBox" | "unitPrice" | "lineTotal", ExtArgs["result"]["orderItem"]>
+  export type OrderItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "variantId" | "productName" | "sku" | "size" | "finish" | "shadeCode" | "image" | "saleType" | "quantity" | "containers" | "sqmPerBox" | "unitPrice" | "lineTotal", ExtArgs["result"]["orderItem"]>
   export type OrderItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
     variant?: boolean | OrderItem$variantArgs<ExtArgs>
@@ -26700,8 +28275,10 @@ export namespace Prisma {
       finish: string | null
       shadeCode: string | null
       image: string | null
-      quantity: number
-      sqmPerBox: Prisma.Decimal
+      saleType: $Enums.SaleType
+      quantity: Prisma.Decimal
+      containers: number | null
+      sqmPerBox: Prisma.Decimal | null
       unitPrice: Prisma.Decimal
       lineTotal: Prisma.Decimal
     }, ExtArgs["result"]["orderItem"]>
@@ -27084,7 +28661,9 @@ export namespace Prisma {
     readonly finish: FieldRef<"OrderItem", 'String'>
     readonly shadeCode: FieldRef<"OrderItem", 'String'>
     readonly image: FieldRef<"OrderItem", 'String'>
-    readonly quantity: FieldRef<"OrderItem", 'Int'>
+    readonly saleType: FieldRef<"OrderItem", 'SaleType'>
+    readonly quantity: FieldRef<"OrderItem", 'Decimal'>
+    readonly containers: FieldRef<"OrderItem", 'Int'>
     readonly sqmPerBox: FieldRef<"OrderItem", 'Decimal'>
     readonly unitPrice: FieldRef<"OrderItem", 'Decimal'>
     readonly lineTotal: FieldRef<"OrderItem", 'Decimal'>
@@ -27470,6 +29049,1041 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: OrderItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Invoice
+   */
+
+  export type AggregateInvoice = {
+    _count: InvoiceCountAggregateOutputType | null
+    _avg: InvoiceAvgAggregateOutputType | null
+    _sum: InvoiceSumAggregateOutputType | null
+    _min: InvoiceMinAggregateOutputType | null
+    _max: InvoiceMaxAggregateOutputType | null
+  }
+
+  export type InvoiceAvgAggregateOutputType = {
+    id: number | null
+    orderId: number | null
+    sizeBytes: number | null
+    total: Decimal | null
+  }
+
+  export type InvoiceSumAggregateOutputType = {
+    id: number | null
+    orderId: number | null
+    sizeBytes: number | null
+    total: Decimal | null
+  }
+
+  export type InvoiceMinAggregateOutputType = {
+    id: number | null
+    orderId: number | null
+    kind: $Enums.InvoiceKind | null
+    number: string | null
+    fileKey: string | null
+    sha256: string | null
+    sizeBytes: number | null
+    total: Decimal | null
+    currency: string | null
+    issuedAt: Date | null
+  }
+
+  export type InvoiceMaxAggregateOutputType = {
+    id: number | null
+    orderId: number | null
+    kind: $Enums.InvoiceKind | null
+    number: string | null
+    fileKey: string | null
+    sha256: string | null
+    sizeBytes: number | null
+    total: Decimal | null
+    currency: string | null
+    issuedAt: Date | null
+  }
+
+  export type InvoiceCountAggregateOutputType = {
+    id: number
+    orderId: number
+    kind: number
+    number: number
+    fileKey: number
+    sha256: number
+    sizeBytes: number
+    total: number
+    currency: number
+    issuedAt: number
+    _all: number
+  }
+
+
+  export type InvoiceAvgAggregateInputType = {
+    id?: true
+    orderId?: true
+    sizeBytes?: true
+    total?: true
+  }
+
+  export type InvoiceSumAggregateInputType = {
+    id?: true
+    orderId?: true
+    sizeBytes?: true
+    total?: true
+  }
+
+  export type InvoiceMinAggregateInputType = {
+    id?: true
+    orderId?: true
+    kind?: true
+    number?: true
+    fileKey?: true
+    sha256?: true
+    sizeBytes?: true
+    total?: true
+    currency?: true
+    issuedAt?: true
+  }
+
+  export type InvoiceMaxAggregateInputType = {
+    id?: true
+    orderId?: true
+    kind?: true
+    number?: true
+    fileKey?: true
+    sha256?: true
+    sizeBytes?: true
+    total?: true
+    currency?: true
+    issuedAt?: true
+  }
+
+  export type InvoiceCountAggregateInputType = {
+    id?: true
+    orderId?: true
+    kind?: true
+    number?: true
+    fileKey?: true
+    sha256?: true
+    sizeBytes?: true
+    total?: true
+    currency?: true
+    issuedAt?: true
+    _all?: true
+  }
+
+  export type InvoiceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Invoice to aggregate.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Invoices
+    **/
+    _count?: true | InvoiceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InvoiceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InvoiceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InvoiceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InvoiceMaxAggregateInputType
+  }
+
+  export type GetInvoiceAggregateType<T extends InvoiceAggregateArgs> = {
+        [P in keyof T & keyof AggregateInvoice]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInvoice[P]>
+      : GetScalarType<T[P], AggregateInvoice[P]>
+  }
+
+
+
+
+  export type InvoiceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceWhereInput
+    orderBy?: InvoiceOrderByWithAggregationInput | InvoiceOrderByWithAggregationInput[]
+    by: InvoiceScalarFieldEnum[] | InvoiceScalarFieldEnum
+    having?: InvoiceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InvoiceCountAggregateInputType | true
+    _avg?: InvoiceAvgAggregateInputType
+    _sum?: InvoiceSumAggregateInputType
+    _min?: InvoiceMinAggregateInputType
+    _max?: InvoiceMaxAggregateInputType
+  }
+
+  export type InvoiceGroupByOutputType = {
+    id: number
+    orderId: number
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal
+    currency: string
+    issuedAt: Date
+    _count: InvoiceCountAggregateOutputType | null
+    _avg: InvoiceAvgAggregateOutputType | null
+    _sum: InvoiceSumAggregateOutputType | null
+    _min: InvoiceMinAggregateOutputType | null
+    _max: InvoiceMaxAggregateOutputType | null
+  }
+
+  type GetInvoiceGroupByPayload<T extends InvoiceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InvoiceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InvoiceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InvoiceGroupByOutputType[P]>
+            : GetScalarType<T[P], InvoiceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InvoiceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderId?: boolean
+    kind?: boolean
+    number?: boolean
+    fileKey?: boolean
+    sha256?: boolean
+    sizeBytes?: boolean
+    total?: boolean
+    currency?: boolean
+    issuedAt?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoice"]>
+
+
+
+  export type InvoiceSelectScalar = {
+    id?: boolean
+    orderId?: boolean
+    kind?: boolean
+    number?: boolean
+    fileKey?: boolean
+    sha256?: boolean
+    sizeBytes?: boolean
+    total?: boolean
+    currency?: boolean
+    issuedAt?: boolean
+  }
+
+  export type InvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "kind" | "number" | "fileKey" | "sha256" | "sizeBytes" | "total" | "currency" | "issuedAt", ExtArgs["result"]["invoice"]>
+  export type InvoiceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+  }
+
+  export type $InvoicePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Invoice"
+    objects: {
+      order: Prisma.$OrderPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      orderId: number
+      kind: $Enums.InvoiceKind
+      number: string
+      fileKey: string
+      sha256: string
+      sizeBytes: number
+      total: Prisma.Decimal
+      currency: string
+      issuedAt: Date
+    }, ExtArgs["result"]["invoice"]>
+    composites: {}
+  }
+
+  type InvoiceGetPayload<S extends boolean | null | undefined | InvoiceDefaultArgs> = $Result.GetResult<Prisma.$InvoicePayload, S>
+
+  type InvoiceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InvoiceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InvoiceCountAggregateInputType | true
+    }
+
+  export interface InvoiceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Invoice'], meta: { name: 'Invoice' } }
+    /**
+     * Find zero or one Invoice that matches the filter.
+     * @param {InvoiceFindUniqueArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InvoiceFindUniqueArgs>(args: SelectSubset<T, InvoiceFindUniqueArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Invoice that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InvoiceFindUniqueOrThrowArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InvoiceFindUniqueOrThrowArgs>(args: SelectSubset<T, InvoiceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Invoice that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindFirstArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InvoiceFindFirstArgs>(args?: SelectSubset<T, InvoiceFindFirstArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Invoice that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindFirstOrThrowArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InvoiceFindFirstOrThrowArgs>(args?: SelectSubset<T, InvoiceFindFirstOrThrowArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Invoices that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Invoices
+     * const invoices = await prisma.invoice.findMany()
+     * 
+     * // Get first 10 Invoices
+     * const invoices = await prisma.invoice.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const invoiceWithIdOnly = await prisma.invoice.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InvoiceFindManyArgs>(args?: SelectSubset<T, InvoiceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Invoice.
+     * @param {InvoiceCreateArgs} args - Arguments to create a Invoice.
+     * @example
+     * // Create one Invoice
+     * const Invoice = await prisma.invoice.create({
+     *   data: {
+     *     // ... data to create a Invoice
+     *   }
+     * })
+     * 
+     */
+    create<T extends InvoiceCreateArgs>(args: SelectSubset<T, InvoiceCreateArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Invoices.
+     * @param {InvoiceCreateManyArgs} args - Arguments to create many Invoices.
+     * @example
+     * // Create many Invoices
+     * const invoice = await prisma.invoice.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InvoiceCreateManyArgs>(args?: SelectSubset<T, InvoiceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Invoice.
+     * @param {InvoiceDeleteArgs} args - Arguments to delete one Invoice.
+     * @example
+     * // Delete one Invoice
+     * const Invoice = await prisma.invoice.delete({
+     *   where: {
+     *     // ... filter to delete one Invoice
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InvoiceDeleteArgs>(args: SelectSubset<T, InvoiceDeleteArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Invoice.
+     * @param {InvoiceUpdateArgs} args - Arguments to update one Invoice.
+     * @example
+     * // Update one Invoice
+     * const invoice = await prisma.invoice.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InvoiceUpdateArgs>(args: SelectSubset<T, InvoiceUpdateArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Invoices.
+     * @param {InvoiceDeleteManyArgs} args - Arguments to filter Invoices to delete.
+     * @example
+     * // Delete a few Invoices
+     * const { count } = await prisma.invoice.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InvoiceDeleteManyArgs>(args?: SelectSubset<T, InvoiceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Invoices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Invoices
+     * const invoice = await prisma.invoice.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InvoiceUpdateManyArgs>(args: SelectSubset<T, InvoiceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Invoice.
+     * @param {InvoiceUpsertArgs} args - Arguments to update or create a Invoice.
+     * @example
+     * // Update or create a Invoice
+     * const invoice = await prisma.invoice.upsert({
+     *   create: {
+     *     // ... data to create a Invoice
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Invoice we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InvoiceUpsertArgs>(args: SelectSubset<T, InvoiceUpsertArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Invoices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceCountArgs} args - Arguments to filter Invoices to count.
+     * @example
+     * // Count the number of Invoices
+     * const count = await prisma.invoice.count({
+     *   where: {
+     *     // ... the filter for the Invoices we want to count
+     *   }
+     * })
+    **/
+    count<T extends InvoiceCountArgs>(
+      args?: Subset<T, InvoiceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InvoiceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Invoice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InvoiceAggregateArgs>(args: Subset<T, InvoiceAggregateArgs>): Prisma.PrismaPromise<GetInvoiceAggregateType<T>>
+
+    /**
+     * Group by Invoice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InvoiceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InvoiceGroupByArgs['orderBy'] }
+        : { orderBy?: InvoiceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InvoiceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvoiceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Invoice model
+   */
+  readonly fields: InvoiceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Invoice.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InvoiceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Invoice model
+   */
+  interface InvoiceFieldRefs {
+    readonly id: FieldRef<"Invoice", 'Int'>
+    readonly orderId: FieldRef<"Invoice", 'Int'>
+    readonly kind: FieldRef<"Invoice", 'InvoiceKind'>
+    readonly number: FieldRef<"Invoice", 'String'>
+    readonly fileKey: FieldRef<"Invoice", 'String'>
+    readonly sha256: FieldRef<"Invoice", 'String'>
+    readonly sizeBytes: FieldRef<"Invoice", 'Int'>
+    readonly total: FieldRef<"Invoice", 'Decimal'>
+    readonly currency: FieldRef<"Invoice", 'String'>
+    readonly issuedAt: FieldRef<"Invoice", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Invoice findUnique
+   */
+  export type InvoiceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice findUniqueOrThrow
+   */
+  export type InvoiceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice findFirst
+   */
+  export type InvoiceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice findFirstOrThrow
+   */
+  export type InvoiceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice findMany
+   */
+  export type InvoiceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoices to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice create
+   */
+  export type InvoiceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Invoice.
+     */
+    data: XOR<InvoiceCreateInput, InvoiceUncheckedCreateInput>
+  }
+
+  /**
+   * Invoice createMany
+   */
+  export type InvoiceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Invoices.
+     */
+    data: InvoiceCreateManyInput | InvoiceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Invoice update
+   */
+  export type InvoiceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Invoice.
+     */
+    data: XOR<InvoiceUpdateInput, InvoiceUncheckedUpdateInput>
+    /**
+     * Choose, which Invoice to update.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice updateMany
+   */
+  export type InvoiceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Invoices.
+     */
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyInput>
+    /**
+     * Filter which Invoices to update
+     */
+    where?: InvoiceWhereInput
+    /**
+     * Limit how many Invoices to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Invoice upsert
+   */
+  export type InvoiceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Invoice to update in case it exists.
+     */
+    where: InvoiceWhereUniqueInput
+    /**
+     * In case the Invoice found by the `where` argument doesn't exist, create a new Invoice with this data.
+     */
+    create: XOR<InvoiceCreateInput, InvoiceUncheckedCreateInput>
+    /**
+     * In case the Invoice was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InvoiceUpdateInput, InvoiceUncheckedUpdateInput>
+  }
+
+  /**
+   * Invoice delete
+   */
+  export type InvoiceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter which Invoice to delete.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice deleteMany
+   */
+  export type InvoiceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Invoices to delete
+     */
+    where?: InvoiceWhereInput
+    /**
+     * Limit how many Invoices to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Invoice without action
+   */
+  export type InvoiceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
   }
 
 
@@ -28499,12 +31113,16 @@ export namespace Prisma {
     id: number | null
     orderId: number | null
     amount: Decimal | null
+    recordedById: number | null
+    refundedAmount: Decimal | null
   }
 
   export type PaymentSumAggregateOutputType = {
     id: number | null
     orderId: number | null
     amount: Decimal | null
+    recordedById: number | null
+    refundedAmount: Decimal | null
   }
 
   export type PaymentMinAggregateOutputType = {
@@ -28518,9 +31136,15 @@ export namespace Prisma {
     providerRef: string | null
     payerPhone: string | null
     failureReason: string | null
+    recordedById: number | null
     paidAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    refundedAmount: Decimal | null
+    refundedAt: Date | null
+    refundReason: string | null
+    note: string | null
+    proofUrl: string | null
   }
 
   export type PaymentMaxAggregateOutputType = {
@@ -28534,9 +31158,15 @@ export namespace Prisma {
     providerRef: string | null
     payerPhone: string | null
     failureReason: string | null
+    recordedById: number | null
     paidAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    refundedAmount: Decimal | null
+    refundedAt: Date | null
+    refundReason: string | null
+    note: string | null
+    proofUrl: string | null
   }
 
   export type PaymentCountAggregateOutputType = {
@@ -28550,10 +31180,16 @@ export namespace Prisma {
     providerRef: number
     payerPhone: number
     failureReason: number
+    recordedById: number
     rawResponse: number
     paidAt: number
     createdAt: number
     updatedAt: number
+    refundedAmount: number
+    refundedAt: number
+    refundReason: number
+    note: number
+    proofUrl: number
     _all: number
   }
 
@@ -28562,12 +31198,16 @@ export namespace Prisma {
     id?: true
     orderId?: true
     amount?: true
+    recordedById?: true
+    refundedAmount?: true
   }
 
   export type PaymentSumAggregateInputType = {
     id?: true
     orderId?: true
     amount?: true
+    recordedById?: true
+    refundedAmount?: true
   }
 
   export type PaymentMinAggregateInputType = {
@@ -28581,9 +31221,15 @@ export namespace Prisma {
     providerRef?: true
     payerPhone?: true
     failureReason?: true
+    recordedById?: true
     paidAt?: true
     createdAt?: true
     updatedAt?: true
+    refundedAmount?: true
+    refundedAt?: true
+    refundReason?: true
+    note?: true
+    proofUrl?: true
   }
 
   export type PaymentMaxAggregateInputType = {
@@ -28597,9 +31243,15 @@ export namespace Prisma {
     providerRef?: true
     payerPhone?: true
     failureReason?: true
+    recordedById?: true
     paidAt?: true
     createdAt?: true
     updatedAt?: true
+    refundedAmount?: true
+    refundedAt?: true
+    refundReason?: true
+    note?: true
+    proofUrl?: true
   }
 
   export type PaymentCountAggregateInputType = {
@@ -28613,10 +31265,16 @@ export namespace Prisma {
     providerRef?: true
     payerPhone?: true
     failureReason?: true
+    recordedById?: true
     rawResponse?: true
     paidAt?: true
     createdAt?: true
     updatedAt?: true
+    refundedAmount?: true
+    refundedAt?: true
+    refundReason?: true
+    note?: true
+    proofUrl?: true
     _all?: true
   }
 
@@ -28717,10 +31375,16 @@ export namespace Prisma {
     providerRef: string | null
     payerPhone: string | null
     failureReason: string | null
+    recordedById: number | null
     rawResponse: JsonValue | null
     paidAt: Date | null
     createdAt: Date
     updatedAt: Date
+    refundedAmount: Decimal
+    refundedAt: Date | null
+    refundReason: string | null
+    note: string | null
+    proofUrl: string | null
     _count: PaymentCountAggregateOutputType | null
     _avg: PaymentAvgAggregateOutputType | null
     _sum: PaymentSumAggregateOutputType | null
@@ -28753,10 +31417,17 @@ export namespace Prisma {
     providerRef?: boolean
     payerPhone?: boolean
     failureReason?: boolean
+    recordedById?: boolean
     rawResponse?: boolean
     paidAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    refundedAmount?: boolean
+    refundedAt?: boolean
+    refundReason?: boolean
+    note?: boolean
+    proofUrl?: boolean
+    user?: boolean | Payment$userArgs<ExtArgs>
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
@@ -28773,20 +31444,28 @@ export namespace Prisma {
     providerRef?: boolean
     payerPhone?: boolean
     failureReason?: boolean
+    recordedById?: boolean
     rawResponse?: boolean
     paidAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    refundedAmount?: boolean
+    refundedAt?: boolean
+    refundReason?: boolean
+    note?: boolean
+    proofUrl?: boolean
   }
 
-  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "method" | "status" | "amount" | "currency" | "provider" | "providerRef" | "payerPhone" | "failureReason" | "rawResponse" | "paidAt" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
+  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "method" | "status" | "amount" | "currency" | "provider" | "providerRef" | "payerPhone" | "failureReason" | "recordedById" | "rawResponse" | "paidAt" | "createdAt" | "updatedAt" | "refundedAmount" | "refundedAt" | "refundReason" | "note" | "proofUrl", ExtArgs["result"]["payment"]>
   export type PaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | Payment$userArgs<ExtArgs>
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }
 
   export type $PaymentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Payment"
     objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
       order: Prisma.$OrderPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -28800,10 +31479,16 @@ export namespace Prisma {
       providerRef: string | null
       payerPhone: string | null
       failureReason: string | null
+      recordedById: number | null
       rawResponse: Prisma.JsonValue | null
       paidAt: Date | null
       createdAt: Date
       updatedAt: Date
+      refundedAmount: Prisma.Decimal
+      refundedAt: Date | null
+      refundReason: string | null
+      note: string | null
+      proofUrl: string | null
     }, ExtArgs["result"]["payment"]>
     composites: {}
   }
@@ -29144,6 +31829,7 @@ export namespace Prisma {
    */
   export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends Payment$userArgs<ExtArgs> = {}>(args?: Subset<T, Payment$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -29184,10 +31870,16 @@ export namespace Prisma {
     readonly providerRef: FieldRef<"Payment", 'String'>
     readonly payerPhone: FieldRef<"Payment", 'String'>
     readonly failureReason: FieldRef<"Payment", 'String'>
+    readonly recordedById: FieldRef<"Payment", 'Int'>
     readonly rawResponse: FieldRef<"Payment", 'Json'>
     readonly paidAt: FieldRef<"Payment", 'DateTime'>
     readonly createdAt: FieldRef<"Payment", 'DateTime'>
     readonly updatedAt: FieldRef<"Payment", 'DateTime'>
+    readonly refundedAmount: FieldRef<"Payment", 'Decimal'>
+    readonly refundedAt: FieldRef<"Payment", 'DateTime'>
+    readonly refundReason: FieldRef<"Payment", 'String'>
+    readonly note: FieldRef<"Payment", 'String'>
+    readonly proofUrl: FieldRef<"Payment", 'String'>
   }
     
 
@@ -29533,6 +32225,25 @@ export namespace Prisma {
      * Limit how many Payments to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Payment.user
+   */
+  export type Payment$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -41670,10 +44381,38 @@ export namespace Prisma {
     emailVerifiedAt: 'emailVerifiedAt',
     lastLogin: 'lastLogin',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    jobTitle: 'jobTitle',
+    bio: 'bio',
+    showOnHomepage: 'showOnHomepage',
+    displayOrder: 'displayOrder'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const BlogPostScalarFieldEnum: {
+    id: 'id',
+    slug: 'slug',
+    locale: 'locale',
+    title: 'title',
+    excerpt: 'excerpt',
+    content: 'content',
+    coverImage: 'coverImage',
+    coverAlt: 'coverAlt',
+    tags: 'tags',
+    readingMinutes: 'readingMinutes',
+    status: 'status',
+    featured: 'featured',
+    seoTitle: 'seoTitle',
+    seoDescription: 'seoDescription',
+    authorId: 'authorId',
+    publishedAt: 'publishedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BlogPostScalarFieldEnum = (typeof BlogPostScalarFieldEnum)[keyof typeof BlogPostScalarFieldEnum]
 
 
   export const RefreshTokenScalarFieldEnum: {
@@ -41812,13 +44551,15 @@ export namespace Prisma {
     color: 'color',
     thicknessMm: 'thicknessMm',
     shadeCode: 'shadeCode',
-    piecesPerBox: 'piecesPerBox',
-    sqmPerBox: 'sqmPerBox',
-    weightKgPerBox: 'weightKgPerBox',
     pricePerSqm: 'pricePerSqm',
-    pricePerBox: 'pricePerBox',
+    containerPricePerSqm: 'containerPricePerSqm',
+    sqmPerContainer: 'sqmPerContainer',
     compareAtPrice: 'compareAtPrice',
     currency: 'currency',
+    piecesPerBox: 'piecesPerBox',
+    sqmPerBox: 'sqmPerBox',
+    pricePerBox: 'pricePerBox',
+    weightKgPerBox: 'weightKgPerBox',
     image: 'image',
     textureUrl: 'textureUrl',
     active: 'active',
@@ -41855,8 +44596,8 @@ export namespace Prisma {
   export const InventoryScalarFieldEnum: {
     id: 'id',
     variantId: 'variantId',
-    onHandBoxes: 'onHandBoxes',
-    reservedBoxes: 'reservedBoxes',
+    onHandSqm: 'onHandSqm',
+    reservedSqm: 'reservedSqm',
     reorderLevel: 'reorderLevel',
     allowBackorder: 'allowBackorder',
     updatedAt: 'updatedAt'
@@ -41895,6 +44636,7 @@ export namespace Prisma {
     id: 'id',
     cartId: 'cartId',
     variantId: 'variantId',
+    saleType: 'saleType',
     quantity: 'quantity',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -41918,7 +44660,7 @@ export namespace Prisma {
     name: 'name',
     districts: 'districts',
     baseFee: 'baseFee',
-    feePerBox: 'feePerBox',
+    feePerSqm: 'feePerSqm',
     freeOverAmount: 'freeOverAmount',
     estimatedDays: 'estimatedDays',
     active: 'active'
@@ -41964,6 +44706,7 @@ export namespace Prisma {
     deliveryZoneId: 'deliveryZoneId',
     shipFullName: 'shipFullName',
     shipPhone: 'shipPhone',
+    shipProvince: 'shipProvince',
     shipDistrict: 'shipDistrict',
     shipSector: 'shipSector',
     shipStreet: 'shipStreet',
@@ -41991,13 +44734,31 @@ export namespace Prisma {
     finish: 'finish',
     shadeCode: 'shadeCode',
     image: 'image',
+    saleType: 'saleType',
     quantity: 'quantity',
+    containers: 'containers',
     sqmPerBox: 'sqmPerBox',
     unitPrice: 'unitPrice',
     lineTotal: 'lineTotal'
   };
 
   export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+  export const InvoiceScalarFieldEnum: {
+    id: 'id',
+    orderId: 'orderId',
+    kind: 'kind',
+    number: 'number',
+    fileKey: 'fileKey',
+    sha256: 'sha256',
+    sizeBytes: 'sizeBytes',
+    total: 'total',
+    currency: 'currency',
+    issuedAt: 'issuedAt'
+  };
+
+  export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
 
 
   export const OrderStatusHistoryScalarFieldEnum: {
@@ -42023,10 +44784,16 @@ export namespace Prisma {
     providerRef: 'providerRef',
     payerPhone: 'payerPhone',
     failureReason: 'failureReason',
+    recordedById: 'recordedById',
     rawResponse: 'rawResponse',
     paidAt: 'paidAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    refundedAmount: 'refundedAmount',
+    refundedAt: 'refundedAt',
+    refundReason: 'refundReason',
+    note: 'note',
+    proofUrl: 'proofUrl'
   };
 
   export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -42241,10 +45008,28 @@ export namespace Prisma {
     firstName: 'firstName',
     lastName: 'lastName',
     password: 'password',
-    profilePicture: 'profilePicture'
+    profilePicture: 'profilePicture',
+    jobTitle: 'jobTitle',
+    bio: 'bio'
   };
 
   export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+  export const BlogPostOrderByRelevanceFieldEnum: {
+    slug: 'slug',
+    locale: 'locale',
+    title: 'title',
+    excerpt: 'excerpt',
+    content: 'content',
+    coverImage: 'coverImage',
+    coverAlt: 'coverAlt',
+    tags: 'tags',
+    seoTitle: 'seoTitle',
+    seoDescription: 'seoDescription'
+  };
+
+  export type BlogPostOrderByRelevanceFieldEnum = (typeof BlogPostOrderByRelevanceFieldEnum)[keyof typeof BlogPostOrderByRelevanceFieldEnum]
 
 
   export const RefreshTokenOrderByRelevanceFieldEnum: {
@@ -42393,6 +45178,7 @@ export namespace Prisma {
     currency: 'currency',
     shipFullName: 'shipFullName',
     shipPhone: 'shipPhone',
+    shipProvince: 'shipProvince',
     shipDistrict: 'shipDistrict',
     shipSector: 'shipSector',
     shipStreet: 'shipStreet',
@@ -42414,6 +45200,16 @@ export namespace Prisma {
   };
 
   export type OrderItemOrderByRelevanceFieldEnum = (typeof OrderItemOrderByRelevanceFieldEnum)[keyof typeof OrderItemOrderByRelevanceFieldEnum]
+
+
+  export const InvoiceOrderByRelevanceFieldEnum: {
+    number: 'number',
+    fileKey: 'fileKey',
+    sha256: 'sha256',
+    currency: 'currency'
+  };
+
+  export type InvoiceOrderByRelevanceFieldEnum = (typeof InvoiceOrderByRelevanceFieldEnum)[keyof typeof InvoiceOrderByRelevanceFieldEnum]
 
 
   export const OrderStatusHistoryOrderByRelevanceFieldEnum: {
@@ -42445,7 +45241,10 @@ export namespace Prisma {
     provider: 'provider',
     providerRef: 'providerRef',
     payerPhone: 'payerPhone',
-    failureReason: 'failureReason'
+    failureReason: 'failureReason',
+    refundReason: 'refundReason',
+    note: 'note',
+    proofUrl: 'proofUrl'
   };
 
   export type PaymentOrderByRelevanceFieldEnum = (typeof PaymentOrderByRelevanceFieldEnum)[keyof typeof PaymentOrderByRelevanceFieldEnum]
@@ -42598,6 +45397,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BlogStatus'
+   */
+  export type EnumBlogStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BlogStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -42608,6 +45414,13 @@ export namespace Prisma {
    * Reference to a field of type 'StockMovementType'
    */
   export type EnumStockMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockMovementType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SaleType'
+   */
+  export type EnumSaleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SaleType'>
     
 
 
@@ -42636,6 +45449,13 @@ export namespace Prisma {
    * Reference to a field of type 'FulfillmentMethod'
    */
   export type EnumFulfillmentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FulfillmentMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'InvoiceKind'
+   */
+  export type EnumInvoiceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceKind'>
     
 
 
@@ -42693,6 +45513,10 @@ export namespace Prisma {
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    jobTitle?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    showOnHomepage?: BoolFilter<"User"> | boolean
+    displayOrder?: IntFilter<"User"> | number
     permissions?: UserPermissionListRelationFilter
     grantedPerms?: UserPermissionListRelationFilter
     permissionLogs?: PermissionLogListRelationFilter
@@ -42707,6 +45531,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryListRelationFilter
     forgetPasswordRequests?: ForgetPasswordRequestListRelationFilter
     role?: RoleListRelationFilter
+    payments?: PaymentListRelationFilter
+    blogPosts?: BlogPostListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -42722,6 +45548,10 @@ export namespace Prisma {
     lastLogin?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    jobTitle?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    showOnHomepage?: SortOrder
+    displayOrder?: SortOrder
     permissions?: UserPermissionOrderByRelationAggregateInput
     grantedPerms?: UserPermissionOrderByRelationAggregateInput
     permissionLogs?: PermissionLogOrderByRelationAggregateInput
@@ -42736,6 +45566,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryOrderByRelationAggregateInput
     forgetPasswordRequests?: ForgetPasswordRequestOrderByRelationAggregateInput
     role?: RoleOrderByRelationAggregateInput
+    payments?: PaymentOrderByRelationAggregateInput
+    blogPosts?: BlogPostOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -42755,6 +45587,10 @@ export namespace Prisma {
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    jobTitle?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    showOnHomepage?: BoolFilter<"User"> | boolean
+    displayOrder?: IntFilter<"User"> | number
     permissions?: UserPermissionListRelationFilter
     grantedPerms?: UserPermissionListRelationFilter
     permissionLogs?: PermissionLogListRelationFilter
@@ -42769,6 +45605,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryListRelationFilter
     forgetPasswordRequests?: ForgetPasswordRequestListRelationFilter
     role?: RoleListRelationFilter
+    payments?: PaymentListRelationFilter
+    blogPosts?: BlogPostListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -42784,6 +45622,10 @@ export namespace Prisma {
     lastLogin?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    jobTitle?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    showOnHomepage?: SortOrder
+    displayOrder?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -42807,6 +45649,133 @@ export namespace Prisma {
     lastLogin?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    jobTitle?: StringNullableWithAggregatesFilter<"User"> | string | null
+    bio?: StringNullableWithAggregatesFilter<"User"> | string | null
+    showOnHomepage?: BoolWithAggregatesFilter<"User"> | boolean
+    displayOrder?: IntWithAggregatesFilter<"User"> | number
+  }
+
+  export type BlogPostWhereInput = {
+    AND?: BlogPostWhereInput | BlogPostWhereInput[]
+    OR?: BlogPostWhereInput[]
+    NOT?: BlogPostWhereInput | BlogPostWhereInput[]
+    id?: IntFilter<"BlogPost"> | number
+    slug?: StringFilter<"BlogPost"> | string
+    locale?: StringFilter<"BlogPost"> | string
+    title?: StringFilter<"BlogPost"> | string
+    excerpt?: StringNullableFilter<"BlogPost"> | string | null
+    content?: StringFilter<"BlogPost"> | string
+    coverImage?: StringNullableFilter<"BlogPost"> | string | null
+    coverAlt?: StringNullableFilter<"BlogPost"> | string | null
+    tags?: StringNullableFilter<"BlogPost"> | string | null
+    readingMinutes?: IntFilter<"BlogPost"> | number
+    status?: EnumBlogStatusFilter<"BlogPost"> | $Enums.BlogStatus
+    featured?: BoolFilter<"BlogPost"> | boolean
+    seoTitle?: StringNullableFilter<"BlogPost"> | string | null
+    seoDescription?: StringNullableFilter<"BlogPost"> | string | null
+    authorId?: IntNullableFilter<"BlogPost"> | number | null
+    publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
+    createdAt?: DateTimeFilter<"BlogPost"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPost"> | Date | string
+    author?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type BlogPostOrderByWithRelationInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    locale?: SortOrder
+    title?: SortOrder
+    excerpt?: SortOrderInput | SortOrder
+    content?: SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    coverAlt?: SortOrderInput | SortOrder
+    tags?: SortOrderInput | SortOrder
+    readingMinutes?: SortOrder
+    status?: SortOrder
+    featured?: SortOrder
+    seoTitle?: SortOrderInput | SortOrder
+    seoDescription?: SortOrderInput | SortOrder
+    authorId?: SortOrderInput | SortOrder
+    publishedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    author?: UserOrderByWithRelationInput
+    _relevance?: BlogPostOrderByRelevanceInput
+  }
+
+  export type BlogPostWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    slug?: string
+    AND?: BlogPostWhereInput | BlogPostWhereInput[]
+    OR?: BlogPostWhereInput[]
+    NOT?: BlogPostWhereInput | BlogPostWhereInput[]
+    locale?: StringFilter<"BlogPost"> | string
+    title?: StringFilter<"BlogPost"> | string
+    excerpt?: StringNullableFilter<"BlogPost"> | string | null
+    content?: StringFilter<"BlogPost"> | string
+    coverImage?: StringNullableFilter<"BlogPost"> | string | null
+    coverAlt?: StringNullableFilter<"BlogPost"> | string | null
+    tags?: StringNullableFilter<"BlogPost"> | string | null
+    readingMinutes?: IntFilter<"BlogPost"> | number
+    status?: EnumBlogStatusFilter<"BlogPost"> | $Enums.BlogStatus
+    featured?: BoolFilter<"BlogPost"> | boolean
+    seoTitle?: StringNullableFilter<"BlogPost"> | string | null
+    seoDescription?: StringNullableFilter<"BlogPost"> | string | null
+    authorId?: IntNullableFilter<"BlogPost"> | number | null
+    publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
+    createdAt?: DateTimeFilter<"BlogPost"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPost"> | Date | string
+    author?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "slug">
+
+  export type BlogPostOrderByWithAggregationInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    locale?: SortOrder
+    title?: SortOrder
+    excerpt?: SortOrderInput | SortOrder
+    content?: SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    coverAlt?: SortOrderInput | SortOrder
+    tags?: SortOrderInput | SortOrder
+    readingMinutes?: SortOrder
+    status?: SortOrder
+    featured?: SortOrder
+    seoTitle?: SortOrderInput | SortOrder
+    seoDescription?: SortOrderInput | SortOrder
+    authorId?: SortOrderInput | SortOrder
+    publishedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BlogPostCountOrderByAggregateInput
+    _avg?: BlogPostAvgOrderByAggregateInput
+    _max?: BlogPostMaxOrderByAggregateInput
+    _min?: BlogPostMinOrderByAggregateInput
+    _sum?: BlogPostSumOrderByAggregateInput
+  }
+
+  export type BlogPostScalarWhereWithAggregatesInput = {
+    AND?: BlogPostScalarWhereWithAggregatesInput | BlogPostScalarWhereWithAggregatesInput[]
+    OR?: BlogPostScalarWhereWithAggregatesInput[]
+    NOT?: BlogPostScalarWhereWithAggregatesInput | BlogPostScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"BlogPost"> | number
+    slug?: StringWithAggregatesFilter<"BlogPost"> | string
+    locale?: StringWithAggregatesFilter<"BlogPost"> | string
+    title?: StringWithAggregatesFilter<"BlogPost"> | string
+    excerpt?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    content?: StringWithAggregatesFilter<"BlogPost"> | string
+    coverImage?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    coverAlt?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    tags?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    readingMinutes?: IntWithAggregatesFilter<"BlogPost"> | number
+    status?: EnumBlogStatusWithAggregatesFilter<"BlogPost"> | $Enums.BlogStatus
+    featured?: BoolWithAggregatesFilter<"BlogPost"> | boolean
+    seoTitle?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    seoDescription?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
+    authorId?: IntNullableWithAggregatesFilter<"BlogPost"> | number | null
+    publishedAt?: DateTimeNullableWithAggregatesFilter<"BlogPost"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BlogPost"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BlogPost"> | Date | string
   }
 
   export type RefreshTokenWhereInput = {
@@ -43510,13 +46479,15 @@ export namespace Prisma {
     color?: StringNullableFilter<"ProductVariant"> | string | null
     thicknessMm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     shadeCode?: StringNullableFilter<"ProductVariant"> | string | null
-    piecesPerBox?: IntFilter<"ProductVariant"> | number
-    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     currency?: StringFilter<"ProductVariant"> | string
+    piecesPerBox?: IntFilter<"ProductVariant"> | number
+    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
     textureUrl?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
@@ -43539,13 +46510,15 @@ export namespace Prisma {
     color?: SortOrderInput | SortOrder
     thicknessMm?: SortOrderInput | SortOrder
     shadeCode?: SortOrderInput | SortOrder
-    piecesPerBox?: SortOrder
-    sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrderInput | SortOrder
     pricePerSqm?: SortOrder
-    pricePerBox?: SortOrder
+    containerPricePerSqm?: SortOrderInput | SortOrder
+    sqmPerContainer?: SortOrderInput | SortOrder
     compareAtPrice?: SortOrderInput | SortOrder
     currency?: SortOrder
+    piecesPerBox?: SortOrder
+    sqmPerBox?: SortOrder
+    pricePerBox?: SortOrder
+    weightKgPerBox?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     textureUrl?: SortOrderInput | SortOrder
     active?: SortOrder
@@ -43572,13 +46545,15 @@ export namespace Prisma {
     color?: StringNullableFilter<"ProductVariant"> | string | null
     thicknessMm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     shadeCode?: StringNullableFilter<"ProductVariant"> | string | null
-    piecesPerBox?: IntFilter<"ProductVariant"> | number
-    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     currency?: StringFilter<"ProductVariant"> | string
+    piecesPerBox?: IntFilter<"ProductVariant"> | number
+    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
     textureUrl?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
@@ -43601,13 +46576,15 @@ export namespace Prisma {
     color?: SortOrderInput | SortOrder
     thicknessMm?: SortOrderInput | SortOrder
     shadeCode?: SortOrderInput | SortOrder
-    piecesPerBox?: SortOrder
-    sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrderInput | SortOrder
     pricePerSqm?: SortOrder
-    pricePerBox?: SortOrder
+    containerPricePerSqm?: SortOrderInput | SortOrder
+    sqmPerContainer?: SortOrderInput | SortOrder
     compareAtPrice?: SortOrderInput | SortOrder
     currency?: SortOrder
+    piecesPerBox?: SortOrder
+    sqmPerBox?: SortOrder
+    pricePerBox?: SortOrder
+    weightKgPerBox?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     textureUrl?: SortOrderInput | SortOrder
     active?: SortOrder
@@ -43632,13 +46609,15 @@ export namespace Prisma {
     color?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     thicknessMm?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     shadeCode?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
-    piecesPerBox?: IntWithAggregatesFilter<"ProductVariant"> | number
-    sqmPerBox?: DecimalWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     currency?: StringWithAggregatesFilter<"ProductVariant"> | string
+    piecesPerBox?: IntWithAggregatesFilter<"ProductVariant"> | number
+    sqmPerBox?: DecimalWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: DecimalNullableWithAggregatesFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     image?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     textureUrl?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     active?: BoolWithAggregatesFilter<"ProductVariant"> | boolean
@@ -43776,9 +46755,9 @@ export namespace Prisma {
     NOT?: InventoryWhereInput | InventoryWhereInput[]
     id?: IntFilter<"Inventory"> | number
     variantId?: IntFilter<"Inventory"> | number
-    onHandBoxes?: IntFilter<"Inventory"> | number
-    reservedBoxes?: IntFilter<"Inventory"> | number
-    reorderLevel?: IntFilter<"Inventory"> | number
+    onHandSqm?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFilter<"Inventory"> | boolean
     updatedAt?: DateTimeFilter<"Inventory"> | Date | string
     variant?: XOR<ProductVariantScalarRelationFilter, ProductVariantWhereInput>
@@ -43787,8 +46766,8 @@ export namespace Prisma {
   export type InventoryOrderByWithRelationInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
     allowBackorder?: SortOrder
     updatedAt?: SortOrder
@@ -43801,9 +46780,9 @@ export namespace Prisma {
     AND?: InventoryWhereInput | InventoryWhereInput[]
     OR?: InventoryWhereInput[]
     NOT?: InventoryWhereInput | InventoryWhereInput[]
-    onHandBoxes?: IntFilter<"Inventory"> | number
-    reservedBoxes?: IntFilter<"Inventory"> | number
-    reorderLevel?: IntFilter<"Inventory"> | number
+    onHandSqm?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFilter<"Inventory"> | boolean
     updatedAt?: DateTimeFilter<"Inventory"> | Date | string
     variant?: XOR<ProductVariantScalarRelationFilter, ProductVariantWhereInput>
@@ -43812,8 +46791,8 @@ export namespace Prisma {
   export type InventoryOrderByWithAggregationInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
     allowBackorder?: SortOrder
     updatedAt?: SortOrder
@@ -43830,9 +46809,9 @@ export namespace Prisma {
     NOT?: InventoryScalarWhereWithAggregatesInput | InventoryScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Inventory"> | number
     variantId?: IntWithAggregatesFilter<"Inventory"> | number
-    onHandBoxes?: IntWithAggregatesFilter<"Inventory"> | number
-    reservedBoxes?: IntWithAggregatesFilter<"Inventory"> | number
-    reorderLevel?: IntWithAggregatesFilter<"Inventory"> | number
+    onHandSqm?: DecimalWithAggregatesFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalWithAggregatesFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalWithAggregatesFilter<"Inventory"> | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolWithAggregatesFilter<"Inventory"> | boolean
     updatedAt?: DateTimeWithAggregatesFilter<"Inventory"> | Date | string
   }
@@ -43844,7 +46823,7 @@ export namespace Prisma {
     id?: IntFilter<"StockMovement"> | number
     variantId?: IntFilter<"StockMovement"> | number
     type?: EnumStockMovementTypeFilter<"StockMovement"> | $Enums.StockMovementType
-    quantity?: IntFilter<"StockMovement"> | number
+    quantity?: DecimalFilter<"StockMovement"> | Decimal | DecimalJsLike | number | string
     reference?: StringNullableFilter<"StockMovement"> | string | null
     note?: StringNullableFilter<"StockMovement"> | string | null
     createdById?: IntNullableFilter<"StockMovement"> | number | null
@@ -43874,7 +46853,7 @@ export namespace Prisma {
     NOT?: StockMovementWhereInput | StockMovementWhereInput[]
     variantId?: IntFilter<"StockMovement"> | number
     type?: EnumStockMovementTypeFilter<"StockMovement"> | $Enums.StockMovementType
-    quantity?: IntFilter<"StockMovement"> | number
+    quantity?: DecimalFilter<"StockMovement"> | Decimal | DecimalJsLike | number | string
     reference?: StringNullableFilter<"StockMovement"> | string | null
     note?: StringNullableFilter<"StockMovement"> | string | null
     createdById?: IntNullableFilter<"StockMovement"> | number | null
@@ -43906,7 +46885,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"StockMovement"> | number
     variantId?: IntWithAggregatesFilter<"StockMovement"> | number
     type?: EnumStockMovementTypeWithAggregatesFilter<"StockMovement"> | $Enums.StockMovementType
-    quantity?: IntWithAggregatesFilter<"StockMovement"> | number
+    quantity?: DecimalWithAggregatesFilter<"StockMovement"> | Decimal | DecimalJsLike | number | string
     reference?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
     note?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
     createdById?: IntNullableWithAggregatesFilter<"StockMovement"> | number | null
@@ -43989,7 +46968,8 @@ export namespace Prisma {
     id?: IntFilter<"CartItem"> | number
     cartId?: IntFilter<"CartItem"> | number
     variantId?: IntFilter<"CartItem"> | number
-    quantity?: IntFilter<"CartItem"> | number
+    saleType?: EnumSaleTypeFilter<"CartItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"CartItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"CartItem"> | Date | string
     updatedAt?: DateTimeFilter<"CartItem"> | Date | string
     cart?: XOR<CartScalarRelationFilter, CartWhereInput>
@@ -44000,6 +46980,7 @@ export namespace Prisma {
     id?: SortOrder
     cartId?: SortOrder
     variantId?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -44009,23 +46990,25 @@ export namespace Prisma {
 
   export type CartItemWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    cartId_variantId?: CartItemCartIdVariantIdCompoundUniqueInput
+    cartId_variantId_saleType?: CartItemCartIdVariantIdSaleTypeCompoundUniqueInput
     AND?: CartItemWhereInput | CartItemWhereInput[]
     OR?: CartItemWhereInput[]
     NOT?: CartItemWhereInput | CartItemWhereInput[]
     cartId?: IntFilter<"CartItem"> | number
     variantId?: IntFilter<"CartItem"> | number
-    quantity?: IntFilter<"CartItem"> | number
+    saleType?: EnumSaleTypeFilter<"CartItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"CartItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"CartItem"> | Date | string
     updatedAt?: DateTimeFilter<"CartItem"> | Date | string
     cart?: XOR<CartScalarRelationFilter, CartWhereInput>
     variant?: XOR<ProductVariantScalarRelationFilter, ProductVariantWhereInput>
-  }, "id" | "cartId_variantId">
+  }, "id" | "cartId_variantId_saleType">
 
   export type CartItemOrderByWithAggregationInput = {
     id?: SortOrder
     cartId?: SortOrder
     variantId?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -44043,7 +47026,8 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"CartItem"> | number
     cartId?: IntWithAggregatesFilter<"CartItem"> | number
     variantId?: IntWithAggregatesFilter<"CartItem"> | number
-    quantity?: IntWithAggregatesFilter<"CartItem"> | number
+    saleType?: EnumSaleTypeWithAggregatesFilter<"CartItem"> | $Enums.SaleType
+    quantity?: DecimalWithAggregatesFilter<"CartItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"CartItem"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"CartItem"> | Date | string
   }
@@ -44112,7 +47096,7 @@ export namespace Prisma {
     name?: StringFilter<"DeliveryZone"> | string
     districts?: StringFilter<"DeliveryZone"> | string
     baseFee?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
     freeOverAmount?: DecimalNullableFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFilter<"DeliveryZone"> | number
     active?: BoolFilter<"DeliveryZone"> | boolean
@@ -44124,7 +47108,7 @@ export namespace Prisma {
     name?: SortOrder
     districts?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrderInput | SortOrder
     estimatedDays?: SortOrder
     active?: SortOrder
@@ -44140,7 +47124,7 @@ export namespace Prisma {
     name?: StringFilter<"DeliveryZone"> | string
     districts?: StringFilter<"DeliveryZone"> | string
     baseFee?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
     freeOverAmount?: DecimalNullableFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFilter<"DeliveryZone"> | number
     active?: BoolFilter<"DeliveryZone"> | boolean
@@ -44152,7 +47136,7 @@ export namespace Prisma {
     name?: SortOrder
     districts?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrderInput | SortOrder
     estimatedDays?: SortOrder
     active?: SortOrder
@@ -44171,7 +47155,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"DeliveryZone"> | string
     districts?: StringWithAggregatesFilter<"DeliveryZone"> | string
     baseFee?: DecimalWithAggregatesFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalWithAggregatesFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalWithAggregatesFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string
     freeOverAmount?: DecimalNullableWithAggregatesFilter<"DeliveryZone"> | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntWithAggregatesFilter<"DeliveryZone"> | number
     active?: BoolWithAggregatesFilter<"DeliveryZone"> | boolean
@@ -44294,7 +47278,8 @@ export namespace Prisma {
     couponId?: IntNullableFilter<"Order"> | number | null
     deliveryZoneId?: IntNullableFilter<"Order"> | number | null
     shipFullName?: StringNullableFilter<"Order"> | string | null
-    shipPhone?: StringNullableFilter<"Order"> | string | null
+    shipPhone?: StringFilter<"Order"> | string
+    shipProvince?: StringNullableFilter<"Order"> | string | null
     shipDistrict?: StringNullableFilter<"Order"> | string | null
     shipSector?: StringNullableFilter<"Order"> | string | null
     shipStreet?: StringNullableFilter<"Order"> | string | null
@@ -44313,6 +47298,7 @@ export namespace Prisma {
     items?: OrderItemListRelationFilter
     payments?: PaymentListRelationFilter
     history?: OrderStatusHistoryListRelationFilter
+    invoices?: InvoiceListRelationFilter
   }
 
   export type OrderOrderByWithRelationInput = {
@@ -44333,7 +47319,8 @@ export namespace Prisma {
     couponId?: SortOrderInput | SortOrder
     deliveryZoneId?: SortOrderInput | SortOrder
     shipFullName?: SortOrderInput | SortOrder
-    shipPhone?: SortOrderInput | SortOrder
+    shipPhone?: SortOrder
+    shipProvince?: SortOrderInput | SortOrder
     shipDistrict?: SortOrderInput | SortOrder
     shipSector?: SortOrderInput | SortOrder
     shipStreet?: SortOrderInput | SortOrder
@@ -44352,6 +47339,7 @@ export namespace Prisma {
     items?: OrderItemOrderByRelationAggregateInput
     payments?: PaymentOrderByRelationAggregateInput
     history?: OrderStatusHistoryOrderByRelationAggregateInput
+    invoices?: InvoiceOrderByRelationAggregateInput
     _relevance?: OrderOrderByRelevanceInput
   }
 
@@ -44376,7 +47364,8 @@ export namespace Prisma {
     couponId?: IntNullableFilter<"Order"> | number | null
     deliveryZoneId?: IntNullableFilter<"Order"> | number | null
     shipFullName?: StringNullableFilter<"Order"> | string | null
-    shipPhone?: StringNullableFilter<"Order"> | string | null
+    shipPhone?: StringFilter<"Order"> | string
+    shipProvince?: StringNullableFilter<"Order"> | string | null
     shipDistrict?: StringNullableFilter<"Order"> | string | null
     shipSector?: StringNullableFilter<"Order"> | string | null
     shipStreet?: StringNullableFilter<"Order"> | string | null
@@ -44395,6 +47384,7 @@ export namespace Prisma {
     items?: OrderItemListRelationFilter
     payments?: PaymentListRelationFilter
     history?: OrderStatusHistoryListRelationFilter
+    invoices?: InvoiceListRelationFilter
   }, "id" | "orderNumber">
 
   export type OrderOrderByWithAggregationInput = {
@@ -44415,7 +47405,8 @@ export namespace Prisma {
     couponId?: SortOrderInput | SortOrder
     deliveryZoneId?: SortOrderInput | SortOrder
     shipFullName?: SortOrderInput | SortOrder
-    shipPhone?: SortOrderInput | SortOrder
+    shipPhone?: SortOrder
+    shipProvince?: SortOrderInput | SortOrder
     shipDistrict?: SortOrderInput | SortOrder
     shipSector?: SortOrderInput | SortOrder
     shipStreet?: SortOrderInput | SortOrder
@@ -44456,7 +47447,8 @@ export namespace Prisma {
     couponId?: IntNullableWithAggregatesFilter<"Order"> | number | null
     deliveryZoneId?: IntNullableWithAggregatesFilter<"Order"> | number | null
     shipFullName?: StringNullableWithAggregatesFilter<"Order"> | string | null
-    shipPhone?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    shipPhone?: StringWithAggregatesFilter<"Order"> | string
+    shipProvince?: StringNullableWithAggregatesFilter<"Order"> | string | null
     shipDistrict?: StringNullableWithAggregatesFilter<"Order"> | string | null
     shipSector?: StringNullableWithAggregatesFilter<"Order"> | string | null
     shipStreet?: StringNullableWithAggregatesFilter<"Order"> | string | null
@@ -44484,8 +47476,10 @@ export namespace Prisma {
     finish?: StringNullableFilter<"OrderItem"> | string | null
     shadeCode?: StringNullableFilter<"OrderItem"> | string | null
     image?: StringNullableFilter<"OrderItem"> | string | null
-    quantity?: IntFilter<"OrderItem"> | number
-    sqmPerBox?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFilter<"OrderItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    containers?: IntNullableFilter<"OrderItem"> | number | null
+    sqmPerBox?: DecimalNullableFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
@@ -44502,8 +47496,10 @@ export namespace Prisma {
     finish?: SortOrderInput | SortOrder
     shadeCode?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
-    sqmPerBox?: SortOrder
+    containers?: SortOrderInput | SortOrder
+    sqmPerBox?: SortOrderInput | SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
     order?: OrderOrderByWithRelationInput
@@ -44524,8 +47520,10 @@ export namespace Prisma {
     finish?: StringNullableFilter<"OrderItem"> | string | null
     shadeCode?: StringNullableFilter<"OrderItem"> | string | null
     image?: StringNullableFilter<"OrderItem"> | string | null
-    quantity?: IntFilter<"OrderItem"> | number
-    sqmPerBox?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFilter<"OrderItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    containers?: IntNullableFilter<"OrderItem"> | number | null
+    sqmPerBox?: DecimalNullableFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
@@ -44542,8 +47540,10 @@ export namespace Prisma {
     finish?: SortOrderInput | SortOrder
     shadeCode?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
-    sqmPerBox?: SortOrder
+    containers?: SortOrderInput | SortOrder
+    sqmPerBox?: SortOrderInput | SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
     _count?: OrderItemCountOrderByAggregateInput
@@ -44566,10 +47566,96 @@ export namespace Prisma {
     finish?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
     shadeCode?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
     image?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
-    quantity?: IntWithAggregatesFilter<"OrderItem"> | number
-    sqmPerBox?: DecimalWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeWithAggregatesFilter<"OrderItem"> | $Enums.SaleType
+    quantity?: DecimalWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    containers?: IntNullableWithAggregatesFilter<"OrderItem"> | number | null
+    sqmPerBox?: DecimalNullableWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalWithAggregatesFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type InvoiceWhereInput = {
+    AND?: InvoiceWhereInput | InvoiceWhereInput[]
+    OR?: InvoiceWhereInput[]
+    NOT?: InvoiceWhereInput | InvoiceWhereInput[]
+    id?: IntFilter<"Invoice"> | number
+    orderId?: IntFilter<"Invoice"> | number
+    kind?: EnumInvoiceKindFilter<"Invoice"> | $Enums.InvoiceKind
+    number?: StringFilter<"Invoice"> | string
+    fileKey?: StringFilter<"Invoice"> | string
+    sha256?: StringFilter<"Invoice"> | string
+    sizeBytes?: IntFilter<"Invoice"> | number
+    total?: DecimalFilter<"Invoice"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Invoice"> | string
+    issuedAt?: DateTimeFilter<"Invoice"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+  }
+
+  export type InvoiceOrderByWithRelationInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    kind?: SortOrder
+    number?: SortOrder
+    fileKey?: SortOrder
+    sha256?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+    currency?: SortOrder
+    issuedAt?: SortOrder
+    order?: OrderOrderByWithRelationInput
+    _relevance?: InvoiceOrderByRelevanceInput
+  }
+
+  export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    number?: string
+    fileKey?: string
+    orderId_kind?: InvoiceOrderIdKindCompoundUniqueInput
+    AND?: InvoiceWhereInput | InvoiceWhereInput[]
+    OR?: InvoiceWhereInput[]
+    NOT?: InvoiceWhereInput | InvoiceWhereInput[]
+    orderId?: IntFilter<"Invoice"> | number
+    kind?: EnumInvoiceKindFilter<"Invoice"> | $Enums.InvoiceKind
+    sha256?: StringFilter<"Invoice"> | string
+    sizeBytes?: IntFilter<"Invoice"> | number
+    total?: DecimalFilter<"Invoice"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Invoice"> | string
+    issuedAt?: DateTimeFilter<"Invoice"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+  }, "id" | "number" | "fileKey" | "orderId_kind">
+
+  export type InvoiceOrderByWithAggregationInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    kind?: SortOrder
+    number?: SortOrder
+    fileKey?: SortOrder
+    sha256?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+    currency?: SortOrder
+    issuedAt?: SortOrder
+    _count?: InvoiceCountOrderByAggregateInput
+    _avg?: InvoiceAvgOrderByAggregateInput
+    _max?: InvoiceMaxOrderByAggregateInput
+    _min?: InvoiceMinOrderByAggregateInput
+    _sum?: InvoiceSumOrderByAggregateInput
+  }
+
+  export type InvoiceScalarWhereWithAggregatesInput = {
+    AND?: InvoiceScalarWhereWithAggregatesInput | InvoiceScalarWhereWithAggregatesInput[]
+    OR?: InvoiceScalarWhereWithAggregatesInput[]
+    NOT?: InvoiceScalarWhereWithAggregatesInput | InvoiceScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Invoice"> | number
+    orderId?: IntWithAggregatesFilter<"Invoice"> | number
+    kind?: EnumInvoiceKindWithAggregatesFilter<"Invoice"> | $Enums.InvoiceKind
+    number?: StringWithAggregatesFilter<"Invoice"> | string
+    fileKey?: StringWithAggregatesFilter<"Invoice"> | string
+    sha256?: StringWithAggregatesFilter<"Invoice"> | string
+    sizeBytes?: IntWithAggregatesFilter<"Invoice"> | number
+    total?: DecimalWithAggregatesFilter<"Invoice"> | Decimal | DecimalJsLike | number | string
+    currency?: StringWithAggregatesFilter<"Invoice"> | string
+    issuedAt?: DateTimeWithAggregatesFilter<"Invoice"> | Date | string
   }
 
   export type OrderStatusHistoryWhereInput = {
@@ -44652,10 +47738,17 @@ export namespace Prisma {
     providerRef?: StringNullableFilter<"Payment"> | string | null
     payerPhone?: StringNullableFilter<"Payment"> | string | null
     failureReason?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: IntNullableFilter<"Payment"> | number | null
     rawResponse?: JsonNullableFilter<"Payment">
     paidAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
     createdAt?: DateTimeFilter<"Payment"> | Date | string
     updatedAt?: DateTimeFilter<"Payment"> | Date | string
+    refundedAmount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
+    refundedAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
+    refundReason?: StringNullableFilter<"Payment"> | string | null
+    note?: StringNullableFilter<"Payment"> | string | null
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }
 
@@ -44670,10 +47763,17 @@ export namespace Prisma {
     providerRef?: SortOrderInput | SortOrder
     payerPhone?: SortOrderInput | SortOrder
     failureReason?: SortOrderInput | SortOrder
+    recordedById?: SortOrderInput | SortOrder
     rawResponse?: SortOrderInput | SortOrder
     paidAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    refundedAmount?: SortOrder
+    refundedAt?: SortOrderInput | SortOrder
+    refundReason?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    proofUrl?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
     order?: OrderOrderByWithRelationInput
     _relevance?: PaymentOrderByRelevanceInput
   }
@@ -44692,10 +47792,17 @@ export namespace Prisma {
     provider?: StringNullableFilter<"Payment"> | string | null
     payerPhone?: StringNullableFilter<"Payment"> | string | null
     failureReason?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: IntNullableFilter<"Payment"> | number | null
     rawResponse?: JsonNullableFilter<"Payment">
     paidAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
     createdAt?: DateTimeFilter<"Payment"> | Date | string
     updatedAt?: DateTimeFilter<"Payment"> | Date | string
+    refundedAmount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
+    refundedAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
+    refundReason?: StringNullableFilter<"Payment"> | string | null
+    note?: StringNullableFilter<"Payment"> | string | null
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }, "id" | "providerRef">
 
@@ -44710,10 +47817,16 @@ export namespace Prisma {
     providerRef?: SortOrderInput | SortOrder
     payerPhone?: SortOrderInput | SortOrder
     failureReason?: SortOrderInput | SortOrder
+    recordedById?: SortOrderInput | SortOrder
     rawResponse?: SortOrderInput | SortOrder
     paidAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    refundedAmount?: SortOrder
+    refundedAt?: SortOrderInput | SortOrder
+    refundReason?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    proofUrl?: SortOrderInput | SortOrder
     _count?: PaymentCountOrderByAggregateInput
     _avg?: PaymentAvgOrderByAggregateInput
     _max?: PaymentMaxOrderByAggregateInput
@@ -44735,10 +47848,16 @@ export namespace Prisma {
     providerRef?: StringNullableWithAggregatesFilter<"Payment"> | string | null
     payerPhone?: StringNullableWithAggregatesFilter<"Payment"> | string | null
     failureReason?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    recordedById?: IntNullableWithAggregatesFilter<"Payment"> | number | null
     rawResponse?: JsonNullableWithAggregatesFilter<"Payment">
     paidAt?: DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
+    refundedAmount?: DecimalWithAggregatesFilter<"Payment"> | Decimal | DecimalJsLike | number | string
+    refundedAt?: DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
+    refundReason?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    note?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    proofUrl?: StringNullableWithAggregatesFilter<"Payment"> | string | null
   }
 
   export type ReviewWhereInput = {
@@ -45654,6 +48773,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -45668,6 +48791,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -45683,6 +48808,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -45697,6 +48826,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUpdateInput = {
@@ -45711,6 +48842,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -45725,6 +48860,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -45740,6 +48877,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -45754,6 +48895,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -45769,6 +48912,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
   }
 
   export type UserUpdateManyMutationInput = {
@@ -45783,6 +48930,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -45796,6 +48947,153 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type BlogPostCreateInput = {
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    author?: UserCreateNestedOneWithoutBlogPostsInput
+  }
+
+  export type BlogPostUncheckedCreateInput = {
+    id?: number
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    authorId?: number | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostUpdateInput = {
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    author?: UserUpdateOneWithoutBlogPostsNestedInput
+  }
+
+  export type BlogPostUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostCreateManyInput = {
+    id?: number
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    authorId?: number | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostUpdateManyMutationInput = {
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -46534,13 +49832,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -46563,13 +49863,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -46589,13 +49891,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -46618,13 +49922,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -46646,13 +49952,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -46667,13 +49975,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -46690,13 +50000,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -46821,9 +50133,9 @@ export namespace Prisma {
   }
 
   export type InventoryCreateInput = {
-    onHandBoxes?: number
-    reservedBoxes?: number
-    reorderLevel?: number
+    onHandSqm: Decimal | DecimalJsLike | number | string
+    reservedSqm: Decimal | DecimalJsLike | number | string
+    reorderLevel?: Decimal | DecimalJsLike | number | string
     allowBackorder?: boolean
     updatedAt?: Date | string
     variant: ProductVariantCreateNestedOneWithoutInventoryInput
@@ -46832,17 +50144,17 @@ export namespace Prisma {
   export type InventoryUncheckedCreateInput = {
     id?: number
     variantId: number
-    onHandBoxes?: number
-    reservedBoxes?: number
-    reorderLevel?: number
+    onHandSqm: Decimal | DecimalJsLike | number | string
+    reservedSqm: Decimal | DecimalJsLike | number | string
+    reorderLevel?: Decimal | DecimalJsLike | number | string
     allowBackorder?: boolean
     updatedAt?: Date | string
   }
 
   export type InventoryUpdateInput = {
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     variant?: ProductVariantUpdateOneRequiredWithoutInventoryNestedInput
@@ -46851,9 +50163,9 @@ export namespace Prisma {
   export type InventoryUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -46861,17 +50173,17 @@ export namespace Prisma {
   export type InventoryCreateManyInput = {
     id?: number
     variantId: number
-    onHandBoxes?: number
-    reservedBoxes?: number
-    reorderLevel?: number
+    onHandSqm: Decimal | DecimalJsLike | number | string
+    reservedSqm: Decimal | DecimalJsLike | number | string
+    reorderLevel?: Decimal | DecimalJsLike | number | string
     allowBackorder?: boolean
     updatedAt?: Date | string
   }
 
   export type InventoryUpdateManyMutationInput = {
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -46879,16 +50191,16 @@ export namespace Prisma {
   export type InventoryUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StockMovementCreateInput = {
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdAt?: Date | string
@@ -46900,7 +50212,7 @@ export namespace Prisma {
     id?: number
     variantId: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdById?: number | null
@@ -46909,7 +50221,7 @@ export namespace Prisma {
 
   export type StockMovementUpdateInput = {
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46921,7 +50233,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
@@ -46932,7 +50244,7 @@ export namespace Prisma {
     id?: number
     variantId: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdById?: number | null
@@ -46941,7 +50253,7 @@ export namespace Prisma {
 
   export type StockMovementUpdateManyMutationInput = {
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46951,7 +50263,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47021,7 +50333,8 @@ export namespace Prisma {
   }
 
   export type CartItemCreateInput = {
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
     cart: CartCreateNestedOneWithoutItemsInput
@@ -47032,13 +50345,15 @@ export namespace Prisma {
     id?: number
     cartId: number
     variantId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type CartItemUpdateInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cart?: CartUpdateOneRequiredWithoutItemsNestedInput
@@ -47049,7 +50364,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     cartId?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -47058,13 +50374,15 @@ export namespace Prisma {
     id?: number
     cartId: number
     variantId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type CartItemUpdateManyMutationInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -47073,7 +50391,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     cartId?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -47126,7 +50445,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal | DecimalJsLike | number | string
-    feePerBox?: Decimal | DecimalJsLike | number | string
+    feePerSqm: Decimal | DecimalJsLike | number | string
     freeOverAmount?: Decimal | DecimalJsLike | number | string | null
     estimatedDays?: number
     active?: boolean
@@ -47138,7 +50457,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal | DecimalJsLike | number | string
-    feePerBox?: Decimal | DecimalJsLike | number | string
+    feePerSqm: Decimal | DecimalJsLike | number | string
     freeOverAmount?: Decimal | DecimalJsLike | number | string | null
     estimatedDays?: number
     active?: boolean
@@ -47149,7 +50468,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -47161,7 +50480,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -47173,7 +50492,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal | DecimalJsLike | number | string
-    feePerBox?: Decimal | DecimalJsLike | number | string
+    feePerSqm: Decimal | DecimalJsLike | number | string
     freeOverAmount?: Decimal | DecimalJsLike | number | string | null
     estimatedDays?: number
     active?: boolean
@@ -47183,7 +50502,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -47194,7 +50513,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -47324,7 +50643,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -47343,6 +50663,7 @@ export namespace Prisma {
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateInput = {
@@ -47363,7 +50684,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -47379,6 +50701,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUpdateInput = {
@@ -47395,7 +50718,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47414,6 +50738,7 @@ export namespace Prisma {
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateInput = {
@@ -47434,7 +50759,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47450,6 +50776,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderCreateManyInput = {
@@ -47470,7 +50797,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -47499,7 +50827,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47532,7 +50861,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47554,8 +50884,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
     order: OrderCreateNestedOneWithoutItemsInput
@@ -47572,8 +50904,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -47585,8 +50919,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -47603,8 +50939,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -47619,8 +50957,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -47632,8 +50972,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -47648,10 +50990,99 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+  }
+
+  export type InvoiceCreateInput = {
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+    order: OrderCreateNestedOneWithoutInvoicesInput
+  }
+
+  export type InvoiceUncheckedCreateInput = {
+    id?: number
+    orderId: number
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+  }
+
+  export type InvoiceUpdateInput = {
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutInvoicesNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderId?: IntFieldUpdateOperationsInput | number
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceCreateManyInput = {
+    id?: number
+    orderId: number
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+  }
+
+  export type InvoiceUpdateManyMutationInput = {
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderId?: IntFieldUpdateOperationsInput | number
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type OrderStatusHistoryCreateInput = {
@@ -47725,6 +51156,12 @@ export namespace Prisma {
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
+    user?: UserCreateNestedOneWithoutPaymentsInput
     order: OrderCreateNestedOneWithoutPaymentsInput
   }
 
@@ -47739,10 +51176,16 @@ export namespace Prisma {
     providerRef?: string | null
     payerPhone?: string | null
     failureReason?: string | null
+    recordedById?: number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
   }
 
   export type PaymentUpdateInput = {
@@ -47758,6 +51201,12 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutPaymentsNestedInput
     order?: OrderUpdateOneRequiredWithoutPaymentsNestedInput
   }
 
@@ -47772,10 +51221,16 @@ export namespace Prisma {
     providerRef?: NullableStringFieldUpdateOperationsInput | string | null
     payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
     failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableIntFieldUpdateOperationsInput | number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PaymentCreateManyInput = {
@@ -47789,10 +51244,16 @@ export namespace Prisma {
     providerRef?: string | null
     payerPhone?: string | null
     failureReason?: string | null
+    recordedById?: number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
   }
 
   export type PaymentUpdateManyMutationInput = {
@@ -47808,6 +51269,11 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PaymentUncheckedUpdateManyInput = {
@@ -47821,10 +51287,16 @@ export namespace Prisma {
     providerRef?: NullableStringFieldUpdateOperationsInput | string | null
     payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
     failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableIntFieldUpdateOperationsInput | number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ReviewCreateInput = {
@@ -48899,6 +52371,18 @@ export namespace Prisma {
     none?: RoleWhereInput
   }
 
+  export type PaymentListRelationFilter = {
+    every?: PaymentWhereInput
+    some?: PaymentWhereInput
+    none?: PaymentWhereInput
+  }
+
+  export type BlogPostListRelationFilter = {
+    every?: BlogPostWhereInput
+    some?: BlogPostWhereInput
+    none?: BlogPostWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -48952,6 +52436,14 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PaymentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BlogPostOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserOrderByRelevanceInput = {
     fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -48971,10 +52463,15 @@ export namespace Prisma {
     lastLogin?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    jobTitle?: SortOrder
+    bio?: SortOrder
+    showOnHomepage?: SortOrder
+    displayOrder?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
     id?: SortOrder
+    displayOrder?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -48990,6 +52487,10 @@ export namespace Prisma {
     lastLogin?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    jobTitle?: SortOrder
+    bio?: SortOrder
+    showOnHomepage?: SortOrder
+    displayOrder?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -49005,10 +52506,15 @@ export namespace Prisma {
     lastLogin?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    jobTitle?: SortOrder
+    bio?: SortOrder
+    showOnHomepage?: SortOrder
+    displayOrder?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
     id?: SortOrder
+    displayOrder?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -49099,6 +52605,13 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type EnumBlogStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BlogStatus | EnumBlogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BlogStatus[]
+    notIn?: $Enums.BlogStatus[]
+    not?: NestedEnumBlogStatusFilter<$PrismaModel> | $Enums.BlogStatus
+  }
+
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -49108,6 +52621,118 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type BlogPostOrderByRelevanceInput = {
+    fields: BlogPostOrderByRelevanceFieldEnum | BlogPostOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type BlogPostCountOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    locale?: SortOrder
+    title?: SortOrder
+    excerpt?: SortOrder
+    content?: SortOrder
+    coverImage?: SortOrder
+    coverAlt?: SortOrder
+    tags?: SortOrder
+    readingMinutes?: SortOrder
+    status?: SortOrder
+    featured?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    authorId?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BlogPostAvgOrderByAggregateInput = {
+    id?: SortOrder
+    readingMinutes?: SortOrder
+    authorId?: SortOrder
+  }
+
+  export type BlogPostMaxOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    locale?: SortOrder
+    title?: SortOrder
+    excerpt?: SortOrder
+    content?: SortOrder
+    coverImage?: SortOrder
+    coverAlt?: SortOrder
+    tags?: SortOrder
+    readingMinutes?: SortOrder
+    status?: SortOrder
+    featured?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    authorId?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BlogPostMinOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    locale?: SortOrder
+    title?: SortOrder
+    excerpt?: SortOrder
+    content?: SortOrder
+    coverImage?: SortOrder
+    coverAlt?: SortOrder
+    tags?: SortOrder
+    readingMinutes?: SortOrder
+    status?: SortOrder
+    featured?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    authorId?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BlogPostSumOrderByAggregateInput = {
+    id?: SortOrder
+    readingMinutes?: SortOrder
+    authorId?: SortOrder
+  }
+
+  export type EnumBlogStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BlogStatus | EnumBlogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BlogStatus[]
+    notIn?: $Enums.BlogStatus[]
+    not?: NestedEnumBlogStatusWithAggregatesFilter<$PrismaModel> | $Enums.BlogStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBlogStatusFilter<$PrismaModel>
+    _max?: NestedEnumBlogStatusFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type UserScalarRelationFilter = {
@@ -49172,22 +52797,6 @@ export namespace Prisma {
     replacedById?: SortOrder
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type PermissionOrderByRelevanceInput = {
     fields: PermissionOrderByRelevanceFieldEnum | PermissionOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -49226,11 +52835,6 @@ export namespace Prisma {
   export type PermissionScalarRelationFilter = {
     is?: PermissionWhereInput
     isNot?: PermissionWhereInput
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
   }
 
   export type UserPermissionUserIdPermissionIdCompoundUniqueInput = {
@@ -49727,13 +53331,15 @@ export namespace Prisma {
     color?: SortOrder
     thicknessMm?: SortOrder
     shadeCode?: SortOrder
-    piecesPerBox?: SortOrder
-    sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrder
     pricePerSqm?: SortOrder
-    pricePerBox?: SortOrder
+    containerPricePerSqm?: SortOrder
+    sqmPerContainer?: SortOrder
     compareAtPrice?: SortOrder
     currency?: SortOrder
+    piecesPerBox?: SortOrder
+    sqmPerBox?: SortOrder
+    pricePerBox?: SortOrder
+    weightKgPerBox?: SortOrder
     image?: SortOrder
     textureUrl?: SortOrder
     active?: SortOrder
@@ -49745,12 +53351,14 @@ export namespace Prisma {
     id?: SortOrder
     productId?: SortOrder
     thicknessMm?: SortOrder
+    pricePerSqm?: SortOrder
+    containerPricePerSqm?: SortOrder
+    sqmPerContainer?: SortOrder
+    compareAtPrice?: SortOrder
     piecesPerBox?: SortOrder
     sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrder
-    pricePerSqm?: SortOrder
     pricePerBox?: SortOrder
-    compareAtPrice?: SortOrder
+    weightKgPerBox?: SortOrder
   }
 
   export type ProductVariantMaxOrderByAggregateInput = {
@@ -49762,13 +53370,15 @@ export namespace Prisma {
     color?: SortOrder
     thicknessMm?: SortOrder
     shadeCode?: SortOrder
-    piecesPerBox?: SortOrder
-    sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrder
     pricePerSqm?: SortOrder
-    pricePerBox?: SortOrder
+    containerPricePerSqm?: SortOrder
+    sqmPerContainer?: SortOrder
     compareAtPrice?: SortOrder
     currency?: SortOrder
+    piecesPerBox?: SortOrder
+    sqmPerBox?: SortOrder
+    pricePerBox?: SortOrder
+    weightKgPerBox?: SortOrder
     image?: SortOrder
     textureUrl?: SortOrder
     active?: SortOrder
@@ -49785,13 +53395,15 @@ export namespace Prisma {
     color?: SortOrder
     thicknessMm?: SortOrder
     shadeCode?: SortOrder
-    piecesPerBox?: SortOrder
-    sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrder
     pricePerSqm?: SortOrder
-    pricePerBox?: SortOrder
+    containerPricePerSqm?: SortOrder
+    sqmPerContainer?: SortOrder
     compareAtPrice?: SortOrder
     currency?: SortOrder
+    piecesPerBox?: SortOrder
+    sqmPerBox?: SortOrder
+    pricePerBox?: SortOrder
+    weightKgPerBox?: SortOrder
     image?: SortOrder
     textureUrl?: SortOrder
     active?: SortOrder
@@ -49803,12 +53415,14 @@ export namespace Prisma {
     id?: SortOrder
     productId?: SortOrder
     thicknessMm?: SortOrder
+    pricePerSqm?: SortOrder
+    containerPricePerSqm?: SortOrder
+    sqmPerContainer?: SortOrder
+    compareAtPrice?: SortOrder
     piecesPerBox?: SortOrder
     sqmPerBox?: SortOrder
-    weightKgPerBox?: SortOrder
-    pricePerSqm?: SortOrder
     pricePerBox?: SortOrder
-    compareAtPrice?: SortOrder
+    weightKgPerBox?: SortOrder
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -49938,8 +53552,8 @@ export namespace Prisma {
   export type InventoryCountOrderByAggregateInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
     allowBackorder?: SortOrder
     updatedAt?: SortOrder
@@ -49948,16 +53562,16 @@ export namespace Prisma {
   export type InventoryAvgOrderByAggregateInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
   }
 
   export type InventoryMaxOrderByAggregateInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
     allowBackorder?: SortOrder
     updatedAt?: SortOrder
@@ -49966,8 +53580,8 @@ export namespace Prisma {
   export type InventoryMinOrderByAggregateInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
     allowBackorder?: SortOrder
     updatedAt?: SortOrder
@@ -49976,8 +53590,8 @@ export namespace Prisma {
   export type InventorySumOrderByAggregateInput = {
     id?: SortOrder
     variantId?: SortOrder
-    onHandBoxes?: SortOrder
-    reservedBoxes?: SortOrder
+    onHandSqm?: SortOrder
+    reservedSqm?: SortOrder
     reorderLevel?: SortOrder
   }
 
@@ -50101,20 +53715,29 @@ export namespace Prisma {
     couponId?: SortOrder
   }
 
+  export type EnumSaleTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SaleType | EnumSaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SaleType[]
+    notIn?: $Enums.SaleType[]
+    not?: NestedEnumSaleTypeFilter<$PrismaModel> | $Enums.SaleType
+  }
+
   export type CartScalarRelationFilter = {
     is?: CartWhereInput
     isNot?: CartWhereInput
   }
 
-  export type CartItemCartIdVariantIdCompoundUniqueInput = {
+  export type CartItemCartIdVariantIdSaleTypeCompoundUniqueInput = {
     cartId: number
     variantId: number
+    saleType: $Enums.SaleType
   }
 
   export type CartItemCountOrderByAggregateInput = {
     id?: SortOrder
     cartId?: SortOrder
     variantId?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -50131,6 +53754,7 @@ export namespace Prisma {
     id?: SortOrder
     cartId?: SortOrder
     variantId?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -50140,6 +53764,7 @@ export namespace Prisma {
     id?: SortOrder
     cartId?: SortOrder
     variantId?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -50150,6 +53775,16 @@ export namespace Prisma {
     cartId?: SortOrder
     variantId?: SortOrder
     quantity?: SortOrder
+  }
+
+  export type EnumSaleTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SaleType | EnumSaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SaleType[]
+    notIn?: $Enums.SaleType[]
+    not?: NestedEnumSaleTypeWithAggregatesFilter<$PrismaModel> | $Enums.SaleType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSaleTypeFilter<$PrismaModel>
+    _max?: NestedEnumSaleTypeFilter<$PrismaModel>
   }
 
   export type WishlistItemUserIdProductIdCompoundUniqueInput = {
@@ -50201,7 +53836,7 @@ export namespace Prisma {
     name?: SortOrder
     districts?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrder
     estimatedDays?: SortOrder
     active?: SortOrder
@@ -50210,7 +53845,7 @@ export namespace Prisma {
   export type DeliveryZoneAvgOrderByAggregateInput = {
     id?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrder
     estimatedDays?: SortOrder
   }
@@ -50220,7 +53855,7 @@ export namespace Prisma {
     name?: SortOrder
     districts?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrder
     estimatedDays?: SortOrder
     active?: SortOrder
@@ -50231,7 +53866,7 @@ export namespace Prisma {
     name?: SortOrder
     districts?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrder
     estimatedDays?: SortOrder
     active?: SortOrder
@@ -50240,7 +53875,7 @@ export namespace Prisma {
   export type DeliveryZoneSumOrderByAggregateInput = {
     id?: SortOrder
     baseFee?: SortOrder
-    feePerBox?: SortOrder
+    feePerSqm?: SortOrder
     freeOverAmount?: SortOrder
     estimatedDays?: SortOrder
   }
@@ -50365,13 +54000,13 @@ export namespace Prisma {
     isNot?: DeliveryZoneWhereInput | null
   }
 
-  export type PaymentListRelationFilter = {
-    every?: PaymentWhereInput
-    some?: PaymentWhereInput
-    none?: PaymentWhereInput
+  export type InvoiceListRelationFilter = {
+    every?: InvoiceWhereInput
+    some?: InvoiceWhereInput
+    none?: InvoiceWhereInput
   }
 
-  export type PaymentOrderByRelationAggregateInput = {
+  export type InvoiceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -50400,6 +54035,7 @@ export namespace Prisma {
     deliveryZoneId?: SortOrder
     shipFullName?: SortOrder
     shipPhone?: SortOrder
+    shipProvince?: SortOrder
     shipDistrict?: SortOrder
     shipSector?: SortOrder
     shipStreet?: SortOrder
@@ -50445,6 +54081,7 @@ export namespace Prisma {
     deliveryZoneId?: SortOrder
     shipFullName?: SortOrder
     shipPhone?: SortOrder
+    shipProvince?: SortOrder
     shipDistrict?: SortOrder
     shipSector?: SortOrder
     shipStreet?: SortOrder
@@ -50478,6 +54115,7 @@ export namespace Prisma {
     deliveryZoneId?: SortOrder
     shipFullName?: SortOrder
     shipPhone?: SortOrder
+    shipProvince?: SortOrder
     shipDistrict?: SortOrder
     shipSector?: SortOrder
     shipStreet?: SortOrder
@@ -50560,7 +54198,9 @@ export namespace Prisma {
     finish?: SortOrder
     shadeCode?: SortOrder
     image?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
+    containers?: SortOrder
     sqmPerBox?: SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
@@ -50571,6 +54211,7 @@ export namespace Prisma {
     orderId?: SortOrder
     variantId?: SortOrder
     quantity?: SortOrder
+    containers?: SortOrder
     sqmPerBox?: SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
@@ -50586,7 +54227,9 @@ export namespace Prisma {
     finish?: SortOrder
     shadeCode?: SortOrder
     image?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
+    containers?: SortOrder
     sqmPerBox?: SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
@@ -50602,7 +54245,9 @@ export namespace Prisma {
     finish?: SortOrder
     shadeCode?: SortOrder
     image?: SortOrder
+    saleType?: SortOrder
     quantity?: SortOrder
+    containers?: SortOrder
     sqmPerBox?: SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
@@ -50613,9 +54258,91 @@ export namespace Prisma {
     orderId?: SortOrder
     variantId?: SortOrder
     quantity?: SortOrder
+    containers?: SortOrder
     sqmPerBox?: SortOrder
     unitPrice?: SortOrder
     lineTotal?: SortOrder
+  }
+
+  export type EnumInvoiceKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceKind | EnumInvoiceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceKind[]
+    notIn?: $Enums.InvoiceKind[]
+    not?: NestedEnumInvoiceKindFilter<$PrismaModel> | $Enums.InvoiceKind
+  }
+
+  export type InvoiceOrderByRelevanceInput = {
+    fields: InvoiceOrderByRelevanceFieldEnum | InvoiceOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type InvoiceOrderIdKindCompoundUniqueInput = {
+    orderId: number
+    kind: $Enums.InvoiceKind
+  }
+
+  export type InvoiceCountOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    kind?: SortOrder
+    number?: SortOrder
+    fileKey?: SortOrder
+    sha256?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+    currency?: SortOrder
+    issuedAt?: SortOrder
+  }
+
+  export type InvoiceAvgOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+  }
+
+  export type InvoiceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    kind?: SortOrder
+    number?: SortOrder
+    fileKey?: SortOrder
+    sha256?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+    currency?: SortOrder
+    issuedAt?: SortOrder
+  }
+
+  export type InvoiceMinOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    kind?: SortOrder
+    number?: SortOrder
+    fileKey?: SortOrder
+    sha256?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+    currency?: SortOrder
+    issuedAt?: SortOrder
+  }
+
+  export type InvoiceSumOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    sizeBytes?: SortOrder
+    total?: SortOrder
+  }
+
+  export type EnumInvoiceKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceKind | EnumInvoiceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceKind[]
+    notIn?: $Enums.InvoiceKind[]
+    not?: NestedEnumInvoiceKindWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceKindFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceKindFilter<$PrismaModel>
   }
 
   export type OrderStatusHistoryOrderByRelevanceInput = {
@@ -50710,16 +54437,24 @@ export namespace Prisma {
     providerRef?: SortOrder
     payerPhone?: SortOrder
     failureReason?: SortOrder
+    recordedById?: SortOrder
     rawResponse?: SortOrder
     paidAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    refundedAmount?: SortOrder
+    refundedAt?: SortOrder
+    refundReason?: SortOrder
+    note?: SortOrder
+    proofUrl?: SortOrder
   }
 
   export type PaymentAvgOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
     amount?: SortOrder
+    recordedById?: SortOrder
+    refundedAmount?: SortOrder
   }
 
   export type PaymentMaxOrderByAggregateInput = {
@@ -50733,9 +54468,15 @@ export namespace Prisma {
     providerRef?: SortOrder
     payerPhone?: SortOrder
     failureReason?: SortOrder
+    recordedById?: SortOrder
     paidAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    refundedAmount?: SortOrder
+    refundedAt?: SortOrder
+    refundReason?: SortOrder
+    note?: SortOrder
+    proofUrl?: SortOrder
   }
 
   export type PaymentMinOrderByAggregateInput = {
@@ -50749,15 +54490,23 @@ export namespace Prisma {
     providerRef?: SortOrder
     payerPhone?: SortOrder
     failureReason?: SortOrder
+    recordedById?: SortOrder
     paidAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    refundedAmount?: SortOrder
+    refundedAt?: SortOrder
+    refundReason?: SortOrder
+    note?: SortOrder
+    proofUrl?: SortOrder
   }
 
   export type PaymentSumOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
     amount?: SortOrder
+    recordedById?: SortOrder
+    refundedAmount?: SortOrder
   }
 
   export type EnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
@@ -51598,6 +55347,20 @@ export namespace Prisma {
     connect?: RoleWhereUniqueInput | RoleWhereUniqueInput[]
   }
 
+  export type PaymentCreateNestedManyWithoutUserInput = {
+    create?: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput> | PaymentCreateWithoutUserInput[] | PaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutUserInput | PaymentCreateOrConnectWithoutUserInput[]
+    createMany?: PaymentCreateManyUserInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type BlogPostCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput> | BlogPostCreateWithoutAuthorInput[] | BlogPostUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: BlogPostCreateOrConnectWithoutAuthorInput | BlogPostCreateOrConnectWithoutAuthorInput[]
+    createMany?: BlogPostCreateManyAuthorInputEnvelope
+    connect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+  }
+
   export type UserPermissionUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<UserPermissionCreateWithoutUserInput, UserPermissionUncheckedCreateWithoutUserInput> | UserPermissionCreateWithoutUserInput[] | UserPermissionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserPermissionCreateOrConnectWithoutUserInput | UserPermissionCreateOrConnectWithoutUserInput[]
@@ -51694,6 +55457,20 @@ export namespace Prisma {
     connect?: RoleWhereUniqueInput | RoleWhereUniqueInput[]
   }
 
+  export type PaymentUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput> | PaymentCreateWithoutUserInput[] | PaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutUserInput | PaymentCreateOrConnectWithoutUserInput[]
+    createMany?: PaymentCreateManyUserInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type BlogPostUncheckedCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput> | BlogPostCreateWithoutAuthorInput[] | BlogPostUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: BlogPostCreateOrConnectWithoutAuthorInput | BlogPostCreateOrConnectWithoutAuthorInput[]
+    createMany?: BlogPostCreateManyAuthorInputEnvelope
+    connect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -51712,6 +55489,14 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type UserPermissionUpdateManyWithoutUserNestedInput = {
@@ -51905,12 +55690,32 @@ export namespace Prisma {
     deleteMany?: RoleScalarWhereInput | RoleScalarWhereInput[]
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type PaymentUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput> | PaymentCreateWithoutUserInput[] | PaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutUserInput | PaymentCreateOrConnectWithoutUserInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutUserInput | PaymentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PaymentCreateManyUserInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutUserInput | PaymentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutUserInput | PaymentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type BlogPostUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput> | BlogPostCreateWithoutAuthorInput[] | BlogPostUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: BlogPostCreateOrConnectWithoutAuthorInput | BlogPostCreateOrConnectWithoutAuthorInput[]
+    upsert?: BlogPostUpsertWithWhereUniqueWithoutAuthorInput | BlogPostUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: BlogPostCreateManyAuthorInputEnvelope
+    set?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    disconnect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    delete?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    connect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    update?: BlogPostUpdateWithWhereUniqueWithoutAuthorInput | BlogPostUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: BlogPostUpdateManyWithWhereWithoutAuthorInput | BlogPostUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: BlogPostScalarWhereInput | BlogPostScalarWhereInput[]
   }
 
   export type UserPermissionUncheckedUpdateManyWithoutUserNestedInput = {
@@ -52104,10 +55909,52 @@ export namespace Prisma {
     deleteMany?: RoleScalarWhereInput | RoleScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutRefreshTokensInput = {
-    create?: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
-    connectOrCreate?: UserCreateOrConnectWithoutRefreshTokensInput
+  export type PaymentUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput> | PaymentCreateWithoutUserInput[] | PaymentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutUserInput | PaymentCreateOrConnectWithoutUserInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutUserInput | PaymentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PaymentCreateManyUserInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutUserInput | PaymentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutUserInput | PaymentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type BlogPostUncheckedUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput> | BlogPostCreateWithoutAuthorInput[] | BlogPostUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: BlogPostCreateOrConnectWithoutAuthorInput | BlogPostCreateOrConnectWithoutAuthorInput[]
+    upsert?: BlogPostUpsertWithWhereUniqueWithoutAuthorInput | BlogPostUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: BlogPostCreateManyAuthorInputEnvelope
+    set?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    disconnect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    delete?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    connect?: BlogPostWhereUniqueInput | BlogPostWhereUniqueInput[]
+    update?: BlogPostUpdateWithWhereUniqueWithoutAuthorInput | BlogPostUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: BlogPostUpdateManyWithWhereWithoutAuthorInput | BlogPostUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: BlogPostScalarWhereInput | BlogPostScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutBlogPostsInput = {
+    create?: XOR<UserCreateWithoutBlogPostsInput, UserUncheckedCreateWithoutBlogPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBlogPostsInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type EnumBlogStatusFieldUpdateOperationsInput = {
+    set?: $Enums.BlogStatus
+  }
+
+  export type UserUpdateOneWithoutBlogPostsNestedInput = {
+    create?: XOR<UserCreateWithoutBlogPostsInput, UserUncheckedCreateWithoutBlogPostsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBlogPostsInput
+    upsert?: UserUpsertWithoutBlogPostsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBlogPostsInput, UserUpdateWithoutBlogPostsInput>, UserUncheckedUpdateWithoutBlogPostsInput>
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -52116,6 +55963,12 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type UserCreateNestedOneWithoutRefreshTokensInput = {
+    create?: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRefreshTokensInput
+    connect?: UserWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutRefreshTokensNestedInput = {
@@ -53056,6 +56909,10 @@ export namespace Prisma {
     connect?: ProductVariantWhereUniqueInput
   }
 
+  export type EnumSaleTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SaleType
+  }
+
   export type CartUpdateOneRequiredWithoutItemsNestedInput = {
     create?: XOR<CartCreateWithoutItemsInput, CartUncheckedCreateWithoutItemsInput>
     connectOrCreate?: CartCreateOrConnectWithoutItemsInput
@@ -53269,6 +57126,13 @@ export namespace Prisma {
     connect?: OrderStatusHistoryWhereUniqueInput | OrderStatusHistoryWhereUniqueInput[]
   }
 
+  export type InvoiceCreateNestedManyWithoutOrderInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
   export type OrderItemUncheckedCreateNestedManyWithoutOrderInput = {
     create?: XOR<OrderItemCreateWithoutOrderInput, OrderItemUncheckedCreateWithoutOrderInput> | OrderItemCreateWithoutOrderInput[] | OrderItemUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: OrderItemCreateOrConnectWithoutOrderInput | OrderItemCreateOrConnectWithoutOrderInput[]
@@ -53288,6 +57152,13 @@ export namespace Prisma {
     connectOrCreate?: OrderStatusHistoryCreateOrConnectWithoutOrderInput | OrderStatusHistoryCreateOrConnectWithoutOrderInput[]
     createMany?: OrderStatusHistoryCreateManyOrderInputEnvelope
     connect?: OrderStatusHistoryWhereUniqueInput | OrderStatusHistoryWhereUniqueInput[]
+  }
+
+  export type InvoiceUncheckedCreateNestedManyWithoutOrderInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
   export type EnumOrderStatusFieldUpdateOperationsInput = {
@@ -53374,6 +57245,20 @@ export namespace Prisma {
     deleteMany?: OrderStatusHistoryScalarWhereInput | OrderStatusHistoryScalarWhereInput[]
   }
 
+  export type InvoiceUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrderInput | InvoiceUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
   export type OrderItemUncheckedUpdateManyWithoutOrderNestedInput = {
     create?: XOR<OrderItemCreateWithoutOrderInput, OrderItemUncheckedCreateWithoutOrderInput> | OrderItemCreateWithoutOrderInput[] | OrderItemUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: OrderItemCreateOrConnectWithoutOrderInput | OrderItemCreateOrConnectWithoutOrderInput[]
@@ -53416,6 +57301,20 @@ export namespace Prisma {
     deleteMany?: OrderStatusHistoryScalarWhereInput | OrderStatusHistoryScalarWhereInput[]
   }
 
+  export type InvoiceUncheckedUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrderInput | InvoiceUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
   export type OrderCreateNestedOneWithoutItemsInput = {
     create?: XOR<OrderCreateWithoutItemsInput, OrderUncheckedCreateWithoutItemsInput>
     connectOrCreate?: OrderCreateOrConnectWithoutItemsInput
@@ -53444,6 +57343,24 @@ export namespace Prisma {
     delete?: ProductVariantWhereInput | boolean
     connect?: ProductVariantWhereUniqueInput
     update?: XOR<XOR<ProductVariantUpdateToOneWithWhereWithoutOrderItemsInput, ProductVariantUpdateWithoutOrderItemsInput>, ProductVariantUncheckedUpdateWithoutOrderItemsInput>
+  }
+
+  export type OrderCreateNestedOneWithoutInvoicesInput = {
+    create?: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutInvoicesInput
+    connect?: OrderWhereUniqueInput
+  }
+
+  export type EnumInvoiceKindFieldUpdateOperationsInput = {
+    set?: $Enums.InvoiceKind
+  }
+
+  export type OrderUpdateOneRequiredWithoutInvoicesNestedInput = {
+    create?: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutInvoicesInput
+    upsert?: OrderUpsertWithoutInvoicesInput
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutInvoicesInput, OrderUpdateWithoutInvoicesInput>, OrderUncheckedUpdateWithoutInvoicesInput>
   }
 
   export type OrderCreateNestedOneWithoutHistoryInput = {
@@ -53476,6 +57393,12 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOrderHistoryInput, UserUpdateWithoutOrderHistoryInput>, UserUncheckedUpdateWithoutOrderHistoryInput>
   }
 
+  export type UserCreateNestedOneWithoutPaymentsInput = {
+    create?: XOR<UserCreateWithoutPaymentsInput, UserUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPaymentsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type OrderCreateNestedOneWithoutPaymentsInput = {
     create?: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
     connectOrCreate?: OrderCreateOrConnectWithoutPaymentsInput
@@ -53484,6 +57407,16 @@ export namespace Prisma {
 
   export type EnumPaymentMethodFieldUpdateOperationsInput = {
     set?: $Enums.PaymentMethod
+  }
+
+  export type UserUpdateOneWithoutPaymentsNestedInput = {
+    create?: XOR<UserCreateWithoutPaymentsInput, UserUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPaymentsInput
+    upsert?: UserUpsertWithoutPaymentsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPaymentsInput, UserUpdateWithoutPaymentsInput>, UserUncheckedUpdateWithoutPaymentsInput>
   }
 
   export type OrderUpdateOneRequiredWithoutPaymentsNestedInput = {
@@ -53970,6 +57903,23 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumBlogStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BlogStatus | EnumBlogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BlogStatus[]
+    notIn?: $Enums.BlogStatus[]
+    not?: NestedEnumBlogStatusFilter<$PrismaModel> | $Enums.BlogStatus
+  }
+
+  export type NestedEnumBlogStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BlogStatus | EnumBlogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BlogStatus[]
+    notIn?: $Enums.BlogStatus[]
+    not?: NestedEnumBlogStatusWithAggregatesFilter<$PrismaModel> | $Enums.BlogStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBlogStatusFilter<$PrismaModel>
+    _max?: NestedEnumBlogStatusFilter<$PrismaModel>
+  }
+
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -54068,6 +58018,23 @@ export namespace Prisma {
     _max?: NestedEnumStockMovementTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumSaleTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SaleType | EnumSaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SaleType[]
+    notIn?: $Enums.SaleType[]
+    not?: NestedEnumSaleTypeFilter<$PrismaModel> | $Enums.SaleType
+  }
+
+  export type NestedEnumSaleTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SaleType | EnumSaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SaleType[]
+    notIn?: $Enums.SaleType[]
+    not?: NestedEnumSaleTypeWithAggregatesFilter<$PrismaModel> | $Enums.SaleType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSaleTypeFilter<$PrismaModel>
+    _max?: NestedEnumSaleTypeFilter<$PrismaModel>
+  }
+
   export type NestedEnumDiscountTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
     in?: $Enums.DiscountType[]
@@ -54134,6 +58101,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumFulfillmentMethodFilter<$PrismaModel>
     _max?: NestedEnumFulfillmentMethodFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInvoiceKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceKind | EnumInvoiceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceKind[]
+    notIn?: $Enums.InvoiceKind[]
+    not?: NestedEnumInvoiceKindFilter<$PrismaModel> | $Enums.InvoiceKind
+  }
+
+  export type NestedEnumInvoiceKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceKind | EnumInvoiceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceKind[]
+    notIn?: $Enums.InvoiceKind[]
+    not?: NestedEnumInvoiceKindWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceKindFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceKindFilter<$PrismaModel>
   }
 
   export type NestedEnumPaymentMethodFilter<$PrismaModel = never> = {
@@ -54395,7 +58379,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -54413,6 +58398,7 @@ export namespace Prisma {
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutUserInput = {
@@ -54432,7 +58418,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -54448,6 +58435,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutUserInput = {
@@ -54547,7 +58535,7 @@ export namespace Prisma {
 
   export type StockMovementCreateWithoutCreatedByInput = {
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdAt?: Date | string
@@ -54558,7 +58546,7 @@ export namespace Prisma {
     id?: number
     variantId: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdAt?: Date | string
@@ -54637,6 +58625,108 @@ export namespace Prisma {
   export type RoleCreateOrConnectWithoutUsersInput = {
     where: RoleWhereUniqueInput
     create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
+  }
+
+  export type PaymentCreateWithoutUserInput = {
+    method: $Enums.PaymentMethod
+    status?: $Enums.PaymentStatus
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    provider?: string | null
+    providerRef?: string | null
+    payerPhone?: string | null
+    failureReason?: string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
+    order: OrderCreateNestedOneWithoutPaymentsInput
+  }
+
+  export type PaymentUncheckedCreateWithoutUserInput = {
+    id?: number
+    orderId: number
+    method: $Enums.PaymentMethod
+    status?: $Enums.PaymentStatus
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    provider?: string | null
+    providerRef?: string | null
+    payerPhone?: string | null
+    failureReason?: string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
+  }
+
+  export type PaymentCreateOrConnectWithoutUserInput = {
+    where: PaymentWhereUniqueInput
+    create: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput>
+  }
+
+  export type PaymentCreateManyUserInputEnvelope = {
+    data: PaymentCreateManyUserInput | PaymentCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BlogPostCreateWithoutAuthorInput = {
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostUncheckedCreateWithoutAuthorInput = {
+    id?: number
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostCreateOrConnectWithoutAuthorInput = {
+    where: BlogPostWhereUniqueInput
+    create: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type BlogPostCreateManyAuthorInputEnvelope = {
+    data: BlogPostCreateManyAuthorInput | BlogPostCreateManyAuthorInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserPermissionUpsertWithWhereUniqueWithoutUserInput = {
@@ -54842,7 +58932,8 @@ export namespace Prisma {
     couponId?: IntNullableFilter<"Order"> | number | null
     deliveryZoneId?: IntNullableFilter<"Order"> | number | null
     shipFullName?: StringNullableFilter<"Order"> | string | null
-    shipPhone?: StringNullableFilter<"Order"> | string | null
+    shipPhone?: StringFilter<"Order"> | string
+    shipProvince?: StringNullableFilter<"Order"> | string | null
     shipDistrict?: StringNullableFilter<"Order"> | string | null
     shipSector?: StringNullableFilter<"Order"> | string | null
     shipStreet?: StringNullableFilter<"Order"> | string | null
@@ -54968,7 +59059,7 @@ export namespace Prisma {
     id?: IntFilter<"StockMovement"> | number
     variantId?: IntFilter<"StockMovement"> | number
     type?: EnumStockMovementTypeFilter<"StockMovement"> | $Enums.StockMovementType
-    quantity?: IntFilter<"StockMovement"> | number
+    quantity?: DecimalFilter<"StockMovement"> | Decimal | DecimalJsLike | number | string
     reference?: StringNullableFilter<"StockMovement"> | string | null
     note?: StringNullableFilter<"StockMovement"> | string | null
     createdById?: IntNullableFilter<"StockMovement"> | number | null
@@ -55055,6 +59146,238 @@ export namespace Prisma {
     roleName?: StringFilter<"Role"> | string
   }
 
+  export type PaymentUpsertWithWhereUniqueWithoutUserInput = {
+    where: PaymentWhereUniqueInput
+    update: XOR<PaymentUpdateWithoutUserInput, PaymentUncheckedUpdateWithoutUserInput>
+    create: XOR<PaymentCreateWithoutUserInput, PaymentUncheckedCreateWithoutUserInput>
+  }
+
+  export type PaymentUpdateWithWhereUniqueWithoutUserInput = {
+    where: PaymentWhereUniqueInput
+    data: XOR<PaymentUpdateWithoutUserInput, PaymentUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PaymentUpdateManyWithWhereWithoutUserInput = {
+    where: PaymentScalarWhereInput
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PaymentScalarWhereInput = {
+    AND?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+    OR?: PaymentScalarWhereInput[]
+    NOT?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+    id?: IntFilter<"Payment"> | number
+    orderId?: IntFilter<"Payment"> | number
+    method?: EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
+    status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    amount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Payment"> | string
+    provider?: StringNullableFilter<"Payment"> | string | null
+    providerRef?: StringNullableFilter<"Payment"> | string | null
+    payerPhone?: StringNullableFilter<"Payment"> | string | null
+    failureReason?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: IntNullableFilter<"Payment"> | number | null
+    rawResponse?: JsonNullableFilter<"Payment">
+    paidAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    updatedAt?: DateTimeFilter<"Payment"> | Date | string
+    refundedAmount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
+    refundedAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
+    refundReason?: StringNullableFilter<"Payment"> | string | null
+    note?: StringNullableFilter<"Payment"> | string | null
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+  }
+
+  export type BlogPostUpsertWithWhereUniqueWithoutAuthorInput = {
+    where: BlogPostWhereUniqueInput
+    update: XOR<BlogPostUpdateWithoutAuthorInput, BlogPostUncheckedUpdateWithoutAuthorInput>
+    create: XOR<BlogPostCreateWithoutAuthorInput, BlogPostUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type BlogPostUpdateWithWhereUniqueWithoutAuthorInput = {
+    where: BlogPostWhereUniqueInput
+    data: XOR<BlogPostUpdateWithoutAuthorInput, BlogPostUncheckedUpdateWithoutAuthorInput>
+  }
+
+  export type BlogPostUpdateManyWithWhereWithoutAuthorInput = {
+    where: BlogPostScalarWhereInput
+    data: XOR<BlogPostUpdateManyMutationInput, BlogPostUncheckedUpdateManyWithoutAuthorInput>
+  }
+
+  export type BlogPostScalarWhereInput = {
+    AND?: BlogPostScalarWhereInput | BlogPostScalarWhereInput[]
+    OR?: BlogPostScalarWhereInput[]
+    NOT?: BlogPostScalarWhereInput | BlogPostScalarWhereInput[]
+    id?: IntFilter<"BlogPost"> | number
+    slug?: StringFilter<"BlogPost"> | string
+    locale?: StringFilter<"BlogPost"> | string
+    title?: StringFilter<"BlogPost"> | string
+    excerpt?: StringNullableFilter<"BlogPost"> | string | null
+    content?: StringFilter<"BlogPost"> | string
+    coverImage?: StringNullableFilter<"BlogPost"> | string | null
+    coverAlt?: StringNullableFilter<"BlogPost"> | string | null
+    tags?: StringNullableFilter<"BlogPost"> | string | null
+    readingMinutes?: IntFilter<"BlogPost"> | number
+    status?: EnumBlogStatusFilter<"BlogPost"> | $Enums.BlogStatus
+    featured?: BoolFilter<"BlogPost"> | boolean
+    seoTitle?: StringNullableFilter<"BlogPost"> | string | null
+    seoDescription?: StringNullableFilter<"BlogPost"> | string | null
+    authorId?: IntNullableFilter<"BlogPost"> | number | null
+    publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
+    createdAt?: DateTimeFilter<"BlogPost"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPost"> | Date | string
+  }
+
+  export type UserCreateWithoutBlogPostsInput = {
+    email: string
+    phoneNumber?: string | null
+    firstName: string
+    lastName?: string | null
+    password: string
+    profilePicture?: string | null
+    isActive?: boolean
+    emailVerifiedAt?: Date | string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
+    permissions?: UserPermissionCreateNestedManyWithoutUserInput
+    grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
+    permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
+    addresses?: AddressCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    cart?: CartCreateNestedOneWithoutUserInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    reviews?: ReviewCreateNestedManyWithoutUserInput
+    wishlist?: WishlistItemCreateNestedManyWithoutUserInput
+    designs?: VisualizerDesignCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutCreatedByInput
+    orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
+    forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
+    role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutBlogPostsInput = {
+    id?: number
+    email: string
+    phoneNumber?: string | null
+    firstName: string
+    lastName?: string | null
+    password: string
+    profilePicture?: string | null
+    isActive?: boolean
+    emailVerifiedAt?: Date | string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
+    permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
+    grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
+    permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
+    addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    cart?: CartUncheckedCreateNestedOneWithoutUserInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutUserInput
+    wishlist?: WishlistItemUncheckedCreateNestedManyWithoutUserInput
+    designs?: VisualizerDesignUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutCreatedByInput
+    orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+    forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
+    role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutBlogPostsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBlogPostsInput, UserUncheckedCreateWithoutBlogPostsInput>
+  }
+
+  export type UserUpsertWithoutBlogPostsInput = {
+    update: XOR<UserUpdateWithoutBlogPostsInput, UserUncheckedUpdateWithoutBlogPostsInput>
+    create: XOR<UserCreateWithoutBlogPostsInput, UserUncheckedCreateWithoutBlogPostsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBlogPostsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBlogPostsInput, UserUncheckedUpdateWithoutBlogPostsInput>
+  }
+
+  export type UserUpdateWithoutBlogPostsInput = {
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    permissions?: UserPermissionUpdateManyWithoutUserNestedInput
+    grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
+    permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
+    addresses?: AddressUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    cart?: CartUpdateOneWithoutUserNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUpdateManyWithoutUserNestedInput
+    wishlist?: WishlistItemUpdateManyWithoutUserNestedInput
+    designs?: VisualizerDesignUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutCreatedByNestedInput
+    orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
+    forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
+    role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBlogPostsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
+    grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
+    permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
+    addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    cart?: CartUncheckedUpdateOneWithoutUserNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutUserNestedInput
+    wishlist?: WishlistItemUncheckedUpdateManyWithoutUserNestedInput
+    designs?: VisualizerDesignUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutCreatedByNestedInput
+    orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+    forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
+    role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutRefreshTokensInput = {
     email: string
     phoneNumber?: string | null
@@ -55067,6 +59390,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -55080,6 +59407,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -55095,6 +59424,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -55108,6 +59441,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -55138,6 +59473,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -55151,6 +59490,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -55166,6 +59507,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -55179,6 +59524,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserPermissionCreateWithoutPermissionInput = {
@@ -55231,6 +59578,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
     addresses?: AddressCreateNestedManyWithoutUserInput
@@ -55244,6 +59595,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutPermissionsInput = {
@@ -55259,6 +59612,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
@@ -55272,6 +59629,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutPermissionsInput = {
@@ -55309,6 +59668,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
     addresses?: AddressCreateNestedManyWithoutUserInput
@@ -55322,6 +59685,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutGrantedPermsInput = {
@@ -55337,6 +59702,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
@@ -55350,6 +59719,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutGrantedPermsInput = {
@@ -55380,6 +59751,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
     addresses?: AddressUpdateManyWithoutUserNestedInput
@@ -55393,6 +59768,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPermissionsInput = {
@@ -55408,6 +59785,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -55421,6 +59802,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type PermissionUpsertWithoutUsersInput = {
@@ -55470,6 +59853,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
     addresses?: AddressUpdateManyWithoutUserNestedInput
@@ -55483,6 +59870,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGrantedPermsInput = {
@@ -55498,6 +59887,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -55511,6 +59904,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserCreateWithoutPermissionLogsInput = {
@@ -55525,6 +59920,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     addresses?: AddressCreateNestedManyWithoutUserInput
@@ -55538,6 +59937,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutPermissionLogsInput = {
@@ -55553,6 +59954,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
@@ -55566,6 +59971,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutPermissionLogsInput = {
@@ -55596,6 +60003,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     addresses?: AddressUpdateManyWithoutUserNestedInput
@@ -55609,6 +60020,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPermissionLogsInput = {
@@ -55624,6 +60037,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -55637,6 +60054,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserCreateWithoutAddressesInput = {
@@ -55651,6 +60070,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -55664,6 +60087,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutAddressesInput = {
@@ -55679,6 +60104,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -55692,6 +60121,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutAddressesInput = {
@@ -55722,6 +60153,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -55735,6 +60170,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -55750,6 +60187,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -55763,6 +60204,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type CategoryCreateWithoutChildrenInput = {
@@ -56065,13 +60508,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -56092,13 +60537,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -56302,13 +60749,15 @@ export namespace Prisma {
     color?: StringNullableFilter<"ProductVariant"> | string | null
     thicknessMm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     shadeCode?: StringNullableFilter<"ProductVariant"> | string | null
-    piecesPerBox?: IntFilter<"ProductVariant"> | number
-    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     currency?: StringFilter<"ProductVariant"> | string
+    piecesPerBox?: IntFilter<"ProductVariant"> | number
+    sqmPerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: DecimalNullableFilter<"ProductVariant"> | Decimal | DecimalJsLike | number | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
     textureUrl?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
@@ -56643,18 +61092,18 @@ export namespace Prisma {
   }
 
   export type InventoryCreateWithoutVariantInput = {
-    onHandBoxes?: number
-    reservedBoxes?: number
-    reorderLevel?: number
+    onHandSqm: Decimal | DecimalJsLike | number | string
+    reservedSqm: Decimal | DecimalJsLike | number | string
+    reorderLevel?: Decimal | DecimalJsLike | number | string
     allowBackorder?: boolean
     updatedAt?: Date | string
   }
 
   export type InventoryUncheckedCreateWithoutVariantInput = {
     id?: number
-    onHandBoxes?: number
-    reservedBoxes?: number
-    reorderLevel?: number
+    onHandSqm: Decimal | DecimalJsLike | number | string
+    reservedSqm: Decimal | DecimalJsLike | number | string
+    reorderLevel?: Decimal | DecimalJsLike | number | string
     allowBackorder?: boolean
     updatedAt?: Date | string
   }
@@ -56666,7 +61115,7 @@ export namespace Prisma {
 
   export type StockMovementCreateWithoutVariantInput = {
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdAt?: Date | string
@@ -56676,7 +61125,7 @@ export namespace Prisma {
   export type StockMovementUncheckedCreateWithoutVariantInput = {
     id?: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdById?: number | null
@@ -56694,7 +61143,8 @@ export namespace Prisma {
   }
 
   export type CartItemCreateWithoutVariantInput = {
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
     cart: CartCreateNestedOneWithoutItemsInput
@@ -56703,7 +61153,8 @@ export namespace Prisma {
   export type CartItemUncheckedCreateWithoutVariantInput = {
     id?: number
     cartId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -56725,8 +61176,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
     order: OrderCreateNestedOneWithoutItemsInput
@@ -56741,8 +61194,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -56872,18 +61327,18 @@ export namespace Prisma {
   }
 
   export type InventoryUpdateWithoutVariantInput = {
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InventoryUncheckedUpdateWithoutVariantInput = {
     id?: IntFieldUpdateOperationsInput | number
-    onHandBoxes?: IntFieldUpdateOperationsInput | number
-    reservedBoxes?: IntFieldUpdateOperationsInput | number
-    reorderLevel?: IntFieldUpdateOperationsInput | number
+    onHandSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reservedSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reorderLevel?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     allowBackorder?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -56927,7 +61382,8 @@ export namespace Prisma {
     id?: IntFilter<"CartItem"> | number
     cartId?: IntFilter<"CartItem"> | number
     variantId?: IntFilter<"CartItem"> | number
-    quantity?: IntFilter<"CartItem"> | number
+    saleType?: EnumSaleTypeFilter<"CartItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"CartItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"CartItem"> | Date | string
     updatedAt?: DateTimeFilter<"CartItem"> | Date | string
   }
@@ -56961,8 +61417,10 @@ export namespace Prisma {
     finish?: StringNullableFilter<"OrderItem"> | string | null
     shadeCode?: StringNullableFilter<"OrderItem"> | string | null
     image?: StringNullableFilter<"OrderItem"> | string | null
-    quantity?: IntFilter<"OrderItem"> | number
-    sqmPerBox?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFilter<"OrderItem"> | $Enums.SaleType
+    quantity?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
+    containers?: IntNullableFilter<"OrderItem"> | number | null
+    sqmPerBox?: DecimalNullableFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFilter<"OrderItem"> | Decimal | DecimalJsLike | number | string
   }
@@ -57242,13 +61700,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57270,13 +61730,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57311,13 +61773,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -57339,13 +61803,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -57364,13 +61830,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57392,13 +61860,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57427,6 +61897,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -57440,6 +61914,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutStockMovementsInput = {
@@ -57455,6 +61931,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -57468,6 +61948,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutStockMovementsInput = {
@@ -57493,13 +61975,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -57521,13 +62005,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -57562,6 +62048,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -57575,6 +62065,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStockMovementsInput = {
@@ -57590,6 +62082,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -57603,6 +62099,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserCreateWithoutCartInput = {
@@ -57617,6 +62115,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -57630,6 +62132,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutCartInput = {
@@ -57645,6 +62149,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -57658,6 +62166,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutCartInput = {
@@ -57702,7 +62212,8 @@ export namespace Prisma {
   }
 
   export type CartItemCreateWithoutCartInput = {
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
     variant: ProductVariantCreateNestedOneWithoutCartItemsInput
@@ -57711,7 +62222,8 @@ export namespace Prisma {
   export type CartItemUncheckedCreateWithoutCartInput = {
     id?: number
     variantId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -57749,6 +62261,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -57762,6 +62278,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCartInput = {
@@ -57777,6 +62295,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -57790,6 +62312,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type CouponUpsertWithoutCartsInput = {
@@ -57879,13 +62403,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57907,13 +62433,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -57976,13 +62504,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -58004,13 +62534,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -58034,6 +62566,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -58047,6 +62583,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutWishlistInput = {
@@ -58062,6 +62600,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -58075,6 +62617,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutWishlistInput = {
@@ -58175,6 +62719,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -58188,6 +62736,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutWishlistInput = {
@@ -58203,6 +62753,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -58216,6 +62770,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type ProductUpsertWithoutWishlistInput = {
@@ -58308,7 +62864,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -58326,6 +62883,7 @@ export namespace Prisma {
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutDeliveryZoneInput = {
@@ -58345,7 +62903,8 @@ export namespace Prisma {
     currency?: string
     couponId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -58361,6 +62920,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutDeliveryZoneInput = {
@@ -58430,7 +62990,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -58448,6 +63009,7 @@ export namespace Prisma {
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutCouponInput = {
@@ -58467,7 +63029,8 @@ export namespace Prisma {
     currency?: string
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -58483,6 +63046,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutCouponInput = {
@@ -58551,6 +63115,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -58564,6 +63132,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutOrdersInput = {
@@ -58579,6 +63149,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -58592,6 +63166,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutOrdersInput = {
@@ -58639,7 +63215,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal | DecimalJsLike | number | string
-    feePerBox?: Decimal | DecimalJsLike | number | string
+    feePerSqm: Decimal | DecimalJsLike | number | string
     freeOverAmount?: Decimal | DecimalJsLike | number | string | null
     estimatedDays?: number
     active?: boolean
@@ -58650,7 +63226,7 @@ export namespace Prisma {
     name: string
     districts: string
     baseFee: Decimal | DecimalJsLike | number | string
-    feePerBox?: Decimal | DecimalJsLike | number | string
+    feePerSqm: Decimal | DecimalJsLike | number | string
     freeOverAmount?: Decimal | DecimalJsLike | number | string | null
     estimatedDays?: number
     active?: boolean
@@ -58668,8 +63244,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
     variant?: ProductVariantCreateNestedOneWithoutOrderItemsInput
@@ -58684,8 +63262,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -58713,6 +63293,12 @@ export namespace Prisma {
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
+    user?: UserCreateNestedOneWithoutPaymentsInput
   }
 
   export type PaymentUncheckedCreateWithoutOrderInput = {
@@ -58725,10 +63311,16 @@ export namespace Prisma {
     providerRef?: string | null
     payerPhone?: string | null
     failureReason?: string | null
+    recordedById?: number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
   }
 
   export type PaymentCreateOrConnectWithoutOrderInput = {
@@ -58766,6 +63358,39 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type InvoiceCreateWithoutOrderInput = {
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+  }
+
+  export type InvoiceUncheckedCreateWithoutOrderInput = {
+    id?: number
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+  }
+
+  export type InvoiceCreateOrConnectWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput>
+  }
+
+  export type InvoiceCreateManyOrderInputEnvelope = {
+    data: InvoiceCreateManyOrderInput | InvoiceCreateManyOrderInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOrdersInput = {
     update: XOR<UserUpdateWithoutOrdersInput, UserUncheckedUpdateWithoutOrdersInput>
     create: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
@@ -58789,6 +63414,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -58802,6 +63431,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -58817,6 +63448,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -58830,6 +63465,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type CouponUpsertWithoutOrdersInput = {
@@ -58889,7 +63526,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -58900,7 +63537,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     districts?: StringFieldUpdateOperationsInput | string
     baseFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    feePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    feePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     freeOverAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     estimatedDays?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -58938,26 +63575,6 @@ export namespace Prisma {
     data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutOrderInput>
   }
 
-  export type PaymentScalarWhereInput = {
-    AND?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
-    OR?: PaymentScalarWhereInput[]
-    NOT?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
-    id?: IntFilter<"Payment"> | number
-    orderId?: IntFilter<"Payment"> | number
-    method?: EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
-    status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
-    amount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
-    currency?: StringFilter<"Payment"> | string
-    provider?: StringNullableFilter<"Payment"> | string | null
-    providerRef?: StringNullableFilter<"Payment"> | string | null
-    payerPhone?: StringNullableFilter<"Payment"> | string | null
-    failureReason?: StringNullableFilter<"Payment"> | string | null
-    rawResponse?: JsonNullableFilter<"Payment">
-    paidAt?: DateTimeNullableFilter<"Payment"> | Date | string | null
-    createdAt?: DateTimeFilter<"Payment"> | Date | string
-    updatedAt?: DateTimeFilter<"Payment"> | Date | string
-  }
-
   export type OrderStatusHistoryUpsertWithWhereUniqueWithoutOrderInput = {
     where: OrderStatusHistoryWhereUniqueInput
     update: XOR<OrderStatusHistoryUpdateWithoutOrderInput, OrderStatusHistoryUncheckedUpdateWithoutOrderInput>
@@ -58974,6 +63591,38 @@ export namespace Prisma {
     data: XOR<OrderStatusHistoryUpdateManyMutationInput, OrderStatusHistoryUncheckedUpdateManyWithoutOrderInput>
   }
 
+  export type InvoiceUpsertWithWhereUniqueWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    update: XOR<InvoiceUpdateWithoutOrderInput, InvoiceUncheckedUpdateWithoutOrderInput>
+    create: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput>
+  }
+
+  export type InvoiceUpdateWithWhereUniqueWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    data: XOR<InvoiceUpdateWithoutOrderInput, InvoiceUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type InvoiceUpdateManyWithWhereWithoutOrderInput = {
+    where: InvoiceScalarWhereInput
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyWithoutOrderInput>
+  }
+
+  export type InvoiceScalarWhereInput = {
+    AND?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+    OR?: InvoiceScalarWhereInput[]
+    NOT?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+    id?: IntFilter<"Invoice"> | number
+    orderId?: IntFilter<"Invoice"> | number
+    kind?: EnumInvoiceKindFilter<"Invoice"> | $Enums.InvoiceKind
+    number?: StringFilter<"Invoice"> | string
+    fileKey?: StringFilter<"Invoice"> | string
+    sha256?: StringFilter<"Invoice"> | string
+    sizeBytes?: IntFilter<"Invoice"> | number
+    total?: DecimalFilter<"Invoice"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Invoice"> | string
+    issuedAt?: DateTimeFilter<"Invoice"> | Date | string
+  }
+
   export type OrderCreateWithoutItemsInput = {
     orderNumber: string
     guestEmail?: string | null
@@ -58988,7 +63637,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59006,6 +63656,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutItemsInput = {
@@ -59026,7 +63677,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59041,6 +63693,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutItemsInput = {
@@ -59055,13 +63708,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -59083,13 +63738,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -59131,7 +63788,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59149,6 +63807,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutItemsInput = {
@@ -59169,7 +63828,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59184,6 +63844,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type ProductVariantUpsertWithoutOrderItemsInput = {
@@ -59204,13 +63865,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -59232,13 +63895,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -59250,7 +63915,7 @@ export namespace Prisma {
     designItems?: VisualizerDesignItemUncheckedUpdateManyWithoutVariantNestedInput
   }
 
-  export type OrderCreateWithoutHistoryInput = {
+  export type OrderCreateWithoutInvoicesInput = {
     orderNumber: string
     guestEmail?: string | null
     guestPhone?: string | null
@@ -59264,7 +63929,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59282,6 +63948,169 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
+    history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutInvoicesInput = {
+    id?: number
+    orderNumber: string
+    userId?: number | null
+    guestEmail?: string | null
+    guestPhone?: string | null
+    status?: $Enums.OrderStatus
+    paymentStatus?: $Enums.PaymentStatus
+    fulfillment?: $Enums.FulfillmentMethod
+    subtotal: Decimal | DecimalJsLike | number | string
+    discountTotal?: Decimal | DecimalJsLike | number | string
+    shippingFee?: Decimal | DecimalJsLike | number | string
+    taxTotal?: Decimal | DecimalJsLike | number | string
+    grandTotal: Decimal | DecimalJsLike | number | string
+    currency?: string
+    couponId?: number | null
+    deliveryZoneId?: number | null
+    shipFullName?: string | null
+    shipPhone: string
+    shipProvince?: string | null
+    shipDistrict?: string | null
+    shipSector?: string | null
+    shipStreet?: string | null
+    shipNotes?: string | null
+    customerNote?: string | null
+    internalNote?: string | null
+    placedAt?: Date | string
+    paidAt?: Date | string | null
+    shippedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    updatedAt?: Date | string
+    items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutInvoicesInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+  }
+
+  export type OrderUpsertWithoutInvoicesInput = {
+    update: XOR<OrderUpdateWithoutInvoicesInput, OrderUncheckedUpdateWithoutInvoicesInput>
+    create: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutInvoicesInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutInvoicesInput, OrderUncheckedUpdateWithoutInvoicesInput>
+  }
+
+  export type OrderUpdateWithoutInvoicesInput = {
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    fulfillment?: EnumFulfillmentMethodFieldUpdateOperationsInput | $Enums.FulfillmentMethod
+    subtotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shippingFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
+    shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
+    shipSector?: NullableStringFieldUpdateOperationsInput | string | null
+    shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
+    shipNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    customerNote?: NullableStringFieldUpdateOperationsInput | string | null
+    internalNote?: NullableStringFieldUpdateOperationsInput | string | null
+    placedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutOrdersNestedInput
+    coupon?: CouponUpdateOneWithoutOrdersNestedInput
+    deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
+    items?: OrderItemUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutInvoicesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    fulfillment?: EnumFulfillmentMethodFieldUpdateOperationsInput | $Enums.FulfillmentMethod
+    subtotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shippingFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    couponId?: NullableIntFieldUpdateOperationsInput | number | null
+    deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
+    shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
+    shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
+    shipSector?: NullableStringFieldUpdateOperationsInput | string | null
+    shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
+    shipNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    customerNote?: NullableStringFieldUpdateOperationsInput | string | null
+    internalNote?: NullableStringFieldUpdateOperationsInput | string | null
+    placedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderCreateWithoutHistoryInput = {
+    orderNumber: string
+    guestEmail?: string | null
+    guestPhone?: string | null
+    status?: $Enums.OrderStatus
+    paymentStatus?: $Enums.PaymentStatus
+    fulfillment?: $Enums.FulfillmentMethod
+    subtotal: Decimal | DecimalJsLike | number | string
+    discountTotal?: Decimal | DecimalJsLike | number | string
+    shippingFee?: Decimal | DecimalJsLike | number | string
+    taxTotal?: Decimal | DecimalJsLike | number | string
+    grandTotal: Decimal | DecimalJsLike | number | string
+    currency?: string
+    shipFullName?: string | null
+    shipPhone: string
+    shipProvince?: string | null
+    shipDistrict?: string | null
+    shipSector?: string | null
+    shipStreet?: string | null
+    shipNotes?: string | null
+    customerNote?: string | null
+    internalNote?: string | null
+    placedAt?: Date | string
+    paidAt?: Date | string | null
+    shippedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutOrdersInput
+    coupon?: CouponCreateNestedOneWithoutOrdersInput
+    deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
+    items?: OrderItemCreateNestedManyWithoutOrderInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutHistoryInput = {
@@ -59302,7 +64131,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59317,6 +64147,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutHistoryInput = {
@@ -59336,6 +64167,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -59349,6 +64184,8 @@ export namespace Prisma {
     stockMovements?: StockMovementCreateNestedManyWithoutCreatedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutOrderHistoryInput = {
@@ -59364,6 +64201,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -59377,6 +64218,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedCreateNestedManyWithoutCreatedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutOrderHistoryInput = {
@@ -59409,7 +64252,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59427,6 +64271,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutHistoryInput = {
@@ -59447,7 +64292,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59462,6 +64308,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type UserUpsertWithoutOrderHistoryInput = {
@@ -59487,6 +64334,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -59500,6 +64351,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUpdateManyWithoutCreatedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrderHistoryInput = {
@@ -59515,6 +64368,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -59528,6 +64385,80 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedUpdateManyWithoutCreatedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
+  }
+
+  export type UserCreateWithoutPaymentsInput = {
+    email: string
+    phoneNumber?: string | null
+    firstName: string
+    lastName?: string | null
+    password: string
+    profilePicture?: string | null
+    isActive?: boolean
+    emailVerifiedAt?: Date | string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
+    permissions?: UserPermissionCreateNestedManyWithoutUserInput
+    grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
+    permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
+    addresses?: AddressCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    cart?: CartCreateNestedOneWithoutUserInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    reviews?: ReviewCreateNestedManyWithoutUserInput
+    wishlist?: WishlistItemCreateNestedManyWithoutUserInput
+    designs?: VisualizerDesignCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutCreatedByInput
+    orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
+    forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
+    role?: RoleCreateNestedManyWithoutUsersInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
+  }
+
+  export type UserUncheckedCreateWithoutPaymentsInput = {
+    id?: number
+    email: string
+    phoneNumber?: string | null
+    firstName: string
+    lastName?: string | null
+    password: string
+    profilePicture?: string | null
+    isActive?: boolean
+    emailVerifiedAt?: Date | string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
+    permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
+    grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
+    permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
+    addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    cart?: CartUncheckedCreateNestedOneWithoutUserInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutUserInput
+    wishlist?: WishlistItemUncheckedCreateNestedManyWithoutUserInput
+    designs?: VisualizerDesignUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutCreatedByInput
+    orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+    forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
+    role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
+  }
+
+  export type UserCreateOrConnectWithoutPaymentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPaymentsInput, UserUncheckedCreateWithoutPaymentsInput>
   }
 
   export type OrderCreateWithoutPaymentsInput = {
@@ -59544,7 +64475,8 @@ export namespace Prisma {
     grandTotal: Decimal | DecimalJsLike | number | string
     currency?: string
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59562,6 +64494,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutPaymentsInput = {
@@ -59582,7 +64515,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -59597,11 +64531,90 @@ export namespace Prisma {
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutPaymentsInput = {
     where: OrderWhereUniqueInput
     create: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
+  }
+
+  export type UserUpsertWithoutPaymentsInput = {
+    update: XOR<UserUpdateWithoutPaymentsInput, UserUncheckedUpdateWithoutPaymentsInput>
+    create: XOR<UserCreateWithoutPaymentsInput, UserUncheckedCreateWithoutPaymentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPaymentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPaymentsInput, UserUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type UserUpdateWithoutPaymentsInput = {
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    permissions?: UserPermissionUpdateManyWithoutUserNestedInput
+    grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
+    permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
+    addresses?: AddressUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    cart?: CartUpdateOneWithoutUserNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUpdateManyWithoutUserNestedInput
+    wishlist?: WishlistItemUpdateManyWithoutUserNestedInput
+    designs?: VisualizerDesignUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutCreatedByNestedInput
+    orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
+    forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
+    role?: RoleUpdateManyWithoutUsersNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPaymentsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
+    grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
+    permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
+    addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    cart?: CartUncheckedUpdateOneWithoutUserNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutUserNestedInput
+    wishlist?: WishlistItemUncheckedUpdateManyWithoutUserNestedInput
+    designs?: VisualizerDesignUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutCreatedByNestedInput
+    orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+    forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
+    role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type OrderUpsertWithoutPaymentsInput = {
@@ -59629,7 +64642,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59647,6 +64661,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutPaymentsInput = {
@@ -59667,7 +64682,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59682,6 +64698,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type ProductCreateWithoutReviewsInput = {
@@ -59766,6 +64783,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -59779,6 +64800,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
@@ -59794,6 +64817,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -59807,6 +64834,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutReviewsInput = {
@@ -59913,6 +64942,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -59926,6 +64959,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -59941,6 +64976,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -59954,6 +64993,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type VisualizerDesignCreateWithoutSceneInput = {
@@ -60017,6 +65058,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -60030,6 +65075,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutDesignsInput = {
@@ -60045,6 +65092,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -60058,6 +65109,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutDesignsInput = {
@@ -60145,6 +65198,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -60158,6 +65215,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDesignsInput = {
@@ -60173,6 +65232,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -60186,6 +65249,8 @@ export namespace Prisma {
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type VisualizerSceneUpsertWithoutDesignsInput = {
@@ -60252,6 +65317,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -60265,6 +65334,8 @@ export namespace Prisma {
     stockMovements?: StockMovementCreateNestedManyWithoutCreatedByInput
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     role?: RoleCreateNestedManyWithoutUsersInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutForgetPasswordRequestsInput = {
@@ -60280,6 +65351,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -60293,6 +65368,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedCreateNestedManyWithoutCreatedByInput
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     role?: RoleUncheckedCreateNestedManyWithoutUsersInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutForgetPasswordRequestsInput = {
@@ -60323,6 +65400,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -60336,6 +65417,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUpdateManyWithoutCreatedByNestedInput
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     role?: RoleUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutForgetPasswordRequestsInput = {
@@ -60351,6 +65434,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -60364,6 +65451,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedUpdateManyWithoutCreatedByNestedInput
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     role?: RoleUncheckedUpdateManyWithoutUsersNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type VisualizerDesignCreateWithoutItemsInput = {
@@ -60401,13 +65490,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -60429,13 +65520,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -60504,13 +65597,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -60532,13 +65627,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -60817,6 +65914,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogCreateNestedManyWithoutTargetInput
@@ -60830,6 +65931,8 @@ export namespace Prisma {
     stockMovements?: StockMovementCreateNestedManyWithoutCreatedByInput
     orderHistory?: OrderStatusHistoryCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestCreateNestedManyWithoutUserInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutRoleInput = {
@@ -60845,6 +65948,10 @@ export namespace Prisma {
     lastLogin?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobTitle?: string | null
+    bio?: string | null
+    showOnHomepage?: boolean
+    displayOrder?: number
     permissions?: UserPermissionUncheckedCreateNestedManyWithoutUserInput
     grantedPerms?: UserPermissionUncheckedCreateNestedManyWithoutGrantedByInput
     permissionLogs?: PermissionLogUncheckedCreateNestedManyWithoutTargetInput
@@ -60858,6 +65965,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedCreateNestedManyWithoutCreatedByInput
     orderHistory?: OrderStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedCreateNestedManyWithoutUserInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    blogPosts?: BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutRoleInput = {
@@ -60897,6 +66006,10 @@ export namespace Prisma {
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    jobTitle?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    showOnHomepage?: BoolFilter<"User"> | boolean
+    displayOrder?: IntFilter<"User"> | number
   }
 
   export type UserPermissionCreateManyUserInput = {
@@ -60964,7 +66077,8 @@ export namespace Prisma {
     couponId?: number | null
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -61011,7 +66125,7 @@ export namespace Prisma {
     id?: number
     variantId: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdAt?: Date | string
@@ -61031,6 +66145,48 @@ export namespace Prisma {
     expiresAt: Date | string
     attempts?: number
     createdAt?: Date | string
+  }
+
+  export type PaymentCreateManyUserInput = {
+    id?: number
+    orderId: number
+    method: $Enums.PaymentMethod
+    status?: $Enums.PaymentStatus
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    provider?: string | null
+    providerRef?: string | null
+    payerPhone?: string | null
+    failureReason?: string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
+  }
+
+  export type BlogPostCreateManyAuthorInput = {
+    id?: number
+    slug: string
+    locale?: string
+    title: string
+    excerpt?: string | null
+    content: string
+    coverImage?: string | null
+    coverAlt?: string | null
+    tags?: string | null
+    readingMinutes?: number
+    status?: $Enums.BlogStatus
+    featured?: boolean
+    seoTitle?: string | null
+    seoDescription?: string | null
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserPermissionUpdateWithoutUserInput = {
@@ -61188,7 +66344,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61206,6 +66363,7 @@ export namespace Prisma {
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutUserInput = {
@@ -61225,7 +66383,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61241,6 +66400,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutUserInput = {
@@ -61260,7 +66420,8 @@ export namespace Prisma {
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61360,7 +66521,7 @@ export namespace Prisma {
 
   export type StockMovementUpdateWithoutCreatedByInput = {
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61371,7 +66532,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61381,7 +66542,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61446,6 +66607,130 @@ export namespace Prisma {
   export type RoleUncheckedUpdateManyWithoutUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
     roleName?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PaymentUpdateWithoutUserInput = {
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerRef?: NullableStringFieldUpdateOperationsInput | string | null
+    payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    order?: OrderUpdateOneRequiredWithoutPaymentsNestedInput
+  }
+
+  export type PaymentUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderId?: IntFieldUpdateOperationsInput | number
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerRef?: NullableStringFieldUpdateOperationsInput | string | null
+    payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderId?: IntFieldUpdateOperationsInput | number
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerRef?: NullableStringFieldUpdateOperationsInput | string | null
+    payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    rawResponse?: NullableJsonNullValueInput | InputJsonValue
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BlogPostUpdateWithoutAuthorInput = {
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostUncheckedUpdateWithoutAuthorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostUncheckedUpdateManyWithoutAuthorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    coverAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumBlogStatusFieldUpdateOperationsInput | $Enums.BlogStatus
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserPermissionCreateManyPermissionInput = {
@@ -61650,13 +66935,15 @@ export namespace Prisma {
     color?: string | null
     thicknessMm?: Decimal | DecimalJsLike | number | string | null
     shadeCode?: string | null
-    piecesPerBox?: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     pricePerSqm: Decimal | DecimalJsLike | number | string
-    pricePerBox: Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: Decimal | DecimalJsLike | number | string | null
     currency?: string
+    piecesPerBox?: number
+    sqmPerBox?: Decimal | DecimalJsLike | number | string
+    pricePerBox?: Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: Decimal | DecimalJsLike | number | string | null
     image?: string | null
     textureUrl?: string | null
     active?: boolean
@@ -61706,13 +66993,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -61733,13 +67022,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -61760,13 +67051,15 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     thicknessMm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
-    piecesPerBox?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     pricePerSqm?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containerPricePerSqm?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    sqmPerContainer?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     compareAtPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     currency?: StringFieldUpdateOperationsInput | string
+    piecesPerBox?: IntFieldUpdateOperationsInput | number
+    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    pricePerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    weightKgPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     textureUrl?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
@@ -61877,7 +67170,7 @@ export namespace Prisma {
   export type StockMovementCreateManyVariantInput = {
     id?: number
     type: $Enums.StockMovementType
-    quantity: number
+    quantity: Decimal | DecimalJsLike | number | string
     reference?: string | null
     note?: string | null
     createdById?: number | null
@@ -61887,7 +67180,8 @@ export namespace Prisma {
   export type CartItemCreateManyVariantInput = {
     id?: number
     cartId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -61901,8 +67195,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -61918,7 +67214,7 @@ export namespace Prisma {
 
   export type StockMovementUpdateWithoutVariantInput = {
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61928,7 +67224,7 @@ export namespace Prisma {
   export type StockMovementUncheckedUpdateWithoutVariantInput = {
     id?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
@@ -61938,7 +67234,7 @@ export namespace Prisma {
   export type StockMovementUncheckedUpdateManyWithoutVariantInput = {
     id?: IntFieldUpdateOperationsInput | number
     type?: EnumStockMovementTypeFieldUpdateOperationsInput | $Enums.StockMovementType
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     reference?: NullableStringFieldUpdateOperationsInput | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
@@ -61946,7 +67242,8 @@ export namespace Prisma {
   }
 
   export type CartItemUpdateWithoutVariantInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cart?: CartUpdateOneRequiredWithoutItemsNestedInput
@@ -61955,7 +67252,8 @@ export namespace Prisma {
   export type CartItemUncheckedUpdateWithoutVariantInput = {
     id?: IntFieldUpdateOperationsInput | number
     cartId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -61963,7 +67261,8 @@ export namespace Prisma {
   export type CartItemUncheckedUpdateManyWithoutVariantInput = {
     id?: IntFieldUpdateOperationsInput | number
     cartId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -61975,8 +67274,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -61991,8 +67292,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -62006,8 +67309,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -62060,13 +67365,15 @@ export namespace Prisma {
   export type CartItemCreateManyCartInput = {
     id?: number
     variantId: number
-    quantity?: number
+    saleType?: $Enums.SaleType
+    quantity?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type CartItemUpdateWithoutCartInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     variant?: ProductVariantUpdateOneRequiredWithoutCartItemsNestedInput
@@ -62075,7 +67382,8 @@ export namespace Prisma {
   export type CartItemUncheckedUpdateWithoutCartInput = {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -62083,7 +67391,8 @@ export namespace Prisma {
   export type CartItemUncheckedUpdateManyWithoutCartInput = {
     id?: IntFieldUpdateOperationsInput | number
     variantId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -62105,7 +67414,8 @@ export namespace Prisma {
     currency?: string
     couponId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -62134,7 +67444,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62152,6 +67463,7 @@ export namespace Prisma {
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutDeliveryZoneInput = {
@@ -62171,7 +67483,8 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62187,6 +67500,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutDeliveryZoneInput = {
@@ -62206,7 +67520,8 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     couponId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62246,7 +67561,8 @@ export namespace Prisma {
     currency?: string
     deliveryZoneId?: number | null
     shipFullName?: string | null
-    shipPhone?: string | null
+    shipPhone: string
+    shipProvince?: string | null
     shipDistrict?: string | null
     shipSector?: string | null
     shipStreet?: string | null
@@ -62300,7 +67616,8 @@ export namespace Prisma {
     grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62318,6 +67635,7 @@ export namespace Prisma {
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutCouponInput = {
@@ -62337,7 +67655,8 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62353,6 +67672,7 @@ export namespace Prisma {
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutCouponInput = {
@@ -62372,7 +67692,8 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
     shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
-    shipPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
     shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
     shipSector?: NullableStringFieldUpdateOperationsInput | string | null
     shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62396,8 +67717,10 @@ export namespace Prisma {
     finish?: string | null
     shadeCode?: string | null
     image?: string | null
-    quantity: number
-    sqmPerBox: Decimal | DecimalJsLike | number | string
+    saleType?: $Enums.SaleType
+    quantity: Decimal | DecimalJsLike | number | string
+    containers?: number | null
+    sqmPerBox?: Decimal | DecimalJsLike | number | string | null
     unitPrice: Decimal | DecimalJsLike | number | string
     lineTotal: Decimal | DecimalJsLike | number | string
   }
@@ -62412,10 +67735,16 @@ export namespace Prisma {
     providerRef?: string | null
     payerPhone?: string | null
     failureReason?: string | null
+    recordedById?: number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    refundedAmount?: Decimal | DecimalJsLike | number | string
+    refundedAt?: Date | string | null
+    refundReason?: string | null
+    note?: string | null
+    proofUrl?: string | null
   }
 
   export type OrderStatusHistoryCreateManyOrderInput = {
@@ -62426,6 +67755,18 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type InvoiceCreateManyOrderInput = {
+    id?: number
+    kind: $Enums.InvoiceKind
+    number: string
+    fileKey: string
+    sha256: string
+    sizeBytes: number
+    total: Decimal | DecimalJsLike | number | string
+    currency?: string
+    issuedAt?: Date | string
+  }
+
   export type OrderItemUpdateWithoutOrderInput = {
     productName?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -62433,8 +67774,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     variant?: ProductVariantUpdateOneWithoutOrderItemsNestedInput
@@ -62449,8 +67792,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -62464,8 +67809,10 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     shadeCode?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
-    quantity?: IntFieldUpdateOperationsInput | number
-    sqmPerBox?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleType?: EnumSaleTypeFieldUpdateOperationsInput | $Enums.SaleType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    containers?: NullableIntFieldUpdateOperationsInput | number | null
+    sqmPerBox?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     lineTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
   }
@@ -62483,6 +67830,12 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutPaymentsNestedInput
   }
 
   export type PaymentUncheckedUpdateWithoutOrderInput = {
@@ -62495,10 +67848,16 @@ export namespace Prisma {
     providerRef?: NullableStringFieldUpdateOperationsInput | string | null
     payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
     failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableIntFieldUpdateOperationsInput | number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PaymentUncheckedUpdateManyWithoutOrderInput = {
@@ -62511,10 +67870,16 @@ export namespace Prisma {
     providerRef?: NullableStringFieldUpdateOperationsInput | string | null
     payerPhone?: NullableStringFieldUpdateOperationsInput | string | null
     failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableIntFieldUpdateOperationsInput | number | null
     rawResponse?: NullableJsonNullValueInput | InputJsonValue
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    refundedAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    refundedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    refundReason?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OrderStatusHistoryUpdateWithoutOrderInput = {
@@ -62538,6 +67903,41 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUpdateWithoutOrderInput = {
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUncheckedUpdateWithoutOrderInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUncheckedUpdateManyWithoutOrderInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    kind?: EnumInvoiceKindFieldUpdateOperationsInput | $Enums.InvoiceKind
+    number?: StringFieldUpdateOperationsInput | string
+    fileKey?: StringFieldUpdateOperationsInput | string
+    sha256?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VisualizerDesignCreateManySceneInput = {
@@ -62651,6 +68051,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUpdateManyWithoutTargetNestedInput
@@ -62664,6 +68068,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUpdateManyWithoutCreatedByNestedInput
     orderHistory?: OrderStatusHistoryUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUpdateManyWithoutUserNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRoleInput = {
@@ -62679,6 +68085,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
     permissions?: UserPermissionUncheckedUpdateManyWithoutUserNestedInput
     grantedPerms?: UserPermissionUncheckedUpdateManyWithoutGrantedByNestedInput
     permissionLogs?: PermissionLogUncheckedUpdateManyWithoutTargetNestedInput
@@ -62692,6 +68102,8 @@ export namespace Prisma {
     stockMovements?: StockMovementUncheckedUpdateManyWithoutCreatedByNestedInput
     orderHistory?: OrderStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
     forgetPasswordRequests?: ForgetPasswordRequestUncheckedUpdateManyWithoutUserNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    blogPosts?: BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -62707,6 +68119,10 @@ export namespace Prisma {
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
+    displayOrder?: IntFieldUpdateOperationsInput | number
   }
 
 

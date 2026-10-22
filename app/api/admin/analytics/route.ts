@@ -81,7 +81,10 @@ export const GET = withAuth(async (request) => {
         _sum: { grandTotal: true },
         _avg: { grandTotal: true },
       }),
-      prisma.order.aggregate({ where: REVENUE_ORDER, _sum: { grandTotal: true } }),
+      prisma.order.aggregate({
+        where: REVENUE_ORDER,
+        _sum: { grandTotal: true },
+      }),
       prisma.order.count({ where: { placedAt: inRange } }),
       prisma.order.count({ where: { placedAt: inPrev } }),
       prisma.order.count({ where: { status: { in: ["PAID", "PROCESSING"] } } }),
@@ -98,8 +101,8 @@ export const GET = withAuth(async (request) => {
       prisma.inventory.findMany({
         where: { variant: { active: true } },
         select: {
-          onHandBoxes: true,
-          reservedBoxes: true,
+          onHandSqm: true,
+          reservedSqm: true,
           reorderLevel: true,
           variant: {
             select: {
@@ -116,7 +119,12 @@ export const GET = withAuth(async (request) => {
       // ── raw rows for time-series ──
       prisma.order.findMany({
         where: { placedAt: { gte: seriesStart } },
-        select: { placedAt: true, grandTotal: true, status: true, paymentStatus: true },
+        select: {
+          placedAt: true,
+          grandTotal: true,
+          status: true,
+          paymentStatus: true,
+        },
       }),
       prisma.user.findMany({
         where: { createdAt: inRange },
@@ -241,29 +249,37 @@ export const GET = withAuth(async (request) => {
     ]);
 
     // ── inventory health ──
-    const stockList = inventoryRows.map((r) => {
-      const available = r.onHandBoxes - r.reservedBoxes;
-      const state = available <= 0 ? "OUT_OF_STOCK" : available <= r.reorderLevel ? "LOW" : "IN_STOCK";
-      return {
-        variantId: r.variant.id,
-        sku: r.variant.sku,
-        product: r.variant.product.name,
-        image: r.variant.product.image,
-        size: r.variant.size,
-        finish: r.variant.finish,
-        onHandBoxes: r.onHandBoxes,
-        reservedBoxes: r.reservedBoxes,
-        availableBoxes: available,
-        reorderLevel: r.reorderLevel,
-        state,
-      };
-    });
+   const stockList = inventoryRows.map((r) => {
+     const onHand = num(r.onHandSqm);
+     const reserved = num(r.reservedSqm);
+     const reorder = num(r.reorderLevel);
+     const available = round(onHand - reserved, 2);
+     const state =
+       available <= 0
+         ? "OUT_OF_STOCK"
+         : available <= reorder
+           ? "LOW"
+           : "IN_STOCK";
+     return {
+       variantId: r.variant.id,
+       sku: r.variant.sku,
+       product: r.variant.product.name,
+       image: r.variant.product.image,
+       size: r.variant.size,
+       finish: r.variant.finish,
+       onHandSqm: onHand,
+       reservedSqm: reserved,
+       availableSqm: available,
+       reorderLevel: reorder,
+       state,
+     };
+   });
     const outOfStock = stockList.filter((s) => s.state === "OUT_OF_STOCK").length;
     const lowStock = stockList.filter((s) => s.state === "LOW").length;
     const inStock = stockList.length - outOfStock - lowStock;
     const lowStockTable = stockList
       .filter((s) => s.state !== "IN_STOCK")
-      .sort((a, b) => a.availableBoxes - b.availableBoxes)
+      .sort((a, b) => a.availableSqm - b.availableSqm)
       .slice(0, 10);
 
     // ── time series ──
@@ -335,26 +351,46 @@ export const GET = withAuth(async (request) => {
           revenueDaily, // [{ label: "2026-10-18", revenue, orders }]
           revenueMonthly, // last 12 months [{ label: "2026-10", revenue, orders }]
           customersDaily, // [{ label, customers }]
-          topProducts: topProducts.map((p) => ({
-            label: p.productName,
-            quantity: num(p._sum.quantity),
+          topProducts: topProducts.map((p, i) => ({
+            rank: i + 1,
+            product: p.productName,
+            sqmSold: num(p._sum.quantity), // was boxesSold
             revenue: num(p._sum.lineTotal),
           })),
         },
         pies: {
-          ordersByStatus: toPie(ordersByStatus.map((r) => ({ label: titleCase(r.status), value: r._count._all }))),
+          ordersByStatus: toPie(
+            ordersByStatus.map((r) => ({
+              label: titleCase(r.status),
+              value: r._count._all,
+            })),
+          ),
           ordersByFulfillment: toPie(
-            ordersByFulfillment.map((r) => ({ label: titleCase(r.fulfillment), value: r._count._all })),
+            ordersByFulfillment.map((r) => ({
+              label: titleCase(r.fulfillment),
+              value: r._count._all,
+            })),
           ),
           paymentsByMethod: toPie(
-            paymentsByMethod.map((r) => ({ label: titleCase(r.method), value: num(r._sum.amount) })),
+            paymentsByMethod.map((r) => ({
+              label: titleCase(r.method),
+              value: num(r._sum.amount),
+            })),
           ),
           paymentsByStatus: toPie(
-            paymentsByStatus.map((r) => ({ label: titleCase(r.status), value: r._count._all })),
+            paymentsByStatus.map((r) => ({
+              label: titleCase(r.status),
+              value: r._count._all,
+            })),
           ),
-          revenueByCategory: toPie([...categoryRevenue].map(([label, value]) => ({ label, value }))),
+          revenueByCategory: toPie(
+            [...categoryRevenue].map(([label, value]) => ({ label, value })),
+          ),
           productsByCategory: toPie(
-            productsByCategory.map((r) => ({ label: r.categoryLabel, value: r._count._all })),
+            productsByCategory.map((r) => ({
+              label: r.categoryLabel,
+              value: r._count._all,
+            })),
           ),
           stockHealth: toPie([
             { label: "In stock", value: inStock },
@@ -366,7 +402,7 @@ export const GET = withAuth(async (request) => {
           recentOrders: recentOrders.map((o) => ({
             id: o.id,
             orderNumber: o.orderNumber,
-            customer: o.user ? fullName(o.user) : o.guestEmail ?? "Guest",
+            customer: o.user ? fullName(o.user) : (o.guestEmail ?? "Guest"),
             email: o.user?.email ?? o.guestEmail,
             status: o.status,
             paymentStatus: o.paymentStatus,

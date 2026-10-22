@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { isStaffUser } from "@/lib/roles";
 import { adminNav, customerNav } from "./nav";
 import { MobileSidebar, SidebarContent } from "../sidebar";
+import CartButton from "../cart-button";
 
 
 export function DashboardShell({
@@ -61,9 +62,10 @@ export function DashboardShell({
                     </Button>
 
                     <div className=" flex items-center gap-2">
-                        {isStaffUser(user) ? (
+                        {/* {isStaffUser(user) ? (
                             <Badge variant="secondary">{user?.role.roleName}</Badge>
-                        ) : <Badge variant="secondary">{user?.lastName}</Badge>}
+                        ) : <CartButton />} */}
+                        <CartButton />
                     </div>
                 </header>
 

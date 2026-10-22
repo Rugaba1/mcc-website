@@ -16,6 +16,8 @@ const nextConfig = {
     }
     return config;
   },
+  serverExternalPackages: ["pdfmake"],
+
   compress: true,
   sassOptions: { implementation: {} },
 
@@ -54,12 +56,16 @@ const nextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-
           {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin-allow-popups",
           },
         ],
+      },
+
+      {
+        source: "/api/invoices/:path*",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
       },
     ];
   },

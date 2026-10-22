@@ -22,6 +22,11 @@ enum OrderStatus {
   REFUNDED
 }
 
+enum SaleType {
+  SQM
+  CONTAINER
+}
+
 enum PaymentStatus {
   PENDING
   AUTHORIZED
@@ -93,10 +98,50 @@ model User {
   designs                VisualizerDesign[]
   stockMovements         StockMovement[]
   orderHistory           OrderStatusHistory[]
+  jobTitle               String?                 @map("job_title") @db.VarChar(100) // public role name, e.g. "Showroom Manager"
+  bio                    String?                 @db.VarChar(500)
+  showOnHomepage         Boolean                 @default(false) @map("show_on_homepage")
+  displayOrder           Int                     @default(0) @map("display_order")
   forgetPasswordRequests ForgetPasswordRequest[]
   role                   Role[]
+  payments               Payment[]
+  blogPosts              BlogPost[]
 
+  @@index([showOnHomepage, displayOrder])
   @@map("users")
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogPost {
+  id             Int        @id @default(autoincrement())
+  slug           String     @unique @db.VarChar(200)
+  locale         String     @default("en") @db.VarChar(5)
+  title          String     @db.VarChar(255)
+  excerpt        String?    @db.VarChar(500)
+  content        String     @db.LongText // raw MDX
+  coverImage     String?    @db.Text
+  coverAlt       String?    @db.VarChar(255)
+  tags           String?    @db.VarChar(255) // comma-separated, like Product.colors
+  readingMinutes Int        @default(1)
+  status         BlogStatus @default(DRAFT)
+  featured       Boolean    @default(false)
+  seoTitle       String?    @db.VarChar(255)
+  seoDescription String?    @db.VarChar(500)
+  authorId       Int?
+  publishedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([locale, status, publishedAt])
+  @@map("blog_post")
 }
 
 // Refresh tokens are NEVER stored in plain text: only a SHA-256 hash.
@@ -266,25 +311,28 @@ model ProductImage {
 }
 
 model ProductVariant {
-  id             Int      @id @default(autoincrement())
-  productId      Int
-  sku            String   @unique @db.VarChar(64)
-  size           String   @db.VarChar(50) // "60x60"
-  finish         String?  @db.VarChar(50) // matt, polished, glossy
-  color          String?  @db.VarChar(80)
-  thicknessMm    Decimal? @db.Decimal(4, 1)
-  shadeCode      String?  @db.VarChar(50) // batch / shade, avoid mixing batches
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  sku         String   @unique @db.VarChar(64)
+  size        String   @db.VarChar(50)
+  finish      String?  @db.VarChar(50)
+  color       String?  @db.VarChar(80)
+  thicknessMm Decimal? @db.Decimal(4, 1)
+  shadeCode   String?  @db.VarChar(50)
+
+  pricePerSqm          Decimal  @db.Decimal(12, 2) // 11,500
+  containerPricePerSqm Decimal? @db.Decimal(12, 2) // 11,000, null = not sold by container
+  sqmPerContainer      Decimal? @db.Decimal(10, 2) // m² in one container
+  compareAtPrice       Decimal? @db.Decimal(12, 2) // strike-through price per m²
+  currency             String   @default("RWF") @db.VarChar(3)
+
   piecesPerBox   Int      @default(1)
-  sqmPerBox      Decimal  @db.Decimal(8, 3) // coverage per box
+  sqmPerBox      Decimal  @default(1) @db.Decimal(8, 3)
+  pricePerBox    Decimal  @default(0) @db.Decimal(12, 2)
   weightKgPerBox Decimal? @db.Decimal(8, 2)
 
-  pricePerSqm    Decimal  @db.Decimal(12, 2) // RWF
-  pricePerBox    Decimal  @db.Decimal(12, 2) // RWF (what the cart charges)
-  compareAtPrice Decimal? @db.Decimal(12, 2) // strike-through price
-  currency       String   @default("RWF") @db.VarChar(3)
-
-  image      String?  @db.Text // swatch / variant image
-  textureUrl String?  @db.Text // seamless texture for visualizer
+  image      String?  @db.Text
+  textureUrl String?  @db.Text
   active     Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -332,9 +380,9 @@ model CollectionItem {
 model Inventory {
   id             Int      @id @default(autoincrement())
   variantId      Int      @unique
-  onHandBoxes    Int      @default(0) // physically in stock
-  reservedBoxes  Int      @default(0) // held by unpaid orders
-  reorderLevel   Int      @default(0)
+  onHandSqm      Decimal  @map("onHandBoxes") // m² in stock                @default(0) @db.Decimal(12, 2)
+  reservedSqm    Decimal  @map("reservedBoxes") // m² held by unpaid orders @default(0) @db.Decimal(12, 2)
+  reorderLevel   Decimal  @default(0) @db.Decimal(12, 2) // m²
   allowBackorder Boolean  @default(false)
   updatedAt      DateTime @updatedAt
 
@@ -348,8 +396,8 @@ model StockMovement {
   id          Int               @id @default(autoincrement())
   variantId   Int
   type        StockMovementType
-  quantity    Int // positive or negative, in boxes
-  reference   String?           @db.VarChar(100) // order number, PO number
+  quantity    Decimal           @db.Decimal(12, 2)
+  reference   String?           @db.VarChar(100)
   note        String?           @db.VarChar(255)
   createdById Int?
   createdAt   DateTime          @default(now())
@@ -384,14 +432,15 @@ model CartItem {
   id        Int      @id @default(autoincrement())
   cartId    Int
   variantId Int
-  quantity  Int      @default(1) // boxes
+  saleType  SaleType @default(SQM)
+  quantity  Decimal  @default(1) @db.Decimal(10, 2)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   cart    Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
   variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
-  @@unique([cartId, variantId])
+  @@unique([cartId, variantId, saleType])
   @@map("cartitem")
 }
 
@@ -414,10 +463,10 @@ model WishlistItem {
 
 model DeliveryZone {
   id             Int      @id @default(autoincrement())
-  name           String   @db.VarChar(150) // "Kigali - Gasabo"
-  districts      String   @db.Text // comma-separated or JSON list
+  name           String   @db.VarChar(150)
+  districts      String   @db.Text
   baseFee        Decimal  @db.Decimal(12, 2)
-  feePerBox      Decimal  @default(0) @db.Decimal(12, 2) // tiles are heavy
+  feePerSqm      Decimal  @map("feePerBox") // shipping per m², same column as before @default(0) @db.Decimal(12, 2)
   freeOverAmount Decimal? @db.Decimal(12, 2)
   estimatedDays  Int      @default(2)
   active         Boolean  @default(true)
@@ -469,7 +518,8 @@ model Order {
   deliveryZoneId Int?
   // address snapshot (so later edits don't change old orders)
   shipFullName   String? @db.VarChar(255)
-  shipPhone      String? @db.VarChar(20)
+  shipPhone      String  @db.VarChar(20)
+  shipProvince   String? @db.VarChar(100)
   shipDistrict   String? @db.VarChar(100)
   shipSector     String? @db.VarChar(100)
   shipStreet     String? @db.VarChar(255)
@@ -489,33 +539,60 @@ model Order {
   items        OrderItem[]
   payments     Payment[]
   history      OrderStatusHistory[]
+  invoices     Invoice[]
 
   @@index([userId])
   @@index([status, placedAt])
   @@map("order")
 }
 
-// Snapshot of what was bought, price and names frozen at purchase time.
 model OrderItem {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   orderId     Int
   variantId   Int?
-  productName String  @db.VarChar(255)
-  sku         String  @db.VarChar(64)
-  size        String  @db.VarChar(50)
-  finish      String? @db.VarChar(50)
-  shadeCode   String? @db.VarChar(50)
-  image       String? @db.Text
-  quantity    Int // boxes
-  sqmPerBox   Decimal @db.Decimal(8, 3)
-  unitPrice   Decimal @db.Decimal(12, 2) // per box
-  lineTotal   Decimal @db.Decimal(12, 2)
+  productName String   @db.VarChar(255)
+  sku         String   @db.VarChar(64)
+  size        String   @db.VarChar(50)
+  finish      String?  @db.VarChar(50)
+  shadeCode   String?  @db.VarChar(50)
+  image       String?  @db.Text
+  saleType    SaleType @default(SQM)
+  quantity    Decimal  @db.Decimal(10, 2) // always m²
+  containers  Int? // how many containers, for display
+  sqmPerBox   Decimal? @db.Decimal(8, 3) // legacy, now optional
+  unitPrice   Decimal  @db.Decimal(12, 2) // price per m²
+  lineTotal   Decimal  @db.Decimal(12, 2)
 
   order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
   variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@map("orderitem")
+}
+
+enum InvoiceKind {
+  PROFORMA
+  INVOICE
+  CREDIT_NOTE
+}
+
+model Invoice {
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  kind      InvoiceKind
+  number    String      @unique @db.VarChar(40)
+  fileKey   String      @unique @db.VarChar(64)
+  sha256    String      @db.VarChar(64)
+  sizeBytes Int
+  total     Decimal     @db.Decimal(12, 2)
+  currency  String      @default("RWF") @db.VarChar(3)
+  issuedAt  DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, kind])
+  @@index([orderId])
+  @@map("invoice")
 }
 
 model OrderStatusHistory {
@@ -534,22 +611,28 @@ model OrderStatusHistory {
 }
 
 model Payment {
-  id            Int           @id @default(autoincrement())
-  orderId       Int
-  method        PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  amount        Decimal       @db.Decimal(12, 2)
-  currency      String        @default("RWF") @db.VarChar(3)
-  provider      String?       @db.VarChar(50) // gateway name (e.g. Flutterwave, Paypack)
-  providerRef   String?       @unique @db.VarChar(150) // gateway transaction id
-  payerPhone    String?       @db.VarChar(20) // mobile money number
-  failureReason String?       @db.VarChar(255)
-  rawResponse   Json?
-  paidAt        DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id             Int           @id @default(autoincrement())
+  orderId        Int
+  method         PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  amount         Decimal       @db.Decimal(12, 2)
+  currency       String        @default("RWF") @db.VarChar(3)
+  provider       String?       @db.VarChar(50) // gateway name (e.g. Flutterwave, Paypack)
+  providerRef    String?       @unique @db.VarChar(150) // gateway transaction id
+  payerPhone     String?       @db.VarChar(20) // mobile money number
+  failureReason  String?       @db.VarChar(255)
+  recordedById   Int?
+  rawResponse    Json?
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  refundedAmount Decimal       @default(0) @db.Decimal(12, 2)
+  refundedAt     DateTime?
+  refundReason   String?       @db.VarChar(255)
+  note           String?       @db.VarChar(255)
+  proofUrl       String?       @db.Text
+  user           User?         @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@index([status])

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import  "react-phone-number-input/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,106 +44,118 @@
   --font-serif: var(--font-glovar);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
-.react-colorful, .react-colorful__saturation, .react-colorful__hue,
-.react-colorful__last-control, .react-colorful__pointer { border-radius: 0 !important; }
+.react-colorful,
+.react-colorful__saturation,
+.react-colorful__hue,
+.react-colorful__last-control,
+.react-colorful__pointer {
+  border-radius: 0 !important;
+}
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
 
-  /* Primary Cyan-Blue */
-  --primary: #b08a26;
-  --primary-foreground: oklch(1 0 0); /* White text for perfect contrast */
+  /* Warm cream surfaces, deep green text */
+  --background: #fffcf5;
+  --foreground: #1a2b27;
+  --card: #ffffff;
+  --card-foreground: #1a2b27;
+  --popover: #ffffff;
+  --popover-foreground: #1a2b27;
 
-  /* Slate Blue Secondary (Light Mode Tint) */
-  --secondary: #e4f2f6;
-  --secondary-foreground: #2d4c5c;
+  /* Primary: Olive Ocher */
+  --primary: #d6b43e;
+  --primary-foreground: #00332e; /* white fails contrast on this gold */
 
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --success: oklch(72.775% 0.12687 153.501);
+  /* Secondary: Cream Yellow tint */
+  --secondary: #fdf1dc;
+  --secondary-foreground: #004f46;
 
-  /* Tech Gold Accent (Conversion/Highlights) */
-  --accent: #2699b0;
-  --accent-foreground: oklch(1 0 0);
+  --muted: #f6f0e0;
+  --muted-foreground: #5f6b63;
 
-  --destructive: oklch(67.609% 0.20965 21.987);
+  /* Success: Cossack Green */
+  --success: #437742;
 
-  /* Theming borders with a soft blue tint instead of pure gray */
-  --border: #c9b88fb5;
-  --input: #e4f2f6;
-  --ring: var(--font-serif);
+  /* Accent: Dusky Green */
+  --accent: #004f46;
+  --accent-foreground: #ffffff;
+
+  /* Warm red that sits well next to gold and green */
+  --destructive: #c9432f;
+
+  /* Warm gold-tinted borders */
+  --border: #eadfb8;
+  --input: #fdf1dc;
+  --ring: #d6b43e;
 
   /* Balanced UI Charts */
-  --chart-1: var(--font-serif);
-  --chart-2: #b08a26;
-  --chart-3: #52788e;
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #d6b43e;
+  --chart-2: #437742;
+  --chart-3: #004f46;
+  --chart-4: #fdbf68;
+  --chart-5: #8a6d1c;
 
   /* Sidebar */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: var(--font-serif);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: #e4f2f6;
-  --sidebar-accent-foreground: #2d4c5c;
-  --sidebar-border: #e2eaf1;
-  --sidebar-ring: var(--font-serif);
+  --sidebar: #faf5e8;
+  --sidebar-foreground: #1a2b27;
+  --sidebar-primary: #d6b43e;
+  --sidebar-primary-foreground: #00332e;
+  --sidebar-accent: #fdf1dc;
+  --sidebar-accent-foreground: #004f46;
+  --sidebar-border: #eadfb8;
+  --sidebar-ring: #d6b43e;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  /* Deep green-black surfaces, cream text */
+  --background: #0d1a17;
+  --foreground: #f5efdc;
+  --card: #13241f;
+  --card-foreground: #f5efdc;
+  --popover: #13241f;
+  --popover-foreground: #f5efdc;
 
-  /* Primary Cyan-Blue */
-  --primary: var(--font-serif);
-  --primary-foreground: oklch(
-    1 0 0
-  ); /* FIXED: Swapped from dark to white text for clear visibility */
+  /* Primary: Olive Ocher */
+  --primary: #d6b43e;
+  --primary-foreground: #00332e;
 
-  /* Slate Blue Secondary (Dark Mode Tone) */
-  --secondary: #223b47;
-  --secondary-foreground: #e2eaf1;
+  /* Secondary: deep green tone */
+  --secondary: #123a34;
+  --secondary-foreground: #fdf1dc;
 
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted: #1a2e29;
+  --muted-foreground: #a3b3ab;
 
-  /* Tech Gold Accent */
-  --accent:  #b09226;
-  --accent-foreground: oklch(1 0 0);
+  /* Success: lighter Cossack Green for dark backgrounds */
+  --success: #5a9a58;
 
-  --destructive: oklch(0.704 0.191 22.216);
+  /* Accent */
+  --accent: #437742;
+  --accent-foreground: #ffffff;
 
-  /* Deep Blue-Gray Borders */
-  --border: #223b47;
-  --input: #223b47;
-  --ring: var(--font-serif);
+  --destructive: #e5604c;
+
+  /* Deep green borders */
+  --border: #1d3f39;
+  --input: #1d3f39;
+  --ring: #d6b43e;
 
   /* Dark Mode Balanced UI Charts */
-  --chart-1: var(--font-serif);
-  --chart-2: #b08a26;
-  --chart-3: #898e52;
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-1: #d6b43e;
+  --chart-2: #fdbf68;
+  --chart-3: #5a9a58;
+  --chart-4: #2aa89a;
+  --chart-5: #e08a5c;
 
   /* Sidebar Dark Mode */
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: var(--font-serif);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: #223b47;
-  --sidebar-accent-foreground: #e2eaf1;
-  --sidebar-border: #223b47;
-  --sidebar-ring: var(--font-serif);
+  --sidebar: #0f1f1b;
+  --sidebar-foreground: #f5efdc;
+  --sidebar-primary: #d6b43e;
+  --sidebar-primary-foreground: #00332e;
+  --sidebar-accent: #123a34;
+  --sidebar-accent-foreground: #fdf1dc;
+  --sidebar-border: #1d3f39;
+  --sidebar-ring: #d6b43e;
 }
 
 @layer base {

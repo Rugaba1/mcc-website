@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Boxes, Download, Loader2, PackageX, Search, SlidersHorizontal, X } from "lucide-react";
@@ -23,7 +23,7 @@ import { colorName, Swatch } from "@/components/color-field";
 
 const PAGE_SIZE = 15;
 type State = "ok" | "low" | "out";
-const stateOf = (i: InventoryItem): State => (i.stockBoxes <= 0 ? "out" : i.stockBoxes <= i.lowStockThreshold ? "low" : "ok");
+const stateOf = (i: InventoryItem): State => (i.stockSqm <= 0 ? "out" : i.stockSqm <= i.lowStockThreshold ? "low" : "ok");
 const STATE_STYLE: Record<State, string> = {
   ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   low: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
@@ -52,7 +52,7 @@ export default function AdminInventoryPage() {
 
   const totals = useMemo(() => ({
     variants: items.length,
-    boxes: items.reduce((n, i) => n + i.stockBoxes, 0),
+    boxes: items.reduce((n, i) => n + i.stockSqm, 0),
     low: items.filter((i) => stateOf(i) === "low").length,
     out: items.filter((i) => stateOf(i) === "out").length,
   }), [items]);
@@ -63,7 +63,7 @@ export default function AdminInventoryPage() {
       (filter === "all" || stateOf(i) === filter) &&
       (!term || [i.productName, i.sku, i.size, i.finish, i.color && colorName(i.color)].some((v) => v?.toLowerCase().includes(term))));
     return [...list].sort((a, b) =>
-      sort === "stock-asc" ? a.stockBoxes - b.stockBoxes : sort === "stock-desc" ? b.stockBoxes - a.stockBoxes : a.productName.localeCompare(b.productName));
+      sort === "stock-asc" ? a.stockSqm - b.stockSqm : sort === "stock-desc" ? b.stockSqm - a.stockSqm : a.productName.localeCompare(b.productName));
   }, [items, q, filter, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -72,8 +72,8 @@ export default function AdminInventoryPage() {
 
   const exportCsv = () => {
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const csv = [["Product", "SKU", "Size", "Finish", "Color", "Boxes", "Alert at", "Status"].join(","),
-    ...filtered.map((i) => [i.productName, i.sku, i.size, i.finish, i.color ? colorName(i.color) : "", i.stockBoxes, i.lowStockThreshold, STATE_LABEL[stateOf(i)]].map(esc).join(","))].join("\n");
+    const csv = [["Product", "SKU", "Size", "Finish", "Color", "m²", "Alert at", "Status"].join(","),
+    ...filtered.map((i) => [i.productName, i.sku, i.size, i.finish, i.color ? colorName(i.color) : "", i.stockSqm, i.lowStockThreshold, STATE_LABEL[stateOf(i)]].map(esc).join(","))].join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     a.download = `inventory-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -83,7 +83,7 @@ export default function AdminInventoryPage() {
 
   const stats = [
     { label: "Variants", value: totals.variants, icon: Boxes, tone: "" },
-    { label: "Boxes in stock", value: totals.boxes, icon: Boxes, tone: "" },
+    { label: "m² in stock", value: totals.boxes, icon: Boxes, tone: "" },
     { label: "Low stock", value: totals.low, icon: AlertTriangle, tone: totals.low ? STATE_STYLE.low : "" },
     { label: "Out of stock", value: totals.out, icon: PackageX, tone: totals.out ? STATE_STYLE.out : "" },
   ];
@@ -93,7 +93,7 @@ export default function AdminInventoryPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
-          <p className="text-sm text-muted-foreground">Stock levels for every variant, counted in boxes.</p>
+          <p className="text-sm text-muted-foreground">Stock levels for every variant, counted in m².</p>
         </div>
         <Button variant="outline" className="rounded-none" onClick={exportCsv} disabled={!filtered.length}><Download /> Export CSV</Button>
       </header>
@@ -137,7 +137,7 @@ export default function AdminInventoryPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Product</TableHead><TableHead>SKU</TableHead><TableHead>Variant</TableHead>
-              <TableHead className="text-right">Boxes</TableHead><TableHead className="text-right">Alert at</TableHead>
+              <TableHead className="text-right">m²</TableHead><TableHead className="text-right">Alert at</TableHead>
               <TableHead>Status</TableHead><TableHead className="w-28 text-right">Stock</TableHead>
             </TableRow>
           </TableHeader>
@@ -151,7 +151,7 @@ export default function AdminInventoryPage() {
                 <TableCell className="font-medium">{i.productName}</TableCell>
                 <TableCell className="text-muted-foreground">{i.sku}</TableCell>
                 <TableCell><span className="flex items-center gap-1.5">{i.color && <Swatch value={i.color} />}{i.size}{i.finish ? ` · ${i.finish}` : ""}</span></TableCell>
-                <TableCell className="text-right font-semibold tabular-nums">{i.stockBoxes}</TableCell>
+                <TableCell className="text-right font-semibold tabular-nums">{i.stockSqm}</TableCell>
                 <TableCell className="text-right tabular-nums text-muted-foreground">{i.lowStockThreshold}</TableCell>
                 <TableCell><Badge variant="outline" className={`rounded-none ${STATE_STYLE[stateOf(i)]}`}>{STATE_LABEL[stateOf(i)]}</Badge></TableCell>
                 <TableCell className="text-right"><Button size="sm" variant="outline" className="rounded-none" onClick={() => setAdjusting(i)}><SlidersHorizontal /> Adjust</Button></TableCell>
@@ -176,15 +176,15 @@ function AdjustDialog({ item, onClose, onSaved }: { item: InventoryItem | null; 
   useEffect(() => { if (item) { setMode("add"); setQty(""); setThreshold(String(item.lowStockThreshold)); } }, [item]);
 
   const amount = Math.max(0, Math.floor(Number(qty) || 0));
-  const result = !item ? 0 : mode === "set" ? amount : mode === "add" ? item.stockBoxes + amount : item.stockBoxes - amount;
+  const result = !item ? 0 : mode === "set" ? amount : mode === "add" ? item.stockSqm + amount : item.stockSqm - amount;
   const invalid = !item || result < 0 || (qty.trim() === "" && Number(threshold) === item.lowStockThreshold);
 
   const save = async () => {
     if (!item || result < 0) return;
     setSaving(true);
     try {
-      await api.updateStock(item.id, { stockBoxes: result, lowStockThreshold: Math.max(0, Math.floor(Number(threshold) || 0)) });
-      toast.success(`${item.sku} now has ${result} boxes`);
+      await api.updateStock(item.id, { stockSqm: result, lowStockThreshold: Math.max(0, Math.floor(Number(threshold) || 0)) });
+      toast.success(`${item.sku} now has ${result} m²`);
       onSaved();
       onClose();
     } catch (e) { toast.error(apiErrorMessage(e, "Could not update stock")); }
@@ -196,7 +196,7 @@ function AdjustDialog({ item, onClose, onSaved }: { item: InventoryItem | null; 
       <DialogContent className="rounded-none sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Adjust stock</DialogTitle>
-          <DialogDescription>{item?.productName} · {item?.sku} · currently {item?.stockBoxes} boxes</DialogDescription>
+          <DialogDescription>{item?.productName} · {item?.sku} · currently {item?.stockSqm} m²</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
@@ -206,10 +206,10 @@ function AdjustDialog({ item, onClose, onSaved }: { item: InventoryItem | null; 
               <TabsTrigger value="set" className="flex-1 rounded-none">Set to</TabsTrigger>
             </TabsList>
           </Tabs>
-          <div className="space-y-1.5"><Label>Boxes</Label><Input className="rounded-none" type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} autoFocus /></div>
+          <div className="space-y-1.5"><Label>m²</Label><Input className="rounded-none" type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} autoFocus /></div>
           <div className="space-y-1.5"><Label>Alert me when stock is at or below</Label><Input className="rounded-none" type="number" min={0} value={threshold} onChange={(e) => setThreshold(e.target.value)} /></div>
           <p className={`text-sm ${result < 0 ? "text-destructive" : "text-muted-foreground"}`}>
-            {result < 0 ? "You can’t remove more boxes than are in stock." : <>New stock: <span className="font-semibold text-foreground">{result} boxes</span></>}
+            {result < 0 ? "You can’t remove more m² than are in stock." : <>New stock: <span className="font-semibold text-foreground">{result} m²</span></>}
           </p>
         </div>
         <DialogFooter>

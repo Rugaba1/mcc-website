@@ -10,6 +10,7 @@ import { siteConfig } from "@/config/site.config";
 import { absolutizeUrl } from "@/lib/absolutize";
 import { generateAlternateLinks } from "@/lib/alternates";
 import AddToCartButton from "@/components/add-cart-button";
+import { WishlistButton } from "@/components/wishlist-button";
 
 function badgeStyle(badge: Product["badge"]) {
   if (badge === "New") return "bg-emerald-500 ";
@@ -280,7 +281,7 @@ export default async function TileDetailPage({
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <AddToCartButton product={tile} className="h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"/>
+                <AddToCartButton product={tile} className="h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"/> <WishlistButton productId={tile.id} />
                 <Link
                   href={`/visualizer?tile=${tile.id}&autoApply=1&surface=${tile.category === "wall" || tile.category === "special" ? "wall" : "floor"}`}
                   className="flex-1 bg-secondary hover:bg-secondary  font-bold py-4 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"

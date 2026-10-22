@@ -78,7 +78,10 @@ export const GET = withAuth(async (request, { user }) => {
       prisma.order.count({ where: { ...mine, placedAt: inRange } }),
       prisma.order.count({ where: { ...mine, placedAt: inPrev } }),
       prisma.order.count({
-        where: { ...mine, status: { in: ["PENDING", "PAID", "PROCESSING", "SHIPPED"] } },
+        where: {
+          ...mine,
+          status: { in: ["PENDING", "PAID", "PROCESSING", "SHIPPED"] },
+        },
       }),
       prisma.order.count({ where: { ...mine, status: "DELIVERED" } }),
       prisma.wishlistItem.count({ where: { userId } }),
@@ -95,13 +98,15 @@ export const GET = withAuth(async (request, { user }) => {
             select: {
               id: true,
               quantity: true,
+              saleType: true,
               variant: {
                 select: {
                   sku: true,
                   size: true,
                   finish: true,
-                  pricePerBox: true,
-                  sqmPerBox: true,
+                  pricePerSqm: true,
+                  containerPricePerSqm: true,
+                  sqmPerContainer: true,
                   image: true,
                   product: { select: { name: true, image: true } },
                 },
@@ -114,12 +119,25 @@ export const GET = withAuth(async (request, { user }) => {
       // ── time series ──
       prisma.order.findMany({
         where: { ...mine, placedAt: { gte: monthsStart } },
-        select: { placedAt: true, grandTotal: true, status: true, paymentStatus: true },
+        select: {
+          placedAt: true,
+          grandTotal: true,
+          status: true,
+          paymentStatus: true,
+        },
       }),
 
       // ── pies ──
-      prisma.order.groupBy({ by: ["status"], where: mine, _count: { _all: true } }),
-      prisma.order.groupBy({ by: ["fulfillment"], where: mine, _count: { _all: true } }),
+      prisma.order.groupBy({
+        by: ["status"],
+        where: mine,
+        _count: { _all: true },
+      }),
+      prisma.order.groupBy({
+        by: ["fulfillment"],
+        where: mine,
+        _count: { _all: true },
+      }),
       prisma.payment.groupBy({
         by: ["method"],
         where: { status: "PAID", order: { userId } },
@@ -136,7 +154,10 @@ export const GET = withAuth(async (request, { user }) => {
 
       // ── tables ──
       prisma.order.findMany({
-        where: { ...mine, status: { in: ["PENDING", "PAID", "PROCESSING", "SHIPPED"] } },
+        where: {
+          ...mine,
+          status: { in: ["PENDING", "PAID", "PROCESSING", "SHIPPED"] },
+        },
         take: 5,
         orderBy: { placedAt: "desc" },
         select: {
@@ -192,7 +213,15 @@ export const GET = withAuth(async (request, { user }) => {
         select: {
           id: true,
           createdAt: true,
-          product: { select: { id: true, name: true, slug: true, image: true, categoryLabel: true } },
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              image: true,
+              categoryLabel: true,
+            },
+          },
         },
       }),
       prisma.visualizerDesign.findMany({
@@ -243,22 +272,33 @@ export const GET = withAuth(async (request, { user }) => {
     }
 
     // ── cart ──
-    const cartItems = (cart?.items ?? []).map((i) => {
-      const unitPrice = num(i.variant.pricePerBox);
-      return {
-        id: i.id,
-        product: i.variant.product.name,
-        image: i.variant.image ?? i.variant.product.image,
-        sku: i.variant.sku,
-        size: i.variant.size,
-        finish: i.variant.finish,
-        quantity: i.quantity,
-        unitPrice,
-        lineTotal: round(unitPrice * i.quantity),
-        coverageSqm: round(num(i.variant.sqmPerBox) * i.quantity, 2),
-      };
-    });
-    const cartSubtotal = round(cartItems.reduce((s, i) => s + i.lineTotal, 0));
+   const cartItems = (cart?.items ?? []).map((i) => {
+     const qty = num(i.quantity);
+     const isContainer = i.saleType === "CONTAINER";
+     const perContainer = num(i.variant.sqmPerContainer);
+     const areaSqm = isContainer ? qty * perContainer : qty;
+     const unitPrice = isContainer
+       ? num(i.variant.containerPricePerSqm)
+       : num(i.variant.pricePerSqm); // RWF per m²
+     return {
+       id: i.id,
+       product: i.variant.product.name,
+       image: i.variant.image ?? i.variant.product.image,
+       sku: i.variant.sku,
+       size: i.variant.size,
+       finish: i.variant.finish,
+       saleType: i.saleType,
+       quantity: qty, // m², or containers when saleType is CONTAINER
+       areaSqm: round(areaSqm, 2),
+       unitPrice, // per m²
+       lineTotal: round(unitPrice * areaSqm),
+     };
+   });
+   const cartSubtotal = round(cartItems.reduce((s, i) => s + i.lineTotal, 0));
+   const cartSqm = round(
+     cartItems.reduce((s, i) => s + i.areaSqm, 0),
+     2,
+   );
     const cartBoxes = cartItems.reduce((s, i) => s + i.quantity, 0);
 
     const spent = num(spentCur._sum.grandTotal);
@@ -277,6 +317,7 @@ export const GET = withAuth(async (request, { user }) => {
       card("designs", "Saved Designs", designsCount),
       card("reviews", "My Reviews", reviewsCount),
       card("addresses", "Saved Addresses", addressesCount),
+      card("cartSqm", "Area In Cart (m²)", cartSqm), 
     ];
 
     return NextResponse.json({

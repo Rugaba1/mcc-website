@@ -20,7 +20,28 @@ import { VariantsSheet } from "@/components/variants-sheet";
 
 const PAGE_SIZE = 10;
 const money = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-
+const STATUS_STYLES: Record<string, string> = {
+  ACTIVE: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  DRAFT: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  ARCHIVED: "bg-muted text-muted-foreground",
+};
+function summarize(p: Product) {
+  const all = p.variants ?? [];
+  const active = all.filter((v) => v.active !== false);
+  const prices = active.map((v) => Number(v.pricePerSqm)).filter((n) => Number.isFinite(n) && n > 0);
+  const containerPrices = active
+    .map((v) => Number(v.containerPricePerSqm))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  const sizes = Array.from(new Set(active.map((v) => v.size).filter(Boolean)));
+  return {
+    total: all.length,
+    active: active.length,
+    inactive: all.length - active.length,
+    fromSqm: prices.length ? Math.min(...prices) : null,
+    fromContainer: containerPrices.length ? Math.min(...containerPrices) : null,
+    sizes: sizes.length ? sizes.join(", ") : p.sizes, // fall back to the legacy string
+  };
+}
 export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search);
@@ -156,6 +177,7 @@ export default function AdminProductsPage() {
               <TableHead>Category</TableHead>
               <TableHead>Sizes</TableHead>
               <TableHead>Variants</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Badge</TableHead>
               <TableHead className="w-24 text-right">Actions</TableHead>
             </TableRow>
@@ -164,105 +186,130 @@ export default function AdminProductsPage() {
             {loading && products.length === 0 ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 7 }).map((__, j) => (
+                  {Array.from({ length: 8 }).map((__, j) => (
                     <TableCell key={j}>
-                      <Skeleton className="h-5 w-full rounded-none" />
+                    <Skeleton className="h-5 w-full rounded-none" />
                     </TableCell>
                   ))}
                 </TableRow>
               ))
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7}>
-                  <div className="flex flex-col items-center gap-2 py-14 text-sm text-muted-foreground">
-                    <Package className="size-7" />
-                    {hasFilters ? "No products match your filters." : "No products yet."}
-                    {!hasFilters && (
-                      <Button className="mt-1 rounded-none" onClick={openCreate}>
-                        <Plus /> Add your first product
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              products.map((p) => {
-                const variants = p.variants ?? [];
-                const from = variants.length ? Math.min(...variants.map((v) => v.pricePerBox)) : null;
-                return (
-                  <TableRow key={p.id} className={loading ? "opacity-50" : ""}>
-                    <TableCell>
-                      <div className="size-11 overflow-hidden border bg-muted">
-                        {p.image && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image} alt={p.name} className="size-full object-cover" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium">{p.name}</span>
-                        {p.featured && <Star className="size-3.5 fill-amber-400 text-amber-400" aria-label="Featured" />}
-                      </div>
-                      <p className="text-xs text-muted-foreground">{p.collection || "No collection"}</p>
-                    </TableCell>
-                    <TableCell>{p.categoryLabel}</TableCell>
-                    <TableCell className="max-w-40 truncate text-muted-foreground">{p.sizes || "—"}</TableCell>
-                    <TableCell>
-                      {variants.length ? (
-                        <>
-                          <span>{variants.length}</span>
-                          <p className="text-xs text-muted-foreground">from {money.format(from!)} RWF</p>
-                        </>
-                      ) : (
-                        <span className="text-xs text-amber-600 dark:text-amber-400">None, can’t be bought</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {p.badge ? (
-                        <Badge variant="secondary" className="rounded-none">{p.badge}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(p)} aria-label={`Edit ${p.name}`}>
-                          <Pencil />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => setVariantsFor(p)} aria-label={`Variants of ${p.name}`}><Boxes /></Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 rounded-none text-destructive hover:text-destructive"
-                          onClick={() => setDeleting(p)}
-                          aria-label={`Delete ${p.name}`}
-                        >
-                          <Trash2 />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+          ) : products.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={8}>                          {/* was 7 */}
+              <div className="flex flex-col items-center gap-2 py-14 text-sm text-muted-foreground">
+                <Package className="size-7" />
+                {hasFilters ? "No products match your filters." : "No products yet."}
+                {!hasFilters && (
+                  <Button className="mt-1 rounded-none" onClick={openCreate}>
+                    <Plus /> Add your first product
+                  </Button>
+                )}
+              </div>
+            </TableCell>
+          </TableRow>
+          ) : (
+        products.map((p) => {
+          const s = summarize(p);
+          return (
+          <TableRow key={p.id} className={loading ? "opacity-50" : ""}>
+            <TableCell>
+              <div className="size-11 overflow-hidden border bg-muted">
+                {p.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.image} alt={p.name} className="size-full object-cover" />
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium">{p.name}</span>
+                {p.featured && <Star className="size-3.5 fill-amber-400 text-amber-400" aria-label="Featured" />}
+              </div>
+              <p className="text-xs text-muted-foreground">{p.collection || "No collection"}</p>
+            </TableCell>
+            <TableCell>{p.categoryLabel}</TableCell>
+            <TableCell className="max-w-40 truncate text-muted-foreground">{s.sizes || "—"}</TableCell>
 
-        <DataPagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} disabled={loading} />
-      </div>
+            {/* VARIANTS: new per-m² content */}
+            <TableCell>
+              {s.active > 0 ? (
+                <>
+                  <span>{s.active}</span>
+                  {s.inactive > 0 && (
+                    <span className="text-xs text-muted-foreground"> (+{s.inactive} inactive)</span>
+                  )}
+                  {s.fromSqm !== null && (
+                    <p className="text-xs text-muted-foreground">from {money.format(s.fromSqm)} RWF/m²</p>
+                  )}
+                  {s.fromContainer !== null && (
+                    <p className="text-xs text-muted-foreground">
+                      container from {money.format(s.fromContainer)} RWF/m²
+                    </p>
+                  )}
+                </>
+              ) : (
+                <span className="text-xs text-amber-600 dark:text-amber-400">
+                  {s.total ? "All inactive, can’t be bought" : "None, can’t be bought"}
+                </span>
+              )}
+            </TableCell>
 
-      <ProductSheet open={sheetOpen} onOpenChange={setSheetOpen} product={editing} onSaved={refresh} />
+            {/* STATUS: moved here, matches the header order */}
+            <TableCell>
+              <Badge variant="secondary" className={`rounded-none ${STATUS_STYLES[p.status] ?? ""}`}>
+                {p.status}
+              </Badge>
+            </TableCell>
 
-      <ConfirmDelete
-        open={!!deleting}
-        onOpenChange={(o) => !o && setDeleting(null)}
-        title="Delete this product?"
-        description={`“${deleting?.name ?? ""}” and all of its variants will be removed. This can’t be undone.`}
-        busy={deleteBusy}
-        onConfirm={confirmDelete}
-      />
-    </main>
+            {/* BADGE */}
+            <TableCell>
+              {p.badge ? (
+                <Badge variant="secondary" className="rounded-none">{p.badge}</Badge>
+              ) : (
+                <span className="text-muted-foreground">—</span>
+              )}
+            </TableCell>
+
+            <TableCell>
+              <div className="flex justify-end gap-1">
+                <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(p)} aria-label={`Edit ${p.name}`}>
+                  <Pencil />
+                </Button>
+                <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => setVariantsFor(p)} aria-label={`Variants of ${p.name}`}>
+                  <Boxes />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-none text-destructive hover:text-destructive"
+                  onClick={() => setDeleting(p)}
+                  aria-label={`Delete ${p.name}`}
+                >
+                  <Trash2 />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+          );
+        })
+      )}
+        </TableBody>
+      </Table>
+
+      <DataPagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} disabled={loading} />
+    </div>
+
+    <ProductSheet open={sheetOpen} onOpenChange={setSheetOpen} product={editing} onSaved={refresh} />
+
+    <ConfirmDelete
+      open={!!deleting}
+      onOpenChange={(o) => !o && setDeleting(null)}
+      title="Delete this product?"
+      description={`“${deleting?.name ?? ""}” and all of its variants will be removed. This can’t be undone.`}
+      busy={deleteBusy}
+      onConfirm={confirmDelete}
+    />
+  </main >
     <VariantsSheet product={variantsFor} onOpenChange={(o) => !o && setVariantsFor(null)} onChanged={refresh} />
   </>
   );

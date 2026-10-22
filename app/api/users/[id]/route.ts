@@ -1,89 +1,122 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+import { getApiUser, hasApiPermission } from "@/lib/auth/api-access";
+import { USER_INCLUDE, formatUser, splitName } from "@/lib/users/format";
+import { syncPermissions } from "@/lib/auth/permissions";
+import { AccountDeleteError, deleteUserAccount } from "@/lib/users/delete-account";
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Ctx = { params: Promise<{ id: string }> };
 
-// PUT /api/users/:id — update user
+const canManage = (u: Parameters<typeof hasApiPermission>[0]) =>
+  hasApiPermission(u, "users.manage") || hasApiPermission(u, "admin");
+
 export async function PUT(req: NextRequest, { params }: Ctx) {
   try {
-    const { id } = await params;
-    const numId = Number(id);
-    if (isNaN(numId))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    const me = await getApiUser(req);
+    if (!me)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // if (!canManage(me))
+    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const body = await req.json();
-    const { name, email, password, active } = body;
+    const id = Number((await params).id);
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // Validate email if provided
-    if (email !== undefined) {
-      if (!email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-        return NextResponse.json(
-          { error: "A valid email is required" },
-          { status: 400 },
-        );
-      // Check email not taken by another user
-      const conflict = await prisma.user.findFirst({
-        where: { email: email.trim().toLowerCase(), NOT: { id: numId } },
-      });
-      if (conflict)
-        return NextResponse.json(
-          { error: "Email already in use by another user" },
-          { status: 409 },
-        );
-    }
+    const b = await req.json();
+    const isSelf = me.id === id;
 
-    // Validate password if provided
-    if (password && password.length < 6)
+    // don't let admins lock themselves out
+    if (isSelf && b.active === false)
       return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
+        { error: "You can't disable your own account" },
+        { status: 400 },
+      );
+    if (
+      isSelf &&
+      Array.isArray(b.permissions) &&
+      !b.permissions.includes("admin") &&
+      !b.permissions.includes("users.manage")
+    )
+      return NextResponse.json(
+        { error: "You can't remove your own user-management access" },
         { status: 400 },
       );
 
     const data: Record<string, unknown> = {};
-    if (name !== undefined) {
-      const parts = name.trim().split(/\s+/);
-      data.firstName = parts[0] || name.trim();
-      data.lastName = parts.slice(1).join(" ") || null;
+
+    if (b.name !== undefined) {
+      const name = String(b.name).trim();
+      if (!name)
+        return NextResponse.json(
+          { error: "Name is required" },
+          { status: 400 },
+        );
+      Object.assign(data, splitName(name));
     }
-    if (email !== undefined) data.email = email.trim().toLowerCase();
-    if (active !== undefined) data.isActive = active;
-    if (password) data.password = await bcrypt.hash(password, 12);
+    if (b.email !== undefined) {
+      const email = String(b.email).trim().toLowerCase();
+      if (!EMAIL.test(email))
+        return NextResponse.json(
+          { error: "A valid email is required" },
+          { status: 400 },
+        );
+      if (
+        email !== existing.email &&
+        (await prisma.user.findUnique({ where: { email } }))
+      )
+        return NextResponse.json(
+          { error: "Email already in use" },
+          { status: 409 },
+        );
+      data.email = email;
+    }
+    if (b.password) {
+      if (b.password.length < 6)
+        return NextResponse.json(
+          { error: "Password must be at least 6 characters" },
+          { status: 400 },
+        );
+      data.password = await bcrypt.hash(b.password, 12);
+    }
+    if (b.active !== undefined) data.isActive = !!b.active;
+    if (b.profilePicture !== undefined)
+      data.profilePicture = b.profilePicture || null;
+    if (b.jobTitle !== undefined)
+      data.jobTitle = String(b.jobTitle).trim() || null;
+    if (b.bio !== undefined)
+      data.bio = String(b.bio).trim().slice(0, 500) || null;
+    if (b.showOnHomepage !== undefined)
+      data.showOnHomepage = !!b.showOnHomepage;
+    if (b.displayOrder !== undefined && Number.isFinite(Number(b.displayOrder)))
+      data.displayOrder = Number(b.displayOrder);
 
-    const user = await prisma.user.update({
-      where: { id: numId },
-      data,
-      include: {
-        permissions: {
-          include: { permission: true },
-        },
-      },
+    const finalTitle =
+      (data.jobTitle as string | null | undefined) ?? existing.jobTitle;
+    const finalShow =
+      (data.showOnHomepage as boolean | undefined) ?? existing.showOnHomepage;
+    if (finalShow && !finalTitle)
+      return NextResponse.json(
+        { error: "A job title is required to show on the homepage" },
+        { status: 400 },
+      );
+
+    const updated = await prisma.$transaction(async (tx) => {
+      if (Object.keys(data).length)
+        await tx.user.update({ where: { id }, data });
+      if (Array.isArray(b.permissions))
+        await syncPermissions(tx, id, b.permissions, me.id);
+      return tx.user.findUniqueOrThrow({
+        where: { id },
+        include: USER_INCLUDE,
+      });
     });
 
-    const permCodes = user.permissions.map((p) => p.permission.code);
-    return NextResponse.json({
-      id: user.id,
-      name: `${user.firstName} ${user.lastName || ""}`.trim(),
-      email: user.email,
-      role: permCodes.includes("admin") ? "admin" : "staff",
-      active: user.isActive,
-      canProducts: true,
-      canCollections: true,
-      canProjects: true,
-      canTestimonials: true,
-      canUsers: permCodes.includes("users.manage"),
-      permissions: permCodes,
-      createdAt: user.createdAt,
-    });
-  } catch (err: unknown) {
+    return NextResponse.json(formatUser(updated));
+  } catch (err) {
     console.error("PUT /api/users/[id]:", err);
-    // Prisma P2025 = record not found
-    if (
-      typeof err === "object" &&
-      err !== null &&
-      (err as { code?: string }).code === "P2025"
-    )
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
     return NextResponse.json(
       { error: "Failed to update user" },
       { status: 500 },
@@ -91,24 +124,27 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   }
 }
 
-// DELETE /api/users/:id
-export async function DELETE(_req: NextRequest, { params }: Ctx) {
+export async function DELETE(req: NextRequest, { params }: Ctx) {
   try {
-    const { id } = await params;
-    const numId = Number(id);
-    if (isNaN(numId))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    const me = await getApiUser(req);
+    if (!me)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!canManage(me))
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    await prisma.user.delete({ where: { id: numId } });
+    const id = Number((await params).id);
+    if (me.id === id)
+      return NextResponse.json(
+        { error: "Use Settings → Delete account to remove your own account" },
+        { status: 400 },
+      );
+
+    await deleteUserAccount(id);
     return NextResponse.json({ ok: true });
-  } catch (err: unknown) {
+  } catch (err) {
+    if (err instanceof AccountDeleteError)
+      return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("DELETE /api/users/[id]:", err);
-    if (
-      typeof err === "object" &&
-      err !== null &&
-      (err as { code?: string }).code === "P2025"
-    )
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
     return NextResponse.json(
       { error: "Failed to delete user" },
       { status: 500 },

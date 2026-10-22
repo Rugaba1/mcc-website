@@ -48,7 +48,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
-
+const sqm = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 const plain = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const money = (n: number, currency = "RWF") => `${plain.format(n)} ${currency}`;
@@ -239,7 +239,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
               <CardDescription>Tiles you saved for later</CardDescription>
             </div>
             <Button asChild variant="ghost" size="sm">
-              <Link href="/wishlist">View all</Link>
+              <Link href="/account/wishlist">View all</Link>
             </Button>
           </CardHeader>
           <CardContent>
@@ -355,9 +355,8 @@ function KpiCard({ card, icon: Icon, currency, days }: { card: StatCard; icon: L
         {card.change !== undefined && (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span
-              className={`inline-flex items-center gap-0.5 font-medium ${
-                up ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-              }`}
+              className={`inline-flex items-center gap-0.5 font-medium ${up ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+                }`}
             >
               <Trend className="size-3.5" />
               {Math.abs(card.change)}%
@@ -456,7 +455,7 @@ function CartCard({ cart, currency }: { cart: CustomerAnalytics["tables"]["cart"
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{i.product}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {i.size} · {i.quantity} box{i.quantity === 1 ? "" : "es"} ({i.coverageSqm} m²)
+                      {i.size} · {sqm.format(i.coverageSqm)} m²
                     </p>
                   </div>
                   <span className="text-sm tabular-nums">{compact.format(i.lineTotal)}</span>

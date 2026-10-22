@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import AddToCartButton from "@/components/add-cart-button";
 import { PaginationControls } from "@/components/pagination-controls";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { WishlistButton } from "@/components/wishlist-button";
 
 const filters = [
     { key: "all", label: "All Collections" },
@@ -152,7 +153,7 @@ export default async function Products({
                                 </h3>
                                 <p className=" text-sm leading-relaxed mb-5 line-clamp-2">{p.description}</p>
                                 <div className="flex items-center justify-between pt-4 -t ">
-                                    <AddToCartButton product={p} sm />
+                                    <AddToCartButton product={p} sm /> <WishlistButton productId={p.id} />
                                     <span className=" text-xs font-medium">{p.sizes}</span>
                                     <div className="flex items-center gap-3">
                                         <div className="flex gap-1.5">

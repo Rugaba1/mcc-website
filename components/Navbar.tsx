@@ -12,12 +12,14 @@ const links = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Products", href: "/products" },
+  { label: "Blogs", href: "/blog" },
   { label: "Catalogue", href: "/catalogue" },
   { label: "Collections", href: "/collections" },
   { label: "Projects", href: "/projects" },
   { label: "Visualizer", href: "/visualizer" },
   { label: "Why Us", href: "/why-us" },
   { label: "Contact", href: "/contact" },
+
 ];
 
 export default function Navbar() {

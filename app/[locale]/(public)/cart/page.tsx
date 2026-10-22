@@ -1,14 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "@/app/i18n/routing";
-import { useCart } from "@/contexts/cart-context";
+import { clampQty, lineOf, useCart, type CartItem } from "@/contexts/cart-context";
 import { computeTotals } from "@/lib/pricing";
+import { MIN_SQM } from "@/lib/sale-pricing";
 import { money } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const nf = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
+/** Number box that only commits on blur or Enter, so typing "12.5" isn't fought by clamping. */
+function QtyInput({ item, onCommit }: { item: CartItem; onCommit: (n: number) => void }) {
+    const [draft, setDraft] = useState(String(item.qty));
+    useEffect(() => setDraft(String(item.qty)), [item.qty]);
+
+    const commit = () => {
+        const n = Number(draft);
+        if (!Number.isFinite(n) || n <= 0) return setDraft(String(item.qty));
+        const q = clampQty(item.saleType, n);
+        onCommit(q);
+        setDraft(String(q));
+    };
+
+    return (
+        <Input
+            aria-label={item.saleType === "CONTAINER" ? "Containers" : "Square metres"}
+            type="number" inputMode="decimal"
+            min={item.saleType === "SQM" ? MIN_SQM : 1} step={item.saleType === "SQM" ? 0.1 : 1}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+            className="h-9 w-20 bg-transparent text-center text-sm focus:outline-none"
+        />
+    );
+}
 
 export default function CartPage() {
     const { items, ready, setQty, removeFromCart, clearCart } = useCart();
@@ -26,68 +55,75 @@ export default function CartPage() {
         );
     }
 
-    const totals = computeTotals(items.map((i) => ({ price: i.pricePerBox, qty: i.qty })), 0);
-    const totalSqm = items.reduce((s, i) => s + i.qty * i.sqmPerBox, 0);
+    const lines = items.map((i) => ({ item: i, line: lineOf(i) }));
+    const priced = lines.filter((l) => l.line);
+    const totals = computeTotals(priced.map((l) => ({ price: l.line!.total, qty: 1 })), 0);
+    const totalSqm = priced.reduce((s, l) => s + l.line!.sqm, 0);
 
     return (
         <div className="mx-auto max-w-6xl px-2">
-
             <div className="mb-8 flex items-end justify-between">
                 <h1 className="font-playfair text-4xl font-bold">Your cart</h1>
                 <Button onClick={clearCart} variant={"destructive"}>Clear cart</Button>
             </div>
 
             <div className="grid contain-content gap-2 grid-cols-1 lg:grid-cols-[1fr_0.5fr]">
-                <ul className="divide-y divide-border  border border-border bg-background">
-                    {items.map((i) => (
-                        <li key={i.variantId} className="flex gap-2 p-2 flex-wrap">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={i.image} alt="" className="h-24 w-24 shrink-0  bg-muted object-cover" />
-                            <div className="flex min-w-0 flex-1 flex-col justify-between">
-                                <div>
-                                    <p className="truncate font-semibold">{i.name}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {[i.size, i.finish, i.color].filter(Boolean).join(" · ")}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {i.sqmPerBox} m² per box · covers {(i.sqmPerBox * i.qty).toFixed(2)} m²
-                                    </p>
-                                </div>
-                                <div className="mt-2 flex items-center justify-between">
-                                    <div className="flex items-center   border border-border">
-                                        <Button variant="ghost" size="icon" aria-label="Fewer boxes" disabled={i.qty <= 1} onClick={() => setQty(i.variantId, i.qty - 1)}>
-                                            <Minus className="h-4 w-4" />
-                                        </Button>
-                                        <Input
-                                            aria-label="Boxes" type="number" min={1} value={i.qty}
-                                            onChange={(e) => setQty(i.variantId, Number(e.target.value))}
-                                            className="h-9 w-14 bg-transparent text-center text-sm focus:outline-none"
-                                        />
-                                        <Button variant="ghost" size="icon" aria-label="More boxes" onClick={() => setQty(i.variantId, i.qty + 1)}>
-                                            <Plus className="h-4 w-4" />
-                                        </Button>
+                <ul className="divide-y divide-border border border-border bg-background">
+                    {lines.map(({ item: i, line }) => {
+                        const step = 1;
+                        const min = i.saleType === "SQM" ? MIN_SQM : 1;
+                        return (
+                            <li key={`${i.variantId}-${i.saleType}`} className="flex gap-2 p-2 flex-wrap">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={i.image} alt="" className="h-24 w-24 shrink-0 bg-muted object-cover" />
+                                <div className="flex min-w-0 flex-1 flex-col justify-between">
+                                    <div>
+                                        <p className="truncate font-semibold">{i.name}</p>
+                                        <p className="text-xs text-muted-foreground">{[i.size, i.finish].filter(Boolean).join(" · ")}</p>
+                                        {line ? (
+                                            <p className="text-xs text-muted-foreground">
+                                                {i.saleType === "CONTAINER"
+                                                    ? `${line.containers} container${line.containers === 1 ? "" : "s"} · ${nf.format(line.sqm)} m² × ${money(line.pricePerSqm)}`
+                                                    : `${nf.format(line.sqm)} m² × ${money(line.pricePerSqm)}`}
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs text-destructive">This item can’t be priced. Please remove it.</p>
+                                        )}
+                                        {line && line.saved > 0 && <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Container price, you save {money(line.saved)}</p>}
                                     </div>
-                                    <p className="font-semibold">{money(i.pricePerBox * i.qty)}</p>
+                                    <div className="mt-2 flex items-center justify-between">
+                                        <div className="flex items-center border border-border">
+                                            <Button variant="ghost" size="icon" aria-label="Less" disabled={i.qty <= min} onClick={() => setQty(i.variantId, i.saleType, i.qty - step)}>
+                                                <Minus className="h-4 w-4" />
+                                            </Button>
+                                            <QtyInput item={i} onCommit={(n) => setQty(i.variantId, i.saleType, n)} />
+                                            <Button variant="ghost" size="icon" aria-label="More" onClick={() => setQty(i.variantId, i.saleType, i.qty + step)}>
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                            <span className="px-2 text-xs text-muted-foreground">{i.saleType === "CONTAINER" ? "containers" : "m²"}</span>
+                                        </div>
+                                        <p className="font-semibold">{line ? money(line.total) : "—"}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <Button variant="ghost" size="icon" aria-label={`Remove ${i.name}`} onClick={() => removeFromCart(i.variantId)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                        </li>
-                    ))}
+                                <Button variant="ghost" size="icon" aria-label={`Remove ${i.name}`} onClick={() => removeFromCart(i.variantId, i.saleType)}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </li>
+                        );
+                    })}
                 </ul>
 
-                <aside className="sticky top-20 space-y-4  border border-border bg-background p-6">
+                <aside className="sticky top-20 space-y-4 border border-border bg-background p-6">
                     <h2 className="font-playfair text-xl font-bold">Order summary</h2>
                     <dl className="space-y-2 text-sm">
-                        <div className="flex justify-between"><dt className="text-muted-foreground">Boxes</dt><dd>{items.reduce((s, i) => s + i.qty, 0)}</dd></div>
-                        <div className="flex justify-between"><dt className="text-muted-foreground">Total coverage</dt><dd>{totalSqm.toFixed(2)} m²</dd></div>
+                        <div className="flex justify-between"><dt className="text-muted-foreground">Items</dt><dd>{items.length}</dd></div>
+                        <div className="flex justify-between"><dt className="text-muted-foreground">Total area</dt><dd>{nf.format(totalSqm)} m²</dd></div>
                         <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{money(totals.subtotal)}</dd></div>
                         <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{money(totals.tax)}</dd></div>
                         <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Estimated total</dt><dd>{money(totals.total)}</dd></div>
                     </dl>
                     <p className="text-xs text-muted-foreground">Delivery is added at checkout. Prices are confirmed when you place the order.</p>
-                    <Button asChild className="w-full"><Link href="/checkout">Checkout</Link></Button>
+                    <Button asChild className="w-full" disabled={priced.length !== items.length}><Link href="/checkout">Checkout</Link></Button>
                     <Button asChild variant="outline" className="w-full"><Link href="/products">Continue shopping</Link></Button>
                 </aside>
             </div>

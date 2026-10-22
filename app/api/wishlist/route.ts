@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           categoryLabel: true,
           variants: {
             where: { active: true },
-            orderBy: { pricePerBox: "asc" },
+            orderBy: { pricePerSqm: "asc" },
             take: 1,
           },
         },
@@ -43,15 +43,19 @@ export async function GET(request: NextRequest) {
               size: v.size,
               color: v.color,
               finish: v.finish,
-              sqmPerBox: Number(v.sqmPerBox),
-              pricePerBox: Number(v.pricePerBox),
+              pricePerSqm: Number(v.pricePerSqm),
+              containerPricePerSqm:
+                v.containerPricePerSqm != null
+                  ? Number(v.containerPricePerSqm)
+                  : null,
+              sqmPerContainer:
+                v.sqmPerContainer != null ? Number(v.sqmPerContainer) : null,
             }
           : null,
       };
     }),
   );
 }
-
 export async function POST(request: NextRequest) {
   const { claims, error } = await requireUser(request);
   if (error) return error;

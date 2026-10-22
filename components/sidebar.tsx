@@ -58,12 +58,12 @@ export function SidebarContent({
                     className="flex items-center gap-2 font-semibold"
                 >
                     <span className="flex  items-center justify-center">
-                        {/* <Image
+                        <Image
                             src="/logo.png"
                             alt="Mountain Ceramics Company"
                             height={60}
                             width={60}
-                            unoptimized /> */}
+                            unoptimized />
                     </span>
                     {!collapsed && (
                         <span className="font-serif text-lg tracking-tight">

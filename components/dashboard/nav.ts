@@ -4,6 +4,7 @@ import {
   Heart,
   LayoutDashboard,
   Mail,
+  Newspaper,
   Package,
   Palette,
   Receipt,
@@ -29,7 +30,8 @@ export type NavItem = {
 
 export const customerNav: NavItem[] = [
   { name: "My Account", href: "/account", icon: UserCircle, exact: true },
-  { name: "Orders", href: "/account/orders", icon: Receipt },
+  { name: "Orders", href: "/account/orders", icon: ShoppingCart },
+  { name: "Payments", href: "/account/payments", icon: CreditCard },
   { name: "Wishlist", href: "/account/wishlist", icon: Heart },
   { name: "Settings", href: "/account/settings", icon: Settings },
 ];
@@ -51,5 +53,6 @@ export const adminNav: NavItem[] = [
   // { name: "Visualizer", href: "/admin/visualizer", icon: Palette },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Messages", href: "/admin/messages", icon: Mail },
-  { name: "Files", href: "/admin/files", icon:  FolderKanban, },
+  { name: "Files", href: "/admin/files", icon: FolderKanban },
+  { name: "Blogs", href: "/admin/blog", icon: Newspaper},
 ];

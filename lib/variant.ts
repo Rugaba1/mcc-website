@@ -4,9 +4,12 @@ const url = z
   .string()
   .trim()
   .max(2048)
-  .refine((u) => u === "" || u.startsWith("/uploads/") || u.startsWith("https://"), {
-    message: "Must be an uploaded file or an https URL",
-  })
+  .refine(
+    (u) => u === "" || u.startsWith("/uploads/") || u.startsWith("https://"),
+    {
+      message: "Must be an uploaded file or an https URL",
+    },
+  )
   .nullable()
   .optional();
 
@@ -17,11 +20,13 @@ export const variantSchema = z.object({
   color: z.string().trim().max(80).nullable().optional(),
   thicknessMm: z.number().min(0).max(99).nullable().optional(),
   shadeCode: z.string().trim().max(50).nullable().optional(),
-  piecesPerBox: z.number().int().min(1).max(1000),
-  sqmPerBox: z.number().positive().max(100),
+  piecesPerBox: z.number().int().min(1).max(1000).optional(),
+  sqmPerBox: z.number().positive().max(100).optional(),
   weightKgPerBox: z.number().min(0).max(9999).nullable().optional(),
   pricePerSqm: z.number().min(0),
-  pricePerBox: z.number().min(0),
+  containerPricePerSqm: z.number().min(0).nullable().optional(),
+  sqmPerContainer: z.number().min(0).nullable().optional(),
+  pricePerBox: z.number().min(0).optional(),
   compareAtPrice: z.number().min(0).nullable().optional(),
   image: url,
   textureUrl: url,
@@ -29,8 +34,14 @@ export const variantSchema = z.object({
 });
 
 type VariantRow = {
-  thicknessMm: unknown; sqmPerBox: unknown; weightKgPerBox: unknown;
-  pricePerSqm: unknown; pricePerBox: unknown; compareAtPrice: unknown;
+  thicknessMm: unknown;
+  sqmPerBox: unknown;
+  weightKgPerBox: unknown;
+  pricePerSqm: unknown;
+  pricePerBox: unknown;
+  containerPricePerSqm: unknown;
+  sqmPerContainer: unknown;
+  compareAtPrice: unknown;
 };
 
 /** Prisma Decimals → numbers. */
@@ -41,9 +52,14 @@ export const serializeVariant = <T extends VariantRow>(v: T) => ({
   weightKgPerBox: v.weightKgPerBox != null ? Number(v.weightKgPerBox) : null,
   pricePerSqm: Number(v.pricePerSqm),
   pricePerBox: Number(v.pricePerBox),
+  containerPricePerSqm:
+    v.containerPricePerSqm != null ? Number(v.containerPricePerSqm) : null,
+  sqmPerContainer: v.sqmPerContainer != null ? Number(v.sqmPerContainer) : null,
   compareAtPrice: v.compareAtPrice != null ? Number(v.compareAtPrice) : null,
 });
 
 /** "" → null so cleared fields are really cleared. */
 export const blankToNull = <T extends Record<string, unknown>>(o: T) =>
-  Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v === "" ? null : v])) as T;
+  Object.fromEntries(
+    Object.entries(o).map(([k, v]) => [k, v === "" ? null : v]),
+  ) as T;

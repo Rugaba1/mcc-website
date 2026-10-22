@@ -1,43 +1,68 @@
 import { randomInt } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../lib/prisma";
-import { requireUser } from "../../../lib/auth/require-user";
-import { computeTotals } from "../../../lib/pricing";
-import { getShipping, SHIPPING_IDS } from "../../../lib/shipping";
+import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/auth/require-user";
+import { computeTotals } from "@/lib/pricing"; // your existing totals helper, unchanged
+import { getShipping, SHIPPING_IDS } from "@/lib/shipping";
+import { PaymentMethod, PaymentStatus } from "@/lib/generated/prisma";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
+import { isValidLocation } from "@/lib/locations";
+import { PAYMENT_METHODS } from "@/lib/payments";
+import { issueInvoiceSafely } from "@/lib/invoices/invoice";
+import { priceLine, SaleType } from "@/lib/sale-pricing";
 
 export const runtime = "nodejs";
 
 class CheckoutError extends Error {}
 
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 const schema = z
   .object({
     items: z
       .array(
-        z.object({
-          variantId: z.number().int().positive(),
-          qty: z.number().int().min(1).max(10_000),
-        }),
+        z
+          .object({
+            variantId: z.number().int().positive(),
+            saleType: z.enum(["SQM", "CONTAINER"]).default("SQM"),
+            qty: z.number().positive().max(100_000), // m² for SQM, containers for CONTAINER
+          })
+          .refine((i) => i.saleType === "SQM" || Number.isInteger(i.qty), {
+            message: "Containers must be a whole number",
+            path: ["qty"],
+          }),
       )
       .min(1)
       .max(50),
     shippingId: z.enum(SHIPPING_IDS),
     fullName: z.string().trim().min(2).max(120),
-    phone: z.string().trim().min(7).max(20),
+    phone: z
+      .string()
+      .trim()
+      .refine((v) => isValidPhoneNumber(v), "Enter a valid phone number"),
+    province: z.string().trim().max(80).optional(),
     district: z.string().trim().max(80).optional(),
     sector: z.string().trim().max(80).optional(),
     street: z.string().trim().max(200).optional(),
     note: z.string().trim().max(1000).optional(),
+    paymentMethod: z.enum(PAYMENT_METHODS),
   })
   .superRefine((d, ctx) => {
-    if (
-      getShipping(d.shippingId).fulfillment === "DELIVERY" &&
-      (!d.district || !d.street)
-    ) {
+    if (getShipping(d.shippingId).fulfillment !== "DELIVERY") return;
+    if (!d.province || !d.district || !d.street) {
       ctx.addIssue({
         code: "custom",
         path: ["street"],
-        message: "District and street are required for delivery",
+        message: "Province, district and street are required for delivery",
+      });
+    } else if (
+      !isValidLocation(d.province, d.district, d.sector || undefined)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["district"],
+        message: "Invalid province, district or sector",
       });
     }
   });
@@ -50,15 +75,21 @@ export async function POST(request: NextRequest) {
     const d = schema.parse(await request.json());
     const ship = getShipping(d.shippingId);
 
-    // Merge duplicate lines for the same variant
-    const qtyByVariant = new Map<number, number>();
+    // Merge duplicate lines: same variant AND same sale type
+    const wanted = new Map<
+      string,
+      { variantId: number; saleType: SaleType; qty: number }
+    >();
     for (const i of d.items) {
-      qtyByVariant.set(
-        i.variantId,
-        (qtyByVariant.get(i.variantId) ?? 0) + i.qty,
-      );
+      const key = `${i.variantId}:${i.saleType}`;
+      const cur = wanted.get(key);
+      wanted.set(key, {
+        variantId: i.variantId,
+        saleType: i.saleType,
+        qty: r2((cur?.qty ?? 0) + i.qty),
+      });
     }
-    const ids = [...qtyByVariant.keys()];
+    const ids = [...new Set([...wanted.values()].map((w) => w.variantId))];
 
     const order = await prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
@@ -76,31 +107,57 @@ export async function POST(request: NextRequest) {
           "Some items in your cart are no longer available",
         );
       }
+      const byId = new Map(variants.map((v) => [v.id, v]));
 
       // Prices come from the database, never from the browser
-      const lines = variants.map((v) => {
-        const qty = qtyByVariant.get(v.id)!;
-        const unit = Number(v.pricePerBox);
-        return { v, qty, unit, total: unit * qty };
+      const lines = [...wanted.values()].map((w) => {
+        const v = byId.get(w.variantId)!;
+        const label = `${v.product.name} (${v.size})`;
+        const pricePerSqm = Number(v.pricePerSqm);
+        if (!(pricePerSqm > 0))
+          throw new CheckoutError(`${label} has no price yet`);
+        try {
+          const line = priceLine(
+            {
+              pricePerSqm,
+              containerPricePerSqm:
+                v.containerPricePerSqm != null
+                  ? Number(v.containerPricePerSqm)
+                  : null,
+              sqmPerContainer:
+                v.sqmPerContainer != null ? Number(v.sqmPerContainer) : null,
+            },
+            w.saleType,
+            w.qty,
+          );
+          return { v, line };
+        } catch (e) {
+          throw new CheckoutError(`${label}: ${(e as Error).message}`);
+        }
       });
 
-      // Atomic reservation: affects 0 rows if available stock is short
-      // (or if the variant has no inventory row yet).
-      for (const l of lines) {
+      const sqmByVariant = new Map<number, number>();
+      for (const { v, line } of lines) {
+        sqmByVariant.set(v.id, r2((sqmByVariant.get(v.id) ?? 0) + line.sqm));
+      }
+
+      for (const [variantId, sqm] of sqmByVariant) {
         const n = await tx.$executeRaw`
           UPDATE inventory
-          SET reservedBoxes = reservedBoxes + ${l.qty}
-          WHERE variantId = ${l.v.id}
-            AND (allowBackorder = 1 OR onHandBoxes - reservedBoxes >= ${l.qty})`;
+          SET reservedBoxes = reservedBoxes + ${sqm}
+          WHERE variantId = ${variantId}
+            AND (allowBackorder = 1 OR onHandBoxes - reservedBoxes >= ${sqm})`;
         if (n === 0) {
+          const v = byId.get(variantId)!;
           throw new CheckoutError(
-            `Not enough stock for ${l.v.product.name} (${l.v.size})`,
+            `Not enough stock for ${v.product.name} (${v.size})`,
           );
         }
       }
 
+      // Each line total is already rounded, so feed them in as price × 1
       const totals = computeTotals(
-        lines.map((l) => ({ price: l.unit, qty: l.qty })),
+        lines.map((l) => ({ price: l.line.total, qty: 1 })),
         ship.fee,
       );
       const delivery = ship.fulfillment === "DELIVERY";
@@ -120,23 +177,25 @@ export async function POST(request: NextRequest) {
           grandTotal: totals.total,
           shipFullName: d.fullName,
           shipPhone: d.phone,
+          shipProvince: delivery ? (d.province ?? null) : null,
           shipDistrict: delivery ? (d.district ?? null) : null,
           shipSector: delivery ? d.sector || null : null,
           shipStreet: delivery ? (d.street ?? null) : null,
           customerNote: d.note || null,
           items: {
-            create: lines.map((l) => ({
-              variantId: l.v.id,
-              productName: l.v.product.name,
-              sku: l.v.sku,
-              size: l.v.size,
-              finish: l.v.finish,
-              shadeCode: l.v.shadeCode,
-              image: l.v.image,
-              quantity: l.qty,
-              sqmPerBox: l.v.sqmPerBox,
-              unitPrice: l.unit,
-              lineTotal: l.total,
+            create: lines.map(({ v, line }) => ({
+              variantId: v.id,
+              productName: v.product.name,
+              sku: v.sku,
+              size: v.size,
+              finish: v.finish,
+              shadeCode: v.shadeCode,
+              image: v.image,
+              saleType: line.saleType,
+              quantity: line.sqm, // always m²
+              containers: line.containers || null,
+              unitPrice: line.pricePerSqm, // per m²
+              lineTotal: line.total,
             })),
           },
           history: {
@@ -146,15 +205,26 @@ export async function POST(request: NextRequest) {
               changedById: claims.userId,
             },
           },
+          payments: {
+            create: {
+              amount: totals.total,
+              payerPhone: d.phone,
+              status: PaymentStatus.PENDING,
+              currency: "RWF",
+              method: d.paymentMethod as PaymentMethod,
+              // "manual" = the customer can add the transaction ID or withdraw it from My payments
+              provider: d.paymentMethod === "CARD" ? null : "manual",
+            },
+          },
         },
         select: { id: true, orderNumber: true },
       });
 
       await tx.stockMovement.createMany({
-        data: lines.map((l) => ({
-          variantId: l.v.id,
+        data: [...sqmByVariant].map(([variantId, sqm]) => ({
+          variantId,
           type: "RESERVE" as const,
-          quantity: l.qty,
+          quantity: sqm,
           reference: created.orderNumber,
           createdById: claims.userId,
         })),
@@ -162,6 +232,9 @@ export async function POST(request: NextRequest) {
 
       return created;
     });
+
+    // After the commit, so the invoice code can see the order. Never throws.
+    await issueInvoiceSafely(order.id);
 
     return NextResponse.json(order, { status: 201 });
   } catch (e) {

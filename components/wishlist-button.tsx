@@ -12,7 +12,7 @@ export function WishlistButton({ productId }: { productId: number }) {
   const router = useRouter();
 
   async function save() {
-    if (!isAuthenticated) return router.push("/login?next=/wishlist");
+    if (!isAuthenticated) return router.push("/login?next=/account/wishlist");
     try {
       await api.addToWishlist(productId); // idempotent
       toast.success("Saved to your wishlist");

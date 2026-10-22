@@ -5,14 +5,18 @@ import { requireStaff } from "../../../../lib/auth/require-staff";
 
 export const runtime = "nodejs";
 
+const r2 = (n: number) => Math.round(n * 100) / 100;
+const sqm = z.number().min(0).max(10_000_000).transform(r2); // m², 2 decimals
+
 const bodySchema = z.object({
-  stockBoxes: z.number().int().min(0).max(1_000_000),
-  lowStockThreshold: z.number().int().min(0).max(1_000_000),
+  stockSqm: sqm,
+  
+  lowStockThreshold: sqm,
 });
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ variantId: string }> }, // Next 14: params is not a Promise
+  { params }: { params: Promise<{ variantId: string }> },
 ) {
   const { claims, error } = await requireStaff(request);
   if (error) return error;
@@ -35,27 +39,28 @@ export async function PUT(
       });
       if (!variant) return null;
 
-      const before = variant.inventory?.onHandBoxes ?? 0;
+      const before = Number(variant.inventory?.onHandSqm ?? 0);
       const inv = await tx.inventory.upsert({
         where: { variantId },
         create: {
           variantId,
-          onHandBoxes: data.stockBoxes,
+          onHandSqm: data.stockSqm,
+          reservedSqm: 0,
           reorderLevel: data.lowStockThreshold,
         },
         update: {
-          onHandBoxes: data.stockBoxes,
+          onHandSqm: data.stockSqm,
           reorderLevel: data.lowStockThreshold,
         },
       });
 
-      if (before !== data.stockBoxes) {
+      if (before !== data.stockSqm) {
         await tx.stockMovement.create({
           data: {
             variantId,
             type: "ADJUSTMENT",
-            quantity: data.stockBoxes - before,
-            note: `Manual: ${before} → ${data.stockBoxes}`,
+            quantity: r2(data.stockSqm - before),
+            note: `Manual: ${before} → ${data.stockSqm} m²`,
             createdById: claims.userId,
           },
         });
@@ -74,8 +79,9 @@ export async function PUT(
       size: variant.size,
       finish: variant.finish,
       color: variant.color,
-      stockBoxes: inv.onHandBoxes,
-      lowStockThreshold: inv.reorderLevel,
+      stockSqm: Number(inv.onHandSqm),
+      reservedSqm: Number(inv.reservedSqm),
+      lowStockThreshold: Number(inv.reorderLevel),
     });
   } catch (e) {
     if (e instanceof z.ZodError) {

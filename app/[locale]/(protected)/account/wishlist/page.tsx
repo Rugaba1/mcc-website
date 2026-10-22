@@ -8,7 +8,7 @@ import { money } from "@/lib/format";
 import { useResource } from "@/hooks/use-resource";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
-
+import { MIN_SQM } from "@/lib/sale-pricing";
 const fetchWishlist = () => api.getWishlist();
 
 export default function WishlistPage() {
@@ -22,14 +22,24 @@ export default function WishlistPage() {
 
   function add(w: WishlistEntry) {
     if (!w.variant) return;
-    addToCart({
-      variantId: w.variant.id, productId: w.productId, name: w.name, image: w.image,
-      size: w.variant.size, finish: w.variant.finish, color: w.variant.color,
-      pricePerBox: w.variant.pricePerBox, sqmPerBox: w.variant.sqmPerBox,
-    });
+    addToCart(
+      {
+        variantId: w.variant.id,
+        productId: w.productId,
+        name: w.name,
+        image: w.image,
+        size: w.variant.size,
+        finish: w.variant.finish,
+        color: w.variant.color,
+        saleType: "SQM",
+        pricePerSqm: Number(w.variant.pricePerSqm),
+        containerPricePerSqm: w.variant.containerPricePerSqm != null ? Number(w.variant.containerPricePerSqm) : null,
+        sqmPerContainer: w.variant.sqmPerContainer != null ? Number(w.variant.sqmPerContainer) : null,
+      },
+      MIN_SQM,
+    );
     toast.success(`${w.name} added to cart`);
   }
-
   return (
     <div className="space-y-5">
       <h1 className="font-playfair text-3xl font-bold">Wishlist</h1>
@@ -49,7 +59,9 @@ export default function WishlistPage() {
             <div className="space-y-2 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{w.categoryLabel}</p>
               <p className="font-semibold">{w.name}</p>
-              <p className="text-sm text-muted-foreground">{w.variant ? `From ${money(w.variant.pricePerBox)} / box` : "Currently unavailable"}</p>
+              <p className="text-sm text-muted-foreground">
+                {w.variant ? `From ${money(Number(w.variant.pricePerSqm))} / m²` : "Currently unavailable"}
+              </p>
               <div className="flex gap-2 pt-1">
                 <Button size="sm" className="flex-1" disabled={!w.variant} onClick={() => add(w)}>
                   <ShoppingCart className="mr-2 h-4 w-4" /> Add to cart

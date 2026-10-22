@@ -1,21 +1,57 @@
-
-export const PERMISSIONS = {
-  // User Management
-  USER_READ: { name: "user:read", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  USER_CREATE: { name: "user:create", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  USER_UPDATE: { name: "user:update", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  USER_DELETE: { name: "user:delete", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-
-  // PDF Management
-  PDF_READ: { name: "pdf:read", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  PDF_UPLOAD: { name: "pdf:upload", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  PDF_UPDATE: { name: "pdf:update", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." },
-  PDF_DELETE:  { name: "pdf:delete", label: "", description: " Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum sit accusamus, natus eveniet eaque architecto debitis facilis repudiandae necessitatibus optio sapiente iusto sunt quae, error aspernatur harum excepturi expedita impedit." }, 
-} as const;
-PERMISSIONS
-
+import { prisma } from "@/lib/prisma";
+import { ALL_PERMISSION_CODES, PERMISSION_LABELS } from "./permissions-catalog";
  
-export function hasPermission(userPermissions: string[], required: string | string[]): boolean {
-  const requiredPerms = Array.isArray(required) ? required : [required];
-  return requiredPerms.every(perm => userPermissions.includes(perm));
+
+type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+/** Makes the user's permissions exactly equal to `codes`, and logs every change. */
+export async function syncPermissions(
+  tx: Tx,
+  userId: number,
+  codes: string[],
+  actorId: number | null,
+) {
+  const wanted = new Set(codes.filter((c) => ALL_PERMISSION_CODES.includes(c)));
+
+  const current = await tx.userPermission.findMany({
+    where: { userId },
+    include: { permission: true },
+  });
+  const have = new Set(current.map((c) => c.permission.code));
+
+  const toAdd = [...wanted].filter((c) => !have.has(c));
+  const toRemove = [...have].filter((c) => !wanted.has(c));
+
+  for (const code of toAdd) {
+    const perm = await tx.permission.upsert({
+      where: { code },
+      update: {},
+      create: { code, description: PERMISSION_LABELS[code] ?? null },
+    });
+    await tx.userPermission.create({
+      data: { userId, permissionId: perm.id, grantedById: actorId },
+    });
+    await tx.permissionLog.create({
+      data: {
+        targetUserId: userId,
+        actorUserId: actorId,
+        permissionCode: code,
+        action: "GRANTED",
+      },
+    });
+  }
+
+  if (toRemove.length) {
+    await tx.userPermission.deleteMany({
+      where: { userId, permission: { code: { in: toRemove } } },
+    });
+    await tx.permissionLog.createMany({
+      data: toRemove.map((code) => ({
+        targetUserId: userId,
+        actorUserId: actorId,
+        permissionCode: code,
+        action: "REVOKED",
+      })),
+    });
+  }
 }

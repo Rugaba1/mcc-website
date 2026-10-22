@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../../lib/prisma";
 import { requireUser } from "../../../../../lib/auth/require-user";
-
+import { invoicePath } from "../../../../../lib/invoices/url";
 export const runtime = "nodejs";
 
 export async function GET(
@@ -22,6 +22,10 @@ export async function GET(
       items: true,
       history: { orderBy: { createdAt: "asc" } },
       payments: { orderBy: { createdAt: "desc" } },
+      invoices: {
+        select: { id: true, kind: true, number: true, issuedAt: true },
+        orderBy: { issuedAt: "asc" },
+      },
     },
   });
   if (!o)
@@ -71,6 +75,13 @@ export async function GET(
       method: p.method,
       amount: Number(p.amount),
       paidAt: p.paidAt?.toISOString() ?? null,
+    })),
+    invoices: o.invoices.map((inv) => ({
+      id: inv.id,
+      kind: inv.kind,
+      number: inv.number,
+      issuedAt: inv.issuedAt.toISOString(),
+      url: invoicePath(inv.number),
     })),
   });
 }

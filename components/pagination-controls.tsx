@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface PaginationControlsProps {
   page: number;
   totalPages: number;
-  basePath: "/products" | "/catalogue";
+  basePath: "/products" | "/catalogue" | "/blog" | "/blog/[slug]" | "/blog/tag/[tag]" | "/blog/search" | "/blog/search/[q]";
   prevLabel: string;
   nextLabel: string;
   pageLabel: string;

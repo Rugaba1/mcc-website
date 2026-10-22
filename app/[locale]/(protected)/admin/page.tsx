@@ -507,7 +507,7 @@ function TopProductsChart({ items, currency }: { items: AdminAnalytics["charts"]
                       <div className="flex flex-col gap-0.5">
                         <span className="font-medium">{item.payload.label}</span>
                         <span className="tabular-nums text-muted-foreground">
-                          {money(Number(value), currency)} · {plain.format(item.payload.quantity)} boxes
+                          {money(Number(value), currency)} · {plain.format(item.payload.quantity)} m²
                         </span>
                       </div>
                     )}
@@ -728,6 +728,7 @@ function DataTable({ head, rows, empty }: { head: string[]; rows: ReactNode[][];
 }
 
 function LowStockCard({ rows }: { rows: AdminAnalytics["tables"]["lowStock"] }) {
+  const sqm = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
   return (
     <Card>
       <CardHeader>
@@ -757,7 +758,7 @@ function LowStockCard({ rows }: { rows: AdminAnalytics["tables"]["lowStock"] }) 
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <StatusBadge status={r.state} />
                   <span className="text-xs tabular-nums text-muted-foreground">
-                    {r.availableBoxes} / {r.reorderLevel} boxes
+                    {sqm.format(r.availableSqm)} / {sqm.format(r.reorderLevel)} m²
                   </span>
                 </div>
               </li>

@@ -100,6 +100,8 @@ export async function GET(req: NextRequest) {
               image: true,
               textureUrl: true,
               active: true,
+              containerPricePerSqm: true,
+              sqmPerContainer: true,
             },
           },
         },
@@ -122,6 +124,10 @@ export async function GET(req: NextRequest) {
           v.weightKgPerBox != null ? Number(v.weightKgPerBox) : null,
         compareAtPrice:
           v.compareAtPrice != null ? Number(v.compareAtPrice) : null,
+        containerPricePerSqm:
+          v.containerPricePerSqm != null ? Number(v.containerPricePerSqm) : null,
+        sqmPerContainer:
+          v.sqmPerContainer != null ? Number(v.sqmPerContainer) : null,
       })),
     }));
 

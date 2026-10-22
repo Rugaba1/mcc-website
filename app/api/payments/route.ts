@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
             orderNumber: true,
             shipFullName: true,
             user: { select: userNameSelect },
+            grandTotal: true,
           },
         },
       },
@@ -40,6 +41,12 @@ export async function GET(request: NextRequest) {
         failureReason: p.failureReason,
         paidAt: p.paidAt?.toISOString() ?? null,
         createdAt: p.createdAt.toISOString(),
+        orderTotal: Number(p.order.grandTotal),
+        refundedAmount: Number(p.refundedAmount),
+        refundedAt: p.refundedAt?.toISOString() ?? null,
+        refundReason: p.refundReason,
+        note: p.note,
+        proofUrl: p.proofUrl,
       })),
     );
   } catch (e) {

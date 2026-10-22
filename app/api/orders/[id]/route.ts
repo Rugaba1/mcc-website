@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { getApiUser, hasApiPermission } from "../../../../lib/auth/api-access";
+import { invoicePath, issueInvoiceSafely } from "@/lib/invoices/invoice";
 
 const ORDER_STATUSES = [
   "PENDING",
@@ -47,6 +48,10 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
             changedBy: { select: { firstName: true, lastName: true } },
           },
         },
+        invoices: {
+          select: { id: true, kind: true, number: true, issuedAt: true },
+          orderBy: { issuedAt: "asc" },
+        },
       },
     });
     if (!order)
@@ -74,6 +79,13 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       payments: order.payments.map((payment) => ({
         ...payment,
         amount: Number(payment.amount),
+      })),
+      invoices: order.invoices.map((inv) => ({
+        id: inv.id,
+        kind: inv.kind,
+        number: inv.number,
+        issuedAt: inv.issuedAt,
+        url: inv.number ? invoicePath(inv.number) : null,
       })),
     });
   } catch (error) {
@@ -174,6 +186,9 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       where: { id },
       select: { id: true, status: true, internalNote: true },
     });
+    if (!updated)
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    await issueInvoiceSafely(updated.id);
     return NextResponse.json(updated);
   } catch (error) {
     console.error("PUT /api/orders/[id]:", error);

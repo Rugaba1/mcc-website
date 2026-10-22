@@ -7,17 +7,32 @@ import { blankToNull, serializeVariant, variantSchema } from "@/lib/variant";
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
 
-const createSchema = variantSchema.extend({
-  stockBoxes: z.number().int().min(0).max(1_000_000).default(0),
-  lowStockThreshold: z.number().int().min(0).max(1_000_000).default(0),
-});
+// m² can be fractional: allow up to 2 decimals
+const sqm = z
+  .number()
+  .min(0)
+  .max(1_000_000)
+  .transform((n) => Math.round(n * 100) / 100);
+
+const createSchema = variantSchema
+  .extend({
+    stockSqm: sqm.default(0),
+    reorderLevel: sqm.default(0),
+  })
+  .refine(
+    (v) => (v.containerPricePerSqm == null) === (v.sqmPerContainer == null),
+    {
+      message: "Container price and m² per container must be set together",
+      path: ["sqmPerContainer"],
+    },
+  );
 
 const productIdOf = async (ctx: Ctx) => {
   const id = Number((await ctx.params).id);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
-// Admin list: includes inactive variants and current stock
+// Admin list: includes inactive variants and current stock (in m²)
 export async function GET(req: NextRequest, ctx: Ctx) {
   const { error } = await requireStaff(req);
   if (error) return error;
@@ -33,8 +48,9 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   return NextResponse.json(
     rows.map(({ inventory, ...v }) => ({
       ...serializeVariant(v),
-      stockBoxes: inventory?.onHandBoxes ?? 0,
-      lowStockThreshold: inventory?.reorderLevel ?? 0,
+      stockSqm: Number(inventory?.onHandSqm ?? 0),
+      reservedSqm: Number(inventory?.reservedSqm ?? 0),
+      reorderLevel: Number(inventory?.reorderLevel ?? 0),
     })),
   );
 }
@@ -47,7 +63,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
-    const { stockBoxes, lowStockThreshold, ...rest } = createSchema.parse(
+    const { stockSqm, reorderLevel, ...rest } = createSchema.parse(
       await req.json(),
     );
 
@@ -58,16 +74,17 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       await tx.inventory.create({
         data: {
           variantId: variant.id,
-          onHandBoxes: stockBoxes,
-          reorderLevel: lowStockThreshold,
+          onHandSqm: stockSqm,
+          reservedSqm: 0,
+          reorderLevel,
         },
       });
-      if (stockBoxes > 0) {
+      if (stockSqm > 0) {
         await tx.stockMovement.create({
           data: {
             variantId: variant.id,
             type: "PURCHASE",
-            quantity: stockBoxes,
+            quantity: stockSqm,
             note: "Initial stock",
             createdById: claims.userId,
           },
@@ -77,7 +94,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     });
 
     return NextResponse.json(
-      { ...serializeVariant(created), stockBoxes, lowStockThreshold },
+      { ...serializeVariant(created), stockSqm, reservedSqm: 0, reorderLevel },
       { status: 201 },
     );
   } catch (e) {

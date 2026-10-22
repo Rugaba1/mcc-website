@@ -8,13 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/auth/password-input";
-
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 export default function SettingsPage() {
     const [profile, setProfile] = useState({ firstName: "", lastName: "", phoneNumber: "", email: "" });
     const [saving, setSaving] = useState(false);
     const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
     const [changing, setChanging] = useState(false);
-
+    const [delOpen, setDelOpen] = useState(false);
+    const [delPw, setDelPw] = useState("");
+    const [deleting, setDeleting] = useState(false);
     useEffect(() => {
         api.getMe().then((m) =>
             setProfile({ firstName: m.firstName, lastName: m.lastName ?? "", phoneNumber: m.phoneNumber ?? "", email: m.email }),
@@ -31,7 +36,18 @@ export default function SettingsPage() {
             toast.error(apiErrorMessage(err, "Update failed"));
         } finally { setSaving(false); }
     }
-
+    async function deleteAccount() {
+        if (!delPw) return toast.error("Enter your password to confirm");
+        setDeleting(true);
+        try {
+            await api.deleteMyAccount(delPw);
+            toast.success("Your account has been deleted");
+            window.location.href = "/";
+        } catch (err) {
+            toast.error(apiErrorMessage(err, "Could not delete account"));
+            setDeleting(false);
+        }
+    }
     async function savePassword(e: FormEvent) {
         e.preventDefault();
         if (pw.next.length < 8) return toast.error("New password must be at least 8 characters");
@@ -69,6 +85,41 @@ export default function SettingsPage() {
                     <div className="space-y-2"><Label htmlFor="cf">Confirm new password</Label><PasswordInput id="cf" autoComplete="new-password" required value={pw.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} /></div>
                     <Button type="submit" disabled={changing}>{changing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Change password</Button>
                 </form>
+                <div className="space-y-4 border border-destructive/40 bg-background p-6">
+                    <h2 className="font-semibold text-destructive">Delete account</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Permanently removes your profile, addresses, cart, wishlist, reviews and saved designs.
+                        Completed orders are kept for our accounting records but are no longer linked to you.
+                        This cannot be undone.
+                    </p>
+
+                    <AlertDialog open={delOpen} onOpenChange={(o) => { setDelOpen(o); if (!o) setDelPw(""); }}>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive">Delete my account</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Enter your password to confirm. You will be signed out immediately.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <div className="space-y-2">
+                                <Label htmlFor="dp">Password</Label>
+                                <PasswordInput id="dp" autoComplete="current-password" value={delPw} onChange={(e) => setDelPw(e.target.value)} />
+                            </div>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    disabled={deleting || !delPw}
+                                    onClick={(e) => { e.preventDefault(); deleteAccount(); }}
+                                >
+                                    {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Delete permanently
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
             </div>
         </div>
     );
