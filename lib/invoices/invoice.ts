@@ -230,11 +230,13 @@ export async function listOrderInvoices(orderId: number) {
  *
  * A PDF failure must never roll back or block a payment.
  */
-export async function issueInvoiceSafely(orderId: number) {
+export async function issueInvoiceSafely(
+  orderId: number,
+): Promise<InvoiceResult | null> {
   try {
     return await syncOrderInvoice(orderId);
-  } catch (e) {
-    console.error(`[invoice] failed for order ${orderId}`, e);
+  } catch (error) {
+    console.error(`[invoice] failed for order ${orderId}`, error);
     return null;
   }
 }

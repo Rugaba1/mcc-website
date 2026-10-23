@@ -1,7 +1,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type Product, serverApi } from "@/lib/api";
+import { type Product, serverApi, type ProductReviewSummary } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Metadata } from "next";
@@ -11,6 +11,7 @@ import { absolutizeUrl } from "@/lib/absolutize";
 import { generateAlternateLinks } from "@/lib/alternates";
 import AddToCartButton from "@/components/add-cart-button";
 import { WishlistButton } from "@/components/wishlist-button";
+import { ProductReviews } from "@/components/products/product-reviews";
 
 function badgeStyle(badge: Product["badge"]) {
   if (badge === "New") return "bg-emerald-500 ";
@@ -26,18 +27,21 @@ export async function generateMetadata({
   params: Promise<{ locale: string, id: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const { id } = await params
+  const { id } = await params;
 
-  let tile = null
+  let tile = null;
+  let reviews: ProductReviewSummary | null = null;
   try {
-    tile = (await serverApi.getProduct(id))
-
-  } catch (error) {
-
-
+    tile = await serverApi.getProduct(id);
+    reviews = await serverApi.getProductReviews(String(tile.id));
+  } catch {
+    // Product metadata remains available if review lookup fails.
   }
-  const title = `${tile?.name} | ${siteConfig.siteName}`;
-  const description = `${tile?.description}`;
+  const reviewSummary = reviews?.total && reviews.averageRating !== null
+    ? ` Rated ${reviews.averageRating.toFixed(1)} out of 5 from ${reviews.total} customer reviews.`
+    : "";
+  const title = `${tile?.name ?? "Product"} | ${siteConfig.siteName}`;
+  const description = `${tile?.description ?? ""}${reviewSummary}`.slice(0, 300);
   const url = `${seoConfig.siteUrl}${`/${locale}`}/products/${tile?.id}`;
 
   const thumb = tile?.image ? absolutizeUrl(tile?.image) : undefined;
@@ -65,13 +69,13 @@ export default async function TileDetailPage({
 }) {
   const { id } = await params
 
-  let tile = null
+  let tile = null;
+  let reviews: ProductReviewSummary | null = null;
   try {
-    tile = (await serverApi.getProduct(id))
-
-  } catch (error) {
-
-
+    tile = await serverApi.getProduct(id);
+    reviews = await serverApi.getProductReviews(String(tile.id));
+  } catch {
+    // Keep the product page available when review data is temporarily unavailable.
   }
 
 
@@ -94,13 +98,52 @@ export default async function TileDetailPage({
 
 
 
-  return (
-    <>   <Breadcrumbs items={[
-      { label: "Home", href: "/" },
-      { label: "Products", href: "/products" },
-      { label: tile.name, href: `/products/${id}` },
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: tile.name,
+    description: tile.description,
+    image: tile.image ? absolutizeUrl(tile.image) : undefined,
+    sku: tile.variants?.[0]?.sku,
+    brand: { "@type": "Brand", name: siteConfig.siteName },
+    ...(reviews?.total && reviews.averageRating !== null
+      ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: reviews.averageRating,
+          reviewCount: reviews.total,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        review: reviews.reviews.map((review) => ({
+          "@type": "Review",
+          name: review.title || undefined,
+          reviewBody: review.body,
+          datePublished: review.createdAt,
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: review.rating,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          author: { "@type": "Person", name: review.author },
+        })),
+      }
+      : {}),
+  };
 
-    ]} />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <Breadcrumbs items={[
+        { label: "Home", href: "/" },
+        { label: "Products", href: "/products" },
+        { label: tile.name, href: `/products/${id}` },
+
+      ]} />
       <div className="min-h-screen ">
 
 
@@ -281,7 +324,7 @@ export default async function TileDetailPage({
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <AddToCartButton product={tile} className="h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"/> <WishlistButton productId={tile.id} />
+                <AddToCartButton product={tile} className="h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2" /> <WishlistButton productId={tile.id} />
                 <Link
                   href={`/visualizer?tile=${tile.id}&autoApply=1&surface=${tile.category === "wall" || tile.category === "special" ? "wall" : "floor"}`}
                   className="flex-1 bg-secondary hover:bg-secondary  font-bold py-4 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"
@@ -302,6 +345,8 @@ export default async function TileDetailPage({
               </div>
             </div>
           </div>
+
+          <ProductReviews productId={tile.id} />
 
           {/* ── Related tiles ──────────────────────────────────────────── */}
           {tile.related && tile.related.length > 0 && (

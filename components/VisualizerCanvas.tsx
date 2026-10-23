@@ -116,7 +116,7 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
     if (!ctx) return;
 
     const baseImg = baseImageRef.current;
-    if (!baseImg || !baseImg.complete) return;
+    if (!baseImg || !baseImg.complete || !baseImg.naturalWidth) return;
 
     const width = scene.originalSize.width;
     const height = scene.originalSize.height;
@@ -279,7 +279,11 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
     }
 
     ctx.restore();
-  }, [selections, hoveredSurface, isZoomMode, zoomScale, panOffset]);
+  }, [scene, selections, hoveredSurface, isZoomMode, zoomScale, panOffset]);
+
+  useEffect(() => {
+    if (!isLoading) renderCanvas();
+  }, [isLoading, renderCanvas]);
 
   // Preload swatches whenever selections change
   useEffect(() => {

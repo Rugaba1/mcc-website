@@ -237,11 +237,11 @@ function CollectionCard({
 
         {/* CTAs */}
         <div className="flex flex-col gap-2">
-          <Link
+          {/* <Link
             href={panoramaUrl}
             className="group/btn w-full bg-primary hover:bg-primary  font-bold py-3.5 text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5"
           >
-            {/* 360 icon */}
+             
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
@@ -250,7 +250,8 @@ function CollectionCard({
             <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
+          </Link> */}
+
           <Link
             href={visualizerUrl}
             className="group/btn w-full bg-accent hover:bg-background  font-bold py-3 text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5  /10"

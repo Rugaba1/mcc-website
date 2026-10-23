@@ -20,10 +20,18 @@ export interface MediaFile {
   alt: string | null;
   createdAt: string;
 }
+
+export interface OrderRequest {
+  id: number;
+  kind: "CANCEL" | "REFUND";
+  status: ContactStatus;
+  createdAt: string;
+  message: string;
+}
 export interface AdminVariant extends ProductVariant {
-  stockSqm: number;        
-  reservedSqm: number;     
-  reorderLevel: number;    
+  stockSqm: number;
+  reservedSqm: number;
+  reorderLevel: number;
 }
 export interface ProductVariant {
   id: number;
@@ -140,6 +148,21 @@ export interface ProductWithVariantsAndRelated {
   collections?: Collection[];
   related?: Product[];
   projects?: Project[];
+}
+export interface ProductReviewSummary {
+  reviews: {
+    id: number;
+    rating: number;
+    title: string | null;
+    body: string;
+    createdAt: string;
+    author: string;
+  }[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  averageRating: number | null;
 }
 export interface TileWithProduct extends TileProduct {
   product: Product;
@@ -395,18 +418,18 @@ export interface MyOrderDetail extends MyOrderSummary {
   shipSector: string | null;
   shipStreet: string | null;
   items: {
-  id: number;
-  productName: string;
-  sku: string;
-  size: string;
-  finish: string | null;
-  image: string | null;
-  saleType: "SQM" | "CONTAINER";
-  quantity: number;          // m²
-  containers?: number | null;
-  unitPrice: number;         // per m²
-  lineTotal: number;
-}[];
+    id: number;
+    productName: string;
+    sku: string;
+    size: string;
+    finish: string | null;
+    image: string | null;
+    saleType: "SQM" | "CONTAINER";
+    quantity: number; // m²
+    containers?: number | null;
+    unitPrice: number; // per m²
+    lineTotal: number;
+  }[];
   history: {
     id: number;
     status: string;
@@ -768,6 +791,51 @@ export interface AdminUser {
   permissions: string[];
   createdAt: string;
 }
+export interface RegularUser {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string | null;
+  profilePicture: string | null;
+  active: boolean;
+  emailVerifiedAt: string | null;
+  lastLogin: string | null;
+  createdAt: string;
+}
+export interface SavedVisualizerDesign {
+  id: number;
+  name: string | null;
+  shareToken: string | null;
+  previewImage: string | null;
+  sessionId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  scene: { name: string; roomType: string } | null;
+  user?: {
+    id: number;
+    firstName: string;
+    lastName: string | null;
+    email: string;
+  } | null;
+  items: {
+    surfaceKey: string;
+    rotation: number;
+    layout: string | null;
+    variant: { sku: string; size: string; product: { name: string } };
+  }[];
+}
+export interface AdminReview {
+  id: number;
+  productId: number;
+  rating: number;
+  title: string | null;
+  body: string;
+  approved: boolean;
+  createdAt: string;
+  product: { name: string };
+  user: { firstName: string; lastName: string | null; email: string };
+  author: string;
+}
 // ─── Request helpers ──────────────────────────────────────────────────────────
 
 type Ok = { ok: boolean };
@@ -882,13 +950,99 @@ export const api = {
   ) => apiClient.patch<Ok>(`/api/me/payments/${id}`, d).then((r) => r.data),
   withdrawMyPayment: (id: number) => del(`/api/me/payments/${id}`),
   getInvoicePdf: (url: string) => getBlob(url),
-  getUsers: () => get<AdminUser[]>("/api/users"),
-  createUser: (
+  getUsers: () => get<RegularUser[]>("/api/users?type=regular"),
+  createUser: (d: {
+    name: string;
+    email: string;
+    password: string;
+    active: boolean;
+    emailVerified?: boolean;
+    phoneNumber?: string | null;
+    profilePicture?: string | null;
+  }) => post<RegularUser>("/api/users", { ...d, accountType: "regular" }),
+  updateUser: (
+    id: number,
+    d: Partial<{
+      name: string;
+      email: string;
+      password: string;
+      active: boolean;
+      emailVerified: boolean;
+      phoneNumber: string | null;
+      profilePicture: string | null;
+    }>,
+  ) => put<RegularUser>(`/api/users/${id}`, { ...d, accountType: "regular" }),
+  deleteUser: (id: number) => del(`/api/users/${id}?type=regular`),
+  getStaff: () => get<AdminUser[]>("/api/users?type=staff"),
+  createStaff: (
     d: AdminUserInput & { name: string; email: string; password: string },
-  ) => post<AdminUser>("/api/users", d),
-  updateUser: (id: number, d: AdminUserInput) =>
-    put<AdminUser>(`/api/users/${id}`, d),
-  deleteUser: (id: number) => del(`/api/users/${id}`),
+  ) => post<AdminUser>("/api/users", { ...d, accountType: "staff" }),
+  updateStaff: (id: number, d: AdminUserInput) =>
+    put<AdminUser>(`/api/users/${id}`, { ...d, accountType: "staff" }),
+  deleteStaff: (id: number) => del(`/api/users/${id}?type=staff`),
+  createVisualizerDesign: (d: {
+    sceneId: number | null;
+    name: string;
+    sessionId?: string;
+    items: {
+      variantId: number;
+      surfaceKey: string;
+      groutColor: string | null;
+      rotation: number;
+      layout: string | null;
+    }[];
+  }) =>
+    post<{
+      success: boolean;
+      designId: number;
+      shareToken: string;
+      shareUrl: string;
+    }>("/api/visualizer/designs", d),
+  updateVisualizerDesign: (d: {
+    shareToken: string;
+    sceneId: number | null;
+    name: string;
+    sessionId?: string;
+    items: {
+      variantId: number;
+      surfaceKey: string;
+      groutColor: string | null;
+      rotation: number;
+      layout: string | null;
+    }[];
+  }) =>
+    put<{
+      success: boolean;
+      designId: number;
+      shareToken: string;
+      shareUrl: string;
+    }>("/api/visualizer/designs", d),
+  getVisualizerDesign: (token: string) =>
+    get<any>(`/api/visualizer/designs?token=${encodeURIComponent(token)}`),
+  getMyVisualizerDesigns: () =>
+    get<SavedVisualizerDesign[]>("/api/me/visualizer/designs"),
+  deleteMyVisualizerDesign: (id: number) =>
+    del(`/api/me/visualizer/designs?id=${id}`),
+  getAdminVisualizerDesigns: () =>
+    get<SavedVisualizerDesign[]>("/api/admin/visualizer/designs"),
+  deleteAdminVisualizerDesign: (id: number) =>
+    del(`/api/admin/visualizer/designs?id=${id}`),
+  getAdminReviews: (page: number, status: "pending" | "approved" | "all") =>
+    get<{
+      reviews: AdminReview[];
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    }>(`/api/admin/reviews${qs({ page, status })}`),
+  moderateReview: (id: number, approved: boolean) =>
+    apiClient
+      .patch<{
+        id: number;
+        approved: boolean;
+      }>("/api/admin/reviews", { id, approved })
+      .then((r) => r.data),
+  deleteReview: (id: number) => del(`/api/admin/reviews?id=${id}`),
   getFiles: (p: { q?: string; kind?: string; page?: number; limit?: number }) =>
     get<{ files: MediaFile[]; total: number; totalPages: number }>(
       `/api/files${qs(p)}`,
@@ -1045,6 +1199,12 @@ export const api = {
   changePassword: (d: { currentPassword: string; newPassword: string }) =>
     post<Ok>("/api/auth/change-password", d),
   getMyOrders: () => get<MyOrderSummary[]>("/api/me/orders"),
+  getMyOrderRequests: (id: number) =>
+    get<OrderRequest[]>(`/api/me/orders/${id}/requests`),
+  createMyOrderRequest: (
+    id: number,
+    body: { kind: OrderRequest["kind"]; reason: string },
+  ) => post<OrderRequest>(`/api/me/orders/${id}/requests`, body),
   getMyOrder: (id: number) => get<MyOrderDetail>(`/api/me/orders/${id}`),
   getWishlist: () => get<WishlistEntry[]>("/api/wishlist"),
   addToWishlist: (productId: number) =>
@@ -1083,6 +1243,8 @@ export const serverApi = {
   getProductsNumber: () => serverGet<number>("/api/products/count"),
   getProduct: (id: string) =>
     serverGet<ProductWithVariantsAndRelated>(`/api/products/${id}`),
+  getProductReviews: (id: string) =>
+    serverGet<ProductReviewSummary>(`/api/products/${id}/reviews?page=1`),
 
   // Collections
   getCollections: () => serverGet<Collection[]>("/api/collections"),

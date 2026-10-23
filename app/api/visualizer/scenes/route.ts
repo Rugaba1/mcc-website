@@ -21,7 +21,8 @@ export async function GET() {
       specifier: `MCC\\Scenes\\${s.name.replace(/\s+/g, "_")}`,
       baseImage: s.image,
       originalSize: { width: 2000, height: 1150 },
-      surfaces: typeof s.surfaces === "string" ? JSON.parse(s.surfaces) : s.surfaces,
+      surfaces:
+        typeof s.surfaces === "string" ? JSON.parse(s.surfaces) : s.surfaces,
     }));
 
     return NextResponse.json(formattedScenes);

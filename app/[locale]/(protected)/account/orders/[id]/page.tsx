@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useParams } from "next/navigation";
 import { FileText } from "lucide-react";
+import { toast } from "sonner";
 import { Link } from "@/app/i18n/routing";
-import { api, type InvoiceRef, type MyOrderDetail } from "@/lib/api";
+import { api, apiErrorMessage, type InvoiceRef, type MyOrderDetail, type OrderRequest } from "@/lib/api";
 import { money } from "@/lib/format";
 import { StatusBadge } from "@/components/account/status-badge";
 import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   PROFORMA: "Proforma invoice",
@@ -21,10 +25,49 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<MyOrderDetail | null>(null);
   const [state, setState] = useState<"loading" | "missing" | "ok">("loading");
   const [invoice, setInvoice] = useState<InvoiceRef | null>(null);
+  const [requests, setRequests] = useState<OrderRequest[]>([]);
+  const [requestKind, setRequestKind] = useState<OrderRequest["kind"]>("CANCEL");
+  const [requestReason, setRequestReason] = useState("");
+  const [requesting, setRequesting] = useState(false);
 
   useEffect(() => {
-    api.getMyOrder(Number(id)).then((o) => { setOrder(o); setState("ok"); }).catch(() => setState("missing"));
+    api.getMyOrder(Number(id)).then((o) => {
+      setOrder(o);
+      setState("ok");
+    }).catch(() => setState("missing"));
+    api.getMyOrderRequests(Number(id)).then(setRequests).catch((error) => {
+      toast.error(apiErrorMessage(error, "Could not load order requests"));
+    });
   }, [id]);
+
+  const canCancel = order !== null && ["PENDING", "PAID", "PROCESSING"].includes(order.status);
+  const canRequestRefund = order !== null && ["PAID", "PARTIALLY_REFUNDED"].includes(order.paymentStatus);
+  const requestOptions = [
+    ...(canCancel ? [{ kind: "CANCEL" as const, label: "Cancel this order" }] : []),
+    ...(canRequestRefund ? [{ kind: "REFUND" as const, label: "Request a refund" }] : []),
+  ];
+  const selectedRequestKind =
+    requestOptions.find((option) => option.kind === requestKind)?.kind ??
+    requestOptions[0]?.kind;
+
+  const submitRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedRequestKind) return;
+    setRequesting(true);
+    try {
+      const created = await api.createMyOrderRequest(Number(id), {
+        kind: selectedRequestKind,
+        reason: requestReason.trim(),
+      });
+      setRequests((current) => [created, ...current]);
+      setRequestReason("");
+      toast.success("Your request was sent to our team");
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Could not submit your request"));
+    } finally {
+      setRequesting(false);
+    }
+  };
 
   if (state === "loading") return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (state === "missing" || !order) {
@@ -117,6 +160,67 @@ export default function OrderDetailPage() {
               ))}
             </ol>
           </div>
+
+          <section className="space-y-4 border border-border bg-background p-5 text-sm" aria-labelledby="order-requests-title">
+            <div>
+              <h2 id="order-requests-title" className="font-semibold">Order help</h2>
+              <p className="mt-1 text-muted-foreground">Send a cancellation or refund request to our team. We’ll review it and reply by email.</p>
+            </div>
+            {requests.length > 0 && (
+              <ul className="space-y-3">
+                {requests.map((request) => (
+                  <li key={request.id} className="space-y-1 border-t border-border pt-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-medium">{request.kind === "CANCEL" ? "Cancellation request" : "Refund request"}</span>
+                      <StatusBadge status={request.status} />
+                    </div>
+                    <p className="whitespace-pre-wrap text-muted-foreground">{request.message}</p>
+                    <p className="text-xs text-muted-foreground">Submitted {new Date(request.createdAt).toLocaleString()}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {requestOptions.length > 0 ? (
+              <form className="space-y-3 border-t border-border pt-4" onSubmit={submitRequest}>
+                <div className="space-y-2">
+                  <Label htmlFor="order-request-kind">Request type</Label>
+                  <Select
+                    value={selectedRequestKind}
+                    onValueChange={(value) => setRequestKind(value as OrderRequest["kind"])}
+                  >
+                    <SelectTrigger id="order-request-kind" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {requestOptions.map((option) => (
+                        <SelectItem key={option.kind} value={option.kind}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="order-request-reason">Reason</Label>
+                  <Textarea
+                    id="order-request-reason"
+                    name="reason"
+                    minLength={10}
+                    maxLength={3000}
+                    required
+                    value={requestReason}
+                    onChange={(event) => setRequestReason(event.target.value)}
+                    placeholder="Tell us how we can help (at least 10 characters)"
+                  />
+                </div>
+                <Button type="submit" disabled={requesting || requestReason.trim().length < 10}>
+                  {requesting ? "Sending…" : "Send request"}
+                </Button>
+              </form>
+            ) : (
+              <p className="border-t border-border pt-3 text-muted-foreground">
+                This order is no longer eligible for an online cancellation or refund request. Contact our team if you need help.
+              </p>
+            )}
+          </section>
         </aside>
       </div>
 

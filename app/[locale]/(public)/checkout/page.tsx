@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PaymentSummary } from "@/components/checkout/payment-summary";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useAuth } from "@/contexts/auth-context";
@@ -21,7 +22,7 @@ import { getShipping, SHIPPING_OPTIONS, ShippingId } from "@/lib/shipping";
 import { computeTotals } from "@/lib/pricing";
 import { PAYMENT_OPTIONS, type PaymentMethodId } from "@/lib/payments";
 import type { Opt } from "@/lib/locations"; // type-only, so the JSON isn't bundled
-import flags from "react-phone-number-input/flags";
+import { COMPANY } from "@/lib/company";
 function useOptions(url: string | null) {
     const [opts, setOpts] = useState<Opt[]>([]);
     useEffect(() => {
@@ -102,7 +103,7 @@ function CheckoutForm() {
         setBusy(true);
         try {
             const order = await api.checkout({
-                items: items.map((i) => ({ variantId: i.variantId, qty: i.qty })),
+                items: items.map((i) => ({ variantId: i.variantId, saleType: i.saleType, qty: i.qty })),
                 shippingId,
                 paymentMethod,
                 fullName: f.fullName, phone: f.phone,
@@ -236,11 +237,7 @@ function CheckoutForm() {
                             </div>
                         </label>
                     ))}
-                    {(paymentMethod === "MTN_MOMO" || paymentMethod === "AIRTEL_MONEY") && (
-                        <p className="text-xs text-muted-foreground">
-                            The payment request will be sent to the phone number above.
-                        </p>
-                    )}
+                    <PaymentSummary method={paymentMethod} phone={f.phone} total={totals.total} />
                 </fieldset>
             </div>
 
@@ -265,7 +262,10 @@ function CheckoutForm() {
                     {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {busy ? "Placing order…" : "Place order"}
                 </Button>
-                <p className="text-xs text-muted-foreground">Our team will contact you to confirm payment (MTN MoMo, Airtel Money, card or bank transfer).</p>
+                <p className="text-xs text-muted-foreground">
+                    Our team will contact you to confirm payment (MTN MoMo, Airtel Money, card or bank transfer).
+                    Need help? Call {COMPANY.phone}.
+                </p>
             </aside>
         </form>
     );

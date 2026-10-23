@@ -19,6 +19,16 @@ import { TILES_CATALOG, TileProduct } from "../data/catalog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 interface HeaderMenuProps {
   sceneName: string;
@@ -36,6 +46,9 @@ interface HeaderMenuProps {
   onOpenRooms?: () => void;
   onOpenRoomsModal?: () => void;
   dbTiles?: TileProduct[];
+  onSaveDesign?: (name: string) => Promise<boolean>;
+  isSavingDesign?: boolean;
+  isExistingDesign?: boolean;
 }
 
 export const HeaderMenu: React.FC<HeaderMenuProps> = ({
@@ -53,9 +66,14 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
   onOpenRooms,
   onOpenRoomsModal,
   dbTiles,
+  onSaveDesign,
+  isSavingDesign = false,
+  isExistingDesign = false,
 }) => {
   const [copied, setCopied] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [designName, setDesignName] = useState("My room design");
   const [isSkuModalOpen, setIsSkuModalOpen] = useState(false);
   const [skuInput, setSkuInput] = useState("");
   const [targetSurfaceSortOrder, setTargetSurfaceSortOrder] = useState<number>(1);
@@ -72,9 +90,13 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2000);
+  const handleSave = async () => {
+    if (!onSaveDesign || isSavingDesign) return;
+    if (await onSaveDesign(designName)) {
+      setIsSaveDialogOpen(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    }
   };
 
   const handleApplySku = (tile: TileProduct) => {
@@ -179,12 +201,13 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
         </Button>
 
         <Button
-          onClick={handleSave}
+          onClick={() => setIsSaveDialogOpen(true)}
+          disabled={isSavingDesign}
           variant={"outline"}
           title="Save Design"
         >
           {saveSuccess ? <Check className="w-3.5 h-3.5 text-success" /> : <Save className="w-3.5 h-3.5" />}
-          <span className="hidden xl:inline">{saveSuccess ? "Saved!" : "Save"}</span>
+          <span className="hidden xl:inline">{saveSuccess ? (isExistingDesign ? "Updated!" : "Saved!") : isExistingDesign ? "Update" : "Save"}</span>
         </Button>
       </div>
 
@@ -261,6 +284,45 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <AlertDialogContent className="rounded-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{isExistingDesign ? "Update room design" : "Save room design"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {isExistingDesign ? "Save your changes to this design." : "Choose a name for this saved design."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <label htmlFor="visualizer-design-name" className="text-sm font-medium">Design name</label>
+            <Input
+              id="visualizer-design-name"
+              value={designName}
+              onChange={(event) => setDesignName(event.target.value)}
+              maxLength={150}
+              autoFocus
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && designName.trim() && !isSavingDesign) {
+                  event.preventDefault();
+                  void handleSave();
+                }
+              }}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSavingDesign}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isSavingDesign || !designName.trim()}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleSave();
+              }}
+            >
+              {isSavingDesign ? (isExistingDesign ? "Updating…" : "Saving…") : isExistingDesign ? "Update design" : "Save design"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );

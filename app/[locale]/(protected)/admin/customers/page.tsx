@@ -60,7 +60,7 @@ export default function AdminCustomersPage() {
   return (
     <ResourcePage<CustomerSummary>
       title="Customers"
-      description="People who have an account on your shop."
+      description="Accounts that have placed an order. Accounts without orders are listed under Users."
       entityName="customer"
       load={api.getCustomers}
       searchText={(c) => `${c.firstName} ${c.lastName ?? ""} ${c.email} ${c.phoneNumber ?? ""}`}

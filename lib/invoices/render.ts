@@ -26,12 +26,19 @@ const MIME: Record<string, string> = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
 };
-const LOGO_EXTS = [".png", ".jpg", ".jpeg", ".svg"];
+const LOGO_EXTS = [".png", ".jpg", ".jpeg"];
 
 async function findLogoFile(): Promise<string | null> {
   const pub = path.join(process.cwd(), "public");
-  if (process.env.INVOICE_LOGO_PATH)
-    return path.resolve(process.env.INVOICE_LOGO_PATH);
+  if (process.env.INVOICE_LOGO_PATH) {
+    const configuredFile = path.resolve(process.env.INVOICE_LOGO_PATH);
+    const ext = path.extname(configuredFile).toLowerCase();
+    const exists = await fs
+      .stat(configuredFile)
+      .then((s) => s.isFile())
+      .catch(() => false);
+    return MIME[ext] && exists ? configuredFile : null;
+  }
 
   for (const ext of LOGO_EXTS) {
     const f = path.join(pub, `logo${ext}`);
@@ -51,26 +58,18 @@ async function findLogoFile(): Promise<string | null> {
   return hit ? path.join(dir, hit) : null;
 }
 
-let logoCache: Content | null | undefined;
+let logoCache: string | null | undefined;
 async function loadLogo(): Promise<Content | null> {
-  if (logoCache !== undefined) return logoCache;
-  try {
-    const file = await findLogoFile();
-    if (!file) return (logoCache = null);
-    const ext = path.extname(file).toLowerCase();
-    const raw = await fs.readFile(file);
-    logoCache =
-      ext === ".svg"
-        ? { svg: raw.toString("utf8"), fit: [150, 50] }
-        : {
-            image: `data:${MIME[ext]};base64,${raw.toString("base64")}`,
-            fit: [150, 50],
-          };
-  } catch (e) {
-    console.error("[invoice] logo load failed, falling back to text", e);
-    logoCache = null;
+  if (logoCache === undefined) {
+    try {
+      logoCache = await findLogoFile();
+    } catch (e) {
+      console.error("[invoice] logo load failed, falling back to text", e);
+      logoCache = null;
+    }
   }
-  return logoCache;
+  // pdfmake rewrites image nodes while processing definitions, so create a fresh node per PDF.
+  return logoCache ? { image: logoCache, fit: [150, 50] } : null;
 }
 
 export async function renderInvoicePdf(data: InvoiceData): Promise<Buffer> {

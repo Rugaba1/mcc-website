@@ -3,13 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
-  TILES_CATALOG,
   PAINTS_CATALOG,
   COUNTERS_CATALOG,
   CABINETS_CATALOG,
   GROUT_CATALOG,
   PATTERNS_CATALOG,
-  TileProduct,
   TileSizeOption,
   PaintProduct,
   CounterProduct,
@@ -24,14 +22,17 @@ import { useCart } from "../contexts/cart-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PurchaseOptions } from "./purchase-option";
+import { Product } from "@/lib/api";
+import { dbProductToTileProduct } from "@/lib/visualizer-adapter";
 interface ProductPickerProps {
   surface: SurfaceDefinition;
   currentSelection: SurfaceSelection | null;
   onApply: (selection: SurfaceSelection) => void;
   onRemove: (sortOrder: number) => void;
   activeSide?: "left" | "right";
-  dbTiles?: TileProduct[];
+  dbTiles?: Product[];
   initialFilter?: string;
 }
 
@@ -51,15 +52,14 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   const isCounterSurface = surface.category === "Counter" || surface.type === "COUNTER";
   const isCabinetSurface = surface.category === "Cabinet" || surface.type === "CABINETS";
   const isTileSurface = !isPaintSurface && !isCounterSurface && !isCabinetSurface;
-
-  // Active collection of tiles (prefers database tiles)
-  const tileList = dbTiles && dbTiles.length > 0 ? dbTiles : TILES_CATALOG;
-
+  const [buyOpen, setBuyOpen] = useState(false);
+  const tileList = dbTiles ?? [];
+  const visualizerTiles = tileList.map(dbProductToTileProduct);
   const [activeTab, setActiveTab] = useState<"tile" | "grout" | "pattern">("tile");
   const [searchQuery, setSearchQuery] = useState(initialFilter || "");
   const [selectedColorCategory, setSelectedColorCategory] = useState<string>("All");
   const [selectedTileCategory, setSelectedTileCategory] = useState<string>("All");
-
+  const handleAddToCart = () => { if (buy) setBuyOpen(true); };
   useEffect(() => {
     if (initialFilter) {
       setSearchQuery(initialFilter);
@@ -67,9 +67,9 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   }, [initialFilter]);
 
   // Selected state
-  const [pickedTile, setPickedTile] = useState<TileProduct>(tileList[0]);
-  const [selectedSizeId, setSelectedSizeId] = useState<number>(
-    tileList[0].availableSizes?.[0]?.id || tileList[0].id
+  const [pickedTile, setPickedTile] = useState<Product | null>(tileList[0] ?? null);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | undefined>(
+    tileList[0]?.variants?.[0]?.id ?? tileList[0]?.id
   );
   const [pickedPaint, setPickedPaint] = useState<PaintProduct>(PAINTS_CATALOG[0]);
   const [pickedCounter, setPickedCounter] = useState<CounterProduct>(COUNTERS_CATALOG[0]);
@@ -78,24 +78,34 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   const [pickedGrout, setPickedGrout] = useState<GroutColor>(GROUT_CATALOG[0]);
   const [pickedPattern, setPickedPattern] = useState<TilePattern>(PATTERNS_CATALOG[0]);
   const [pickedRotation, setPickedRotation] = useState<number>(0);
-
+  const pickedTileView = pickedTile ? dbProductToTileProduct(pickedTile) : null;
+  const size = pickedTileView?.availableSizes.find((s) => s.id === selectedSizeId) ?? pickedTileView?.availableSizes[0];
+  const buy = pickedTile && size?.variantId && (size.pricePerSqm ?? 0) > 0
+    ? { variantId: size.variantId, pricePerSqm: size.pricePerSqm!, containerPricePerSqm: size.containerPricePerSqm ?? null, sqmPerContainer: size.sqmPerContainer ?? null }
+    : null;
   // Sync pickedTile when tileList loads from database
   useEffect(() => {
     if (tileList.length > 0 && !currentSelection) {
       setPickedTile(tileList[0]);
-      if (tileList[0].availableSizes?.[0]) {
-        setSelectedSizeId(tileList[0].availableSizes[0].id);
+      const firstSize = dbProductToTileProduct(tileList[0]).availableSizes[0];
+      if (firstSize) {
+        setSelectedSizeId(firstSize.id);
       }
     }
-  }, [tileList]);
+  }, [dbTiles, currentSelection]);
 
   // Sync with currentSelection when surface or selection changes
   useEffect(() => {
     if (currentSelection) {
       if (currentSelection.productType === "tile") {
-        const tileProd = currentSelection.product as TileProduct;
-        setPickedTile(tileProd);
-        setSelectedSizeId(tileProd.id);
+        const selectedTile = currentSelection.product;
+        const matchingProduct = tileList.find((product) =>
+          product.id === selectedTile.id || product.variants?.some((variant) => variant.id === selectedTile.id)
+        );
+        if (matchingProduct) {
+          setPickedTile(matchingProduct);
+          setSelectedSizeId(selectedTile.id);
+        }
       }
       if (currentSelection.productType === "paint") setPickedPaint(currentSelection.product as PaintProduct);
       if (currentSelection.productType === "counter") setPickedCounter(currentSelection.product as CounterProduct);
@@ -109,24 +119,13 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   // Handle tile size / variant switch
   const handleSelectSize = (sizeOpt: TileSizeOption) => {
     setSelectedSizeId(sizeOpt.id);
-    setPickedTile((prev) => ({
-      ...prev,
-      id: sizeOpt.id,
-      size: sizeOpt.size,
-      sku: sizeOpt.sku,
-      ratio: sizeOpt.ratio,
-      specifier: sizeOpt.specifier,
-      swatchUrl: sizeOpt.swatchUrl || prev.swatchUrl,
-      pricePerBox: sizeOpt.pricePerBox ?? prev.pricePerBox,
-      pricePerSqm: sizeOpt.pricePerSqm ?? prev.pricePerSqm,
-    }));
   };
 
   // Filter chips
   const colorCategories = ["All", "Beige", "Grey", "White", "Black", "Brown", "Green", "Special"];
   const tileCategories = ["All", "Floor", "Wall", "Outdoor", "Special"];
 
-  const filteredTiles = tileList.filter((tile) => {
+  const filteredTiles = visualizerTiles.filter((tile) => {
     const cleanQuery = searchQuery.trim().toLowerCase().replace(/^\^/, "");
     const matchesSearch =
       !cleanQuery ||
@@ -171,7 +170,23 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
       productToApply = pickedCabinet;
       type = "cabinet";
     } else {
-      productToApply = pickedTile;
+      if (!pickedTile) return;
+      const tileProduct = dbProductToTileProduct(pickedTile);
+      const selectedSize = tileProduct.availableSizes.find((sizeOption) => sizeOption.id === selectedSizeId)
+        ?? tileProduct.availableSizes[0];
+      productToApply = selectedSize
+        ? {
+          ...tileProduct,
+          id: selectedSize.id,
+          size: selectedSize.size,
+          sku: selectedSize.sku,
+          ratio: selectedSize.ratio,
+          specifier: selectedSize.specifier,
+          swatchUrl: selectedSize.swatchUrl || tileProduct.swatchUrl,
+          pricePerBox: selectedSize.pricePerBox ?? tileProduct.pricePerBox,
+          pricePerSqm: selectedSize.pricePerSqm ?? tileProduct.pricePerSqm,
+        }
+        : tileProduct;
       type = "tile";
     }
 
@@ -186,20 +201,6 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
     });
   };
 
-  const handleAddToCart = () => {
-    if (!pickedTile) return;
-    addToCart({
-      id: String(selectedSizeId || pickedTile.id),
-      name: `${pickedTile.name} (${pickedTile.size})`,
-      price: pickedTile.pricePerBox || 32000,
-      color: pickedTile.color,
-      size: pickedTile.size,
-      image: pickedTile.swatchUrl,
-      qty: 1,
-    });
-    setAddedToast(true);
-    setTimeout(() => setAddedToast(false), 2500);
-  };
 
   const cycleRotation = () => {
     setPickedRotation((prev) => (prev + 45) % 180);
@@ -302,19 +303,19 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
         {isTileSurface && activeTab === "tile" && (
           <div className="space-y-3">
             {/* Active Tile Size & Pricing Selection Panel */}
-            {pickedTile && pickedTile.availableSizes && pickedTile.availableSizes.length > 0 && (
+            {pickedTileView && pickedTileView.availableSizes.length > 0 && (
               <div className="p-3   bg-background/60 border border-primary/30 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold  flex items-center gap-1.5">
                     <Ruler className="w-3.5 h-3.5 text-primary" />
-                    <span>Sizes for {pickedTile.name}:</span>
+                    <span>Sizes for {pickedTileView.name}:</span>
                   </span>
                   <span className="text-[10px] text-primary font-mono">
-                    SKU: {pickedTile.sku}
+                    SKU: {pickedTileView.sku}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {pickedTile.availableSizes.map((sizeOpt) => {
+                  {pickedTileView.availableSizes.map((sizeOpt) => {
                     const isSizeActive = selectedSizeId === sizeOpt.id;
                     return (
                       <Button
@@ -328,12 +329,12 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     );
                   })}
                 </div>
-                {pickedTile.pricePerBox && (
+                {pickedTileView.pricePerBox && (
                   <div className="flex items-center justify-between pt-1 border-t  /80 text-[11px]">
                     <span className="text-muted-foreground">Price per box:</span>
-                    <span className="text-primary font-bold">{pickedTile.pricePerBox.toLocaleString()} RWF</span>
-                    {pickedTile.pricePerSqm && (
-                      <span className="text-sm">({pickedTile.pricePerSqm.toLocaleString()} RWF/m²)</span>
+                    <span className="text-primary font-bold">{pickedTileView.pricePerBox.toLocaleString()} RWF</span>
+                    {pickedTileView.pricePerSqm && (
+                      <span className="text-sm">({pickedTileView.pricePerSqm.toLocaleString()} RWF/m²)</span>
                     )}
                   </div>
                 )}
@@ -373,13 +374,15 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             {/* Tile Cards Grid */}
             <div className="grid grid-cols-2 gap-2.5 pt-1">
               {filteredTiles.map((tile, idx) => {
-                const isSelected = pickedTile.name === tile.name;
+                const isSelected = pickedTile?.id === tile.id;
                 return (
                   <div
                     key={tile.id}
                     onClick={() => {
-                      setPickedTile(tile);
-                      if (tile.availableSizes?.[0]) {
+                      const product = tileList.find((item) => item.id === tile.id);
+                      if (!product) return;
+                      setPickedTile(product);
+                      if (tile.availableSizes[0]) {
                         setSelectedSizeId(tile.availableSizes[0].id);
                       }
                     }}
@@ -626,18 +629,18 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
           <span className="truncate max-w-50 font-medium text-foreground">
             {isPaintSurface
-              ? pickedPaint.name
+              ? pickedPaint?.name
               : isCounterSurface
-                ? pickedCounter.name
+                ? pickedCounter?.name
                 : isCabinetSurface
-                  ? pickedCabinet.name
-                  : `${pickedTile.name} (${pickedTile.size})`}
+                  ? pickedCabinet?.name
+                  : `${pickedTileView?.name ?? ""} (${pickedTileView?.availableSizes.find((option) => option.id === selectedSizeId)?.size ?? pickedTileView?.size ?? ""})`}
           </span>
           <span className="text-primary font-mono text-[11px]">
-            {isTileSurface && pickedTile.pricePerBox
-              ? `${pickedTile.pricePerBox.toLocaleString()} RWF/box`
+            {isTileSurface && pickedTileView?.pricePerBox
+              ? `${pickedTileView?.pricePerSqm?.toLocaleString()} RWF/m2`
               : isTileSurface
-                ? pickedTile.sku
+                ? pickedTileView?.sku
                 : ""}
           </span>
         </div>
@@ -657,6 +660,30 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           </Button>
         </div>
       </div>
+      {buy && pickedTile && size && (
+        <Dialog open={buyOpen} onOpenChange={setBuyOpen}>
+          <DialogContent className="max-h-[90vh] overflow-y-auto rounded-none sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{pickedTileView?.name} ({size.size})</DialogTitle>
+              <DialogDescription>Choose how you want to buy.</DialogDescription>
+            </DialogHeader>
+            <PurchaseOptions
+              variant={{ pricePerSqm: buy.pricePerSqm, containerPricePerSqm: buy.containerPricePerSqm, sqmPerContainer: buy.sqmPerContainer }}
+              onAdd={({ saleType, qty }) => {
+                addToCart({
+                  variantId: buy.variantId, productId: pickedTile.id, name: pickedTile.name,
+                  image: size.swatchUrl ?? pickedTile.image, size: size.size, finish: null, color: pickedTile.colors[0] ?? "",
+                  saleType, pricePerSqm: buy.pricePerSqm,
+                  containerPricePerSqm: buy.containerPricePerSqm, sqmPerContainer: buy.sqmPerContainer,
+                }, qty);
+                setBuyOpen(false);
+                setAddedToast(true);
+                setTimeout(() => setAddedToast(false), 2500);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

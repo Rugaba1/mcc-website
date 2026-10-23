@@ -224,6 +224,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
         where: { id },
         data: {
           status,
+          ...(status === "PAID" && { paymentStatus: "PAID", paidAt: now }),
           ...(status === "SHIPPED" && { shippedAt: now }),
           ...(status === "DELIVERED" && { deliveredAt: now }),
           ...(status === "CANCELLED" && { cancelledAt: now }),

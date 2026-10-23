@@ -16,10 +16,9 @@ export interface InvoiceItemData {
   saleType: "SQM" | "CONTAINER";
   sqm: number;
   containers: number;
-  unitPrice: number;  
+  unitPrice: number;
   lineTotal: number;
 }
-
 
 export interface InvoiceData {
   kind: InvoiceKindName;
@@ -251,6 +250,12 @@ export function buildInvoiceDefinition(
       { text: String(i + 1), color: BRAND.muted },
       {
         stack: [
+          { text: it.name, bold: true },
+          ...(spec ? [{ text: spec, fontSize: 7.5, color: BRAND.muted }] : []),
+        ],
+      },
+      {
+        stack: [
           { text: `${it.sqm.toFixed(2)} m²`, alignment: "center" },
           ...(it.saleType === "CONTAINER"
             ? [
@@ -265,8 +270,6 @@ export function buildInvoiceDefinition(
         ],
       },
       { text: money(it.unitPrice, cur), alignment: "right" },
-      { text: it.sqm.toFixed(2), alignment: "center" },
-      { text: money(it.unitPrice, cur), alignment: "right" },
       { text: money(it.lineTotal, cur), alignment: "right", bold: true },
     ];
   });
@@ -275,7 +278,7 @@ export function buildInvoiceDefinition(
     table: {
       headerRows: 1,
       dontBreakRows: true,
-     widths: [18, "*", 70, 78, 82],
+      widths: [18, "*", 70, 78, 82],
       body: [
         [
           th("#"),

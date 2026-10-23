@@ -26,11 +26,17 @@ export async function POST(
     const msg = await prisma.contactMessage.findUnique({ where: { id } });
     if (!msg) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    const orderRequest =
+      /^\[ORDER_REQUEST:(CANCEL|REFUND):\d+\]\r?\nOrder: ([^\r\n]+)\r?\n\r?\nCustomer request:\r?\n([\s\S]*)$/.exec(
+        msg.message,
+      );
     const sent = await sendContactReply({
       to: msg.email,
       firstName: msg.firstName,
       reply,
-      originalMessage: msg.message,
+      originalMessage: orderRequest
+        ? `${orderRequest[1] === "CANCEL" ? "Order cancellation" : "Refund"} request for ${orderRequest[2]}:\n\n${orderRequest[3]}`
+        : msg.message,
     });
     if (!sent) {
       return NextResponse.json(

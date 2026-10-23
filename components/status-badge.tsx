@@ -11,10 +11,10 @@ export const TONES = {
 
 const toneOf = (s: string): keyof typeof TONES => {
     switch (s) {
-        case "PAID": case "DELIVERED": case "REPLIED": case "ACTIVE": return "green";
-        case "PENDING": case "NEW": case "AUTHORIZED": case "PROCESSING": case "PARTIALLY_REFUNDED": return "amber";
+        case "PAID": case "DELIVERED": case "REPLIED": case "ACTIVE": case "VERIFIED": return "green";
+        case "PENDING": case "NEW": case "AUTHORIZED": case "PROCESSING": case "PARTIALLY_REFUNDED": case "UNVERIFIED": return "amber";
         case "SHIPPED": case "READ": return "blue";
-        case "CANCELLED": case "FAILED": case "REFUNDED": return "red";
+        case "CANCELLED": case "FAILED": case "REFUNDED": case "DISABLED": return "red";
         default: return "gray";
     }
 };

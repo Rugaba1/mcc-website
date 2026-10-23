@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { ALL_ROOM_SCENES, DEFAULT_SCENE, SceneDefinition } from "@/data/scenes";
 import { TILES_CATALOG, GROUT_CATALOG, PATTERNS_CATALOG, TileProduct } from "@/data/catalog";
 import { SelectionMap, SurfaceSelection } from "@/types/visualizer";
+import { api, apiErrorMessage, type Product } from "@/lib/api";
+import apiClient from "@/lib/api-client";
 import { HeaderMenu } from "@/components/HeaderMenu";
 import { SurfaceTabs } from "@/components/SurfaceTabs";
 import { VisualizerCanvas } from "@/components/VisualizerCanvas";
@@ -11,7 +14,7 @@ import { CompareSlider } from "@/components/CompareSlider";
 import { ProductPicker } from "@/components/ProductPicker";
 import { AppliedSummary } from "@/components/AppliedSummary";
 import { RoomScenesModal } from "@/components/RoomScenesModal";
-import { fetchVisualizerTiles, fetchVisualizerScenes, findTileInList } from "@/lib/visualizer-adapter";
+import { dbProductToTileProduct, fetchVisualizerProducts, fetchVisualizerScenes, findTileInList } from "@/lib/visualizer-adapter";
 
 export default function VisualizerPage() {
   // Current active room scene
@@ -20,7 +23,8 @@ export default function VisualizerPage() {
   const [isRoomsModalOpen, setIsRoomsModalOpen] = useState<boolean>(false);
 
   // Dynamic database tiles
-  const [dbTiles, setDbTiles] = useState<TileProduct[]>([]);
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+  const dbTiles = dbProducts.map(dbProductToTileProduct);
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(true);
 
   // Main design (Side A) selections
@@ -58,6 +62,8 @@ export default function VisualizerPage() {
   const [isZoomMode, setIsZoomMode] = useState<boolean>(false);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [initialFilter, setInitialFilter] = useState<string>("");
+  const [isSavingDesign, setIsSavingDesign] = useState(false);
+  const [activeDesignToken, setActiveDesignToken] = useState<string | null>(null);
 
   // Determine current active selections based on activeSide
   const currentSelections = isCompareMode && activeSide === "right" ? rightSelections : leftSelections;
@@ -72,15 +78,110 @@ export default function VisualizerPage() {
     return arr.join(",");
   }, [currentScene]);
 
+  const handleSaveDesign = async (name: string) => {
+    const selected = currentScene.surfaces.flatMap((surface) => [
+      leftSelections[surface.sortOrder]
+        ? { side: "left" as const, selection: leftSelections[surface.sortOrder]! }
+        : null,
+      rightSelections[surface.sortOrder]
+        ? { side: "right" as const, selection: rightSelections[surface.sortOrder]! }
+        : null,
+    ]).filter((item): item is { side: "left" | "right"; selection: SurfaceSelection } => item !== null);
+
+    if (selected.some(({ selection }) => selection.productType !== "tile")) {
+      toast.error("Saved designs currently support tile selections only.");
+      return false;
+    }
+    if (selected.length === 0) {
+      toast.error("Apply at least one tile before saving a design.");
+      return false;
+    }
+
+    if (!name.trim()) {
+      toast.error("Enter a name for this design.");
+      return false;
+    }
+
+    const variants = dbProducts.flatMap((product) => product.variants ?? []);
+    const items: {
+      variantId: number;
+      surfaceKey: string;
+      groutColor: string | null;
+      rotation: number;
+      layout: string | null;
+    }[] = [];
+    for (const { side, selection } of selected) {
+      const tile = selection.product as TileProduct;
+      const size = tile.availableSizes.find(
+        (option) => option.id === tile.id || option.sku === tile.sku,
+      );
+      const variantId = size?.variantId ?? size?.id ?? tile.id;
+      if (!variants.some((variant) => variant.id === variantId)) {
+        toast.error(`Could not find a database variant for ${tile.name}.`);
+        return false;
+      }
+      items.push({
+        variantId,
+        surfaceKey: `${side}:${selection.sortOrder}`,
+        groutColor: selection.grout?.color ?? null,
+        rotation: selection.rotation ?? 0,
+        layout: selection.pattern?.name ?? null,
+      });
+    }
+
+    setIsSavingDesign(true);
+    try {
+      let sessionId = localStorage.getItem("mcc-visualizer-session");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem("mcc-visualizer-session", sessionId);
+      }
+
+      const sceneId = currentScene.dbId ?? Number(currentScene.id.replace(/^scene_/, ""));
+      const designData = {
+        sceneId: Number.isSafeInteger(sceneId) && sceneId > 0 ? sceneId : null,
+        name: name.trim(),
+        sessionId,
+        items,
+      };
+      const result = activeDesignToken
+        ? (
+          await apiClient.put<{
+            success: boolean;
+            designId: number;
+            shareToken: string;
+            shareUrl: string;
+          }>("/api/visualizer/designs", {
+            ...designData,
+            shareToken: activeDesignToken,
+          })
+        ).data
+        : await api.createVisualizerDesign(designData);
+      setActiveDesignToken(result.shareToken);
+      const url = new URL(window.location.href);
+      url.searchParams.set("design", result.shareToken);
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      setShareUrl(url.toString());
+      toast.success("Design saved");
+      return true;
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Could not save design"));
+      return false;
+    } finally {
+      setIsSavingDesign(false);
+    }
+  };
+
   // Load database tiles & scenes, and handle deep-linking (?tile=, ?sku=, ?product=, ?scene=)
   useEffect(() => {
     let isMounted = true;
 
-    Promise.all([fetchVisualizerTiles(), fetchVisualizerScenes()]).then(([tiles, scenes]) => {
+    Promise.all([fetchVisualizerProducts(), fetchVisualizerScenes()]).then(async ([products, scenes]) => {
       if (!isMounted) return;
 
-      if (tiles && tiles.length > 0) {
-        setDbTiles(tiles);
+      const tiles = products.map(dbProductToTileProduct);
+      if (products.length > 0) {
+        setDbProducts(products);
       }
       if (scenes && scenes.length > 0) {
         setAllScenes(scenes);
@@ -91,6 +192,8 @@ export default function VisualizerPage() {
 
       const params = new URLSearchParams(window.location.search);
       const sceneParam = params.get("scene") || params.get("room");
+      const designToken = params.get("design");
+      setActiveDesignToken(designToken);
       const skuParam = params.get("sku") || params.get("SKU");
       const productParam = params.get("product") || params.get("tile");
       const surfaceParam = params.get("surface");
@@ -98,6 +201,88 @@ export default function VisualizerPage() {
       // 1. Resolve Scene
       let activeScn = DEFAULT_SCENE;
       const scenesList = scenes && scenes.length > 0 ? scenes : ALL_ROOM_SCENES;
+
+      if (designToken) {
+        try {
+          const design = await api.getVisualizerDesign(designToken);
+          if (!isMounted) return;
+          setActiveDesignToken(designToken);
+          const savedSceneId = design.scene?.id ?? design.sceneId;
+          const savedScene = scenesList.find(
+            (scene) => scene.dbId === savedSceneId || scene.id === `scene_${savedSceneId}`,
+          );
+          if (savedScene) activeScn = savedScene;
+
+          const restored: SelectionMap = {};
+          const restoredRight: SelectionMap = {};
+          activeScn.surfaces.forEach((surface) => {
+            restored[surface.sortOrder] = null;
+            restoredRight[surface.sortOrder] = null;
+          });
+          for (const item of design.items ?? []) {
+            const variantId = item.variant?.id ?? item.variantId;
+            const keyMatch = /^(left|right):(\d+)$/.exec(item.surfaceKey);
+            const side = keyMatch?.[1] === "right" ? "right" : "left";
+            const surfaceSortOrder = Number(keyMatch?.[2] ?? item.surfaceKey);
+            const product = products.find((candidate) =>
+              candidate.variants?.some((variant) => variant.id === variantId),
+            );
+            const variant = product?.variants?.find((candidate) => candidate.id === variantId);
+            const surface = activeScn.surfaces.find((candidate) => candidate.sortOrder === surfaceSortOrder);
+            if (!product || !variant || !surface) continue;
+
+            const tile = dbProductToTileProduct(product);
+            const size = tile.availableSizes.find((option) => option.variantId === variant.id);
+            const selectedTile: TileProduct = {
+              ...tile,
+              id: variant.id,
+              size: variant.size,
+              sku: variant.sku,
+              ratio: size?.ratio ?? tile.ratio,
+              specifier: size?.specifier ?? tile.specifier,
+              swatchUrl: variant.image || size?.swatchUrl || tile.swatchUrl,
+            };
+            const pattern = PATTERNS_CATALOG.find(
+              (candidate) => candidate.name === item.layout || String(candidate.id) === item.layout,
+            ) ?? PATTERNS_CATALOG[0];
+            const grout = GROUT_CATALOG.find(
+              (candidate) => candidate.color === item.groutColor || String(candidate.id) === item.groutColor,
+            ) ?? GROUT_CATALOG[0];
+
+            const selection: SurfaceSelection = {
+              sortOrder: surface.sortOrder,
+              product: selectedTile,
+              productType: "tile",
+              grout,
+              pattern,
+              rotation: item.rotation,
+              layerUrl: surface.sampleLayer,
+            };
+            if (side === "right") restoredRight[surface.sortOrder] = selection;
+            else restored[surface.sortOrder] = selection;
+          }
+
+          const hasRestoredRight = Object.values(restoredRight).some(Boolean);
+          setCurrentScene(activeScn);
+          setLeftSelections(restored);
+          setRightSelections(restoredRight);
+          setIsCompareMode(hasRestoredRight);
+          setIsZoomMode(false);
+          setActiveSide("left");
+          setActiveSurfaceSortOrder(
+            activeScn.surfaces.find((surface) => restored[surface.sortOrder])?.sortOrder ??
+            activeScn.surfaces.find((surface) => restoredRight[surface.sortOrder])?.sortOrder ??
+            activeScn.surfaces[0]?.sortOrder ?? 1,
+          );
+          setHistory([{ left: restored, right: restoredRight }]);
+          setHistoryIndex(0);
+          setShareUrl(window.location.href);
+          return;
+        } catch (error) {
+          toast.error(apiErrorMessage(error, "Could not load the saved design"));
+        }
+      }
+
       if (sceneParam) {
         const found = scenesList.find(
           (s) =>
@@ -109,6 +294,7 @@ export default function VisualizerPage() {
           setCurrentScene(found);
         }
       }
+      console.log(dbTiles)
 
       // 2. Resolve Target Surface (e.g. surface=wall or surface=floor)
       let targetSortOrder = activeScn.surfaces[0]?.sortOrder || 1;
@@ -159,8 +345,10 @@ export default function VisualizerPage() {
     if (typeof window !== "undefined") {
       const selString = getSelString(leftSelections);
       const hash = `#visualizer/spec/${encodeURIComponent(currentScene.specifier)}/sel/${selString}`;
-      window.history.replaceState(null, "", hash);
-      setShareUrl(window.location.href);
+      const url = new URL(window.location.href);
+      url.hash = hash;
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      setShareUrl(url.toString());
     }
   }, [leftSelections, currentScene, getSelString]);
 
@@ -298,6 +486,9 @@ export default function VisualizerPage() {
         canRedo={historyIndex < history.length - 1}
         onOpenRooms={() => setIsRoomsModalOpen(true)}
         shareUrl={shareUrl}
+        onSaveDesign={handleSaveDesign}
+        isSavingDesign={isSavingDesign}
+        isExistingDesign={Boolean(activeDesignToken)}
         dbTiles={dbTiles}
         onQuickApplyProduct={handleQuickApply}
       />
@@ -345,7 +536,7 @@ export default function VisualizerPage() {
             onApply={handleApply}
             onRemove={handleRemove}
             activeSide={isCompareMode ? activeSide : undefined}
-            dbTiles={dbTiles}
+            dbTiles={dbProducts}
             initialFilter={initialFilter}
           />
         </aside>

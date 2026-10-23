@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import CartButton from "./cart-button";
-import { Link } from "@/app/i18n/routing";
+import { Link, usePathname } from "@/app/i18n/routing";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
@@ -25,34 +25,23 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("/home");
+  const pathname = usePathname();
   const { user } = useAuth();
   const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
+
+  const isActive = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 60);
-      // Update active section
-      const sections = links.map((l) => l.href);
-      for (const id of [...sections]) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= 180) {
-          setActive(`${id}`);
-          break;
-        }
-      }
     };
+    onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-
-  useEffect(() => {
-    window.addEventListener("", () => console.log("Event triggered"));
-
-    const route = window.location.pathname.split("/")[2]
-    setActive(`/${route}`)
-
-  }, [])
   return (
     <header
       className={`${scrolled ? "fixed" : "relative"} top-0 left-0 right-0 z-50 border-b transition-all duration-500 ${scrolled
@@ -84,14 +73,13 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-1">
           {links.map((l) => {
             const isExternal = !l.href.startsWith("#");
-            const cls = `relative px-4 py-2 text-sm font-medium transition-colors duration-200 group ${active === l.href ? "" : "  "
-              }`;
+            const active = isActive(l.href);
+            const cls = `relative px-4 py-2 text-sm font-medium transition-colors duration-200 group ${active ? "text-primary" : ""}`;
             const underline = (
-              <span className={`absolute bottom-0 left-4 right-4 h-px bg-primary transition-all duration-300 ${active === l.href ? "opacity-100" : "opacity-0 group-hover:opacity-60"
-                }`} />
+              <span className={`absolute bottom-0 left-4 right-4 h-px bg-primary transition-all duration-300 ${active ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
             );
             return isExternal ? (
-              <Link key={l.href} href={l.href} className={cls}>
+              <Link key={l.href} href={l.href} className={cls} aria-current={active ? "page" : undefined}>
                 {l.label}
                 {underline}
               </Link>
@@ -161,15 +149,15 @@ export default function Navbar() {
         <nav className="flex flex-col px-6 py-6 gap-1">
           {links.map((l) => {
             const isExternal = !l.href.startsWith("#");
-            const cls = `flex items-center justify-between py-3.5 -b /8 text-base font-medium transition-colors ${active === l.href ? "" : " "
-              }`;
+            const active = isActive(l.href);
+            const cls = `flex items-center justify-between border-b py-3.5 text-base font-medium transition-colors ${active ? "border-primary text-primary" : "border-border/50"}`;
             const arrow = (
               <svg className="w-4 h-4 /50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             );
             return isExternal ? (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={cls} >
+              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={cls} aria-current={active ? "page" : undefined}>
                 <div className="font-serif flex justify-between w-full"> <span>{l.label}</span> <span>{arrow}</span></div>
               </Link>
             ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
+import { Link } from "@/app/i18n/routing";
 import {
   Area,
   CartesianGrid,
@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 
 import { api, apiErrorMessage, type CustomerAnalytics, type PieSlice, type StatCard } from "@/lib/api";
+import { lineOf, useCart } from "@/contexts/cart-context";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -197,7 +198,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
       {/* Orders in progress + cart */}
       <section className="grid gap-4 lg:grid-cols-3">
         <ActiveOrders orders={tables.activeOrders} currency={currency} />
-        <CartCard cart={tables.cart} currency={currency} />
+        <CartCard currency={currency} />
       </section>
 
       {/* Spending + pies */}
@@ -278,7 +279,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {tables.designs.map((d) => (
-                  <Link key={d.id} href={`/visualizer?design=${d.id}`} className="group space-y-1.5">
+                  <Link key={d.id} href={d.shareToken ? `/visualizer?design=${encodeURIComponent(d.shareToken)}` : "/visualizer"} className="group space-y-1.5">
                     <div className="aspect-[4/3] overflow-hidden bg-muted">
                       {d.previewImage && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -426,16 +427,23 @@ function ActiveOrders({ orders, currency }: { orders: CustomerAnalytics["tables"
 
 // ─── Cart ─────────────────────────────────────────────────────────────────────
 
-function CartCard({ cart, currency }: { cart: CustomerAnalytics["tables"]["cart"]; currency: string }) {
+function CartCard({ currency }: { currency: string }) {
+  const { items, ready } = useCart();
+  const subtotal = items.reduce((total, item) => total + (lineOf(item)?.total ?? 0), 0);
+
   return (
-    <Card className="flex flex-col">
+    <Card className="flex h-fit flex-col self-start">
       <CardHeader>
         <CardTitle>Your cart</CardTitle>
-        <CardDescription>{cart.items.length === 0 ? "Nothing here yet" : `${cart.items.length} item(s) ready to order`}</CardDescription>
+        <CardDescription>
+          {!ready ? "Loading your cart…" : items.length === 0 ? "Nothing here yet" : `${items.length} item(s) ready to order`}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col">
-        {cart.items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3">
+      <CardContent className="flex flex-col">
+        {!ready ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">Loading…</div>
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-8">
             <Empty icon={ShoppingCart} text="Your cart is empty" />
             <Button asChild variant="outline">
               <Link href="/products">Browse tiles</Link>
@@ -443,34 +451,37 @@ function CartCard({ cart, currency }: { cart: CustomerAnalytics["tables"]["cart"
           </div>
         ) : (
           <>
-            <ul className="flex-1 divide-y">
-              {cart.items.slice(0, 4).map((i) => (
-                <li key={i.id} className="flex items-center gap-3 py-3">
-                  <div className="size-12 shrink-0 overflow-hidden  bg-muted">
-                    {i.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={i.image} alt={i.product} className="size-full object-cover" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{i.product}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {i.size} · {sqm.format(i.coverageSqm)} m²
-                    </p>
-                  </div>
-                  <span className="text-sm tabular-nums">{compact.format(i.lineTotal)}</span>
-                </li>
-              ))}
+            <ul className="divide-y">
+              {items.slice(0, 4).map((i) => {
+                const line = lineOf(i);
+                return (
+                  <li key={`${i.variantId}:${i.saleType}`} className="flex items-center gap-3 py-3">
+                    <div className="size-12 shrink-0 overflow-hidden  bg-muted">
+                      {i.image && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={i.image} alt={i.product} className="size-full object-cover" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{i.product}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {i.size} · {i.saleType === "CONTAINER"
+                          ? `${line?.containers ?? i.qty} container(s) · ${sqm.format(line?.sqm ?? 0)} m²`
+                          : `${sqm.format(i.qty)} m²`}
+                      </p>
+                    </div>
+                    <span className="text-sm tabular-nums">{compact.format(line?.total ?? 0)}</span>
+                  </li>
+                );
+              })}
             </ul>
-            {cart.items.length > 4 && (
-              <p className="pt-1 text-xs text-muted-foreground">+ {cart.items.length - 4} more in your cart</p>
+            {items.length > 4 && (
+              <p className="pt-1 text-xs text-muted-foreground">+ {items.length - 4} more in your cart</p>
             )}
             <div className="mt-4 space-y-3 border-t pt-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Subtotal{cart.coupon ? ` · code ${cart.coupon.code}` : ""}
-                </span>
-                <span className="font-semibold tabular-nums">{money(cart.subtotal, currency)}</span>
+                <span className="text-sm text-muted-foreground">Subtotal</span>
+                <span className="font-semibold tabular-nums">{money(subtotal, currency)}</span>
               </div>
               <Button asChild className="w-full">
                 <Link href="/checkout">Go to checkout</Link>

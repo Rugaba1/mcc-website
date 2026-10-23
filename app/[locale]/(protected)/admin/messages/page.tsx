@@ -5,6 +5,7 @@ import { Archive, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 
 import { api, apiErrorMessage, type ContactMessage } from "@/lib/api";
+import { Link } from "@/app/i18n/routing";
 import { ResourcePage } from "@/components/admin/resource-page";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { fmtDate, fmtDateTime, options } from "@/lib/format";
 function MessageView({ row, reload }: { row: ContactMessage; reload: () => Promise<void> }) {
   const [reply, setReply] = useState("");
   const [busy, setBusy] = useState(false);
+  const orderRequest = /^\[ORDER_REQUEST:(CANCEL|REFUND):(\d+)\]\r?\nOrder: ([^\r\n]+)\r?\n\r?\nCustomer request:\r?\n([\s\S]*)$/.exec(row.message);
 
   // Opening a new message marks it as read
   useEffect(() => {
@@ -37,7 +39,20 @@ function MessageView({ row, reload }: { row: ContactMessage; reload: () => Promi
         <p><a className="underline" href={`mailto:${row.email}`}>{row.email}</a>{row.phone ? ` · ${row.phone}` : ""}</p>
         <p className="text-muted-foreground">{row.projectType ?? "General enquiry"} · {fmtDateTime(row.createdAt)}</p>
       </div>
-      <p className="whitespace-pre-wrap border bg-muted/40 p-4 text-sm">{row.message}</p>
+      {orderRequest && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border bg-muted/40 p-4">
+          <div>
+            <p className="font-medium">{orderRequest[1] === "CANCEL" ? "Order cancellation request" : "Refund request"}</p>
+            <p className="text-sm text-muted-foreground">{orderRequest[3]}</p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/admin/orders/${orderRequest[2]}`}>Review order</Link>
+          </Button>
+        </div>
+      )}
+      <p className="whitespace-pre-wrap border bg-muted/40 p-4 text-sm">
+        {orderRequest ? orderRequest[4] : row.message}
+      </p>
 
       {row.replyText && (
         <div className="space-y-1.5">
@@ -66,7 +81,7 @@ export default function AdminMessagesPage() {
   return (
     <ResourcePage<ContactMessage>
       title="Messages"
-      description="Enquiries from the contact form."
+      description="Contact enquiries and customer order cancellation or refund requests. Reply to customers here and review linked orders."
       entityName="message"
       load={api.getContactMessages}
       searchText={(m) => `${m.firstName} ${m.lastName} ${m.email} ${m.projectType ?? ""} ${m.message}`}

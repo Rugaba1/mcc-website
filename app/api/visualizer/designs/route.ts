@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import { getApiUser } from "@/lib/auth/api-access";
 import crypto from "crypto";
+import { z } from "zod";
+
+const saveSchema = z.object({
+  sceneId: z.number().int().positive().nullable().optional(),
+  name: z.string().trim().min(1).max(150),
+  sessionId: z.string().trim().max(100).optional(),
+  items: z
+    .array(
+      z.object({
+        variantId: z.number().int().positive(),
+        surfaceKey: z.string().trim().min(1).max(50),
+        groutColor: z.string().trim().max(20).nullable().optional(),
+        rotation: z.number().int().min(0).max(360).default(0),
+        layout: z.string().trim().max(30).nullable().optional(),
+      }),
+    )
+    .max(50),
+});
 
 // ── GET /api/visualizer/designs?token=xxx ─────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -45,33 +64,36 @@ export async function GET(req: NextRequest) {
 // ── POST /api/visualizer/designs ──────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { sceneId, name, previewImage, items, sessionId } = body;
+    const user = await getApiUser(req);
+    const parsed = saveSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid design" },
+        { status: 400 },
+      );
+    }
+    const { sceneId, name, items, sessionId } = parsed.data;
 
     const shareToken = crypto.randomBytes(16).toString("hex");
 
     const design = await prisma.visualizerDesign.create({
       data: {
-        sceneId: sceneId ? Number(sceneId) : null,
-        name: name || "My Room Design",
+        userId: user?.id ?? null,
+        sessionId: user ? null : sessionId || null,
+        sceneId: sceneId ?? null,
+        name,
         shareToken,
-        previewImage: previewImage || null,
-        sessionId: sessionId || null,
         items: {
-          create: (items || [])
-            .filter((item: any) => item.variantId)
-            .map((item: any) => ({
-              variantId: Number(item.variantId),
-              surfaceKey: String(item.surfaceKey || item.sortOrder),
-              groutColor: item.groutColor || null,
-              rotation: Number(item.rotation || 0),
-              layout: item.layout || "straight",
-            })),
+          create: items.map((item) => ({
+            variantId: item.variantId,
+            surfaceKey: item.surfaceKey,
+            groutColor: item.groutColor || null,
+            rotation: item.rotation,
+            layout: item.layout || "straight",
+          })),
         },
       },
-      include: {
-        items: true,
-      },
+      select: { id: true, shareToken: true },
     });
 
     return NextResponse.json(
@@ -87,6 +109,75 @@ export async function POST(req: NextRequest) {
     console.error("POST /api/visualizer/designs error:", err);
     return NextResponse.json(
       { error: "Failed to save design" },
+      { status: 500 },
+    );
+  }
+}
+
+// ── PUT /api/visualizer/designs — update an owned saved design ───────────────
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await getApiUser(req);
+    const bodySchema = saveSchema.extend({
+      shareToken: z.string().trim().min(1).max(64),
+    });
+    const parsed = bodySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid design" },
+        { status: 400 },
+      );
+    }
+
+    const { shareToken, sceneId, name, items, sessionId } = parsed.data;
+    const existing = await prisma.visualizerDesign.findUnique({
+      where: { shareToken },
+      select: { id: true, userId: true, sessionId: true },
+    });
+    if (!existing)
+      return NextResponse.json({ error: "Design not found" }, { status: 404 });
+
+    const canUpdate =
+      existing.userId !== null
+        ? user?.id === existing.userId
+        : Boolean(
+            sessionId && existing.sessionId && sessionId === existing.sessionId,
+          );
+    if (!canUpdate)
+      return NextResponse.json(
+        { error: "You cannot update this design" },
+        { status: 403 },
+      );
+
+    const updated = await prisma.visualizerDesign.update({
+      where: { id: existing.id },
+      data: {
+        sceneId: sceneId ?? null,
+        name,
+        items: {
+          deleteMany: {},
+          create: items.map((item) => ({
+            variantId: item.variantId,
+            surfaceKey: item.surfaceKey,
+            groutColor: item.groutColor || null,
+            rotation: item.rotation,
+            layout: item.layout || "straight",
+          })),
+        },
+      },
+      select: { id: true, shareToken: true },
+    });
+
+    return NextResponse.json({
+      success: true,
+      designId: updated.id,
+      shareToken: updated.shareToken,
+      shareUrl: `/visualizer?design=${updated.shareToken}`,
+    });
+  } catch (err) {
+    console.error("PUT /api/visualizer/designs error:", err);
+    return NextResponse.json(
+      { error: "Failed to update design" },
       { status: 500 },
     );
   }

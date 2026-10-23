@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "@/app/i18n/routing";
 import { toast } from "sonner";
 import { Loader2, Pencil, Plus, Star, Trash2, UserRound } from "lucide-react";
 
 import { api, apiErrorMessage, type AdminUser } from "@/lib/api";
+// import { RegularUsersPage } from "@/components/admin/regular-users-page";
 import { fmtDate } from "@/lib/format";
 import { PERMISSION_GROUPS, ROLE_PRESETS } from "@/lib/auth/permissions-catalog";
 import { ImageField } from "@/components/file-picker";
@@ -20,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { RegularUsersPage } from "@/components/admin/regular-users-page";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Form = {
@@ -72,7 +75,7 @@ function Field({
     </div>
   );
 }
-export default function AdminUsersPage() {
+function StaffManagementPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -84,7 +87,7 @@ export default function AdminUsersPage() {
 
   const load = useCallback(async () => {
     try {
-      setUsers(await api.getUsers());
+      setUsers(await api.getStaff());
     } catch (e) {
       toast.error(apiErrorMessage(e, "Failed to load users"));
     } finally {
@@ -131,8 +134,8 @@ export default function AdminUsersPage() {
         permissions: form.permissions,
         ...(form.password ? { password: form.password } : {}),
       };
-      if (editing) await api.updateUser(editing.id, payload);
-      else await api.createUser({ ...payload, password: form.password });
+      if (editing) await api.updateStaff(editing.id, payload);
+      else await api.createStaff({ ...payload, password: form.password });
       toast.success(editing ? "User updated" : "User created");
       setOpen(false);
       load();
@@ -145,7 +148,7 @@ export default function AdminUsersPage() {
 
   const toggleFeatured = async (u: AdminUser) => {
     try {
-      await api.updateUser(u.id, { showOnHomepage: !u.showOnHomepage });
+      await api.updateStaff(u.id, { showOnHomepage: !u.showOnHomepage });
       load();
     } catch (e) {
       toast.error(apiErrorMessage(e));
@@ -155,7 +158,7 @@ export default function AdminUsersPage() {
   const remove = async (u: AdminUser) => {
     if (!confirm(`${u.name} (${u.email}) will lose access. If they have placed orders, consider disabling the account instead.\n\nDelete this user?`)) return;
     try {
-      await api.deleteUser(u.id);
+      await api.deleteStaff(u.id);
       toast.success("User deleted");
       load();
     } catch (e) {
@@ -170,12 +173,12 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Users</h1>
+          <h1 className="text-2xl font-semibold">Staff Management</h1>
           <p className="text-sm text-muted-foreground">
-            Accounts that can sign in, what they can do, and who appears on the homepage team section.
+            Create staff accounts, manage access permissions, and control who appears in the homepage team section. Customers are managed separately.
           </p>
         </div>
-        <Button className="rounded-none" onClick={openNew}><Plus /> Add user</Button>
+        <Button className="rounded-none" onClick={openNew}><Plus /> Add staff</Button>
       </div>
 
       <Input className="max-w-sm rounded-none" placeholder="Search name, email or job title…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -198,7 +201,7 @@ export default function AdminUsersPage() {
               <tr><td colSpan={7} className="p-8 text-center text-muted-foreground"><Loader2 className="mx-auto animate-spin" /></td></tr>
             )}
             {!loading && visible.length === 0 && (
-              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No users found.</td></tr>
+              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No staff found.</td></tr>
             )}
             {visible.map((u) => (
               <tr key={u.id} className="border-t">
@@ -246,7 +249,7 @@ export default function AdminUsersPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden rounded-none p-0 sm:max-w-3xl">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle>{editing ? "Edit user" : "Add user"}</DialogTitle>
+            <DialogTitle>{editing ? "Edit staff member" : "Add staff member"}</DialogTitle>
             <DialogDescription>Profile, homepage visibility and permissions.</DialogDescription>
           </DialogHeader>
 
@@ -370,11 +373,16 @@ export default function AdminUsersPage() {
           <DialogFooter className="p-6 pt-4">
             <Button variant="outline" className="rounded-none" onClick={() => setOpen(false)}>Cancel</Button>
             <Button className="rounded-none" disabled={saving} onClick={save}>
-              {saving && <Loader2 className="animate-spin" />} {editing ? "Save changes" : "Create user"}
+              {saving && <Loader2 className="animate-spin" />} {editing ? "Save changes" : "Create staff account"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
+}
+
+export default function AdminUsersPage() {
+  const pathname = usePathname();
+  return pathname.endsWith("/staff") ? <StaffManagementPage /> : <RegularUsersPage />;
 }

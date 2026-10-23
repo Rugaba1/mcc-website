@@ -25,7 +25,10 @@ export function deriveRatio(sizeStr: string): string {
 /**
  * Categorizes a tile into a high-level color bucket for filter chips
  */
-export function getColorCategory(name: string, colors?: string[] | string): string {
+export function getColorCategory(
+  name: string,
+  colors?: string[] | string,
+): string {
   let colorsStr = "";
   if (Array.isArray(colors)) {
     colorsStr = colors.join(" ");
@@ -33,14 +36,35 @@ export function getColorCategory(name: string, colors?: string[] | string): stri
     colorsStr = colors;
   }
   const text = (name + " " + colorsStr).toLowerCase();
-  if (text.includes("beige") || text.includes("cream") || text.includes("sand") || text.includes("ivory")) return "Beige";
-  if (text.includes("grey") || text.includes("gray") || text.includes("ash") || text.includes("silver") || text.includes("rubino")) return "Grey";
+  if (
+    text.includes("beige") ||
+    text.includes("cream") ||
+    text.includes("sand") ||
+    text.includes("ivory")
+  )
+    return "Beige";
+  if (
+    text.includes("grey") ||
+    text.includes("gray") ||
+    text.includes("ash") ||
+    text.includes("silver") ||
+    text.includes("rubino")
+  )
+    return "Grey";
   if (text.includes("white")) return "White";
   if (text.includes("black") || text.includes("dark")) return "Black";
-  if (text.includes("brown") || text.includes("wood") || text.includes("oak") || text.includes("teak") || text.includes("tik")) return "Brown";
+  if (
+    text.includes("brown") ||
+    text.includes("wood") ||
+    text.includes("oak") ||
+    text.includes("teak") ||
+    text.includes("tik")
+  )
+    return "Brown";
   if (text.includes("blue") || text.includes("azure")) return "Blue";
   if (text.includes("green") || text.includes("emerald")) return "Green";
-  if (text.includes("pink") || text.includes("gold") || text.includes("red")) return "Special";
+  if (text.includes("pink") || text.includes("gold") || text.includes("red"))
+    return "Special";
   return "All Colors";
 }
 
@@ -48,7 +72,8 @@ export function getColorCategory(name: string, colors?: string[] | string): stri
  * Transforms a database Product with ProductVariants into a TileProduct for the Visualizer
  */
 export function dbProductToTileProduct(prod: Product): TileProduct {
-  const variants = prod.variants && prod.variants.length > 0 ? prod.variants : [];
+  const variants =
+    prod.variants && prod.variants.length > 0 ? prod.variants : [];
   const primaryVariant: ProductVariant | undefined = variants[0];
 
   let parsedColors: string[] = [];
@@ -62,31 +87,32 @@ export function dbProductToTileProduct(prod: Product): TileProduct {
     }
   }
 
-  const sizeOptions: TileSizeOption[] = variants.length > 0
-    ? variants.map((v) => ({
-        id: v.id,
-        size: v.size,
-        sku: v.sku,
-        ratio: deriveRatio(v.size),
-        specifier: v.sku,
-        swatchUrl: v.image || prod.image,
-        pricePerBox: v.pricePerBox,
-        pricePerSqm: v.pricePerSqm,
-        variantId: v.id,
-      }))
-    : [
-        {
-          id: prod.id * 100,
-          size: prod.sizes?.split("&")[0]?.split(",")[0]?.trim() || "60x60",
-          sku: `MCC-${prod.id}`,
-          ratio: "1x1",
-          specifier: prod.name,
-          swatchUrl: prod.image,
-          pricePerBox: 32000,
-          pricePerSqm: 22000,
-          variantId: prod.id,
-        },
-      ];
+  const sizeOptions: TileSizeOption[] =
+    variants.length > 0
+      ? variants.map((v) => ({
+          id: v.id,
+          size: v.size,
+          sku: v.sku,
+          ratio: deriveRatio(v.size),
+          specifier: v.sku,
+          swatchUrl: v.image || prod.image,
+          pricePerBox: v.pricePerBox,
+          pricePerSqm: v.pricePerSqm,
+          variantId: v.id,
+        }))
+      : [
+          {
+            id: prod.id * 100,
+            size: prod.sizes?.split("&")[0]?.split(",")[0]?.trim() || "60x60",
+            sku: `MCC-${prod.id}`,
+            ratio: "1x1",
+            specifier: prod.name,
+            swatchUrl: prod.image,
+            pricePerBox: 32000,
+            pricePerSqm: 22000,
+            variantId: prod.id,
+          },
+        ];
 
   const activeSize = sizeOptions[0];
   const colorCat = getColorCategory(prod.name, parsedColors);
@@ -113,19 +139,20 @@ export function dbProductToTileProduct(prod: Product): TileProduct {
 /**
  * Fetches real products from the database via /api/products and returns visualizer-ready TileProducts
  */
-export async function fetchVisualizerTiles(): Promise<TileProduct[]> {
+export async function fetchVisualizerProducts(): Promise<Product[]> {
   try {
-    const res = await fetch("/api/products", { cache: "no-store" });
+    const res = await fetch("/api/visualizer-products", { cache: "no-store" });
     if (!res.ok) {
       throw new Error(`Failed to fetch products: ${res.status}`);
     }
-    const products: Product[] = await res.json();
-    if (!Array.isArray(products) || products.length === 0) {
+    const resp = await res.json();
+    const products: Product[] = resp.products;
+    if (!Array.isArray(products)) {
       return [];
     }
-    return products.map(dbProductToTileProduct);
+    return products;
   } catch (err) {
-    console.error("fetchVisualizerTiles error:", err);
+    console.error("fetchVisualizerProducts error:", err);
     return [];
   }
 }
@@ -140,7 +167,9 @@ export async function fetchVisualizerScenes(): Promise<SceneDefinition[]> {
       return ALL_ROOM_SCENES;
     }
     const scenes = await res.json();
-    return Array.isArray(scenes) && scenes.length > 0 ? scenes : ALL_ROOM_SCENES;
+    return Array.isArray(scenes) && scenes.length > 0
+      ? scenes
+      : ALL_ROOM_SCENES;
   } catch (err) {
     console.error("fetchVisualizerScenes error:", err);
     return ALL_ROOM_SCENES;
@@ -150,7 +179,10 @@ export async function fetchVisualizerScenes(): Promise<SceneDefinition[]> {
 /**
  * Finds a tile in the list by ID, SKU, slug, or name
  */
-export function findTileInList(tiles: TileProduct[], query: string): TileProduct | undefined {
+export function findTileInList(
+  tiles: TileProduct[],
+  query: string,
+): TileProduct | undefined {
   if (!query) return undefined;
   const clean = query.trim().toLowerCase().replace(/^\^/, "");
 
@@ -165,19 +197,22 @@ export function findTileInList(tiles: TileProduct[], query: string): TileProduct
   const bySku = tiles.find(
     (t) =>
       t.sku.toLowerCase() === clean ||
-      t.availableSizes.some((s) => s.sku.toLowerCase() === clean)
+      t.availableSizes.some((s) => s.sku.toLowerCase() === clean),
   );
   if (bySku) return bySku;
 
   // 3. Exact slug / specifier match
   const bySlug = tiles.find(
-    (t) => t.specifier.toLowerCase() === clean || t.specifier.toLowerCase().includes(clean)
+    (t) =>
+      t.specifier.toLowerCase() === clean ||
+      t.specifier.toLowerCase().includes(clean),
   );
   if (bySlug) return bySlug;
 
   // 4. Name match
   const byName = tiles.find(
-    (t) => t.name.toLowerCase() === clean || t.name.toLowerCase().includes(clean)
+    (t) =>
+      t.name.toLowerCase() === clean || t.name.toLowerCase().includes(clean),
   );
   if (byName) return byName;
 

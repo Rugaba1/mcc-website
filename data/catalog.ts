@@ -8,6 +8,8 @@ export interface TileSizeOption {
   pricePerBox?: number;
   pricePerSqm?: number;
   variantId?: number;
+  containerPricePerSqm?: number | null;
+  sqmPerContainer?: number | null;
 }
 
 export interface TileProduct {
@@ -26,6 +28,8 @@ export interface TileProduct {
   category?: string;
   description?: string;
   availableSizes: TileSizeOption[];
+  containerPricePerSqm?: number | null;
+  sqmPerContainer?: number | null;
 }
 
 export interface PaintProduct {
@@ -72,1566 +76,1566 @@ export interface TilePattern {
 }
 
 export const TILES_CATALOG: TileProduct[] = [
-  {
-    "id": 2468708,
-    "name": "Bambusa",
-    "color": "Beige",
-    "sku": "^309440",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24_Fascia()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "PORCELAIN",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/8f77e9a7b361c1d198919dc102d552b4.jpg",
-    "availableSizes": [
-      {
-        "id": 2468708,
-        "size": "12x24",
-        "sku": "^309440",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24_Fascia()",
-        "swatchUrl": "/swatches/8f77e9a7b361c1d198919dc102d552b4.jpg"
-      },
-      {
-        "id": 2468709,
-        "size": "12x24",
-        "sku": "^309434",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24()",
-        "swatchUrl": "/swatches/bb31fb2926e696c81c57435747734257.jpg"
-      },
-      {
-        "id": 2468710,
-        "size": "24x24",
-        "sku": "^309446",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Intarsio()",
-        "swatchUrl": "/swatches/2acc4b29cddf35a9dde03527c23f3995.jpg"
-      },
-      {
-        "id": 2468711,
-        "size": "2x2 Mosaic",
-        "sku": "^309458",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_2x2()",
-        "swatchUrl": "/swatches/740839e2bdc5c4211e4c96ce84c6427e.jpg"
-      },
-      {
-        "id": 2468712,
-        "size": "9.5x11",
-        "sku": "^309452",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Hex()",
-        "swatchUrl": "/swatches/05cc180fdeaa3a18714d3913a706d5fd.jpg"
-      },
-      {
-        "id": 2468713,
-        "size": "Losanga Mosaic",
-        "sku": "^309943",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Losanga()",
-        "swatchUrl": "/swatches/e3fc8efdddfdf0a720743b76d4138741.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2468714,
-    "name": "Bambusa",
-    "color": "Bianco",
-    "sku": "^309441",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24_Fascia()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "PORCELAIN",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/a5301b11a26c74ff0beddfe4f5aafe5f.jpg",
-    "availableSizes": [
-      {
-        "id": 2468714,
-        "size": "12x24",
-        "sku": "^309441",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24_Fascia()",
-        "swatchUrl": "/swatches/a5301b11a26c74ff0beddfe4f5aafe5f.jpg"
-      },
-      {
-        "id": 2468715,
-        "size": "12x24",
-        "sku": "^309435",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24()",
-        "swatchUrl": "/swatches/9c0d72be8cc0171e2a409fe1aaa2bffd.jpg"
-      },
-      {
-        "id": 2468716,
-        "size": "24x24",
-        "sku": "^309447",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Intarsio()",
-        "swatchUrl": "/swatches/c9e7f932c99598f095642c6fb5d39685.jpg"
-      },
-      {
-        "id": 2468717,
-        "size": "2x2 Mosaic",
-        "sku": "^309459",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_2x2()",
-        "swatchUrl": "/swatches/907555b8525fe2cde68d209942f0807f.jpg"
-      },
-      {
-        "id": 2468718,
-        "size": "9.5x11",
-        "sku": "^309453",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Hex()",
-        "swatchUrl": "/swatches/1044db4c9cc5056c966a0aaf317e92c9.jpg"
-      },
-      {
-        "id": 2468719,
-        "size": "Losanga Mosaic",
-        "sku": "^309944",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Losanga()",
-        "swatchUrl": "/swatches/fa8fadd0b500ed81ff4aeef258ebf19c.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2468720,
-    "name": "Bambusa",
-    "color": "Crema",
-    "sku": "^309442",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Fascia()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "PORCELAIN",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/ffd7c235267f42b5d826401689424811.jpg",
-    "availableSizes": [
-      {
-        "id": 2468720,
-        "size": "12x24",
-        "sku": "^309442",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Fascia()",
-        "swatchUrl": "/swatches/ffd7c235267f42b5d826401689424811.jpg"
-      },
-      {
-        "id": 2468721,
-        "size": "12x24",
-        "sku": "^309436",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema_12x24()",
-        "swatchUrl": "/swatches/3f7331c1126b94ba38814f3288bb487a.jpg"
-      },
-      {
-        "id": 2468722,
-        "size": "24x24",
-        "sku": "^309448",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Intarsio()",
-        "swatchUrl": "/swatches/40760957d0a005dc4ea3a041fd3de1f2.jpg"
-      },
-      {
-        "id": 2468723,
-        "size": "2x2 Mosaic",
-        "sku": "^309460",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema_2x2()",
-        "swatchUrl": "/swatches/a916bdb914ffe92d1172f522d51344ab.jpg"
-      },
-      {
-        "id": 2468724,
-        "size": "9.5x11",
-        "sku": "^309454",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema__Hex()",
-        "swatchUrl": "/swatches/1bc5872c8e0f354c1c9ee8aa02822962.jpg"
-      },
-      {
-        "id": 2468725,
-        "size": "Losanga Mosaic",
-        "sku": "^309945",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Losanga()",
-        "swatchUrl": "/swatches/2aaf5a163c6371e2d37a0515c4457e8d.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2468726,
-    "name": "Bambusa",
-    "color": "Grigio",
-    "sku": "^309443",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Fascia()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "PORCELAIN",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/6fe84c0809c0a6afa5a675daec8bf64c.jpg",
-    "availableSizes": [
-      {
-        "id": 2468726,
-        "size": "12x24",
-        "sku": "^309443",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Fascia()",
-        "swatchUrl": "/swatches/6fe84c0809c0a6afa5a675daec8bf64c.jpg"
-      },
-      {
-        "id": 2468727,
-        "size": "12x24",
-        "sku": "^309437",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_12x24()",
-        "swatchUrl": "/swatches/74812ea135c0e31885383bfe5a178998.jpg"
-      },
-      {
-        "id": 2468728,
-        "size": "24x24",
-        "sku": "^309449",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Intarsio()",
-        "swatchUrl": "/swatches/6250671a66039b65188e8e288eea1bd0.jpg"
-      },
-      {
-        "id": 2468729,
-        "size": "2x2 Mosaic",
-        "sku": "^309461",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_2x2()",
-        "swatchUrl": "/swatches/ff5c9f1686d39170e43c1459c98c2851.jpg"
-      },
-      {
-        "id": 2468730,
-        "size": "9.5x11",
-        "sku": "^309455",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Hex()",
-        "swatchUrl": "/swatches/d5145a6536684faab51a14adb85ff44d.jpg"
-      },
-      {
-        "id": 2468731,
-        "size": "Losanga Mosaic",
-        "sku": "^309946",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Losanga()",
-        "swatchUrl": "/swatches/afec1caad7cad51335516a5e3241a170.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2468732,
-    "name": "Bambusa",
-    "color": "Tortora",
-    "sku": "^309444",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Fascia()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "PORCELAIN",
-    "colorCategory": "Brown",
-    "swatchUrl": "/swatches/d1307c2cc608726f97378186e2618c3a.jpg",
-    "availableSizes": [
-      {
-        "id": 2468732,
-        "size": "12x24",
-        "sku": "^309444",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Fascia()",
-        "swatchUrl": "/swatches/d1307c2cc608726f97378186e2618c3a.jpg"
-      },
-      {
-        "id": 2468733,
-        "size": "12x24",
-        "sku": "^309438",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_12x24()",
-        "swatchUrl": "/swatches/4ebdee1d719b05a225d2cf78a2c128aa.jpg"
-      },
-      {
-        "id": 2468734,
-        "size": "24x24",
-        "sku": "^309450",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Intarsio()",
-        "swatchUrl": "/swatches/7a69e6941820d161140c0973a5b370b7.jpg"
-      },
-      {
-        "id": 2468735,
-        "size": "2x2 Mosaic",
-        "sku": "^309462",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_2x2()",
-        "swatchUrl": "/swatches/5ac8d0a0808ad6d5addf0535b73f5429.jpg"
-      },
-      {
-        "id": 2468736,
-        "size": "9.5x11",
-        "sku": "^309456",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Hex()",
-        "swatchUrl": "/swatches/3bbd5adb861cc7423cab0827c823098a.jpg"
-      },
-      {
-        "id": 2468737,
-        "size": "Losanga Mosaic",
-        "sku": "^309947",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Losanga()",
-        "swatchUrl": "/swatches/6ba60f8c1ea640c8c4ffd77fe2c31e14.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2468742,
-    "name": "Bambusa",
-    "color": "Wenge",
-    "sku": "^309457",
-    "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Hex()",
-    "size": "9.5x11",
-    "ratio": "Mosaic",
-    "material": "PORCELAIN",
-    "colorCategory": "Black",
-    "swatchUrl": "/swatches/75aec41c575b6f5512d2b3d5e85b178e.jpg",
-    "availableSizes": [
-      {
-        "id": 2468738,
-        "size": "12x24",
-        "sku": "^309445",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Fascia()",
-        "swatchUrl": null
-      },
-      {
-        "id": 2468739,
-        "size": "12x24",
-        "sku": "^309439",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_12x24()",
-        "swatchUrl": null
-      },
-      {
-        "id": 2468740,
-        "size": "24x24",
-        "sku": "^309451",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Intarsio()",
-        "swatchUrl": null
-      },
-      {
-        "id": 2468741,
-        "size": "2x2 Mosaic",
-        "sku": "^309463",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_2x2()",
-        "swatchUrl": null
-      },
-      {
-        "id": 2468742,
-        "size": "9.5x11",
-        "sku": "^309457",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Hex()",
-        "swatchUrl": "/swatches/75aec41c575b6f5512d2b3d5e85b178e.jpg"
-      },
-      {
-        "id": 2468743,
-        "size": "Losanga Mosaic",
-        "sku": "^309948",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Losanga()",
-        "swatchUrl": "/swatches/5135513dca3626b7d31549f54d69266c.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2707810,
-    "name": "Atenas",
-    "color": "Beige",
-    "sku": "^285984",
-    "specifier": "Best_Tile\\Products\\Atenas\\Beige_9x48()",
-    "size": "9x48",
-    "ratio": "3x16",
-    "material": "PORCELAIN",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/7839fd66ebb9a08f9e276b87a19d29f6.jpg",
-    "availableSizes": [
-      {
-        "id": 2707810,
-        "size": "9x48",
-        "sku": "^285984",
-        "ratio": "3x16",
-        "specifier": "Best_Tile\\Products\\Atenas\\Beige_9x48()",
-        "swatchUrl": "/swatches/7839fd66ebb9a08f9e276b87a19d29f6.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2707812,
-    "name": "Atenas",
-    "color": "Gris",
-    "sku": "^285988",
-    "specifier": "Best_Tile\\Products\\Atenas\\Gris_9x48()",
-    "size": "9x48",
-    "ratio": "3x16",
-    "material": "PORCELAIN",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/a7836c06a09529ecb5f6861aaf3fb53f.jpg",
-    "availableSizes": [
-      {
-        "id": 2707812,
-        "size": "9x48",
-        "sku": "^285988",
-        "ratio": "3x16",
-        "specifier": "Best_Tile\\Products\\Atenas\\Gris_9x48()",
-        "swatchUrl": "/swatches/a7836c06a09529ecb5f6861aaf3fb53f.jpg"
-      }
-    ]
-  },
-  {
-    "id": 2707814,
-    "name": "Atenas",
-    "color": "Taupe",
-    "sku": "^285986",
-    "specifier": "Best_Tile\\Products\\Atenas\\Taupe_9x48()",
-    "size": "9x48",
-    "ratio": "3x16",
-    "material": "PORCELAIN",
-    "colorCategory": "Taupe",
-    "swatchUrl": "/swatches/ab367e6a9a46aceea8cbac0661872d12.jpg",
-    "availableSizes": [
-      {
-        "id": 2707814,
-        "size": "9x48",
-        "sku": "^285986",
-        "ratio": "3x16",
-        "specifier": "Best_Tile\\Products\\Atenas\\Taupe_9x48()",
-        "swatchUrl": "/swatches/ab367e6a9a46aceea8cbac0661872d12.jpg"
-      }
-    ]
-  },
-  {
-    "id": 5668372,
-    "name": "Aria",
-    "color": "Beige",
-    "sku": "ECWAIABEI03",
-    "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI03()",
-    "size": "24x24",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/dcb0187606707319d39f603e9c8a475e.jpg",
-    "availableSizes": [
-      {
-        "id": 5668370,
-        "size": "12x24",
-        "sku": "ECWAIABEI01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI01()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668371,
-        "size": "12x24",
-        "sku": "ECWAIABEI02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI02()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668372,
-        "size": "24x24",
-        "sku": "ECWAIABEI03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI03()",
-        "swatchUrl": "/swatches/dcb0187606707319d39f603e9c8a475e.jpg"
-      },
-      {
-        "id": 5668373,
-        "size": "24x48",
-        "sku": "ECWAIABEI04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI04()",
-        "swatchUrl": "/swatches/0310722fcb2fc1e0f6964545391059ef.jpg"
-      },
-      {
-        "id": 5668374,
-        "size": "3.3x3.8",
-        "sku": "ECWAIABEI05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI05()",
-        "swatchUrl": "/swatches/a4512cca50414e1d5a298225c3657056.jpg"
-      }
-    ]
-  },
-  {
-    "id": 5668377,
-    "name": "Aria",
-    "color": "Black",
-    "sku": "ECWAIABLK03",
-    "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK03()",
-    "size": "24x24",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "Black",
-    "swatchUrl": "/swatches/f339088858e1b6cbc53f4f64b14945da.jpg",
-    "availableSizes": [
-      {
-        "id": 5668375,
-        "size": "12x24",
-        "sku": "ECWAIABLK01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK01()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668376,
-        "size": "12x24",
-        "sku": "ECWAIABLK02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK02()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668377,
-        "size": "24x24",
-        "sku": "ECWAIABLK03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK03()",
-        "swatchUrl": "/swatches/f339088858e1b6cbc53f4f64b14945da.jpg"
-      },
-      {
-        "id": 5668378,
-        "size": "24x48",
-        "sku": "ECWAIABLK04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK04()",
-        "swatchUrl": "/swatches/19f77680d420bc334e79d793d891f9b9.jpg"
-      },
-      {
-        "id": 5668379,
-        "size": "3.3x3.8",
-        "sku": "ECWAIABLK05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK05()",
-        "swatchUrl": "/swatches/31f11f558c3b84abe290f4f457b60940.jpg"
-      }
-    ]
-  },
-  {
-    "id": 5668382,
-    "name": "Aria",
-    "color": "Grey",
-    "sku": "ECWAIAGRY03",
-    "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY03()",
-    "size": "24x24",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/fbc3d0aeafdebc12422d5315362db545.jpg",
-    "availableSizes": [
-      {
-        "id": 5668380,
-        "size": "12x24",
-        "sku": "ECWAIAGRY01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY01()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668381,
-        "size": "12x24",
-        "sku": "ECWAIAGRY02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY02()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668382,
-        "size": "24x24",
-        "sku": "ECWAIAGRY03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY03()",
-        "swatchUrl": "/swatches/fbc3d0aeafdebc12422d5315362db545.jpg"
-      },
-      {
-        "id": 5668383,
-        "size": "24x48",
-        "sku": "ECWAIAGRY04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY04()",
-        "swatchUrl": "/swatches/c1c5d424dcebaa841f98179bd9f61704.jpg"
-      },
-      {
-        "id": 5668384,
-        "size": "3.3x3.8",
-        "sku": "ECWAIAGRY05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY05()",
-        "swatchUrl": "/swatches/910a7956435f49d27014127461e005ac.jpg"
-      }
-    ]
-  },
-  {
-    "id": 5668385,
-    "name": "Aria",
-    "color": "Mix",
-    "sku": "ECWAIAMIX06",
-    "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAMIX06()",
-    "size": "1x5.25 Picket Mosaic",
-    "ratio": "Mosaic",
-    "material": "Porcelain",
-    "colorCategory": "Neutral",
-    "swatchUrl": "/swatches/ddff8fae01e0f9a8b943bbd045581643.jpg",
-    "availableSizes": [
-      {
-        "id": 5668385,
-        "size": "1x5.25 Picket Mosaic",
-        "sku": "ECWAIAMIX06",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAMIX06()",
-        "swatchUrl": "/swatches/ddff8fae01e0f9a8b943bbd045581643.jpg"
-      }
-    ]
-  },
-  {
-    "id": 5668389,
-    "name": "Aria",
-    "color": "White",
-    "sku": "ECWAIAWHT03",
-    "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT03()",
-    "size": "24x24",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/5f4fec0ab5e192d3e12f1087a327eb6b.jpg",
-    "availableSizes": [
-      {
-        "id": 5668386,
-        "size": "12x24",
-        "sku": "ECWAIAWHT01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT01()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668388,
-        "size": "12x24",
-        "sku": "ECWAIAWHT02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT02()",
-        "swatchUrl": null
-      },
-      {
-        "id": 5668389,
-        "size": "24x24",
-        "sku": "ECWAIAWHT03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT03()",
-        "swatchUrl": "/swatches/5f4fec0ab5e192d3e12f1087a327eb6b.jpg"
-      },
-      {
-        "id": 5668390,
-        "size": "24x48",
-        "sku": "ECWAIAWHT04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT04()",
-        "swatchUrl": "/swatches/b1eb5f054f1fc185a44f7fc06fa54de8.jpg"
-      },
-      {
-        "id": 5668391,
-        "size": "3.3x3.8",
-        "sku": "ECWAIAWHT05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT05()",
-        "swatchUrl": "/swatches/4284fd88944a6371f4363646da216ff1.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293445,
-    "name": "Sagrada",
-    "color": "Ghiaccio",
-    "sku": "ECWSAGWHT02",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT02()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "Porcelain",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/c462f5874c72e02fe9306c9be3b58aaf.jpg",
-    "availableSizes": [
-      {
-        "id": 6293443,
-        "size": "Mosaic",
-        "sku": "ECWSAGWHT05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT05()",
-        "swatchUrl": null
-      },
-      {
-        "id": 6293444,
-        "size": "12x12",
-        "sku": "ECWSAGWHT01",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT01()",
-        "swatchUrl": null
-      },
-      {
-        "id": 6293445,
-        "size": "12x24",
-        "sku": "ECWSAGWHT02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT02()",
-        "swatchUrl": "/swatches/c462f5874c72e02fe9306c9be3b58aaf.jpg"
-      },
-      {
-        "id": 6293446,
-        "size": "18x18",
-        "sku": "ECWSAGWHT03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT03()",
-        "swatchUrl": "/swatches/b0d945e4a368c132ddd461ef744c0d10.jpg"
-      },
-      {
-        "id": 6293447,
-        "size": "Mosaic",
-        "sku": "ECWSAGWHT04",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT04()",
-        "swatchUrl": "/swatches/f6b2fa0e73ad869be01dcb2bdde05524.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293448,
-    "name": "Sagrada",
-    "color": "Moro",
-    "sku": "ECWSAGBLK05",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK05()",
-    "size": "Mosaic",
-    "ratio": "Mosaic",
-    "material": "Porcelain",
-    "colorCategory": "Black",
-    "swatchUrl": "/swatches/8ff57d2049dbf859124d6a658c56bced.jpg",
-    "availableSizes": [
-      {
-        "id": 6293448,
-        "size": "Mosaic",
-        "sku": "ECWSAGBLK05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK05()",
-        "swatchUrl": "/swatches/8ff57d2049dbf859124d6a658c56bced.jpg"
-      },
-      {
-        "id": 6293449,
-        "size": "12x12",
-        "sku": "ECWSAGBLK01",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK01()",
-        "swatchUrl": "/swatches/3aa8d0417fb48f2366a85b99e078c0c7.jpg"
-      },
-      {
-        "id": 6293450,
-        "size": "12x24",
-        "sku": "ECWSAGBLK02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK02()",
-        "swatchUrl": "/swatches/3dda1ef84f8afe0482ee59eaae18e75d.jpg"
-      },
-      {
-        "id": 6293451,
-        "size": "18x18",
-        "sku": "ECWSAGBLK03",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK03()",
-        "swatchUrl": "/swatches/6583baa13868ce16bcf9ed0feb86feb5.jpg"
-      },
-      {
-        "id": 6293452,
-        "size": "Mosaic",
-        "sku": "ECWSAGBLK04",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK04()",
-        "swatchUrl": "/swatches/ddd5d130fa1d4776a4c812460a14f45b.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293453,
-    "name": "Wellfleet",
-    "color": "Abyss",
-    "sku": "ECWWELABY01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELABY01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Black",
-    "swatchUrl": "/swatches/a70ada393ebacefe2b12c2344040cb9a.jpg",
-    "availableSizes": [
-      {
-        "id": 6293453,
-        "size": "2x6.5",
-        "sku": "ECWWELABY01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELABY01()",
-        "swatchUrl": "/swatches/a70ada393ebacefe2b12c2344040cb9a.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293454,
-    "name": "Wellfleet",
-    "color": "Azure",
-    "sku": "ECWWELAZU01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELAZU01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Blue",
-    "swatchUrl": "/swatches/775f88ccffbe574c4405533363e18216.jpg",
-    "availableSizes": [
-      {
-        "id": 6293454,
-        "size": "2x6.5",
-        "sku": "ECWWELAZU01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELAZU01()",
-        "swatchUrl": "/swatches/775f88ccffbe574c4405533363e18216.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293455,
-    "name": "Wellfleet",
-    "color": "Blanc",
-    "sku": "ECWWELBNC04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELBNC04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/9998f19f6e51bdf2de6b37a91b6d9bdb.jpg",
-    "availableSizes": [
-      {
-        "id": 6293455,
-        "size": "2x6.5",
-        "sku": "ECWWELBNC04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELBNC04()",
-        "swatchUrl": "/swatches/9998f19f6e51bdf2de6b37a91b6d9bdb.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293456,
-    "name": "Wellfleet",
-    "color": "Cityscape",
-    "sku": "ECWWELCTY04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCTY04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Blue, Green, Grey",
-    "swatchUrl": "/swatches/67cfad2a971dc72d8b7127864075081a.jpg",
-    "availableSizes": [
-      {
-        "id": 6293456,
-        "size": "2x6.5",
-        "sku": "ECWWELCTY04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCTY04()",
-        "swatchUrl": "/swatches/67cfad2a971dc72d8b7127864075081a.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293457,
-    "name": "Wellfleet",
-    "color": "Claytone",
-    "sku": "ECWWELCLY01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCLY01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Orange",
-    "swatchUrl": "/swatches/234ac7cab3bf98ba9ebd98c0a2d76646.jpg",
-    "availableSizes": [
-      {
-        "id": 6293457,
-        "size": "2x6.5",
-        "sku": "ECWWELCLY01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCLY01()",
-        "swatchUrl": "/swatches/234ac7cab3bf98ba9ebd98c0a2d76646.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293458,
-    "name": "Wellfleet",
-    "color": "Dune",
-    "sku": "ECWWELDUN04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELDUN04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Ivory",
-    "swatchUrl": "/swatches/9260e3d06233dfadbe7d5a09a78be057.jpg",
-    "availableSizes": [
-      {
-        "id": 6293458,
-        "size": "2x6.5",
-        "sku": "ECWWELDUN04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELDUN04()",
-        "swatchUrl": "/swatches/9260e3d06233dfadbe7d5a09a78be057.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293459,
-    "name": "Wellfleet",
-    "color": "Earth",
-    "sku": "ECWWELEAR04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELEAR04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Orange",
-    "swatchUrl": "/swatches/3edc2f573482c7d2af471f2ceee913ea.jpg",
-    "availableSizes": [
-      {
-        "id": 6293459,
-        "size": "2x6.5",
-        "sku": "ECWWELEAR04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELEAR04()",
-        "swatchUrl": "/swatches/3edc2f573482c7d2af471f2ceee913ea.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293460,
-    "name": "Wellfleet",
-    "color": "Fog",
-    "sku": "ECWWELFOG04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOG04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/2e137a883c6a727505ac3c5b74b56e33.jpg",
-    "availableSizes": [
-      {
-        "id": 6293460,
-        "size": "2x6.5",
-        "sku": "ECWWELFOG04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOG04()",
-        "swatchUrl": "/swatches/2e137a883c6a727505ac3c5b74b56e33.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293461,
-    "name": "Wellfleet",
-    "color": "Forest",
-    "sku": "ECWWELFOR01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOR01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/449e2528b99f04ecc6b64876371823a0.jpg",
-    "availableSizes": [
-      {
-        "id": 6293461,
-        "size": "2x6.5",
-        "sku": "ECWWELFOR01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOR01()",
-        "swatchUrl": "/swatches/449e2528b99f04ecc6b64876371823a0.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293462,
-    "name": "Wellfleet",
-    "color": "Garden",
-    "sku": "ECWWELGAR04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELGAR04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/c9952f8ff6d43c5f558e8b13a260975c.jpg",
-    "availableSizes": [
-      {
-        "id": 6293462,
-        "size": "2x6.5",
-        "sku": "ECWWELGAR04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELGAR04()",
-        "swatchUrl": "/swatches/c9952f8ff6d43c5f558e8b13a260975c.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293463,
-    "name": "Wellfleet",
-    "color": "Ivory Glow",
-    "sku": "ECWWELIVR01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELIVR01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Ivory",
-    "swatchUrl": "/swatches/565f255362a369d1667bfc52ca0a60cf.jpg",
-    "availableSizes": [
-      {
-        "id": 6293463,
-        "size": "2x6.5",
-        "sku": "ECWWELIVR01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELIVR01()",
-        "swatchUrl": "/swatches/565f255362a369d1667bfc52ca0a60cf.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293464,
-    "name": "Wellfleet",
-    "color": "Jade",
-    "sku": "ECWWELJAD01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELJAD01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/4c50189b0335615b087fab396dcb0e37.jpg",
-    "availableSizes": [
-      {
-        "id": 6293464,
-        "size": "2x6.5",
-        "sku": "ECWWELJAD01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELJAD01()",
-        "swatchUrl": "/swatches/4c50189b0335615b087fab396dcb0e37.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293465,
-    "name": "Wellfleet",
-    "color": "Midnight",
-    "sku": "ECWWELMID04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMID04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Black",
-    "swatchUrl": "/swatches/00377cd4265431805363913a60e5b9db.jpg",
-    "availableSizes": [
-      {
-        "id": 6293465,
-        "size": "2x6.5",
-        "sku": "ECWWELMID04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMID04()",
-        "swatchUrl": "/swatches/00377cd4265431805363913a60e5b9db.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293466,
-    "name": "Wellfleet",
-    "color": "Mint",
-    "sku": "ECWWELMNT01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMNT01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/8bcb2c315a6264f21f9036fae130ad2e.jpg",
-    "availableSizes": [
-      {
-        "id": 6293466,
-        "size": "2x6.5",
-        "sku": "ECWWELMNT01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMNT01()",
-        "swatchUrl": "/swatches/8bcb2c315a6264f21f9036fae130ad2e.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293467,
-    "name": "Wellfleet",
-    "color": "Ocean",
-    "sku": "ECWWELOCN04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCN04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Blue",
-    "swatchUrl": "/swatches/33d76c22f4f74d731b80cf74d3959653.jpg",
-    "availableSizes": [
-      {
-        "id": 6293467,
-        "size": "2x6.5",
-        "sku": "ECWWELOCN04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCN04()",
-        "swatchUrl": "/swatches/33d76c22f4f74d731b80cf74d3959653.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293468,
-    "name": "Wellfleet",
-    "color": "Ocean Mist",
-    "sku": "ECWWELOCM04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCM04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/9a68a0fb0d34615f7e296465c92b7d3d.jpg",
-    "availableSizes": [
-      {
-        "id": 6293468,
-        "size": "2x6.5",
-        "sku": "ECWWELOCM04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCM04()",
-        "swatchUrl": "/swatches/9a68a0fb0d34615f7e296465c92b7d3d.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293469,
-    "name": "Wellfleet",
-    "color": "Oxide",
-    "sku": "ECWWELOXI04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOXI04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Red",
-    "swatchUrl": "/swatches/22f48ae12a6901876881ffb6e04844e1.jpg",
-    "availableSizes": [
-      {
-        "id": 6293469,
-        "size": "2x6.5",
-        "sku": "ECWWELOXI04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOXI04()",
-        "swatchUrl": "/swatches/22f48ae12a6901876881ffb6e04844e1.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293470,
-    "name": "Wellfleet",
-    "color": "Sea Glass",
-    "sku": "ECWWELSGL04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELSGL04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Green",
-    "swatchUrl": "/swatches/4910530de52e80f8a4bf0c71e3a9d934.jpg",
-    "availableSizes": [
-      {
-        "id": 6293470,
-        "size": "2x6.5",
-        "sku": "ECWWELSGL04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELSGL04()",
-        "swatchUrl": "/swatches/4910530de52e80f8a4bf0c71e3a9d934.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293471,
-    "name": "Wellfleet",
-    "color": "Vivid Ruby",
-    "sku": "ECWWELVRB01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELVRB01()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Red",
-    "swatchUrl": "/swatches/74da4de4777911812ed9bda35104124d.jpg",
-    "availableSizes": [
-      {
-        "id": 6293471,
-        "size": "2x6.5",
-        "sku": "ECWWELVRB01",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELVRB01()",
-        "swatchUrl": "/swatches/74da4de4777911812ed9bda35104124d.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293472,
-    "name": "Wellfleet",
-    "color": "Water",
-    "sku": "ECWWELWAT04",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELWAT04()",
-    "size": "2x6.5",
-    "ratio": "1x3",
-    "material": "Ceramic",
-    "colorCategory": "Blue",
-    "swatchUrl": "/swatches/e0b4d680adcb54bcc5fd2bb0e2c58ee5.jpg",
-    "availableSizes": [
-      {
-        "id": 6293472,
-        "size": "2x6.5",
-        "sku": "ECWWELWAT04",
-        "ratio": "1x3",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELWAT04()",
-        "swatchUrl": "/swatches/e0b4d680adcb54bcc5fd2bb0e2c58ee5.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293473,
-    "name": "Majestic",
-    "color": "Caramel",
-    "sku": "ECWMAJBEI01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI01()",
-    "size": "12x12",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/7cc6f21ea38c09c37a897dd2c2df3943.jpg",
-    "availableSizes": [
-      {
-        "id": 6293473,
-        "size": "12x12",
-        "sku": "ECWMAJBEI01",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI01()",
-        "swatchUrl": "/swatches/7cc6f21ea38c09c37a897dd2c2df3943.jpg"
-      },
-      {
-        "id": 6293474,
-        "size": "12x24",
-        "sku": "ECWMAJBEI02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI02()",
-        "swatchUrl": "/swatches/248971559251770e44208a843e32ec5a.jpg"
-      },
-      {
-        "id": 6293475,
-        "size": "24x48",
-        "sku": "ECWMAJBEI03",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI03()",
-        "swatchUrl": "/swatches/ac838d74d5499d0c810b7754f5fb8b2b.jpg"
-      },
-      {
-        "id": 6293476,
-        "size": "24x48",
-        "sku": "ECWMAJBEI04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI04()",
-        "swatchUrl": "/swatches/7f76496c47a05338db9f1502b9abeaf4.jpg"
-      },
-      {
-        "id": 6293477,
-        "size": "Mosaic",
-        "sku": "ECWMAJBEI05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI05()",
-        "swatchUrl": "/swatches/53aed02352d41766717ca5a55ef11e91.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293478,
-    "name": "Majestic",
-    "color": "Cotton",
-    "sku": "ECWMAJWHT01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT01()",
-    "size": "12x12",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/e37f02313c4a2b97ece0d4440d101c1f.jpg",
-    "availableSizes": [
-      {
-        "id": 6293478,
-        "size": "12x12",
-        "sku": "ECWMAJWHT01",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT01()",
-        "swatchUrl": "/swatches/e37f02313c4a2b97ece0d4440d101c1f.jpg"
-      },
-      {
-        "id": 6293479,
-        "size": "12x24",
-        "sku": "ECWMAJWHT02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT02()",
-        "swatchUrl": "/swatches/0654776c7882f4c09c1ec4ec3db0ec89.jpg"
-      },
-      {
-        "id": 6293480,
-        "size": "24x48",
-        "sku": "ECWMAJWHT03",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT03()",
-        "swatchUrl": "/swatches/40416420e9bad0dbb814ab8ba90879d3.jpg"
-      },
-      {
-        "id": 6293481,
-        "size": "24x48",
-        "sku": "ECWMAJWHT04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT04()",
-        "swatchUrl": "/swatches/6ba4656acb92b40374b30807ab9d6867.jpg"
-      },
-      {
-        "id": 6293482,
-        "size": "Mosaic",
-        "sku": "ECWMAJWHT05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT05()",
-        "swatchUrl": "/swatches/3fc7c62f50a1f55167422b00e4a4d13e.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293483,
-    "name": "Majestic",
-    "color": "Mix",
-    "sku": "ECWMAJMIX05",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJMIX05()",
-    "size": "Mosaic",
-    "ratio": "Mosaic",
-    "material": "Porcelain",
-    "colorCategory": "Beige, White, Grey",
-    "swatchUrl": "/swatches/a7fba8037334212aa515e1876709a22e.jpg",
-    "availableSizes": [
-      {
-        "id": 6293483,
-        "size": "Mosaic",
-        "sku": "ECWMAJMIX05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJMIX05()",
-        "swatchUrl": "/swatches/a7fba8037334212aa515e1876709a22e.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293484,
-    "name": "Majestic",
-    "color": "Pearl",
-    "sku": "ECWMAJGRY01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY01()",
-    "size": "12x12",
-    "ratio": "1x1",
-    "material": "Porcelain",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/28172ab8e0b1f6a9318174276d48f6ee.jpg",
-    "availableSizes": [
-      {
-        "id": 6293484,
-        "size": "12x12",
-        "sku": "ECWMAJGRY01",
-        "ratio": "1x1",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY01()",
-        "swatchUrl": "/swatches/28172ab8e0b1f6a9318174276d48f6ee.jpg"
-      },
-      {
-        "id": 6293485,
-        "size": "12x24",
-        "sku": "ECWMAJGRY02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY02()",
-        "swatchUrl": "/swatches/ca137de1ce399cc5a12dc7a7a873534f.jpg"
-      },
-      {
-        "id": 6293486,
-        "size": "24x48",
-        "sku": "ECWMAJGRY03",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY03()",
-        "swatchUrl": "/swatches/9c82a455dd586f37b623d7d308662739.jpg"
-      },
-      {
-        "id": 6293487,
-        "size": "24x48",
-        "sku": "ECWMAJGRY04",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY04()",
-        "swatchUrl": "/swatches/ca38393ce67b47852c6d53a4060b494f.jpg"
-      },
-      {
-        "id": 6293488,
-        "size": "Mosaic",
-        "sku": "ECWMAJGRY05",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY05()",
-        "swatchUrl": "/swatches/9854884ab30def6adf0a128c65b2199a.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293489,
-    "name": "Haven",
-    "color": "Earth",
-    "sku": "ECWHAVBRN01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN01()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "Porcelain",
-    "colorCategory": "Brown",
-    "swatchUrl": "/swatches/19e0a6507eacc46ee51efeaee029faf6.jpg",
-    "availableSizes": [
-      {
-        "id": 6293489,
-        "size": "12x24",
-        "sku": "ECWHAVBRN01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN01()",
-        "swatchUrl": "/swatches/19e0a6507eacc46ee51efeaee029faf6.jpg"
-      },
-      {
-        "id": 6293490,
-        "size": "24x48",
-        "sku": "ECWHAVBRN02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN02()",
-        "swatchUrl": "/swatches/41a73190d4fc7ca8be06a138d18c73c8.jpg"
-      },
-      {
-        "id": 6293491,
-        "size": "2x2",
-        "sku": "ECWHAVBRN03",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN03()",
-        "swatchUrl": "/swatches/d23363c95f5e8d0b8a299594cae78a61.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293492,
-    "name": "Haven",
-    "color": "Milk",
-    "sku": "ECWHAVWHT01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT01()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "Porcelain",
-    "colorCategory": "White",
-    "swatchUrl": "/swatches/6da9ea81a92c87506b66863ac84cc298.jpg",
-    "availableSizes": [
-      {
-        "id": 6293492,
-        "size": "12x24",
-        "sku": "ECWHAVWHT01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT01()",
-        "swatchUrl": "/swatches/6da9ea81a92c87506b66863ac84cc298.jpg"
-      },
-      {
-        "id": 6293493,
-        "size": "24x48",
-        "sku": "ECWHAVWHT02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT02()",
-        "swatchUrl": "/swatches/3d58cf80ad38e7982e9e55ce2b306f32.jpg"
-      },
-      {
-        "id": 6293494,
-        "size": "2x2",
-        "sku": "ECWHAVWHT03",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT03()",
-        "swatchUrl": "/swatches/8785f4f1fc80f02ce9893d7e601fab92.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293495,
-    "name": "Haven",
-    "color": "Oat",
-    "sku": "ECWHAVBEI01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI01()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "Porcelain",
-    "colorCategory": "Beige",
-    "swatchUrl": "/swatches/cfb1976fab5eeb93075a85c5fe56315e.jpg",
-    "availableSizes": [
-      {
-        "id": 6293495,
-        "size": "12x24",
-        "sku": "ECWHAVBEI01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI01()",
-        "swatchUrl": "/swatches/cfb1976fab5eeb93075a85c5fe56315e.jpg"
-      },
-      {
-        "id": 6293496,
-        "size": "24x48",
-        "sku": "ECWHAVBEI02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI02()",
-        "swatchUrl": "/swatches/75a56fc0bcf085323d97ea774969aa69.jpg"
-      },
-      {
-        "id": 6293497,
-        "size": "2x2",
-        "sku": "ECWHAVBEI03",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI03()",
-        "swatchUrl": "/swatches/b7badecdb774840fe01435832a3b1380.jpg"
-      }
-    ]
-  },
-  {
-    "id": 6293498,
-    "name": "Haven",
-    "color": "Shale",
-    "sku": "ECWHAVGRY01",
-    "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY01()",
-    "size": "12x24",
-    "ratio": "1x2",
-    "material": "Porcelain",
-    "colorCategory": "Grey",
-    "swatchUrl": "/swatches/18cddcb06299196c7d346a9222c05ec4.jpg",
-    "availableSizes": [
-      {
-        "id": 6293498,
-        "size": "12x24",
-        "sku": "ECWHAVGRY01",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY01()",
-        "swatchUrl": "/swatches/18cddcb06299196c7d346a9222c05ec4.jpg"
-      },
-      {
-        "id": 6293499,
-        "size": "24x48",
-        "sku": "ECWHAVGRY02",
-        "ratio": "1x2",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY02()",
-        "swatchUrl": "/swatches/8308880297abd98dbc48f78ce7c30fa2.jpg"
-      },
-      {
-        "id": 6293500,
-        "size": "2x2",
-        "sku": "ECWHAVGRY03",
-        "ratio": "Mosaic",
-        "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY03()",
-        "swatchUrl": "/swatches/27cb1aac7af999821b4608f2fb544fa0.jpg"
-      }
-    ]
-  }
+  // {
+  //   "id": 2468708,
+  //   "name": "Bambusa",
+  //   "color": "Beige",
+  //   "sku": "^309440",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24_Fascia()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/8f77e9a7b361c1d198919dc102d552b4.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468708,
+  //       "size": "12x24",
+  //       "sku": "^309440",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24_Fascia()",
+  //       "swatchUrl": "/swatches/8f77e9a7b361c1d198919dc102d552b4.jpg"
+  //     },
+  //     {
+  //       "id": 2468709,
+  //       "size": "12x24",
+  //       "sku": "^309434",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_12x24()",
+  //       "swatchUrl": "/swatches/bb31fb2926e696c81c57435747734257.jpg"
+  //     },
+  //     {
+  //       "id": 2468710,
+  //       "size": "24x24",
+  //       "sku": "^309446",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Intarsio()",
+  //       "swatchUrl": "/swatches/2acc4b29cddf35a9dde03527c23f3995.jpg"
+  //     },
+  //     {
+  //       "id": 2468711,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309458",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_2x2()",
+  //       "swatchUrl": "/swatches/740839e2bdc5c4211e4c96ce84c6427e.jpg"
+  //     },
+  //     {
+  //       "id": 2468712,
+  //       "size": "9.5x11",
+  //       "sku": "^309452",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Hex()",
+  //       "swatchUrl": "/swatches/05cc180fdeaa3a18714d3913a706d5fd.jpg"
+  //     },
+  //     {
+  //       "id": 2468713,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309943",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Beige_Losanga()",
+  //       "swatchUrl": "/swatches/e3fc8efdddfdf0a720743b76d4138741.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2468714,
+  //   "name": "Bambusa",
+  //   "color": "Bianco",
+  //   "sku": "^309441",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24_Fascia()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/a5301b11a26c74ff0beddfe4f5aafe5f.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468714,
+  //       "size": "12x24",
+  //       "sku": "^309441",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24_Fascia()",
+  //       "swatchUrl": "/swatches/a5301b11a26c74ff0beddfe4f5aafe5f.jpg"
+  //     },
+  //     {
+  //       "id": 2468715,
+  //       "size": "12x24",
+  //       "sku": "^309435",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_12x24()",
+  //       "swatchUrl": "/swatches/9c0d72be8cc0171e2a409fe1aaa2bffd.jpg"
+  //     },
+  //     {
+  //       "id": 2468716,
+  //       "size": "24x24",
+  //       "sku": "^309447",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Intarsio()",
+  //       "swatchUrl": "/swatches/c9e7f932c99598f095642c6fb5d39685.jpg"
+  //     },
+  //     {
+  //       "id": 2468717,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309459",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_2x2()",
+  //       "swatchUrl": "/swatches/907555b8525fe2cde68d209942f0807f.jpg"
+  //     },
+  //     {
+  //       "id": 2468718,
+  //       "size": "9.5x11",
+  //       "sku": "^309453",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Hex()",
+  //       "swatchUrl": "/swatches/1044db4c9cc5056c966a0aaf317e92c9.jpg"
+  //     },
+  //     {
+  //       "id": 2468719,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309944",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Bianco_Losanga()",
+  //       "swatchUrl": "/swatches/fa8fadd0b500ed81ff4aeef258ebf19c.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2468720,
+  //   "name": "Bambusa",
+  //   "color": "Crema",
+  //   "sku": "^309442",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Fascia()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/ffd7c235267f42b5d826401689424811.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468720,
+  //       "size": "12x24",
+  //       "sku": "^309442",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Fascia()",
+  //       "swatchUrl": "/swatches/ffd7c235267f42b5d826401689424811.jpg"
+  //     },
+  //     {
+  //       "id": 2468721,
+  //       "size": "12x24",
+  //       "sku": "^309436",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema_12x24()",
+  //       "swatchUrl": "/swatches/3f7331c1126b94ba38814f3288bb487a.jpg"
+  //     },
+  //     {
+  //       "id": 2468722,
+  //       "size": "24x24",
+  //       "sku": "^309448",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Intarsio()",
+  //       "swatchUrl": "/swatches/40760957d0a005dc4ea3a041fd3de1f2.jpg"
+  //     },
+  //     {
+  //       "id": 2468723,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309460",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema_2x2()",
+  //       "swatchUrl": "/swatches/a916bdb914ffe92d1172f522d51344ab.jpg"
+  //     },
+  //     {
+  //       "id": 2468724,
+  //       "size": "9.5x11",
+  //       "sku": "^309454",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema__Hex()",
+  //       "swatchUrl": "/swatches/1bc5872c8e0f354c1c9ee8aa02822962.jpg"
+  //     },
+  //     {
+  //       "id": 2468725,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309945",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Crema_Losanga()",
+  //       "swatchUrl": "/swatches/2aaf5a163c6371e2d37a0515c4457e8d.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2468726,
+  //   "name": "Bambusa",
+  //   "color": "Grigio",
+  //   "sku": "^309443",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Fascia()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/6fe84c0809c0a6afa5a675daec8bf64c.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468726,
+  //       "size": "12x24",
+  //       "sku": "^309443",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Fascia()",
+  //       "swatchUrl": "/swatches/6fe84c0809c0a6afa5a675daec8bf64c.jpg"
+  //     },
+  //     {
+  //       "id": 2468727,
+  //       "size": "12x24",
+  //       "sku": "^309437",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_12x24()",
+  //       "swatchUrl": "/swatches/74812ea135c0e31885383bfe5a178998.jpg"
+  //     },
+  //     {
+  //       "id": 2468728,
+  //       "size": "24x24",
+  //       "sku": "^309449",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Intarsio()",
+  //       "swatchUrl": "/swatches/6250671a66039b65188e8e288eea1bd0.jpg"
+  //     },
+  //     {
+  //       "id": 2468729,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309461",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_2x2()",
+  //       "swatchUrl": "/swatches/ff5c9f1686d39170e43c1459c98c2851.jpg"
+  //     },
+  //     {
+  //       "id": 2468730,
+  //       "size": "9.5x11",
+  //       "sku": "^309455",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Hex()",
+  //       "swatchUrl": "/swatches/d5145a6536684faab51a14adb85ff44d.jpg"
+  //     },
+  //     {
+  //       "id": 2468731,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309946",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Grigio_Losanga()",
+  //       "swatchUrl": "/swatches/afec1caad7cad51335516a5e3241a170.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2468732,
+  //   "name": "Bambusa",
+  //   "color": "Tortora",
+  //   "sku": "^309444",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Fascia()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Brown",
+  //   "swatchUrl": "/swatches/d1307c2cc608726f97378186e2618c3a.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468732,
+  //       "size": "12x24",
+  //       "sku": "^309444",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Fascia()",
+  //       "swatchUrl": "/swatches/d1307c2cc608726f97378186e2618c3a.jpg"
+  //     },
+  //     {
+  //       "id": 2468733,
+  //       "size": "12x24",
+  //       "sku": "^309438",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_12x24()",
+  //       "swatchUrl": "/swatches/4ebdee1d719b05a225d2cf78a2c128aa.jpg"
+  //     },
+  //     {
+  //       "id": 2468734,
+  //       "size": "24x24",
+  //       "sku": "^309450",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Intarsio()",
+  //       "swatchUrl": "/swatches/7a69e6941820d161140c0973a5b370b7.jpg"
+  //     },
+  //     {
+  //       "id": 2468735,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309462",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_2x2()",
+  //       "swatchUrl": "/swatches/5ac8d0a0808ad6d5addf0535b73f5429.jpg"
+  //     },
+  //     {
+  //       "id": 2468736,
+  //       "size": "9.5x11",
+  //       "sku": "^309456",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Hex()",
+  //       "swatchUrl": "/swatches/3bbd5adb861cc7423cab0827c823098a.jpg"
+  //     },
+  //     {
+  //       "id": 2468737,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309947",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Tortora_Losanga()",
+  //       "swatchUrl": "/swatches/6ba60f8c1ea640c8c4ffd77fe2c31e14.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2468742,
+  //   "name": "Bambusa",
+  //   "color": "Wenge",
+  //   "sku": "^309457",
+  //   "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Hex()",
+  //   "size": "9.5x11",
+  //   "ratio": "Mosaic",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Black",
+  //   "swatchUrl": "/swatches/75aec41c575b6f5512d2b3d5e85b178e.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2468738,
+  //       "size": "12x24",
+  //       "sku": "^309445",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Fascia()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 2468739,
+  //       "size": "12x24",
+  //       "sku": "^309439",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_12x24()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 2468740,
+  //       "size": "24x24",
+  //       "sku": "^309451",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Intarsio()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 2468741,
+  //       "size": "2x2 Mosaic",
+  //       "sku": "^309463",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_2x2()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 2468742,
+  //       "size": "9.5x11",
+  //       "sku": "^309457",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Hex()",
+  //       "swatchUrl": "/swatches/75aec41c575b6f5512d2b3d5e85b178e.jpg"
+  //     },
+  //     {
+  //       "id": 2468743,
+  //       "size": "Losanga Mosaic",
+  //       "sku": "^309948",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\Bambusa\\Wenge_Losanga()",
+  //       "swatchUrl": "/swatches/5135513dca3626b7d31549f54d69266c.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2707810,
+  //   "name": "Atenas",
+  //   "color": "Beige",
+  //   "sku": "^285984",
+  //   "specifier": "Best_Tile\\Products\\Atenas\\Beige_9x48()",
+  //   "size": "9x48",
+  //   "ratio": "3x16",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/7839fd66ebb9a08f9e276b87a19d29f6.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2707810,
+  //       "size": "9x48",
+  //       "sku": "^285984",
+  //       "ratio": "3x16",
+  //       "specifier": "Best_Tile\\Products\\Atenas\\Beige_9x48()",
+  //       "swatchUrl": "/swatches/7839fd66ebb9a08f9e276b87a19d29f6.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2707812,
+  //   "name": "Atenas",
+  //   "color": "Gris",
+  //   "sku": "^285988",
+  //   "specifier": "Best_Tile\\Products\\Atenas\\Gris_9x48()",
+  //   "size": "9x48",
+  //   "ratio": "3x16",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/a7836c06a09529ecb5f6861aaf3fb53f.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2707812,
+  //       "size": "9x48",
+  //       "sku": "^285988",
+  //       "ratio": "3x16",
+  //       "specifier": "Best_Tile\\Products\\Atenas\\Gris_9x48()",
+  //       "swatchUrl": "/swatches/a7836c06a09529ecb5f6861aaf3fb53f.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 2707814,
+  //   "name": "Atenas",
+  //   "color": "Taupe",
+  //   "sku": "^285986",
+  //   "specifier": "Best_Tile\\Products\\Atenas\\Taupe_9x48()",
+  //   "size": "9x48",
+  //   "ratio": "3x16",
+  //   "material": "PORCELAIN",
+  //   "colorCategory": "Taupe",
+  //   "swatchUrl": "/swatches/ab367e6a9a46aceea8cbac0661872d12.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 2707814,
+  //       "size": "9x48",
+  //       "sku": "^285986",
+  //       "ratio": "3x16",
+  //       "specifier": "Best_Tile\\Products\\Atenas\\Taupe_9x48()",
+  //       "swatchUrl": "/swatches/ab367e6a9a46aceea8cbac0661872d12.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 5668372,
+  //   "name": "Aria",
+  //   "color": "Beige",
+  //   "sku": "ECWAIABEI03",
+  //   "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI03()",
+  //   "size": "24x24",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/dcb0187606707319d39f603e9c8a475e.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 5668370,
+  //       "size": "12x24",
+  //       "sku": "ECWAIABEI01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI01()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668371,
+  //       "size": "12x24",
+  //       "sku": "ECWAIABEI02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI02()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668372,
+  //       "size": "24x24",
+  //       "sku": "ECWAIABEI03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI03()",
+  //       "swatchUrl": "/swatches/dcb0187606707319d39f603e9c8a475e.jpg"
+  //     },
+  //     {
+  //       "id": 5668373,
+  //       "size": "24x48",
+  //       "sku": "ECWAIABEI04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI04()",
+  //       "swatchUrl": "/swatches/0310722fcb2fc1e0f6964545391059ef.jpg"
+  //     },
+  //     {
+  //       "id": 5668374,
+  //       "size": "3.3x3.8",
+  //       "sku": "ECWAIABEI05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABEI05()",
+  //       "swatchUrl": "/swatches/a4512cca50414e1d5a298225c3657056.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 5668377,
+  //   "name": "Aria",
+  //   "color": "Black",
+  //   "sku": "ECWAIABLK03",
+  //   "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK03()",
+  //   "size": "24x24",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Black",
+  //   "swatchUrl": "/swatches/f339088858e1b6cbc53f4f64b14945da.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 5668375,
+  //       "size": "12x24",
+  //       "sku": "ECWAIABLK01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK01()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668376,
+  //       "size": "12x24",
+  //       "sku": "ECWAIABLK02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK02()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668377,
+  //       "size": "24x24",
+  //       "sku": "ECWAIABLK03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK03()",
+  //       "swatchUrl": "/swatches/f339088858e1b6cbc53f4f64b14945da.jpg"
+  //     },
+  //     {
+  //       "id": 5668378,
+  //       "size": "24x48",
+  //       "sku": "ECWAIABLK04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK04()",
+  //       "swatchUrl": "/swatches/19f77680d420bc334e79d793d891f9b9.jpg"
+  //     },
+  //     {
+  //       "id": 5668379,
+  //       "size": "3.3x3.8",
+  //       "sku": "ECWAIABLK05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIABLK05()",
+  //       "swatchUrl": "/swatches/31f11f558c3b84abe290f4f457b60940.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 5668382,
+  //   "name": "Aria",
+  //   "color": "Grey",
+  //   "sku": "ECWAIAGRY03",
+  //   "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY03()",
+  //   "size": "24x24",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/fbc3d0aeafdebc12422d5315362db545.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 5668380,
+  //       "size": "12x24",
+  //       "sku": "ECWAIAGRY01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY01()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668381,
+  //       "size": "12x24",
+  //       "sku": "ECWAIAGRY02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY02()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668382,
+  //       "size": "24x24",
+  //       "sku": "ECWAIAGRY03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY03()",
+  //       "swatchUrl": "/swatches/fbc3d0aeafdebc12422d5315362db545.jpg"
+  //     },
+  //     {
+  //       "id": 5668383,
+  //       "size": "24x48",
+  //       "sku": "ECWAIAGRY04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY04()",
+  //       "swatchUrl": "/swatches/c1c5d424dcebaa841f98179bd9f61704.jpg"
+  //     },
+  //     {
+  //       "id": 5668384,
+  //       "size": "3.3x3.8",
+  //       "sku": "ECWAIAGRY05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAGRY05()",
+  //       "swatchUrl": "/swatches/910a7956435f49d27014127461e005ac.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 5668385,
+  //   "name": "Aria",
+  //   "color": "Mix",
+  //   "sku": "ECWAIAMIX06",
+  //   "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAMIX06()",
+  //   "size": "1x5.25 Picket Mosaic",
+  //   "ratio": "Mosaic",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Neutral",
+  //   "swatchUrl": "/swatches/ddff8fae01e0f9a8b943bbd045581643.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 5668385,
+  //       "size": "1x5.25 Picket Mosaic",
+  //       "sku": "ECWAIAMIX06",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAMIX06()",
+  //       "swatchUrl": "/swatches/ddff8fae01e0f9a8b943bbd045581643.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 5668389,
+  //   "name": "Aria",
+  //   "color": "White",
+  //   "sku": "ECWAIAWHT03",
+  //   "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT03()",
+  //   "size": "24x24",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/5f4fec0ab5e192d3e12f1087a327eb6b.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 5668386,
+  //       "size": "12x24",
+  //       "sku": "ECWAIAWHT01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT01()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668388,
+  //       "size": "12x24",
+  //       "sku": "ECWAIAWHT02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT02()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 5668389,
+  //       "size": "24x24",
+  //       "sku": "ECWAIAWHT03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT03()",
+  //       "swatchUrl": "/swatches/5f4fec0ab5e192d3e12f1087a327eb6b.jpg"
+  //     },
+  //     {
+  //       "id": 5668390,
+  //       "size": "24x48",
+  //       "sku": "ECWAIAWHT04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT04()",
+  //       "swatchUrl": "/swatches/b1eb5f054f1fc185a44f7fc06fa54de8.jpg"
+  //     },
+  //     {
+  //       "id": 5668391,
+  //       "size": "3.3x3.8",
+  //       "sku": "ECWAIAWHT05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_April_2025\\ECWAIAWHT05()",
+  //       "swatchUrl": "/swatches/4284fd88944a6371f4363646da216ff1.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293445,
+  //   "name": "Sagrada",
+  //   "color": "Ghiaccio",
+  //   "sku": "ECWSAGWHT02",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT02()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "Porcelain",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/c462f5874c72e02fe9306c9be3b58aaf.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293443,
+  //       "size": "Mosaic",
+  //       "sku": "ECWSAGWHT05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT05()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 6293444,
+  //       "size": "12x12",
+  //       "sku": "ECWSAGWHT01",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT01()",
+  //       "swatchUrl": null
+  //     },
+  //     {
+  //       "id": 6293445,
+  //       "size": "12x24",
+  //       "sku": "ECWSAGWHT02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT02()",
+  //       "swatchUrl": "/swatches/c462f5874c72e02fe9306c9be3b58aaf.jpg"
+  //     },
+  //     {
+  //       "id": 6293446,
+  //       "size": "18x18",
+  //       "sku": "ECWSAGWHT03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT03()",
+  //       "swatchUrl": "/swatches/b0d945e4a368c132ddd461ef744c0d10.jpg"
+  //     },
+  //     {
+  //       "id": 6293447,
+  //       "size": "Mosaic",
+  //       "sku": "ECWSAGWHT04",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGWHT04()",
+  //       "swatchUrl": "/swatches/f6b2fa0e73ad869be01dcb2bdde05524.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293448,
+  //   "name": "Sagrada",
+  //   "color": "Moro",
+  //   "sku": "ECWSAGBLK05",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK05()",
+  //   "size": "Mosaic",
+  //   "ratio": "Mosaic",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Black",
+  //   "swatchUrl": "/swatches/8ff57d2049dbf859124d6a658c56bced.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293448,
+  //       "size": "Mosaic",
+  //       "sku": "ECWSAGBLK05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK05()",
+  //       "swatchUrl": "/swatches/8ff57d2049dbf859124d6a658c56bced.jpg"
+  //     },
+  //     {
+  //       "id": 6293449,
+  //       "size": "12x12",
+  //       "sku": "ECWSAGBLK01",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK01()",
+  //       "swatchUrl": "/swatches/3aa8d0417fb48f2366a85b99e078c0c7.jpg"
+  //     },
+  //     {
+  //       "id": 6293450,
+  //       "size": "12x24",
+  //       "sku": "ECWSAGBLK02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK02()",
+  //       "swatchUrl": "/swatches/3dda1ef84f8afe0482ee59eaae18e75d.jpg"
+  //     },
+  //     {
+  //       "id": 6293451,
+  //       "size": "18x18",
+  //       "sku": "ECWSAGBLK03",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK03()",
+  //       "swatchUrl": "/swatches/6583baa13868ce16bcf9ed0feb86feb5.jpg"
+  //     },
+  //     {
+  //       "id": 6293452,
+  //       "size": "Mosaic",
+  //       "sku": "ECWSAGBLK04",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWSAGBLK04()",
+  //       "swatchUrl": "/swatches/ddd5d130fa1d4776a4c812460a14f45b.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293453,
+  //   "name": "Wellfleet",
+  //   "color": "Abyss",
+  //   "sku": "ECWWELABY01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELABY01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Black",
+  //   "swatchUrl": "/swatches/a70ada393ebacefe2b12c2344040cb9a.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293453,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELABY01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELABY01()",
+  //       "swatchUrl": "/swatches/a70ada393ebacefe2b12c2344040cb9a.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293454,
+  //   "name": "Wellfleet",
+  //   "color": "Azure",
+  //   "sku": "ECWWELAZU01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELAZU01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Blue",
+  //   "swatchUrl": "/swatches/775f88ccffbe574c4405533363e18216.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293454,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELAZU01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELAZU01()",
+  //       "swatchUrl": "/swatches/775f88ccffbe574c4405533363e18216.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293455,
+  //   "name": "Wellfleet",
+  //   "color": "Blanc",
+  //   "sku": "ECWWELBNC04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELBNC04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/9998f19f6e51bdf2de6b37a91b6d9bdb.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293455,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELBNC04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELBNC04()",
+  //       "swatchUrl": "/swatches/9998f19f6e51bdf2de6b37a91b6d9bdb.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293456,
+  //   "name": "Wellfleet",
+  //   "color": "Cityscape",
+  //   "sku": "ECWWELCTY04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCTY04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Blue, Green, Grey",
+  //   "swatchUrl": "/swatches/67cfad2a971dc72d8b7127864075081a.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293456,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELCTY04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCTY04()",
+  //       "swatchUrl": "/swatches/67cfad2a971dc72d8b7127864075081a.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293457,
+  //   "name": "Wellfleet",
+  //   "color": "Claytone",
+  //   "sku": "ECWWELCLY01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCLY01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Orange",
+  //   "swatchUrl": "/swatches/234ac7cab3bf98ba9ebd98c0a2d76646.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293457,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELCLY01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELCLY01()",
+  //       "swatchUrl": "/swatches/234ac7cab3bf98ba9ebd98c0a2d76646.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293458,
+  //   "name": "Wellfleet",
+  //   "color": "Dune",
+  //   "sku": "ECWWELDUN04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELDUN04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Ivory",
+  //   "swatchUrl": "/swatches/9260e3d06233dfadbe7d5a09a78be057.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293458,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELDUN04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELDUN04()",
+  //       "swatchUrl": "/swatches/9260e3d06233dfadbe7d5a09a78be057.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293459,
+  //   "name": "Wellfleet",
+  //   "color": "Earth",
+  //   "sku": "ECWWELEAR04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELEAR04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Orange",
+  //   "swatchUrl": "/swatches/3edc2f573482c7d2af471f2ceee913ea.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293459,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELEAR04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELEAR04()",
+  //       "swatchUrl": "/swatches/3edc2f573482c7d2af471f2ceee913ea.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293460,
+  //   "name": "Wellfleet",
+  //   "color": "Fog",
+  //   "sku": "ECWWELFOG04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOG04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/2e137a883c6a727505ac3c5b74b56e33.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293460,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELFOG04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOG04()",
+  //       "swatchUrl": "/swatches/2e137a883c6a727505ac3c5b74b56e33.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293461,
+  //   "name": "Wellfleet",
+  //   "color": "Forest",
+  //   "sku": "ECWWELFOR01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOR01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/449e2528b99f04ecc6b64876371823a0.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293461,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELFOR01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELFOR01()",
+  //       "swatchUrl": "/swatches/449e2528b99f04ecc6b64876371823a0.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293462,
+  //   "name": "Wellfleet",
+  //   "color": "Garden",
+  //   "sku": "ECWWELGAR04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELGAR04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/c9952f8ff6d43c5f558e8b13a260975c.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293462,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELGAR04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELGAR04()",
+  //       "swatchUrl": "/swatches/c9952f8ff6d43c5f558e8b13a260975c.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293463,
+  //   "name": "Wellfleet",
+  //   "color": "Ivory Glow",
+  //   "sku": "ECWWELIVR01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELIVR01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Ivory",
+  //   "swatchUrl": "/swatches/565f255362a369d1667bfc52ca0a60cf.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293463,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELIVR01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELIVR01()",
+  //       "swatchUrl": "/swatches/565f255362a369d1667bfc52ca0a60cf.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293464,
+  //   "name": "Wellfleet",
+  //   "color": "Jade",
+  //   "sku": "ECWWELJAD01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELJAD01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/4c50189b0335615b087fab396dcb0e37.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293464,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELJAD01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELJAD01()",
+  //       "swatchUrl": "/swatches/4c50189b0335615b087fab396dcb0e37.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293465,
+  //   "name": "Wellfleet",
+  //   "color": "Midnight",
+  //   "sku": "ECWWELMID04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMID04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Black",
+  //   "swatchUrl": "/swatches/00377cd4265431805363913a60e5b9db.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293465,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELMID04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMID04()",
+  //       "swatchUrl": "/swatches/00377cd4265431805363913a60e5b9db.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293466,
+  //   "name": "Wellfleet",
+  //   "color": "Mint",
+  //   "sku": "ECWWELMNT01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMNT01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/8bcb2c315a6264f21f9036fae130ad2e.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293466,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELMNT01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELMNT01()",
+  //       "swatchUrl": "/swatches/8bcb2c315a6264f21f9036fae130ad2e.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293467,
+  //   "name": "Wellfleet",
+  //   "color": "Ocean",
+  //   "sku": "ECWWELOCN04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCN04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Blue",
+  //   "swatchUrl": "/swatches/33d76c22f4f74d731b80cf74d3959653.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293467,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELOCN04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCN04()",
+  //       "swatchUrl": "/swatches/33d76c22f4f74d731b80cf74d3959653.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293468,
+  //   "name": "Wellfleet",
+  //   "color": "Ocean Mist",
+  //   "sku": "ECWWELOCM04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCM04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/9a68a0fb0d34615f7e296465c92b7d3d.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293468,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELOCM04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOCM04()",
+  //       "swatchUrl": "/swatches/9a68a0fb0d34615f7e296465c92b7d3d.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293469,
+  //   "name": "Wellfleet",
+  //   "color": "Oxide",
+  //   "sku": "ECWWELOXI04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOXI04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Red",
+  //   "swatchUrl": "/swatches/22f48ae12a6901876881ffb6e04844e1.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293469,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELOXI04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELOXI04()",
+  //       "swatchUrl": "/swatches/22f48ae12a6901876881ffb6e04844e1.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293470,
+  //   "name": "Wellfleet",
+  //   "color": "Sea Glass",
+  //   "sku": "ECWWELSGL04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELSGL04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Green",
+  //   "swatchUrl": "/swatches/4910530de52e80f8a4bf0c71e3a9d934.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293470,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELSGL04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELSGL04()",
+  //       "swatchUrl": "/swatches/4910530de52e80f8a4bf0c71e3a9d934.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293471,
+  //   "name": "Wellfleet",
+  //   "color": "Vivid Ruby",
+  //   "sku": "ECWWELVRB01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELVRB01()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Red",
+  //   "swatchUrl": "/swatches/74da4de4777911812ed9bda35104124d.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293471,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELVRB01",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELVRB01()",
+  //       "swatchUrl": "/swatches/74da4de4777911812ed9bda35104124d.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293472,
+  //   "name": "Wellfleet",
+  //   "color": "Water",
+  //   "sku": "ECWWELWAT04",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELWAT04()",
+  //   "size": "2x6.5",
+  //   "ratio": "1x3",
+  //   "material": "Ceramic",
+  //   "colorCategory": "Blue",
+  //   "swatchUrl": "/swatches/e0b4d680adcb54bcc5fd2bb0e2c58ee5.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293472,
+  //       "size": "2x6.5",
+  //       "sku": "ECWWELWAT04",
+  //       "ratio": "1x3",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWWELWAT04()",
+  //       "swatchUrl": "/swatches/e0b4d680adcb54bcc5fd2bb0e2c58ee5.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293473,
+  //   "name": "Majestic",
+  //   "color": "Caramel",
+  //   "sku": "ECWMAJBEI01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI01()",
+  //   "size": "12x12",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/7cc6f21ea38c09c37a897dd2c2df3943.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293473,
+  //       "size": "12x12",
+  //       "sku": "ECWMAJBEI01",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI01()",
+  //       "swatchUrl": "/swatches/7cc6f21ea38c09c37a897dd2c2df3943.jpg"
+  //     },
+  //     {
+  //       "id": 6293474,
+  //       "size": "12x24",
+  //       "sku": "ECWMAJBEI02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI02()",
+  //       "swatchUrl": "/swatches/248971559251770e44208a843e32ec5a.jpg"
+  //     },
+  //     {
+  //       "id": 6293475,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJBEI03",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI03()",
+  //       "swatchUrl": "/swatches/ac838d74d5499d0c810b7754f5fb8b2b.jpg"
+  //     },
+  //     {
+  //       "id": 6293476,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJBEI04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI04()",
+  //       "swatchUrl": "/swatches/7f76496c47a05338db9f1502b9abeaf4.jpg"
+  //     },
+  //     {
+  //       "id": 6293477,
+  //       "size": "Mosaic",
+  //       "sku": "ECWMAJBEI05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJBEI05()",
+  //       "swatchUrl": "/swatches/53aed02352d41766717ca5a55ef11e91.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293478,
+  //   "name": "Majestic",
+  //   "color": "Cotton",
+  //   "sku": "ECWMAJWHT01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT01()",
+  //   "size": "12x12",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/e37f02313c4a2b97ece0d4440d101c1f.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293478,
+  //       "size": "12x12",
+  //       "sku": "ECWMAJWHT01",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT01()",
+  //       "swatchUrl": "/swatches/e37f02313c4a2b97ece0d4440d101c1f.jpg"
+  //     },
+  //     {
+  //       "id": 6293479,
+  //       "size": "12x24",
+  //       "sku": "ECWMAJWHT02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT02()",
+  //       "swatchUrl": "/swatches/0654776c7882f4c09c1ec4ec3db0ec89.jpg"
+  //     },
+  //     {
+  //       "id": 6293480,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJWHT03",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT03()",
+  //       "swatchUrl": "/swatches/40416420e9bad0dbb814ab8ba90879d3.jpg"
+  //     },
+  //     {
+  //       "id": 6293481,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJWHT04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT04()",
+  //       "swatchUrl": "/swatches/6ba4656acb92b40374b30807ab9d6867.jpg"
+  //     },
+  //     {
+  //       "id": 6293482,
+  //       "size": "Mosaic",
+  //       "sku": "ECWMAJWHT05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJWHT05()",
+  //       "swatchUrl": "/swatches/3fc7c62f50a1f55167422b00e4a4d13e.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293483,
+  //   "name": "Majestic",
+  //   "color": "Mix",
+  //   "sku": "ECWMAJMIX05",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJMIX05()",
+  //   "size": "Mosaic",
+  //   "ratio": "Mosaic",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Beige, White, Grey",
+  //   "swatchUrl": "/swatches/a7fba8037334212aa515e1876709a22e.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293483,
+  //       "size": "Mosaic",
+  //       "sku": "ECWMAJMIX05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJMIX05()",
+  //       "swatchUrl": "/swatches/a7fba8037334212aa515e1876709a22e.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293484,
+  //   "name": "Majestic",
+  //   "color": "Pearl",
+  //   "sku": "ECWMAJGRY01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY01()",
+  //   "size": "12x12",
+  //   "ratio": "1x1",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/28172ab8e0b1f6a9318174276d48f6ee.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293484,
+  //       "size": "12x12",
+  //       "sku": "ECWMAJGRY01",
+  //       "ratio": "1x1",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY01()",
+  //       "swatchUrl": "/swatches/28172ab8e0b1f6a9318174276d48f6ee.jpg"
+  //     },
+  //     {
+  //       "id": 6293485,
+  //       "size": "12x24",
+  //       "sku": "ECWMAJGRY02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY02()",
+  //       "swatchUrl": "/swatches/ca137de1ce399cc5a12dc7a7a873534f.jpg"
+  //     },
+  //     {
+  //       "id": 6293486,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJGRY03",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY03()",
+  //       "swatchUrl": "/swatches/9c82a455dd586f37b623d7d308662739.jpg"
+  //     },
+  //     {
+  //       "id": 6293487,
+  //       "size": "24x48",
+  //       "sku": "ECWMAJGRY04",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY04()",
+  //       "swatchUrl": "/swatches/ca38393ce67b47852c6d53a4060b494f.jpg"
+  //     },
+  //     {
+  //       "id": 6293488,
+  //       "size": "Mosaic",
+  //       "sku": "ECWMAJGRY05",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWMAJGRY05()",
+  //       "swatchUrl": "/swatches/9854884ab30def6adf0a128c65b2199a.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293489,
+  //   "name": "Haven",
+  //   "color": "Earth",
+  //   "sku": "ECWHAVBRN01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN01()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Brown",
+  //   "swatchUrl": "/swatches/19e0a6507eacc46ee51efeaee029faf6.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293489,
+  //       "size": "12x24",
+  //       "sku": "ECWHAVBRN01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN01()",
+  //       "swatchUrl": "/swatches/19e0a6507eacc46ee51efeaee029faf6.jpg"
+  //     },
+  //     {
+  //       "id": 6293490,
+  //       "size": "24x48",
+  //       "sku": "ECWHAVBRN02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN02()",
+  //       "swatchUrl": "/swatches/41a73190d4fc7ca8be06a138d18c73c8.jpg"
+  //     },
+  //     {
+  //       "id": 6293491,
+  //       "size": "2x2",
+  //       "sku": "ECWHAVBRN03",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBRN03()",
+  //       "swatchUrl": "/swatches/d23363c95f5e8d0b8a299594cae78a61.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293492,
+  //   "name": "Haven",
+  //   "color": "Milk",
+  //   "sku": "ECWHAVWHT01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT01()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "Porcelain",
+  //   "colorCategory": "White",
+  //   "swatchUrl": "/swatches/6da9ea81a92c87506b66863ac84cc298.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293492,
+  //       "size": "12x24",
+  //       "sku": "ECWHAVWHT01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT01()",
+  //       "swatchUrl": "/swatches/6da9ea81a92c87506b66863ac84cc298.jpg"
+  //     },
+  //     {
+  //       "id": 6293493,
+  //       "size": "24x48",
+  //       "sku": "ECWHAVWHT02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT02()",
+  //       "swatchUrl": "/swatches/3d58cf80ad38e7982e9e55ce2b306f32.jpg"
+  //     },
+  //     {
+  //       "id": 6293494,
+  //       "size": "2x2",
+  //       "sku": "ECWHAVWHT03",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVWHT03()",
+  //       "swatchUrl": "/swatches/8785f4f1fc80f02ce9893d7e601fab92.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293495,
+  //   "name": "Haven",
+  //   "color": "Oat",
+  //   "sku": "ECWHAVBEI01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI01()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Beige",
+  //   "swatchUrl": "/swatches/cfb1976fab5eeb93075a85c5fe56315e.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293495,
+  //       "size": "12x24",
+  //       "sku": "ECWHAVBEI01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI01()",
+  //       "swatchUrl": "/swatches/cfb1976fab5eeb93075a85c5fe56315e.jpg"
+  //     },
+  //     {
+  //       "id": 6293496,
+  //       "size": "24x48",
+  //       "sku": "ECWHAVBEI02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI02()",
+  //       "swatchUrl": "/swatches/75a56fc0bcf085323d97ea774969aa69.jpg"
+  //     },
+  //     {
+  //       "id": 6293497,
+  //       "size": "2x2",
+  //       "sku": "ECWHAVBEI03",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVBEI03()",
+  //       "swatchUrl": "/swatches/b7badecdb774840fe01435832a3b1380.jpg"
+  //     }
+  //   ]
+  // },
+  // {
+  //   "id": 6293498,
+  //   "name": "Haven",
+  //   "color": "Shale",
+  //   "sku": "ECWHAVGRY01",
+  //   "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY01()",
+  //   "size": "12x24",
+  //   "ratio": "1x2",
+  //   "material": "Porcelain",
+  //   "colorCategory": "Grey",
+  //   "swatchUrl": "/swatches/18cddcb06299196c7d346a9222c05ec4.jpg",
+  //   "availableSizes": [
+  //     {
+  //       "id": 6293498,
+  //       "size": "12x24",
+  //       "sku": "ECWHAVGRY01",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY01()",
+  //       "swatchUrl": "/swatches/18cddcb06299196c7d346a9222c05ec4.jpg"
+  //     },
+  //     {
+  //       "id": 6293499,
+  //       "size": "24x48",
+  //       "sku": "ECWHAVGRY02",
+  //       "ratio": "1x2",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY02()",
+  //       "swatchUrl": "/swatches/8308880297abd98dbc48f78ce7c30fa2.jpg"
+  //     },
+  //     {
+  //       "id": 6293500,
+  //       "size": "2x2",
+  //       "sku": "ECWHAVGRY03",
+  //       "ratio": "Mosaic",
+  //       "specifier": "Best_Tile\\Products\\_July_2026\\ECWHAVGRY03()",
+  //       "swatchUrl": "/swatches/27cb1aac7af999821b4608f2fb544fa0.jpg"
+  //     }
+  //   ]
+  // }
 ];
 export const PAINTS_CATALOG: PaintProduct[] = [
   {

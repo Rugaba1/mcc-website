@@ -16,9 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 const money = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const qty = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+const FINISHES = ["Matt", "Glossy"] as const;
+const NO_FINISH = "__none__";
 
 type F = Record<
   | "sku" | "size" | "finish" | "color" | "thicknessMm" | "shadeCode"
@@ -169,7 +171,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
 
   return (
     <Sheet open={!!product} onOpenChange={(o) => !saving && onOpenChange(o)}>
-      <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-3xl">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-[min(90vw,1200px)]">
         <SheetHeader className="border-b">
           <SheetTitle>Variants · {product?.name}</SheetTitle>
           <SheetDescription>Each size, finish or shade customers can buy, with its price per m² and stock in m².</SheetDescription>
@@ -242,7 +244,25 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
               <h3 className="font-semibold">{editId ? "Edit variant" : "New variant"}</h3>
               <div className="grid gap-4 sm:grid-cols-3">
                 <Field label="Size" error={errors.size}><Input className="rounded-none" value={form.size} onChange={(e) => set("size", e.target.value)} placeholder="60x60" /></Field>
-                <Field label="Finish"><Input className="rounded-none" value={form.finish} onChange={(e) => set("finish", e.target.value)} placeholder="Matt, Polished" /></Field>
+                  <Field label="Finish">
+                    <Select
+                      value={form.finish || NO_FINISH}
+                      onValueChange={(v) => set("finish", v === NO_FINISH ? "" : v)}
+                    >
+                      <SelectTrigger className="w-full rounded-none">
+                        <SelectValue placeholder="Select finish" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-none">
+                        <SelectItem value={NO_FINISH}>None</SelectItem>
+                        {FINISHES.map((f) => (
+                          <SelectItem key={f} value={f}>{f}</SelectItem>
+                        ))}
+                        {form.finish && !FINISHES.includes(form.finish as (typeof FINISHES)[number]) && (
+                          <SelectItem value={form.finish}>{form.finish}</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </Field>
                 <Field label="Shade / batch"><Input className="rounded-none" value={form.shadeCode} onChange={(e) => set("shadeCode", e.target.value)} /></Field>
               </div>
               <div className="grid gap-4 sm:grid-cols-[1fr_auto]">

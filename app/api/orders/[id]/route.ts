@@ -162,7 +162,9 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     const updateData = {
       ...(status ? { status } : {}),
       ...(hasNote ? { internalNote: data.internalNote as string | null } : {}),
-      ...(status === "PAID" ? { paidAt: now } : {}),
+      ...(status === "PAID"
+        ? { paymentStatus: "PAID" as const, paidAt: now }
+        : {}),
       ...(status === "SHIPPED" ? { shippedAt: now } : {}),
       ...(status === "DELIVERED" ? { deliveredAt: now } : {}),
       ...(status === "CANCELLED" ? { cancelledAt: now } : {}),
@@ -170,6 +172,12 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
 
     await prisma.$transaction(async (tx) => {
       await tx.order.update({ where: { id }, data: updateData });
+      if (status === "PAID") {
+        await tx.payment.updateMany({
+          where: { orderId: id, status: "PENDING" },
+          data: { status: "PAID", paidAt: now, recordedById: user.id },
+        });
+      }
       if (status && status !== existing.status) {
         await tx.orderStatusHistory.create({
           data: {
