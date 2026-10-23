@@ -45,6 +45,7 @@ export async function deliverMail(options: SendMailOptions): Promise<boolean> {
       console.error("Email recipient was rejected by the SMTP server.", {
         code: "RECIPIENT_REJECTED",
         responseCode: result.responseCode,
+        rejectedCount: result.rejected.length,
       });
       return false;
     }
@@ -58,7 +59,11 @@ export async function deliverMail(options: SendMailOptions): Promise<boolean> {
       error && typeof error === "object" && "responseCode" in error
         ? Number(error.responseCode)
         : undefined;
-    console.error("Email delivery failed.", { code, responseCode });
+    const command =
+      error && typeof error === "object" && "command" in error
+        ? String(error.command)
+        : undefined;
+    console.error("Email delivery failed.", { code, responseCode, command });
     return false;
   }
 }

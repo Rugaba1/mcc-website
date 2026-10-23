@@ -69,7 +69,7 @@ export default function Contact() {
       setSent(result.confirmationSent);
       if (!result.confirmationSent) {
         toast.warning(
-          "Your message was received, but the confirmation email could not be sent. Check the address or contact us by phone.",
+          "Your message was received, but we couldn't deliver the confirmation email right now. We'll respond to your message; contact us by phone if it's urgent.",
         );
       }
       setTimeout(() => setSent(false), 8000);
