@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/auth/require-staff";
 import { syncOrderPayment } from "@/lib/payments/sync";
 import { blankToNull } from "@/lib/variant";
+import { sendPaymentStatusEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -49,8 +50,18 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         select: {
           status: true,
           orderId: true,
+          amount: true,
           refundedAmount: true,
           paidAt: true,
+          order: {
+            select: {
+              orderNumber: true,
+              currency: true,
+              guestEmail: true,
+              shipFullName: true,
+              user: { select: { email: true, firstName: true } },
+            },
+          },
         },
       });
       if (!current) return { code: 404 } as const;
@@ -78,7 +89,27 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 
       const payment = await tx.payment.update({ where: { id }, data });
       const sync = await syncOrderPayment(tx, current.orderId, claims.userId);
-      return { code: 200, payment, sync } as const;
+      return {
+        code: 200,
+        payment,
+        sync,
+        notification:
+          rest.status &&
+          rest.status !== current.status &&
+          (rest.status === "PAID" || rest.status === "FAILED")
+            ? {
+                to: current.order.user?.email ?? current.order.guestEmail,
+                firstName:
+                  current.order.user?.firstName ??
+                  current.order.shipFullName?.split(/\s+/)[0] ??
+                  "Customer",
+                orderNumber: current.order.orderNumber,
+                status: rest.status,
+                amount: current.amount.toString(),
+                currency: current.order.currency,
+              }
+            : null,
+      } as const;
     });
 
     if (result.code === 404)
@@ -91,6 +122,12 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         },
         { status: 409 },
       );
+    if (result.notification?.to) {
+      await sendPaymentStatusEmail({
+        ...result.notification,
+        to: result.notification.to,
+      });
+    }
     return NextResponse.json({
       id,
       status: result.payment.status,

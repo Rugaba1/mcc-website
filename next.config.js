@@ -17,6 +17,12 @@ const nextConfig = {
     return config;
   },
   serverExternalPackages: ["pdfmake"],
+  outputFileTracingIncludes: {
+    "/api/auth/**/*": [
+      "./disposable_domains.txt",
+      "./disposable_mx.txt",
+    ],
+  },
 
   compress: true,
   sassOptions: { implementation: {} },

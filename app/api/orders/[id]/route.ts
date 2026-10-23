@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { getApiUser, hasApiPermission } from "../../../../lib/auth/api-access";
 import { invoicePath, issueInvoiceSafely } from "@/lib/invoices/invoice";
+import { sendOrderStatusEmail } from "@/lib/email";
 
 const ORDER_STATUSES = [
   "PENDING",
@@ -150,7 +151,13 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
 
     const existing = await prisma.order.findUnique({
       where: { id },
-      select: { status: true },
+      select: {
+        status: true,
+        orderNumber: true,
+        guestEmail: true,
+        shipFullName: true,
+        user: { select: { email: true, firstName: true } },
+      },
     });
     if (!existing)
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -197,6 +204,20 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     if (!updated)
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     await issueInvoiceSafely(updated.id);
+    if (status && status !== existing.status) {
+      const email = existing.user?.email ?? existing.guestEmail;
+      if (email) {
+        await sendOrderStatusEmail({
+          to: email,
+          firstName:
+            existing.user?.firstName ??
+            existing.shipFullName?.split(/\s+/)[0] ??
+            "Customer",
+          orderNumber: existing.orderNumber,
+          status,
+        });
+      }
+    }
     return NextResponse.json(updated);
   } catch (error) {
     console.error("PUT /api/orders/[id]:", error);

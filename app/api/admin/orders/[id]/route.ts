@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/auth/require-staff";
+import { sendOrderStatusEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -147,18 +148,23 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     const { status, note } = statusSchema.parse(await req.json());
     const now = new Date();
 
-    await prisma.$transaction(async (tx) => {
+    const notification = await prisma.$transaction(async (tx) => {
       const current = await tx.order.findUnique({
         where: { id },
         select: {
           status: true,
           orderNumber: true,
+          guestEmail: true,
+          shipFullName: true,
+          user: {
+            select: { email: true, firstName: true, lastName: true },
+          },
           items: { select: { variantId: true, quantity: true } },
         },
       });
       if (!current)
         throw Object.assign(new Error("not found"), { code: "NOT_FOUND" });
-      if (current.status === status) return;
+      if (current.status === status) return null;
 
       const from = stockState(current.status);
       const to = stockState(status);
@@ -238,8 +244,23 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
           changedById: claims.userId,
         },
       });
+      return {
+        orderNumber: current.orderNumber,
+        status,
+        to: current.user?.email ?? current.guestEmail,
+        firstName:
+          current.user?.firstName ?? current.shipFullName?.split(/\s+/)[0] ?? "Customer",
+      };
     });
 
+    if (notification?.to) {
+      await sendOrderStatusEmail({
+        to: notification.to,
+        firstName: notification.firstName,
+        orderNumber: notification.orderNumber,
+        status: notification.status,
+      });
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     if (e instanceof z.ZodError)

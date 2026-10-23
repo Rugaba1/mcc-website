@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/require-user";
 import { syncOrderPayment, totalsOf } from "@/lib/payments/sync";
 import { blankToNull } from "@/lib/variant";
+import { sendAdminNotificationEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -55,6 +56,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           grandTotal: true,
           currency: true,
           status: true,
+          orderNumber: true,
+          guestEmail: true,
+          shipFullName: true,
+          user: { select: { email: true, firstName: true, lastName: true } },
           payments: {
             select: { amount: true, refundedAmount: true, status: true },
           },
@@ -98,13 +103,33 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         },
       });
       await syncOrderPayment(tx, orderId, claims.userId);
-      return { code: 201, id: payment.id } as const;
+      return {
+        code: 201,
+        id: payment.id,
+        notification: {
+          orderNumber: order.orderNumber,
+          name:
+            [order.user?.firstName, order.user?.lastName]
+              .filter(Boolean)
+              .join(" ") || order.shipFullName || "Customer",
+          email: order.user?.email ?? order.guestEmail,
+        },
+      } as const;
     });
 
     if (result.code === 404)
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    if (result.code === 201)
+    if (result.code === 201) {
+      if (result.notification.email) {
+        await sendAdminNotificationEmail({
+          name: result.notification.name,
+          email: result.notification.email,
+          subject: `Payment submitted for order ${result.notification.orderNumber}`,
+          message: `A customer submitted payment details for order ${result.notification.orderNumber}. Please review the payment in the admin dashboard.`,
+        });
+      }
       return NextResponse.json({ id: result.id }, { status: 201 });
+    }
     return NextResponse.json({ error: result.msg }, { status: result.code });
   } catch (e) {
     if (e instanceof z.ZodError)

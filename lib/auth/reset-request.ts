@@ -1,8 +1,14 @@
 import { prisma } from "../prisma";
 import { RESET_MAX_ATTEMPTS, verifyResetCode } from "./reset-code";
+import { normalizeEmail } from "./email-hygiene";
 
 export async function checkResetCode(email: string, code: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const normalizedEmail = normalizeEmail(email);
+  const user =
+    (await prisma.user.findUnique({ where: { email: normalizedEmail } })) ??
+    (normalizedEmail === email
+      ? null
+      : await prisma.user.findUnique({ where: { email } }));
   if (!user || !user.isActive) return null;
 
   const record = await prisma.forgetPasswordRequest.findFirst({

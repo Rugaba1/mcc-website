@@ -1,24 +1,14 @@
-import nodemailer from "nodemailer";
+import "server-only";
+import { deliverMail } from "@/lib/mailer";
 
-const companyName = process.env.COMPANY_NAME || "MCC";
+type SendMailOptions = Parameters<typeof deliverMail>[0];
+
+const companyName =
+  process.env.COMPANY_NAME ||
+  process.env.NEXT_PUBLIC_APP_NAME ||
+  "Mountain Ceramic Company LTD";
 const adminEmail =
-  process.env.ADMIN_EMAIL ||
-  process.env.EMAIL_FROM ||
-  process.env.EMAIL_USER ||
-  "admin@example.com";
-
-const transporter =
-  process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASSWORD
-    ? nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: Number(process.env.EMAIL_PORT || "587"),
-        secure: false,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASSWORD,
-        },
-      })
-    : null;
+  process.env.ADMIN_EMAIL?.trim() || process.env.EMAIL_USER?.trim() || "";
 
 const esc = (s: string) =>
   s
@@ -33,10 +23,17 @@ const oneLine = (s: string) => s.replace(/[\r\n]+/g, " ").trim(); // for subject
 const sender = () => process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail;
 
 const shell = (title: string, body: string) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-    <h2 style="margin: 0 0 16px;">${title}</h2>
-    <div style="background: #f9f9f9; padding: 24px; border: 1px solid #eee; line-height: 1.6;">${body}</div>
-    <p style="font-size: 12px; color: #666; margin-top: 16px;">&copy; ${new Date().getFullYear()} ${esc(companyName)}</p>
+  <div style="margin:0;background:#fffcf5;padding:24px 12px;color:#1a2b27;font-family:Arial,sans-serif;">
+    <div style="max-width:600px;margin:0 auto;border:1px solid #eadfb8;background:#ffffff;">
+      <div style="padding:22px 24px;background:#004f46;color:#ffffff;border-bottom:4px solid #d6b43e;">
+        <p style="margin:0;color:#fdf1dc;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${esc(companyName)}</p>
+        <h1 style="margin:8px 0 0;font-family:Georgia,serif;font-size:24px;font-weight:700;">${title}</h1>
+      </div>
+      <div style="padding:24px;line-height:1.65;">${body}</div>
+      <div style="padding:16px 24px;border-top:1px solid #eadfb8;color:#5f6b63;font-size:12px;">
+        &copy; ${new Date().getFullYear()} ${esc(companyName)}
+      </div>
+    </div>
   </div>`;
 
 /** Acknowledgement sent to the person who used the contact form. */
@@ -61,19 +58,12 @@ export async function sendContactAcknowledgement(p: {
 }
 
 
-async function safeSendMail(mailOptions: nodemailer.SendMailOptions) {
-  if (!transporter) {
-    console.warn("Email sending skipped because SMTP config is missing.");
+async function safeSendMail(mailOptions: SendMailOptions) {
+  if (!sender()) {
+    console.warn("Email delivery skipped because EMAIL_FROM is not configured.");
     return false;
   }
-
-  try {
-    await transporter.sendMail(mailOptions);
-    return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return false;
-  }
+  return deliverMail(mailOptions);
 }
 
 /** Alert to the internal inbox. Reply-To is the visitor, so "Reply" in your mail app works. */
@@ -84,6 +74,10 @@ export async function sendContactStaffAlert(p: {
   projectType?: string | null;
   message: string;
 }) {
+  if (!adminEmail) {
+    console.warn("Staff email notification skipped because ADMIN_EMAIL is not configured.");
+    return false;
+  }
   return safeSendMail({
     from: sender(),
     to: adminEmail,
@@ -111,8 +105,8 @@ export async function sendContactReply(p: {
   return safeSendMail({
     from: sender(),
     to: p.to,
-    replyTo: adminEmail,
-    subject: `Re: your message to ${companyName}`,
+    replyTo: adminEmail || sender(),
+    subject: oneLine(`Re: your message to ${companyName}`),
     html: shell(
       `Hi ${esc(p.firstName)},`,
       `<p>${multiline(p.reply)}</p>
@@ -127,51 +121,21 @@ export async function sendContactReply(p: {
 
 export async function sendPasswordResetEmail(
   to: string,
-  resetUrl: string,
+  code: string,
   firstName: string,
 ) {
   const mailOptions = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail,
+    from: sender(),
     to,
     subject: "Password Reset Request",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; background-color: #f9f9f9; }
-            .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-            .warning { background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 10px; margin: 15px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Password Reset Request</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${firstName},</p>
-              <p>We received a request to reset your password. Click the link below to create a new password:</p>
-              <div style="text-align: center;">
-                <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
-              </div>
-              <div class="warning">
-                <strong>⚠️ Important:</strong> This link will expire in 1 hour for security reasons.
-              </div>
-              <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
-            </div>
-            <div class="footer">
-              <p>This is an automated email, please do not reply.</p>
-              <p>&copy; ${new Date().getFullYear()} ${companyName}. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-    text: `Hi ${firstName},\n\nWe received a request to reset your password. Use this link to create a new password:\n\n${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request a password reset, please ignore this email or contact support if you have concerns.`,
+    html: shell(
+      "Password reset code",
+      `<p>Hi ${esc(firstName)},</p>
+       <p>Use this code to reset your password:</p>
+       <p style="padding:16px;border:1px solid #eadfb8;background:#fffcf5;color:#004f46;font-size:28px;font-weight:bold;letter-spacing:6px;text-align:center;">${esc(code)}</p>
+       <p>This code expires in one hour. If you did not request a reset, you can ignore this email.</p>`,
+    ),
+    text: `Hi ${firstName},\n\nWe received a request to reset your password. Enter this code to continue:\n\n${code}\n\nThis code will expire in 1 hour.\n\nIf you didn't request a password reset, please ignore this email or contact support if you have concerns.`,
   };
 
   const sent = await safeSendMail(mailOptions);
@@ -183,72 +147,33 @@ export async function sendPasswordResetEmail(
 }
 
 export async function sendPasswordChangedEmail(to: string, firstName: string) {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail,
+  return safeSendMail({
+    from: sender(),
     to,
     subject: "Password Changed Successfully",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; background-color: #f9f9f9; }
-            .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-            .alert { background-color: #FEE2E2; border-left: 4px solid #EF4444; padding: 10px; margin: 15px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>✓ Password Changed</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${firstName},</p>
-              <p>This email confirms that your password was successfully changed.</p>
-              <div class="alert">
-                <strong>⚠️ Didn't make this change?</strong>
-                <p>If you didn't change your password, please contact our support team immediately and secure your account.</p>
-              </div>
-              <p>For your security, you've been logged out of all devices. Please login again with your new password.</p>
-            </div>
-            <div class="footer">
-              <p>This is an automated email, please do not reply.</p>
-              <p>&copy; ${new Date().getFullYear()} ${companyName}. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
+    html: shell(
+      "Password changed",
+      `<p>Hi ${esc(firstName)},</p>
+       <p>This email confirms your password was changed.</p>
+       <p>If you did not make this change, contact our support team immediately.</p>`,
+    ),
     text: `Hi ${firstName},\n\nThis email confirms that your password was successfully changed.\n\nIf you didn't change your password, please contact our support team immediately and secure your account.`,
-  };
-
-  await safeSendMail(mailOptions);
-  return true;
+  });
 }
 
 export async function sendWelcomeEmail(to: string, firstName: string) {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail,
+  return safeSendMail({
+    from: sender(),
     to,
     subject: `Welcome to ${companyName}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="background: #4F46E5; color: white; padding: 20px; text-align: center; margin: 0;">Welcome, ${firstName}!</h1>
-        <div style="background: #f9f9f9; padding: 24px; border: 1px solid #eee;">
-          <p>Thank you for creating an account with ${companyName}.</p>
-          <p>Your customer account is now active and you can browse our tiles, save favourites, and start design reviews.</p>
-          <p>If you need help, our team is always ready to assist.</p>
-        </div>
-      </div>
-    `,
+    html: shell(
+      `Welcome, ${esc(firstName)}`,
+      `<p>Thank you for creating an account with ${esc(companyName)}.</p>
+       <p>Your customer account is ready. Browse our tiles, save favourites, and create room designs.</p>
+       <p>If you need help, our team is ready to assist.</p>`,
+    ),
     text: `Welcome ${firstName}! Your account with ${companyName} is ready.`,
-  };
-
-  await safeSendMail(mailOptions);
-  return true;
+  });
 }
 
 export async function sendCustomerNotificationEmail({
@@ -262,23 +187,13 @@ export async function sendCustomerNotificationEmail({
   subject: string;
   message: string;
 }) {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail,
+  return safeSendMail({
+    from: sender(),
     to,
-    subject,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="margin-bottom: 12px;">Hi ${firstName},</h2>
-        <div style="background: #f9f9f9; padding: 24px; border: 1px solid #eee;">
-          ${message}
-        </div>
-      </div>
-    `,
+    subject: oneLine(subject),
+    html: shell(`Hi ${esc(firstName)},`, `<p>${multiline(message)}</p>`),
     text: `Hi ${firstName},\n\n${message}`,
-  };
-
-  await safeSendMail(mailOptions);
-  return true;
+  });
 }
 
 export async function sendAdminNotificationEmail({
@@ -294,22 +209,80 @@ export async function sendAdminNotificationEmail({
   subject: string;
   message: string;
 }) {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || adminEmail,
+  if (!adminEmail) {
+    console.warn("Staff email notification skipped because ADMIN_EMAIL is not configured.");
+    return false;
+  }
+  return safeSendMail({
+    from: sender(),
     to,
-    subject: `[${companyName}] ${subject}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>New customer notification</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <div style="background: #f9f9f9; padding: 20px; border: 1px solid #eee; white-space: pre-wrap;">${message}</div>
-      </div>
-    `,
+    subject: oneLine(`[${companyName}] ${subject}`),
+    html: shell(
+      "New customer notification",
+      `<p><strong>Name:</strong> ${esc(name)}</p>
+       <p><strong>Email:</strong> ${esc(email)}</p>
+       <p><strong>Subject:</strong> ${esc(subject)}</p>
+       <div style="padding:16px;border:1px solid #eadfb8;background:#fffcf5;white-space:pre-wrap;">${multiline(message)}</div>`,
+    ),
     text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}`,
-  };
+  });
+}
 
-  await safeSendMail(mailOptions);
-  return true;
+export async function sendOrderPlacedEmail(p: {
+  to: string;
+  firstName: string;
+  orderNumber: string;
+  total: string;
+}) {
+  return sendCustomerNotificationEmail({
+    to: p.to,
+    firstName: p.firstName,
+    subject: `Order ${oneLine(p.orderNumber)} received`,
+    message: `We received your order ${p.orderNumber}.\n\nOrder total: ${p.total}\n\nWe’ll email you when its status changes.`,
+  });
+}
+
+export async function sendOrderStatusEmail(p: {
+  to: string;
+  firstName: string;
+  orderNumber: string;
+  status: string;
+}) {
+  return sendCustomerNotificationEmail({
+    to: p.to,
+    firstName: p.firstName,
+    subject: `Order ${oneLine(p.orderNumber)} update`,
+    message: `Your order ${p.orderNumber} is now ${p.status.toLowerCase().replace(/_/g, " ")}.`,
+  });
+}
+
+export async function sendPaymentStatusEmail(p: {
+  to: string;
+  firstName: string;
+  orderNumber: string;
+  status: string;
+  amount: string;
+  currency: string;
+}) {
+  return sendCustomerNotificationEmail({
+    to: p.to,
+    firstName: p.firstName,
+    subject: `Payment update for order ${oneLine(p.orderNumber)}`,
+    message: `The payment of ${p.amount} ${p.currency} for order ${p.orderNumber} is ${p.status.toLowerCase().replace(/_/g, " ")}.`,
+  });
+}
+
+export async function sendReviewSubmittedAlert(p: {
+  name: string;
+  email: string;
+  productName: string;
+  rating: number;
+  body: string;
+}) {
+  return sendAdminNotificationEmail({
+    name: p.name,
+    email: p.email,
+    subject: `Review awaiting moderation: ${p.productName}`,
+    message: `Product: ${p.productName}\nRating: ${p.rating}/5\n\n${p.body}`,
+  });
 }

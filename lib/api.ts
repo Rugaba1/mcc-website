@@ -1177,7 +1177,10 @@ export const api = {
     ),
   // Contact
   sendContact: (d: ContactInput) =>
-    post<{ success: boolean }>("/api/contact", d),
+    post<{ success: boolean; confirmationSent: boolean }>(
+      "/api/contact",
+      d,
+    ),
   getContactMessages: () => get<ContactMessage[]>("/api/contact-messages"),
   updateContactStatus: (id: number, status: ContactStatus) =>
     put<{ id: number; status: ContactStatus }>(`/api/contact-messages/${id}`, {

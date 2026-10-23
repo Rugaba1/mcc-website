@@ -7,6 +7,15 @@ import { api, apiErrorMessage } from "@/lib/api";
 import { EnvelopeIcon, FacebookIcon, InstagramIcon, LinkedInIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const contactDetails = [
@@ -32,24 +41,35 @@ const label = "mb-2 block text-xs font-bold uppercase tracking-wider text-muted-
 export default function Contact() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [phone, setPhone] = useState("");
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const f = new FormData(form);
+    if (phone && !isValidPhoneNumber(phone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
     setSending(true);
     try {
-      await api.sendContact({
+      const result = await api.sendContact({
         firstName: String(f.get("fname") ?? ""),
         lastName: String(f.get("lname") ?? ""),
         email: String(f.get("email") ?? ""),
-        phone: String(f.get("phone") ?? ""),
+        phone,
         projectType: String(f.get("project") ?? ""),
         message: String(f.get("message") ?? ""),
         website: String(f.get("website") ?? ""),
       });
       form.reset();
-      setSent(true);
+      setPhone("");
+      setSent(result.confirmationSent);
+      if (!result.confirmationSent) {
+        toast.warning(
+          "Your message was received, but the confirmation email could not be sent. Check the address or contact us by phone.",
+        );
+      }
       setTimeout(() => setSent(false), 8000);
     } catch (err) {
       toast.error(apiErrorMessage(err, "Could not send your message. Please try again."));
@@ -146,19 +166,34 @@ export default function Contact() {
 
               <div>
                 <label htmlFor="phone" className={label}>Phone Number</label>
-                <Input id="phone" name="phone" type="tel" maxLength={20} placeholder="+250 7XX XXX XXX" autoComplete="tel" className={field} />
+                <PhoneInput
+                  id="phone"
+                  name="phone"
+                  international
+                  defaultCountry="RW"
+                  countryCallingCodeEditable={false}
+                  autoComplete="tel"
+                  placeholder="Enter phone number"
+                  className={field}
+                  value={phone}
+                  onChange={setPhone}
+                />
               </div>
 
               <div>
                 <label htmlFor="project" className={label}>Project Type</label>
-                <select id="project" name="project" className={field} defaultValue="">
-                  <option value="">Select project type</option>
-                  <option>Residential</option>
-                  <option>Commercial</option>
-                  <option>Industrial</option>
-                  <option>Infrastructure</option>
-                  <option>Other</option>
-                </select>
+                <Select name="project" defaultValue="">
+                  <SelectTrigger id="project" className={field}>
+                    <SelectValue placeholder="Select project type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Residential">Residential</SelectItem>
+                    <SelectItem value="Commercial">Commercial</SelectItem>
+                    <SelectItem value="Industrial">Industrial</SelectItem>
+                    <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

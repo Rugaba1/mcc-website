@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/auth/require-staff";
+import { sendCustomerNotificationEmail } from "@/lib/email";
 
 const PAGE_SIZE = 10;
 const moderateSchema = z.object({
@@ -81,9 +82,27 @@ export async function PATCH(request: NextRequest) {
     const review = await prisma.review.update({
       where: { id: parsed.data.id },
       data: { approved: parsed.data.approved },
-      select: { id: true, approved: true },
+      select: {
+        id: true,
+        approved: true,
+        title: true,
+        user: { select: { firstName: true, email: true } },
+        product: { select: { name: true } },
+      },
     });
-    return NextResponse.json({ ...review, changedById: claims.userId });
+    if (review.approved) {
+      await sendCustomerNotificationEmail({
+        to: review.user.email,
+        firstName: review.user.firstName,
+        subject: "Your product review is published",
+        message: `Your review${review.title ? ` “${review.title}”` : ""} for ${review.product.name} has been approved and is now visible on the product page.`,
+      });
+    }
+    return NextResponse.json({
+      id: review.id,
+      approved: review.approved,
+      changedById: claims.userId,
+    });
   } catch (cause) {
     if ((cause as { code?: string })?.code === "P2025")
       return NextResponse.json({ error: "Review not found" }, { status: 404 });

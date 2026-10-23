@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { ROLE_IDS } from "@/lib/constants";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { sendWelcomeEmail } from "@/lib/email";
+import {
+  checkEmailEligibility,
+  normalizeEmail,
+  PLUS_ALIASING_DOMAINS,
+} from "@/lib/auth/email-hygiene";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 
 export const runtime = "nodejs"; // bcryptjs + Prisma
 
@@ -12,7 +18,13 @@ const registerSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
   email: z.string().trim().toLowerCase().email().max(254),
-  phoneNumber: z.string().trim().min(7).max(20).optional(),
+  phoneNumber: z
+    .string()
+    .trim()
+    .min(7)
+    .max(20)
+    .refine(isValidPhoneNumber, "Enter a valid phone number")
+    .optional(),
   password: z.string().min(8).max(200),
 });
 
@@ -21,20 +33,55 @@ const conflict = (message: string) =>
 
 export async function POST(request: NextRequest) {
   try {
-    const { firstName, lastName, email, phoneNumber, password } =
-      registerSchema.parse(await request.json());
+    const {
+      firstName,
+      lastName,
+      email: submittedEmail,
+      phoneNumber,
+      password,
+    } = registerSchema.parse(await request.json());
+    const email = normalizeEmail(submittedEmail);
 
-    const existing = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, ...(phoneNumber ? [{ phoneNumber }] : [])],
-      },
-      select: { email: true },
-    });
-    if (existing) {
-      return existing.email === email
-        ? conflict("An account with that email already exists")
-        : conflict("An account with that phone number already exists");
+    const emailEligibility = await checkEmailEligibility(email);
+    if (emailEligibility === "lists_unavailable") {
+      return NextResponse.json(
+        { success: false, message: "Sign-up email checks are temporarily unavailable. Please try again later." },
+        { status: 503 },
+      );
     }
+    if (emailEligibility === "disposable") {
+      return NextResponse.json(
+        { success: false, message: "Please use a permanent email address. Temporary email addresses are not accepted." },
+        { status: 400 },
+      );
+    }
+    const domain = email.split("@").at(-1) ?? "";
+    if (emailEligibility === "no_mx") {
+      return NextResponse.json(
+        { success: false, message: "This email domain cannot receive mail. Check the address and try again." },
+        { status: 400 },
+      );
+    }
+
+    const existingUsers = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email },
+          ...(phoneNumber ? [{ phoneNumber }] : []),
+          ...(PLUS_ALIASING_DOMAINS.has(domain)
+            ? [{ email: { endsWith: `@${domain}` } }]
+            : []),
+        ],
+      },
+      select: { email: true, phoneNumber: true },
+    });
+    if (existingUsers.some((user) => normalizeEmail(user.email) === email))
+      return conflict("An account with that email already exists");
+    if (
+      phoneNumber &&
+      existingUsers.some((user) => user.phoneNumber === phoneNumber)
+    )
+      return conflict("An account with that phone number already exists");
 
     const user = await prisma.user.create({
       data: {
@@ -50,11 +97,9 @@ export async function POST(request: NextRequest) {
       select: { id: true, email: true },
     });
 
-    try {
-      await sendWelcomeEmail(user.email, firstName);
-    } catch {
-      // non-blocking: customer account creation should still succeed even if email delivery is unavailable
-    }
+    const welcomeSent = await sendWelcomeEmail(user.email, firstName);
+    if (!welcomeSent)
+      console.warn("Welcome email was not delivered; account creation succeeded.");
 
     return NextResponse.json(
       {

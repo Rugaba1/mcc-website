@@ -6,6 +6,7 @@ import {
   sendContactAcknowledgement,
   sendContactStaffAlert,
 } from "../../../lib/email";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 
 export const runtime = "nodejs";
 
@@ -21,7 +22,12 @@ const schema = z.object({
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
   email: z.string().trim().toLowerCase().email().max(254),
-  phone: z.string().trim().max(20).optional(),
+  phone: z
+    .string()
+    .trim()
+    .max(20)
+    .refine((value) => !value || isValidPhoneNumber(value), "Enter a valid phone number")
+    .optional(),
   projectType: z.enum(PROJECT_TYPES).optional().or(z.literal("")),
   message: z
     .string()
@@ -78,7 +84,7 @@ export async function POST(request: NextRequest) {
     });
 
     // The message is already stored, so a mail failure must not fail the request
-    const [ackSent] = await Promise.all([
+    const [ackSent, staffAlertSent] = await Promise.all([
       sendContactAcknowledgement({
         to: data.email,
         firstName: data.firstName,
@@ -98,9 +104,20 @@ export async function POST(request: NextRequest) {
         where: { id: saved.id },
         data: { ackSentAt: new Date() },
       });
+    } else {
+      console.error("Contact confirmation email was not delivered.", {
+        contactMessageId: saved.id,
+      });
     }
+    if (!staffAlertSent)
+      console.error("Contact staff notification email was not delivered.", {
+        contactMessageId: saved.id,
+      });
 
-    return NextResponse.json(OK, { status: 201 });
+    return NextResponse.json(
+      { ...OK, confirmationSent: ackSent },
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

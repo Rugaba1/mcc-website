@@ -11,6 +11,10 @@ import { isValidLocation } from "@/lib/locations";
 import { PAYMENT_METHODS } from "@/lib/payments";
 import { issueInvoiceSafely } from "@/lib/invoices/invoice";
 import { priceLine, SaleType } from "@/lib/sale-pricing";
+import {
+  sendAdminNotificationEmail,
+  sendOrderPlacedEmail,
+} from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -94,7 +98,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: claims.userId },
-        select: { isActive: true },
+        select: { isActive: true, email: true, firstName: true, lastName: true },
       });
       if (!user?.isActive) throw new CheckoutError("Account is not active");
 
@@ -230,13 +234,37 @@ export async function POST(request: NextRequest) {
         })),
       });
 
-      return created;
+      return {
+        ...created,
+        customerEmail: user.email,
+        customerName: [user.firstName, user.lastName].filter(Boolean).join(" "),
+        customerFirstName: user.firstName,
+        total: totals.total,
+      };
     });
 
     // After the commit, so the invoice code can see the order. Never throws.
     await issueInvoiceSafely(order.id);
+    const total = `${order.total.toLocaleString("en-US")} RWF`;
+    await Promise.all([
+      sendOrderPlacedEmail({
+        to: order.customerEmail,
+        firstName: order.customerFirstName,
+        orderNumber: order.orderNumber,
+        total,
+      }),
+      sendAdminNotificationEmail({
+        name: order.customerName || "Customer",
+        email: order.customerEmail,
+        subject: `New order ${order.orderNumber}`,
+        message: `Order ${order.orderNumber} has been placed.\nTotal: ${total}`,
+      }),
+    ]);
 
-    return NextResponse.json(order, { status: 201 });
+    return NextResponse.json(
+      { id: order.id, orderNumber: order.orderNumber },
+      { status: 201 },
+    );
   } catch (e) {
     if (e instanceof z.ZodError) {
       return NextResponse.json(

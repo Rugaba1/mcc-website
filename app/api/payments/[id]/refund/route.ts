@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/auth/require-staff";
 import { syncOrderPayment } from "@/lib/payments/sync";
+import { sendPaymentStatusEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -30,6 +31,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           amount: true,
           refundedAmount: true,
           orderId: true,
+          order: {
+            select: {
+              orderNumber: true,
+              currency: true,
+              guestEmail: true,
+              shipFullName: true,
+              user: { select: { email: true, firstName: true } },
+            },
+          },
         },
       });
       if (!p) return { code: 404 } as const;
@@ -57,7 +67,21 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         },
       });
       const sync = await syncOrderPayment(tx, p.orderId, claims.userId);
-      return { code: 200, sync } as const;
+      return {
+        code: 200,
+        sync,
+        notification: {
+          to: p.order.user?.email ?? p.order.guestEmail,
+          firstName:
+            p.order.user?.firstName ??
+            p.order.shipFullName?.split(/\s+/)[0] ??
+            "Customer",
+          orderNumber: p.order.orderNumber,
+          status: refunded >= Number(p.amount) - 0.005 ? "REFUNDED" : "PARTIALLY_REFUNDED",
+          amount: String(amount),
+          currency: p.order.currency,
+        },
+      } as const;
     });
 
     if (result.code === 404)
@@ -74,6 +98,12 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         },
         { status: 400 },
       );
+    if (result.notification.to) {
+      await sendPaymentStatusEmail({
+        ...result.notification,
+        to: result.notification.to,
+      });
+    }
     return NextResponse.json({
       ok: true,
       orderPaymentStatus: result.sync?.paymentStatus,

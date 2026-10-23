@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "../../../../lib/prisma";
 import { checkResetCode } from "../../../../lib/auth/reset-request";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -50,6 +51,10 @@ export async function POST(request: NextRequest) {
         where: { userId: result.user.id },
       }),
     ]);
+    await sendPasswordChangedEmail(
+      result.user.email,
+      result.user.firstName,
+    );
 
     const res = NextResponse.json({
       success: true,

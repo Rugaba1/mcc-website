@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { verifyToken } from "../../../../lib/auth/jwt";
 import { prisma } from "../../../../lib/prisma";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 const changePasswordSchema = z.object({
   currentPassword: z.string(),
@@ -98,6 +99,7 @@ export async function POST(request: NextRequest) {
       where: { id: user.id },
       data: { password: hashedPassword },
     });
+    await sendPasswordChangedEmail(user.email, user.firstName);
 
     return NextResponse.json(
       {

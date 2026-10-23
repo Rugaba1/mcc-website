@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getApiUser } from "@/lib/auth/api-access";
 import { requireUser } from "@/lib/auth/require-user";
+import { sendReviewSubmittedAlert } from "@/lib/email";
 
 const PAGE_SIZE = 5;
 const reviewSchema = z.object({
@@ -136,10 +137,26 @@ export async function POST(request: NextRequest, context: Context) {
         body: parsed.data.body,
         approved: false,
       },
-      select: { id: true, approved: true },
+      include: {
+        product: { select: { name: true } },
+        user: { select: { firstName: true, lastName: true, email: true } },
+      },
+    });
+    await sendReviewSubmittedAlert({
+      name: [review.user.firstName, review.user.lastName]
+        .filter(Boolean)
+        .join(" ") || "Customer",
+      email: review.user.email,
+      productName: review.product.name,
+      rating: review.rating,
+      body: review.body ?? "",
     });
     return NextResponse.json(
-      { ...review, message: "Your review is awaiting moderation." },
+      {
+        id: review.id,
+        approved: review.approved,
+        message: "Your review is awaiting moderation.",
+      },
       { status: 201 },
     );
   } catch (cause) {

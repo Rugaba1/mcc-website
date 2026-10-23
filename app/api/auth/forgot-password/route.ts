@@ -7,6 +7,7 @@ import {
   hashResetCode,
   RESET_CODE_TTL_MS,
 } from "../../../../lib/auth/reset-code";
+import { normalizeEmail } from "@/lib/auth/email-hygiene";
 
 export const runtime = "nodejs"; // reset-code.ts uses node:crypto
 
@@ -27,7 +28,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email } = forgotPasswordSchema.parse(body);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = normalizeEmail(email);
+    const user =
+      (await prisma.user.findUnique({ where: { email: normalizedEmail } })) ??
+      (normalizedEmail === email
+        ? null
+        : await prisma.user.findUnique({ where: { email } }));
 
     if (!user || !user.isActive) {
       return NextResponse.json(GENERIC_OK, { status: 200 });

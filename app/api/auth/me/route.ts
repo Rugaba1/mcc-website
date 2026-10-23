@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth/jwt";
 import bcrypt from "bcryptjs";
+import {
+  checkEmailEligibility,
+  normalizeEmail,
+  PLUS_ALIASING_DOMAINS,
+} from "@/lib/auth/email-hygiene";
 
 export async function PUT(req: NextRequest) {
   try {
@@ -32,11 +37,48 @@ export async function PUT(req: NextRequest) {
           { error: "A valid email is required" },
           { status: 400 },
         );
-      // Check email not taken by another user
-      const conflict = await prisma.user.findFirst({
-        where: { email: email.trim().toLowerCase(), NOT: { id: numId } },
+      const normalizedEmail = normalizeEmail(email);
+      const domain = normalizedEmail.split("@").at(-1) ?? "";
+      const account = await prisma.user.findUnique({
+        where: { id: numId },
+        select: { email: true },
       });
-      if (conflict)
+      if (!account)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+      if (normalizedEmail !== account.email) {
+        const eligibility = await checkEmailEligibility(normalizedEmail);
+        if (eligibility === "lists_unavailable")
+          return NextResponse.json(
+            { error: "Email checks are temporarily unavailable. Please try again later." },
+            { status: 503 },
+          );
+        if (eligibility === "disposable")
+          return NextResponse.json(
+            { error: "Temporary email addresses are not accepted." },
+            { status: 400 },
+          );
+        if (eligibility === "no_mx")
+          return NextResponse.json(
+            { error: "This email domain cannot receive mail. Check the address and try again." },
+            { status: 400 },
+          );
+      }
+
+      // Check email not taken by another user
+      const conflicts = await prisma.user.findMany({
+        where: {
+          NOT: { id: numId },
+          OR: [
+            { email: normalizedEmail },
+            ...(PLUS_ALIASING_DOMAINS.has(domain)
+              ? [{ email: { endsWith: `@${domain}` } }]
+              : []),
+          ],
+        },
+        select: { email: true },
+      });
+      if (conflicts.some((user) => normalizeEmail(user.email) === normalizedEmail))
         return NextResponse.json(
           { error: "Email already in use by another user" },
           { status: 409 },
@@ -45,7 +87,7 @@ export async function PUT(req: NextRequest) {
 
     const data: Record<string, unknown> = {};
 
-    if (email !== undefined) data.email = email.trim().toLowerCase();
+    if (email !== undefined) data.email = normalizeEmail(email);
     if (firstName !== undefined)
       data.firstName = firstName.trim().toLowerCase();
     if (lastName !== undefined) data.lastName = lastName.trim().toLowerCase();

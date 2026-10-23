@@ -7,6 +7,7 @@ import {
   generateRefreshToken,
 } from "../../../../lib/auth/jwt";
 import { IS_PROD, ROLE_IDS, WEEK } from "../../../../lib/constants";
+import { normalizeEmail } from "@/lib/auth/email-hygiene";
 
 export const runtime = "nodejs"; // bcryptjs + Prisma
 
@@ -30,12 +31,26 @@ export async function POST(request: NextRequest) {
   try {
     const { identifier, password } = loginSchema.parse(await request.json());
 
-    const user = await prisma.user.findFirst({
-      where: identifier.includes("@")
-        ? { email: identifier.toLowerCase() }
-        : { phoneNumber: identifier },
-      include: { role: true }, // an array in your schema
-    });
+    let user;
+    if (identifier.includes("@")) {
+      const normalizedEmail = normalizeEmail(identifier);
+      user = await prisma.user.findFirst({
+        where: { email: normalizedEmail },
+        include: { role: true },
+      });
+      // Keep sign-in working for accounts created before alias normalization.
+      if (!user && normalizedEmail !== identifier.toLowerCase()) {
+        user = await prisma.user.findFirst({
+          where: { email: identifier.toLowerCase() },
+          include: { role: true },
+        });
+      }
+    } else {
+      user = await prisma.user.findFirst({
+        where: { phoneNumber: identifier },
+        include: { role: true },
+      });
+    }
 
     // Always run one bcrypt comparison
     const passwordOk = await bcrypt.compare(

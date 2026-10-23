@@ -12,6 +12,8 @@ import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 export default function RegisterPage() {
     const { login } = useAuth();
@@ -29,6 +31,9 @@ export default function RegisterPage() {
         setError("");
         if (form.password.length < 8) return setError("Password must be at least 8 characters.");
         if (form.password !== form.confirm) return setError("Passwords don't match.");
+        if (form.phoneNumber && !isValidPhoneNumber(form.phoneNumber)) {
+            return setError("Please enter a valid phone number.");
+        }
 
         setSubmitting(true);
         try {
@@ -85,7 +90,19 @@ export default function RegisterPage() {
 
                 <div className="space-y-2">
                     <Label htmlFor="phone">Phone (optional)</Label>
-                    <Input id="phone" type="tel" autoComplete="tel" maxLength={20} placeholder="+250 7XX XXX XXX" value={form.phoneNumber} onChange={set("phoneNumber")} />
+                    <PhoneInput
+                        id="phone"
+                        name="phoneNumber"
+                        international
+                        defaultCountry="RW"
+                        countryCallingCodeEditable={false}
+                        autoComplete="tel"
+                        placeholder="Enter phone number"
+                        value={form.phoneNumber}
+                        onChange={(phoneNumber) =>
+                            setForm((current) => ({ ...current, phoneNumber }))
+                        }
+                    />
                 </div>
 
                 <div className="space-y-2">
