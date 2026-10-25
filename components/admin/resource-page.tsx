@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Eye, Inbox, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiErrorMessage } from "@/lib/api";
+import type { PaginatedResult } from "@/lib/server-pagination";
+import type { PermCode } from "@/lib/permissions/catalog";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { DataPagination } from "@/components/admin/data-pagination";
 import { ImageField } from "@/components/file-picker";
+import { PermissionGate } from "@/components/permission-gate";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,7 +41,7 @@ export type FieldDef = {
     render?: (value: any, onChange: (v: any) => void) => ReactNode; // type "custom"
 };
 
-export type FilterDef<T> = { key: string; label: string; options: Option[]; match: (row: T, value: string) => boolean };
+export type FilterDef = { key: string; label: string; options: Option[] };
 
 export type DetailDef<T> = {
     title: (row: T) => string;
@@ -50,10 +53,14 @@ export interface ResourcePageProps<T extends { id: number }> {
     title: string;
     description: string;
     entityName: string; // "testimonial"
-    load: () => Promise<T[]>;
+    loadPage: (query: {
+        page: number;
+        limit: number;
+        q: string;
+        filters: Record<string, string>;
+    }) => Promise<PaginatedResult<T>>;
     columns: Column<T>[];
-    searchText: (row: T) => string;
-    filters?: FilterDef<T>[];
+    filters?: FilterDef[];
     pageSize?: number;
     // CRUD, every part optional: omit create/update/remove for a read-only page
     fields?: FieldDef[];
@@ -61,8 +68,11 @@ export interface ResourcePageProps<T extends { id: number }> {
     toForm?: (row: T) => Values;
     validate?: (values: Values, editing: boolean) => Record<string, string>;
     create?: (values: Values) => Promise<unknown>;
+    createPermission?: PermCode;
     update?: (row: T, values: Values) => Promise<unknown>;
+    updatePermission?: PermCode;
     remove?: (row: T) => Promise<unknown>;
+    deletePermission?: PermCode;
     deleteWarning?: (row: T) => string;
     detail?: DetailDef<T>;
 }
@@ -98,6 +108,8 @@ function Control({ f, value, onChange }: { f: FieldDef; value: any; onChange: (v
 export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) {
     const { pageSize = 10 } = p;
     const [rows, setRows] = useState<T[]>([]);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const q = useDebouncedValue(search, 250);
@@ -115,31 +127,29 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
     const [detailId, setDetailId] = useState<number | null>(null);
 
     const reload = useCallback(async () => {
+        setLoading(true);
         try {
-            setRows(await p.load());
+            const result = await p.loadPage({
+                page,
+                limit: pageSize,
+                q: q.trim(),
+                filters: filterValues,
+            });
+            setRows(result.items);
+            setTotal(result.total);
+            setTotalPages(result.totalPages);
+            if (result.page !== page) setPage(result.page);
         } catch (e) {
             toast.error(apiErrorMessage(e, `Failed to load ${p.title.toLowerCase()}`));
         } finally {
             setLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    useEffect(() => { reload(); }, [reload]);
+    }, [filterValues, page, pageSize, p.loadPage, p.title, q]);
+    useEffect(() => { void reload(); }, [reload]);
     useEffect(() => setPage(1), [q, filterValues]);
 
-    const filtered = useMemo(() => {
-        const term = q.trim().toLowerCase();
-        return rows.filter(
-            (r) =>
-                (!term || p.searchText(r).toLowerCase().includes(term)) &&
-                (p.filters ?? []).every((f) => !filterValues[f.key] || filterValues[f.key] === "all" || f.match(r, filterValues[f.key])),
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rows, q, filterValues]);
-
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
     const current = Math.min(page, totalPages);
-    const pageRows = filtered.slice((current - 1) * pageSize, current * pageSize);
+    const pageRows = rows;
     const hasFilters = !!search || Object.values(filterValues).some((v) => v && v !== "all");
     const detailRow = detailId != null ? rows.find((r) => r.id === detailId) ?? null : null;
 
@@ -192,6 +202,7 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
 
     const colSpan = p.columns.length + 1;
     const canEdit = !!p.update && !!p.fields;
+    const formPermission = editing ? p.updatePermission : p.createPermission;
 
     return (
         <main className="flex-1 space-y-5 p-4 md:p-6">
@@ -200,7 +211,11 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                     <h1 className="text-2xl font-bold tracking-tight">{p.title}</h1>
                     <p className="text-sm text-muted-foreground">{p.description}</p>
                 </div>
-                {p.create && p.fields && <Button className="rounded-none" onClick={() => openForm(null)}><Plus /> Add {p.entityName}</Button>}
+                {p.create && p.fields && p.createPermission && (
+                    <PermissionGate required={p.createPermission}>
+                        <Button className="rounded-none" onClick={() => openForm(null)}><Plus /> Add {p.entityName}</Button>
+                    </PermissionGate>
+                )}
             </header>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -244,19 +259,28 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                                 <TableCell>
                                     <div className="flex justify-end gap-1">
                                         {p.detail && <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => setDetailId(r.id)} aria-label="View"><Eye /></Button>}
-                                        {canEdit && <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openForm(r)} aria-label="Edit"><Pencil /></Button>}
-                                        {p.remove && <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(r)} aria-label="Delete"><Trash2 /></Button>}
+                                        {canEdit && p.updatePermission && (
+                                            <PermissionGate required={p.updatePermission}>
+                                                <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openForm(r)} aria-label="Edit"><Pencil /></Button>
+                                            </PermissionGate>
+                                        )}
+                                        {p.remove && p.deletePermission && (
+                                            <PermissionGate required={p.deletePermission}>
+                                                <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(r)} aria-label="Delete"><Trash2 /></Button>
+                                            </PermissionGate>
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
-                <DataPagination page={current} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />
+                <DataPagination page={current} totalPages={totalPages} total={total} pageSize={pageSize} onPageChange={setPage} disabled={loading} />
             </div>
 
             {/* Create / edit */}
-            {p.fields && (
+            {p.fields && formPermission && (
+                <PermissionGate required={formPermission}>
                 <Dialog open={formOpen} onOpenChange={(o) => !saving && setFormOpen(o)}>
                     <DialogContent className="flex max-h-[92vh] flex-col gap-0 overflow-hidden rounded-none p-0 sm:max-w-2xl">
                         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
@@ -281,6 +305,7 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                         </form>
                     </DialogContent>
                 </Dialog>
+                </PermissionGate>
             )}
 
             {/* Details */}
@@ -298,14 +323,18 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                 </Sheet>
             )}
 
-            <ConfirmDelete
-                open={!!deleting}
-                onOpenChange={(o) => !o && setDeleting(null)}
-                title={`Delete this ${p.entityName}?`}
-                description={deleting && p.deleteWarning ? p.deleteWarning(deleting) : "This can’t be undone."}
-                busy={deleteBusy}
-                onConfirm={confirmDelete}
-            />
+            {p.deletePermission && (
+                <PermissionGate required={p.deletePermission}>
+                    <ConfirmDelete
+                        open={!!deleting}
+                        onOpenChange={(o) => !o && setDeleting(null)}
+                        title={`Delete this ${p.entityName}?`}
+                        description={deleting && p.deleteWarning ? p.deleteWarning(deleting) : "This can’t be undone."}
+                        busy={deleteBusy}
+                        onConfirm={confirmDelete}
+                    />
+                </PermissionGate>
+            )}
         </main>
     );
 }

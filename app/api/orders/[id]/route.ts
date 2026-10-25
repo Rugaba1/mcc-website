@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
-import { getApiUser, hasApiPermission } from "../../../../lib/auth/api-access";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { invoicePath, issueInvoiceSafely } from "@/lib/invoices/invoice";
 import { sendOrderStatusEmail } from "@/lib/email";
 
@@ -16,16 +17,10 @@ const ORDER_STATUSES = [
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function GET(req: NextRequest, { params }: RouteContext) {
+export const GET = withPermission(PERM.ORDERS_VIEW)(
+  async (_req: NextRequest, context) => {
   try {
-    const user = await getApiUser(req);
-    if (!user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!hasApiPermission(user, "orders.view", "orders.manage")) {
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    // }
-
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     if (!Number.isSafeInteger(id) || id < 1)
       return NextResponse.json({ error: "Invalid order id" }, { status: 400 });
 
@@ -96,18 +91,13 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
+  async (req: NextRequest, context) => {
   try {
-    const user = await getApiUser(req);
-    if (!user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!hasApiPermission(user, "orders.manage")) {
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    // }
-
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     if (!Number.isSafeInteger(id) || id < 1)
       return NextResponse.json({ error: "Invalid order id" }, { status: 400 });
     const body: unknown = await req.json();
@@ -182,7 +172,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       if (status === "PAID") {
         await tx.payment.updateMany({
           where: { orderId: id, status: "PENDING" },
-          data: { status: "PAID", paidAt: now, recordedById: user.id },
+          data: { status: "PAID", paidAt: now, recordedById: context.user.id },
         });
       }
       if (status && status !== existing.status) {
@@ -190,7 +180,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
           data: {
             orderId: id,
             status,
-            changedById: user.id,
+            changedById: context.user.id,
             note: `Status changed from ${existing.status} to ${status}`,
           },
         });
@@ -226,4 +216,4 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       { status: 500 },
     );
   }
-}
+});

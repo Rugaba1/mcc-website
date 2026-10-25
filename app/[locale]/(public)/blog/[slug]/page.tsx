@@ -2,37 +2,53 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { headers } from "next/headers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MdxContent } from "@/components/blog/mdx-content";
 import { getPostBySlug } from "@/lib/blog/queries";
-import { absolutizeUrl } from "@/lib/absolutize";
-import { seoConfig } from "@/config/seo.config";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { siteConfig } from "@/config/site.config";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { localizedUrl } from "@/lib/alternates";
+import { fmtDate } from "@/lib/format";
 
 export const revalidate = 300;
-const SITE = process.env.NEXT_PUBLIC_SITE_URL!;
 type Props = { params: Promise<{ locale: string; slug: string }> };
 const load = cache(getPostBySlug); // dedupes between generateMetadata and the page
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { locale, slug } = await params;
     const post = await load(slug);
-    if (!post) return {};
+    if (!post) {
+        return createPageMetadata({
+            locale,
+            path: `/blog/${slug}`,
+            title: `Blog post not found | ${siteConfig.siteName}`,
+            description: "This article could not be found.",
+            noIndex: true,
+        });
+    }
     const title = post.seoTitle || post.title;
     const description = post.seoDescription || post.excerpt || undefined;
-    const url = `${seoConfig.siteUrl}/${post.locale}/blog/${post.slug}`;
-    const image = absolutizeUrl(post.coverImage ?? "/logo.png") ?? `${seoConfig.siteUrl}/logo.png`;
+    const metadata = createPageMetadata({
+        locale,
+        path: `/blog/${post.slug}`,
+        title,
+        description: description ?? "",
+        image: post.coverImage ?? "/logo.png",
+        type: "article",
+    });
     return {
-        title, description,
+        ...metadata,
         openGraph: {
-            title, description, url, siteName: seoConfig.siteName, locale: post.locale.replace("-", "_"), type: "article",
-            publishedTime: post.publishedAt?.toISOString(), modifiedTime: post.updatedAt.toISOString(),
-            tags: post.tags?.split(","), images: [{ url: image, width: 1200, height: 630, alt: post.coverAlt ?? title }]
+            ...metadata.openGraph,
+            type: "article",
+            publishedTime: post.publishedAt?.toISOString(),
+            modifiedTime: post.updatedAt.toISOString(),
+            tags: post.tags?.split(",").map((tag) => tag.trim()),
         },
-        twitter: { card: "summary_large_image", title, description, images: [image] },
-        alternates: { canonical: url },
-        robots: { index: true, follow: true },
     };
 }
 
@@ -40,6 +56,9 @@ export default async function PostPage({ params }: Props) {
     const { locale, slug } = await params;
     const post = await load(slug);
     if (!post) notFound();
+    const requestHeaders = await headers();
+    const nonce = requestHeaders.get("x-nonce") ?? undefined;
+    const timeZone = requestHeaders.get("x-timezone") ?? siteConfig.defaultTimeZone;
     const author = [post.author?.firstName, post.author?.lastName].filter(Boolean).join(" ");
 
     const jsonLd = {
@@ -47,12 +66,18 @@ export default async function PostPage({ params }: Props) {
         headline: post.title, description: post.seoDescription || post.excerpt,
         image: post.coverImage, datePublished: post.publishedAt, dateModified: post.updatedAt,
         author: author ? { "@type": "Person", name: author } : undefined,
-        mainEntityOfPage: `${SITE}/${locale}/blog/${post.slug}`,
+        mainEntityOfPage: localizedUrl(locale, `/blog/${post.slug}`),
     };
 
     return (
+        <>
+        <Breadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Blog", href: "/blog" },
+            { label: post.title },
+        ]} />
         <article className="container mx-auto max-w-3xl px-4 py-16">
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+            <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
             <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
             <div className="mt-4 flex items-center gap-3 text-sm text-muted-foreground">
                 <Avatar className="h-8 w-8">
@@ -60,7 +85,7 @@ export default async function PostPage({ params }: Props) {
                     <AvatarFallback>{author.slice(0, 1)}</AvatarFallback>
                 </Avatar>
                 <span>{author}</span>
-                <time dateTime={post.publishedAt?.toISOString()}>{post.publishedAt?.toLocaleDateString(locale)}</time>
+                <time dateTime={post.publishedAt?.toISOString()}>{fmtDate(post.publishedAt, locale, timeZone)}</time>
                 <span>· {post.readingMinutes} min</span>
             </div>
             {post.coverImage && (
@@ -74,5 +99,6 @@ export default async function PostPage({ params }: Props) {
                 {post.tags?.split(",").map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
             </div>
         </article>
+        </>
     );
 }

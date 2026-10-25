@@ -7,9 +7,7 @@ type Result =
 
 export async function requireUser(request: NextRequest): Promise<Result> {
   const auth = request.headers.get("authorization");
-  const token = auth?.startsWith("Bearer ")
-    ? auth.slice(7)
-    : request.cookies.get("auth_token")?.value;
+  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : undefined;
 
   const claims = token ? await verifyAccessPayload(token) : null;
   if (!claims) {

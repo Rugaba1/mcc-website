@@ -21,7 +21,7 @@ export function InventorySection({
   const [editing, setEditing] = useState<InventoryItem | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const isLow = (i: InventoryItem) => i.stockBoxes <= i.lowStockThreshold;
+  const isLow = (i: InventoryItem) => i.stockSqm <= i.lowStockThreshold;
 
   const visible = items.filter(
     (i) =>
@@ -34,7 +34,7 @@ export function InventorySection({
     setSaving(true);
     try {
       await api.updateStock(editing.id, {
-        stockBoxes: editing.stockBoxes,
+        stockSqm: editing.stockSqm,
         lowStockThreshold: editing.lowStockThreshold,
       });
       toast.success("Stock updated");
@@ -80,7 +80,7 @@ export function InventorySection({
         <table className="w-full min-w-170 text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/60 text-left">
-              {["Product", "SKU", "Size", "In stock (boxes)", "Alert at", ""].map((h) => (
+              {["Product", "SKU", "Size", "In stock (m²)", "Alert at (m²)", ""].map((h) => (
                 <th key={h} className="px-4 py-3 text-xs font-semibold uppercase">{h}</th>
               ))}
             </tr>
@@ -97,8 +97,8 @@ export function InventorySection({
                 <td className="px-4 py-3">{i.sku}</td>
                 <td className="px-4 py-3">{i.size}</td>
                 <td className="px-4 py-3">
-                  <span className="mr-2 font-semibold">{i.stockBoxes}</span>
-                  {i.stockBoxes === 0 ? (
+                  <span className="mr-2 font-semibold">{i.stockSqm}</span>
+                  {i.stockSqm === 0 ? (
                     <Badge variant="destructive">Out</Badge>
                   ) : isLow(i) ? (
                     <Badge variant="outline">Low</Badge>
@@ -132,13 +132,13 @@ export function InventorySection({
           saving={saving}
         >
           <div>
-            <Label>Boxes in stock</Label>
+            <Label>Stock (m²)</Label>
             <Input
               type="number"
               min={0}
-              value={editing.stockBoxes}
+              value={editing.stockSqm}
               onChange={(e) =>
-                setEditing({ ...editing, stockBoxes: Math.max(0, Number(e.target.value) || 0) })
+                setEditing({ ...editing, stockSqm: Math.max(0, Number(e.target.value) || 0) })
               }
             />
           </div>

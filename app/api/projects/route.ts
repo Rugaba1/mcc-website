@@ -1,28 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
+import type { Prisma } from "@/lib/generated/prisma/client";
+import { pageForTotal, paginatedResult, parsePagination } from "@/lib/server-pagination";
 
 // ── GET /api/projects ─────────────────────────────────────────────────────────
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  console.log(searchParams.values());
-
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (req: NextRequest) => {
+  const { searchParams } = req.nextUrl;
+  const pagination = parsePagination(searchParams);
+  if (!pagination) {
+    return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
+  }
   const type = searchParams.get("activeType");
-
-const selectedProject = searchParams.get("selectedProject");
-  const where: any = {};
+  const selectedProjectParam = searchParams.get("selectedProject");
+  const selectedProject = selectedProjectParam === "undefined" ? null : selectedProjectParam;
+  const selectedProjectId = selectedProject ? Number(selectedProject) : undefined;
+  if (selectedProject && (!Number.isSafeInteger(selectedProjectId) || Number(selectedProjectId) < 1)) {
+    return NextResponse.json({ error: "Invalid project id" }, { status: 400 });
+  }
+  const where: Prisma.ProjectWhereInput = {};
 
   if (type && type !== "All" && type !== 'undefined') {
     where.type = type;
   }
-
-    if (selectedProject  && selectedProject !== 'undefined') {
-      where.id = parseInt(selectedProject);
-    }
+  if (selectedProjectId) where.id = selectedProjectId;
+  if (pagination.search) {
+    where.OR = [
+      { title: { contains: pagination.search } },
+      { type: { contains: pagination.search } },
+      { description: { contains: pagination.search } },
+      { location: { contains: pagination.search } },
+    ];
+  }
   try {
+    let total = 0;
+    let page = pagination.page;
+    if (pagination.requested) {
+      total = await prisma.project.count({ where });
+      page = pageForTotal(total, pagination.page, pagination.pageSize).page;
+    }
     const rows = await prisma.project.findMany({
       where,
       orderBy: { id: "asc" },
-
+      ...(pagination.requested
+        ? { skip: (page - 1) * pagination.pageSize, take: pagination.pageSize }
+        : {}),
       include: {
         tiles: { include: { product: true } },
       },
@@ -41,7 +68,11 @@ const selectedProject = searchParams.get("selectedProject");
       tileIds: p.tiles.map((t) => t.productId),
       products: p.tiles,
     }));
-    return NextResponse.json(projects);
+    return NextResponse.json(
+      pagination.requested
+        ? paginatedResult(projects, total, page, pagination.pageSize)
+        : projects,
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(
@@ -49,10 +80,11 @@ const selectedProject = searchParams.get("selectedProject");
       { status: 500 },
     );
   }
-}
+});
 
 // ── POST /api/projects ────────────────────────────────────────────────────────
-export async function POST(req: NextRequest) {
+export const POST = withPermission(PERM.PROJECTS_MANAGE)(
+  async (req: NextRequest) => {
   try {
     const body = await req.json();
     const project = await prisma.project.create({
@@ -88,4 +120,5 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);

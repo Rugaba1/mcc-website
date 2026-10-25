@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../../../lib/prisma";
-import { requireStaff } from "../../../../../lib/auth/require-staff";
-import { sendContactReply } from "../../../../../lib/email";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
+import { sendContactReply } from "@/lib/email";
 
 export const runtime = "nodejs";
 
 const bodySchema = z.object({ reply: z.string().trim().min(1).max(5000) });
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { claims, error } = await requireStaff(request);
-  if (error) return error;
+export const POST = withPermission(PERM.MESSAGES_REPLY)(
+  async (request: NextRequest, context) => {
 
-  const id = Number((await params).id);
+  const id = Number((await context.params!).id);
   if (!Number.isSafeInteger(id) || id <= 0) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
@@ -51,7 +48,7 @@ export async function POST(
         status: "REPLIED",
         replyText: reply,
         repliedAt: new Date(),
-        repliedById: claims.userId,
+        repliedById: context.user.id,
       },
       select: { id: true, status: true, replyText: true, repliedAt: true },
     });
@@ -72,4 +69,4 @@ export async function POST(
       { status: 500 },
     );
   }
-}
+});

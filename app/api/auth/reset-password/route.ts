@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "../../../../lib/prisma";
-import { checkResetCode } from "../../../../lib/auth/reset-request";
+import { prisma } from "@/lib/prisma";
 import { sendPasswordChangedEmail } from "@/lib/email";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { clearRefreshCookie } from "@/lib/auth/csrf";
+import { otpBinding, verifyStatelessChallenge } from "@/lib/auth/stateless-otp";
+import { isEmailBlocklisted } from "@/lib/auth/email-blocklist";
 
 export const runtime = "nodejs";
 
 const resetPasswordSchema = z
   .object({
-    email: z.string().trim().toLowerCase().email(),
-    otp: z
-      .string()
-      .trim()
-      .regex(/^\d{6}$/, "Code must be 6 digits"),
+    token: z.string().min(20).max(2048),
     newPassword: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -23,37 +22,65 @@ const resetPasswordSchema = z
   .refine((d) => d.newPassword === d.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  });
+  }).strict();
 
-export async function POST(request: NextRequest) {
+export const POST = withRateLimit({
+  interval: 60 * 60_000,
+  uniqueTokenPerInterval: 10,
+})(async (request: NextRequest) => {
   try {
-    const { email, otp, newPassword } = resetPasswordSchema.parse(
+    const { token, newPassword } = resetPasswordSchema.parse(
       await request.json(),
     );
 
-    const result = await checkResetCode(email, otp);
-    if (!result) {
+    const verified = verifyStatelessChallenge(token, "password-reset");
+    const userId = verified && /^\d+$/.test(verified.subject)
+      ? Number(verified.subject)
+      : Number.NaN;
+    const user = Number.isSafeInteger(userId) && userId > 0
+      ? await prisma.user.findUnique({
+          where: { id: userId },
+        })
+      : null;
+    if (
+      !verified ||
+      !user?.isActive ||
+      (user && (await isEmailBlocklisted(user.email))) ||
+      verified.binding !== otpBinding(user.password)
+    ) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid or expired code. Please request a new one.",
-        },
+        { error: "Invalid or expired reset link. Please request a new one." },
         { status: 400 },
       );
     }
 
     const password = await bcrypt.hash(newPassword, 12);
 
-    // Change the password and burn every reset request for this user together
-    await prisma.$transaction([
-      prisma.user.update({ where: { id: result.user.id }, data: { password } }),
-      prisma.forgetPasswordRequest.deleteMany({
-        where: { userId: result.user.id },
-      }),
-    ]);
+    const changed = await prisma.$transaction(async (tx) => {
+      const result = await tx.user.updateMany({
+        where: { id: user.id, isActive: true, password: user.password },
+        data: { password },
+      });
+      if (result.count !== 1) return false;
+
+      await tx.forgetPasswordRequest.deleteMany({
+        where: { userId: user.id },
+      });
+      await tx.refreshToken.updateMany({
+        where: { userId: user.id },
+        data: { revokedAt: new Date(), replacedById: null },
+      });
+      return true;
+    });
+    if (!changed) {
+      return NextResponse.json(
+        { error: "Invalid or expired reset link. Please request a new one." },
+        { status: 400 },
+      );
+    }
     await sendPasswordChangedEmail(
-      result.user.email,
-      result.user.firstName,
+      user.email,
+      user.firstName,
     );
 
     const res = NextResponse.json({
@@ -62,8 +89,7 @@ export async function POST(request: NextRequest) {
         "Password reset successfully. Please sign in with your new password.",
     });
     // Drop any session cookies in this browser
-    res.cookies.set("refresh_token", "", { path: "/api/auth", maxAge: 0 });
-    res.cookies.set("auth_token", "", { path: "/", maxAge: 0 });
+    clearRefreshCookie(res);
     return res;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -78,4 +104,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

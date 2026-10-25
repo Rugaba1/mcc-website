@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { blankToNull, serializeVariant, variantSchema } from "@/lib/variant";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
 
 const createSchema = variantSchema.extend({
-  stockBoxes: z.number().int().min(0).max(1_000_000).default(0),
-  lowStockThreshold: z.number().int().min(0).max(1_000_000).default(0),
+  stockSqm: z.number().min(0).max(10_000_000).default(0),
+  lowStockThreshold: z.number().min(0).max(10_000_000).default(0),
 });
 
 const productIdOf = async (ctx: Ctx) => {
@@ -18,10 +19,9 @@ const productIdOf = async (ctx: Ctx) => {
 };
 
 // Admin list: includes inactive variants and current stock
-export async function GET(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const productId = await productIdOf(ctx);
+export const GET = withPermission(PERM.VARIANTS_MANAGE)(
+  async (_req: NextRequest, context) => {
+  const productId = await productIdOf(context as Ctx);
   if (!productId)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
@@ -33,43 +33,54 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   return NextResponse.json(
     rows.map(({ inventory, ...v }) => ({
       ...serializeVariant(v),
-      stockBoxes: inventory?.onHandBoxes ?? 0,
+      stockSqm: Number(inventory?.onHandSqm ?? 0),
       lowStockThreshold: inventory?.reorderLevel ?? 0,
     })),
   );
-}
+  },
+);
 
-export async function POST(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const productId = await productIdOf(ctx);
+export const POST = withPermission(PERM.VARIANTS_MANAGE)(
+  async (req: NextRequest, context) => {
+  const productId = await productIdOf(context as Ctx);
   if (!productId)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
-    const { stockBoxes, lowStockThreshold, ...rest } = createSchema.parse(
+    const { stockSqm, lowStockThreshold, ...rest } = createSchema.parse(
       await req.json(),
     );
+    const baseCurrency = await prisma.currency.findFirst({
+      where: { isBase: true, enabled: true },
+      select: { code: true },
+    });
+    if (!baseCurrency) {
+      return NextResponse.json(
+        { error: "Store base currency is not configured" },
+        { status: 503 },
+      );
+    }
 
     const created = await prisma.$transaction(async (tx) => {
       const variant = await tx.productVariant.create({
-        data: { ...blankToNull(rest), productId },
+        data: { ...blankToNull(rest), productId, currency: baseCurrency.code },
       });
       await tx.inventory.create({
         data: {
           variantId: variant.id,
-          onHandBoxes: stockBoxes,
+          onHandSqm: stockSqm,
+          reservedSqm: 0,
           reorderLevel: lowStockThreshold,
         },
       });
-      if (stockBoxes > 0) {
+      if (stockSqm > 0) {
         await tx.stockMovement.create({
           data: {
             variantId: variant.id,
             type: "PURCHASE",
-            quantity: stockBoxes,
+            quantity: stockSqm,
             note: "Initial stock",
-            createdById: claims.userId,
+            createdById: context.user.id,
           },
         });
       }
@@ -77,7 +88,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     });
 
     return NextResponse.json(
-      { ...serializeVariant(created), stockBoxes, lowStockThreshold },
+      { ...serializeVariant(created), stockSqm, lowStockThreshold },
       { status: 201 },
     );
   } catch (e) {
@@ -100,4 +111,4 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

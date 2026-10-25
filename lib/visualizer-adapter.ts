@@ -1,4 +1,4 @@
-import { type Product, type ProductVariant } from "./api";
+import { api, type Product, type ProductVariant } from "./api";
 import { type TileProduct, type TileSizeOption } from "../data/catalog";
 import { ALL_ROOM_SCENES, type SceneDefinition } from "../data/scenes";
 
@@ -95,7 +95,7 @@ export function dbProductToTileProduct(prod: Product): TileProduct {
           sku: v.sku,
           ratio: deriveRatio(v.size),
           specifier: v.sku,
-          swatchUrl: v.image || prod.image,
+          swatchUrl: v.textureUrl || v.image || prod.image,
           pricePerBox: v.pricePerBox,
           pricePerSqm: v.pricePerSqm,
           variantId: v.id,
@@ -127,7 +127,7 @@ export function dbProductToTileProduct(prod: Product): TileProduct {
     ratio: activeSize.ratio,
     material: prod.material || "Porcelain",
     colorCategory: colorCat,
-    swatchUrl: primaryVariant?.image || prod.image,
+    swatchUrl: primaryVariant?.textureUrl || primaryVariant?.image || prod.image,
     pricePerBox: primaryVariant?.pricePerBox || 32000,
     pricePerSqm: primaryVariant?.pricePerSqm || 22000,
     category: prod.category,
@@ -141,16 +141,7 @@ export function dbProductToTileProduct(prod: Product): TileProduct {
  */
 export async function fetchVisualizerProducts(): Promise<Product[]> {
   try {
-    const res = await fetch("/api/visualizer-products", { cache: "no-store" });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.status}`);
-    }
-    const resp = await res.json();
-    const products: Product[] = resp.products;
-    if (!Array.isArray(products)) {
-      return [];
-    }
-    return products;
+    return await api.getVisualizerProducts();
   } catch (err) {
     console.error("fetchVisualizerProducts error:", err);
     return [];
@@ -162,11 +153,7 @@ export async function fetchVisualizerProducts(): Promise<Product[]> {
  */
 export async function fetchVisualizerScenes(): Promise<SceneDefinition[]> {
   try {
-    const res = await fetch("/api/visualizer/scenes", { cache: "no-store" });
-    if (!res.ok) {
-      return ALL_ROOM_SCENES;
-    }
-    const scenes = await res.json();
+    const scenes = await api.getVisualizerScenes();
     return Array.isArray(scenes) && scenes.length > 0
       ? scenes
       : ALL_ROOM_SCENES;

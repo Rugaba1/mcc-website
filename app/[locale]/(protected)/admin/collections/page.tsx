@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Layers, Pencil, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,11 +15,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 const PAGE_SIZE = 10;
 
 export default function AdminCollectionsPage() {
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -34,13 +38,22 @@ export default function AdminCollectionsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setCollections(await api.getCollections());
+      const result = await api.getCollectionsPage({
+        page,
+        limit: PAGE_SIZE,
+        q: debouncedSearch.trim(),
+        filters: {},
+      });
+      setCollections(result.items);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      if (result.page !== page) setPage(result.page);
     } catch (e) {
       toast.error(apiErrorMessage(e, "Failed to load collections"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [debouncedSearch, page]);
 
   useEffect(() => {
     load();
@@ -50,16 +63,7 @@ export default function AdminCollectionsPage() {
     setPage(1);
   }, [debouncedSearch]);
 
-  // The API returns every collection, so search and paging happen here.
-  const filtered = useMemo(() => {
-    const q = debouncedSearch.trim().toLowerCase();
-    if (!q) return collections;
-    return collections.filter((c) => c.name.toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q));
-  }, [collections, debouncedSearch]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const rows = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const rows = collections;
 
   const openCreate = () => {
     setEditing(null);
@@ -92,9 +96,11 @@ export default function AdminCollectionsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Collections</h1>
           <p className="text-sm text-muted-foreground">Series that group tiles together on the site.</p>
         </div>
-        <Button className="rounded-none" onClick={openCreate}>
-          <Plus /> Add collection
-        </Button>
+        <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+          <Button className="rounded-none" onClick={openCreate}>
+            <Plus /> Add collection
+          </Button>
+        </PermissionGate>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -139,9 +145,11 @@ export default function AdminCollectionsPage() {
                     <Layers className="size-7" />
                     {search ? "No collections match your search." : "No collections yet."}
                     {!search && (
-                      <Button className="mt-1 rounded-none" onClick={openCreate}>
-                        <Plus /> Create your first collection
-                      </Button>
+                      <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+                        <Button className="mt-1 rounded-none" onClick={openCreate}>
+                          <Plus /> Create your first collection
+                        </Button>
+                      </PermissionGate>
                     )}
                   </div>
                 </TableCell>
@@ -163,7 +171,7 @@ export default function AdminCollectionsPage() {
                   <TableCell>
                     {c.featured ? (
                       <Badge variant="secondary" className="gap-1 rounded-none">
-                        <Star className="size-3 fill-amber-400 text-amber-400" /> Featured
+                        <Star className="size-3 fill-warning text-warning" /> Featured
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground">—</span>
@@ -171,18 +179,22 @@ export default function AdminCollectionsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(c)} aria-label={`Edit ${c.name}`}>
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 rounded-none text-destructive hover:text-destructive"
-                        onClick={() => setDeleting(c)}
-                        aria-label={`Delete ${c.name}`}
-                      >
-                        <Trash2 />
-                      </Button>
+                      <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+                        <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(c)} aria-label={`Edit ${c.name}`}>
+                          <Pencil />
+                        </Button>
+                      </PermissionGate>
+                      <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-none text-destructive hover:text-destructive"
+                          onClick={() => setDeleting(c)}
+                          aria-label={`Delete ${c.name}`}
+                        >
+                          <Trash2 />
+                        </Button>
+                      </PermissionGate>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -191,19 +203,23 @@ export default function AdminCollectionsPage() {
           </TableBody>
         </Table>
 
-        <DataPagination page={currentPage} totalPages={totalPages} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+        <DataPagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} disabled={loading} />
       </div>
 
-      <CollectionDialog open={dialogOpen} onOpenChange={setDialogOpen} collection={editing} onSaved={load} />
+      <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+        <CollectionDialog open={dialogOpen} onOpenChange={setDialogOpen} collection={editing} onSaved={load} />
+      </PermissionGate>
 
-      <ConfirmDelete
-        open={!!deleting}
-        onOpenChange={(o) => !o && setDeleting(null)}
-        title="Delete this collection?"
-        description={`“${deleting?.name ?? ""}” will be removed. The products inside it are not deleted.`}
-        busy={deleteBusy}
-        onConfirm={confirmDelete}
-      />
+      <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
+        <ConfirmDelete
+          open={!!deleting}
+          onOpenChange={(o) => !o && setDeleting(null)}
+          title="Delete this collection?"
+          description={`“${deleting?.name ?? ""}” will be removed. The products inside it are not deleted.`}
+          busy={deleteBusy}
+          onConfirm={confirmDelete}
+        />
+      </PermissionGate>
     </main>
   );
 }

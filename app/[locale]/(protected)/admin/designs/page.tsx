@@ -6,46 +6,55 @@ import { toast } from "sonner";
 
 import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type SavedVisualizerDesign } from "@/lib/api";
-import { fmtDateTime } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { DataPagination } from "@/components/admin/data-pagination";
 
+const PAGE_SIZE = 18;
 export default function AdminSavedDesignsPage() {
+  const { dateTime } = useFormatters();
     const [designs, setDesigns] = useState<SavedVisualizerDesign[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const q = useDebouncedValue(search, 250);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     const load = useCallback(async () => {
+        setLoading(true);
         try {
-            setDesigns(await api.getAdminVisualizerDesigns());
+            const result = await api.getAdminVisualizerDesignsPage(page, PAGE_SIZE, q.trim());
+            setDesigns(result.items);
+            setTotal(result.total);
+            setTotalPages(result.totalPages);
+            if (result.page !== page) setPage(result.page);
         } catch (error) {
             toast.error(apiErrorMessage(error, "Could not load saved designs"));
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [page, q]);
 
     useEffect(() => { void load(); }, [load]);
+    useEffect(() => { setPage(1); }, [q]);
 
     const remove = async (design: SavedVisualizerDesign) => {
         if (!confirm(`Delete “${design.name || "Untitled design"}”?`)) return;
         try {
             await api.deleteAdminVisualizerDesign(design.id);
-            setDesigns((current) => current.filter((item) => item.id !== design.id));
             toast.success("Design deleted");
+            await load();
         } catch (error) {
             toast.error(apiErrorMessage(error, "Could not delete design"));
         }
     };
 
-    const query = search.trim().toLowerCase();
-    const visible = designs.filter((design) => {
-        const owner = design.user
-            ? `${design.user.firstName} ${design.user.lastName ?? ""} ${design.user.email}`
-            : "guest";
-        const products = design.items.map((item) => item.variant.product.name).join(" ");
-        return !query || `${design.name ?? ""} ${owner} ${design.scene?.name ?? ""} ${products}`.toLowerCase().includes(query);
-    });
+    const visible = designs;
 
     return (
         <main className="space-y-6">
@@ -66,7 +75,7 @@ export default function AdminSavedDesignsPage() {
             ) : visible.length === 0 ? (
                 <div className="flex min-h-56 flex-col items-center justify-center gap-3 border text-center">
                     <Palette className="size-7 text-muted-foreground" />
-                    <p className="font-medium">{designs.length ? "No matching designs" : "No saved designs yet"}</p>
+                    <p className="font-medium">{q ? "No matching designs" : "No saved designs yet"}</p>
                 </div>
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -87,16 +96,28 @@ export default function AdminSavedDesignsPage() {
                                     <p className="mt-1 truncate text-xs text-muted-foreground">
                                         {design.user ? `${design.user.firstName} ${design.user.lastName ?? ""} · ${design.user.email}` : "Guest design"}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">Updated {fmtDateTime(design.updatedAt)}</p>
+                                    <p className="text-xs text-muted-foreground">Updated {dateTime(design.updatedAt)}</p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {design.shareToken && <Button asChild size="sm"><Link href={`/visualizer?design=${design.shareToken}`}><ExternalLink /> Open</Link></Button>}
-                                    <Button type="button" size="icon" variant="ghost" aria-label={`Delete ${design.name || "design"}`} onClick={() => void remove(design)}><Trash2 /></Button>
+                                    <PermissionGate required={PERM.CONTENT_MANAGE}>
+                                        <Button type="button" size="icon" variant="ghost" aria-label={`Delete ${design.name || "design"}`} onClick={() => void remove(design)}><Trash2 /></Button>
+                                    </PermissionGate>
                                 </div>
                             </div>
                         </article>
                     ))}
                 </div>
+            )}
+            {!loading && total > 0 && (
+                <DataPagination
+                    page={page}
+                    totalPages={totalPages}
+                    total={total}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setPage}
+                    disabled={loading}
+                />
             )}
         </main>
     );

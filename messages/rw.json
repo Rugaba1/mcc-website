@@ -2478,6 +2478,10 @@
     "timesValue": "Sunday at 10:00 AM",
     "mapPlaceholder": "Mbarara District, Uganda",
     "mapTitle": "Church location map",
+    "mapEmbedHeading": "Aho uruganda rwacu ruherereye",
+    "mapEmbedNotice": "Iyo ufunguye ikarita, uhuza na Google Maps kandi aderesi yawe ya IP ishobora koherezwa.",
+    "mapEmbedButton": "Fungura ikarita",
+    "mapEmbedTitle": "Ikarita y'aho Mountain Ceramics Co. Ltd. iherereye",
     "formTitle": "Send a Message",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
@@ -2699,18 +2703,21 @@
     "codeSent": "Code sent — check your email."
   },
   "cookieConsent": {
-    "title": "Cookie preferences",
-    "message": "Choose which cookies we can use. You can change this anytime from the privacy policy page.",
-    "necessaryLabel": "Necessary",
-    "necessaryDesc": "Keeps you signed in and remembers your language. Always on — the site can't function without these.",
-    "analyticsLabel": "Analytics",
-    "analyticsDesc": "Helps us understand how visitors use the site (Google Analytics). Off by default.",
-    "thirdPartyLabel": "Third-party embeds",
-    "thirdPartyDesc": "YouTube video, PayPal donations, and Google sign-in may set their own cookies when you use those features. We don't control these — see each provider's own privacy policy.",
-    "learnMore": "Learn more",
-    "necessaryOnly": "Necessary only",
-    "savePreferences": "Save preferences",
-    "accept": "Accept all"
+    "title": "Ibyerekeye kuki",
+    "message": "Dukoresha ububiko bukenewe kugira ngo urubuga rukore kandi rwibuke amahitamo yawe. Isesengura ritari ngombwa ntirikorwa utaryemeye.",
+    "necessaryLabel": "Iby'ingenzi",
+    "necessaryDesc": "Bifasha kwinjira, guhitamo ururimi n'ibindi wifuza kugaragaza, kandi bikabika iki cyemezo. Bihora bikora.",
+    "analyticsLabel": "Isesengura",
+    "analyticsDesc": "Byemerera Google Analytics gukusanya amakuru y'ikoreshwa ry'urubuga. Itangira gusa umaze kubyemera.",
+    "analyticsUnavailable": "Isesengura ritari ngombwa ntirashyizweho kuri uru rubuga.",
+    "privacyPolicy": "Soma politiki yacu y'ibanga",
+    "necessaryOnly": "Iby'ingenzi gusa",
+    "savePreferences": "Bika amahitamo",
+    "accept": "Emera byose",
+    "customize": "Hitamo ibyo wemera",
+    "changeSettings": "Igenamiterere rya kuki",
+    "cancel": "Hagarika",
+    "storageError": "Ntibyashobotse kubika amahitamo yawe kuri iki gikoresho. Azakurikizwa muri uru ruzinduko gusa."
   },
   "profilePage": {
     "not_using_it": "Not using it",
@@ -3744,5 +3751,14 @@
     "login": "Log in",
     "goHome": "Go home",
     "contact": "Contact us"
+  },
+  "accessGate": {
+    "deniedTitle": "Nta burenganzira bwo kugera aha",
+    "deniedDescription": "Konti yawe nta burenganzira ifite bwo kureba ibi. Niba utekereza ko ari ikosa, hamagara ubufasha.",
+    "disabledTitle": "Uru rupapuro ntiruboneka by’agateganyo",
+    "disabledDescription": "Iyi serivisi yahagaritswe by’agateganyo. Hamagara ubufasha niba ukeneye ko tugufasha.",
+    "removedTitle": "Uru rupapuro ntirukiboneka",
+    "removedDescription": "Iyi serivisi yakuweho kandi ntikiboneka.",
+    "contactSupport": "Hamagara ubufasha"
   }
 }

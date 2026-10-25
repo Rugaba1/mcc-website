@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { syncOrderPayment } from "@/lib/payments/sync";
 import { sendPaymentStatusEmail } from "@/lib/email";
 
@@ -13,10 +14,9 @@ const schema = z.object({
   reason: z.string().trim().min(3, "Give a reason for the refund").max(255),
 });
 
-export async function POST(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const id = Number((await ctx.params).id);
+export const POST = withPermission(PERM.PAYMENTS_REFUND)(
+  async (req: NextRequest, context) => {
+  const id = Number((await context.params!).id);
   if (!Number.isSafeInteger(id) || id <= 0)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
       const refunded =
         Math.round((Number(p.refundedAmount) + amount) * 100) / 100;
-      await tx.payment.update({
+      const payment = await tx.payment.update({
         where: { id },
         data: {
           refundedAmount: refunded,
@@ -63,10 +63,23 @@ export async function POST(req: NextRequest, ctx: Ctx) {
             refunded >= Number(p.amount) - 0.005
               ? "REFUNDED"
               : "PARTIALLY_REFUNDED",
-          recordedById: claims.userId,
+          recordedById: context.user.id,
         },
       });
-      const sync = await syncOrderPayment(tx, p.orderId, claims.userId);
+      await tx.adminNotification.create({
+        data: {
+          type: "payment",
+          requiredPermission: PERM.PAYMENTS_VIEW,
+          title:
+            refunded >= Number(p.amount) - 0.005
+              ? "Payment refunded"
+              : "Payment partially refunded",
+          message: `${p.order.orderNumber} · ${p.order.currency} ${amount}`,
+          targetPath: "/admin/payments",
+          entityId: payment.id,
+        },
+      });
+      const sync = await syncOrderPayment(tx, p.orderId, context.user.id);
       return {
         code: 200,
         sync,
@@ -120,4 +133,4 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { syncOrderPayment } from "@/lib/payments/sync";
 import { blankToNull } from "@/lib/variant";
 import { sendPaymentStatusEmail } from "@/lib/email";
@@ -34,10 +35,9 @@ const schema = z.object({
 });
 
 // PUT /api/payments/[id] — confirm a manual payment, mark it failed, fix the reference or notes
-export async function PUT(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const id = Number((await ctx.params).id);
+export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
+  async (req: NextRequest, context) => {
+  const id = Number((await context.params!).id);
   if (!Number.isSafeInteger(id) || id <= 0)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 
       const data: Prisma.PaymentUncheckedUpdateInput = {
         ...rest,
-        recordedById: claims.userId,
+        recordedById: context.user.id,
       };
       if (rest.status === "PAID") {
         data.paidAt = paidAt
@@ -88,7 +88,23 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
       }
 
       const payment = await tx.payment.update({ where: { id }, data });
-      const sync = await syncOrderPayment(tx, current.orderId, claims.userId);
+      if (
+        rest.status &&
+        rest.status !== current.status &&
+        (rest.status === "PAID" || rest.status === "FAILED")
+      ) {
+        await tx.adminNotification.create({
+          data: {
+            type: "payment",
+            requiredPermission: PERM.PAYMENTS_VIEW,
+            title: rest.status === "PAID" ? "Payment confirmed" : "Payment failed",
+            message: `${current.order.orderNumber} · ${current.order.currency} ${current.amount}`,
+            targetPath: "/admin/payments",
+            entityId: payment.id,
+          },
+        });
+      }
+      const sync = await syncOrderPayment(tx, current.orderId, context.user.id);
       return {
         code: 200,
         payment,
@@ -150,4 +166,4 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

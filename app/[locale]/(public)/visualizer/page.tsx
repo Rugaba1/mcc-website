@@ -6,7 +6,6 @@ import { ALL_ROOM_SCENES, DEFAULT_SCENE, SceneDefinition } from "@/data/scenes";
 import { TILES_CATALOG, GROUT_CATALOG, PATTERNS_CATALOG, TileProduct } from "@/data/catalog";
 import { SelectionMap, SurfaceSelection } from "@/types/visualizer";
 import { api, apiErrorMessage, type Product } from "@/lib/api";
-import apiClient from "@/lib/api-client";
 import { HeaderMenu } from "@/components/HeaderMenu";
 import { SurfaceTabs } from "@/components/SurfaceTabs";
 import { VisualizerCanvas } from "@/components/VisualizerCanvas";
@@ -145,17 +144,10 @@ export default function VisualizerPage() {
         items,
       };
       const result = activeDesignToken
-        ? (
-          await apiClient.put<{
-            success: boolean;
-            designId: number;
-            shareToken: string;
-            shareUrl: string;
-          }>("/api/visualizer/designs", {
-            ...designData,
-            shareToken: activeDesignToken,
-          })
-        ).data
+        ? await api.updateVisualizerDesign({
+          ...designData,
+          shareToken: activeDesignToken,
+        })
         : await api.createVisualizerDesign(designData);
       setActiveDesignToken(result.shareToken);
       const url = new URL(window.location.href);
@@ -240,7 +232,11 @@ export default function VisualizerPage() {
               sku: variant.sku,
               ratio: size?.ratio ?? tile.ratio,
               specifier: size?.specifier ?? tile.specifier,
-              swatchUrl: variant.image || size?.swatchUrl || tile.swatchUrl,
+              swatchUrl:
+                variant.textureUrl ||
+                variant.image ||
+                size?.swatchUrl ||
+                tile.swatchUrl,
             };
             const pattern = PATTERNS_CATALOG.find(
               (candidate) => candidate.name === item.layout || String(candidate.id) === item.layout,
@@ -504,7 +500,7 @@ export default function VisualizerPage() {
       {/* 3. Main Workspace: Canvas Stage + Product Catalog Sidebar */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Canvas Visualizer Stage (Left / Center) */}
-        <main className="flex-1 h-full min-h-87.5 relative bg-dark flex items-center justify-center p-2 lg:p-4">
+        <main className="flex-1 h-full min-h-87.5 relative bg-inverse flex items-center justify-center p-2 lg:p-4">
           <div className="w-full h-full max-w-350 max-h-212.5 relative  overflow-hidden shadow-2xl border ">
             {isCompareMode ? (
               <CompareSlider
@@ -529,7 +525,7 @@ export default function VisualizerPage() {
         </main>
 
         {/* Product Catalog & Finishes Drawer (Right) */}
-        <aside className="w-full lg:w-95 xl:w-105 sm:h-[60vh] h-full lg:h-full shrink-0 flex flex-col bg-dark z-20   ">
+        <aside className="w-full lg:w-95 xl:w-105 sm:h-[60vh] h-full lg:h-full shrink-0 flex flex-col bg-inverse z-20   ">
           <ProductPicker
             surface={activeSurface}
             currentSelection={currentSelections[activeSurfaceSortOrder]}

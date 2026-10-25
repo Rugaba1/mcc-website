@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { sendCustomerNotificationEmail } from "@/lib/email";
 
 const PAGE_SIZE = 10;
@@ -10,10 +11,8 @@ const moderateSchema = z.object({
   approved: z.boolean(),
 });
 
-export async function GET(request: NextRequest) {
-  const { error } = await requireStaff(request);
-  if (error) return error;
-
+export const GET = withPermission(PERM.REVIEWS_MODERATE)(
+  async (request: NextRequest) => {
   const pageParam = Number(request.nextUrl.searchParams.get("page") ?? 1);
   const page = Number.isSafeInteger(pageParam) && pageParam > 0 ? pageParam : 1;
   const status = request.nextUrl.searchParams.get("status") ?? "pending";
@@ -65,12 +64,11 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function PATCH(request: NextRequest) {
-  const { claims, error } = await requireStaff(request);
-  if (error) return error;
-
+export const PATCH = withPermission(PERM.REVIEWS_MODERATE)(
+  async (request: NextRequest, { user }) => {
   const parsed = moderateSchema.safeParse(await request.json());
   if (!parsed.success)
     return NextResponse.json(
@@ -101,7 +99,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({
       id: review.id,
       approved: review.approved,
-      changedById: claims.userId,
+      changedById: user.id,
     });
   } catch (cause) {
     if ((cause as { code?: string })?.code === "P2025")
@@ -112,12 +110,11 @@ export async function PATCH(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(request: NextRequest) {
-  const { error } = await requireStaff(request);
-  if (error) return error;
-
+export const DELETE = withPermission(PERM.REVIEWS_MODERATE)(
+  async (request: NextRequest) => {
   const id = Number(request.nextUrl.searchParams.get("id"));
   if (!Number.isSafeInteger(id) || id < 1)
     return NextResponse.json({ error: "Invalid review id" }, { status: 400 });
@@ -134,4 +131,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

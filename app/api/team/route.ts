@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 
 export const revalidate = 300;
 
-export async function GET() {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (_request: NextRequest) => {
   const users = await prisma.user.findMany({
     where: { isActive: true, showOnHomepage: true },
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
@@ -26,4 +30,4 @@ export async function GET() {
       image: u.profilePicture,
     })),
   );
-}
+});

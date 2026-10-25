@@ -7,6 +7,8 @@ import { TileProduct } from "@/data/catalog";
 import { Code, Trash2, CheckCircle, ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
+import { useFormatters } from "@/contexts/format-context";
 
 interface AppliedSummaryProps {
   scene: SceneDefinition;
@@ -24,6 +26,7 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
   onClearAll,
 }) => {
   const { addToCart } = useCart();
+  const { displayMoney } = useFormatters();
   const [showDsl, setShowDsl] = useState<boolean>(false);
   const [addedAllToast, setAddedAllToast] = useState<boolean>(false);
 
@@ -50,15 +53,26 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
       const sel = selections[surf.sortOrder];
       if (sel && sel.productType === "tile") {
         const tile = sel.product as TileProduct;
+        const variant = tile.availableSizes.find((size) => size.variantId != null);
+        const variantId = variant?.variantId;
+        const pricePerSqm = variant?.pricePerSqm ?? tile.pricePerSqm;
+        if (!variantId || typeof pricePerSqm !== "number" || pricePerSqm <= 0) {
+          toast.error(`${tile.name} is not available for online ordering yet.`);
+          return;
+        }
         addToCart({
-          id: String(tile.id),
+          variantId,
+          productId: tile.id,
           name: `${tile.name} (${tile.size})`,
-          price: tile.pricePerBox || 32000,
-          color: tile.color,
-          size: tile.size,
           image: tile.swatchUrl,
-          qty: 1,
-        });
+          size: tile.size,
+          finish: null,
+          color: tile.color,
+          saleType: "SQM",
+          pricePerSqm,
+          containerPricePerSqm: variant?.containerPricePerSqm ?? tile.containerPricePerSqm ?? null,
+          sqmPerContainer: variant?.sqmPerContainer ?? tile.sqmPerContainer ?? null,
+        }, 1);
       }
     });
     setAddedAllToast(true);
@@ -66,7 +80,7 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
   };
 
   return (
-    <div className="bg-dark border-t border p-3 select-none">
+    <div className="bg-inverse border-t border p-3 select-none">
       <div className="flex items-center flex-wrap justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-foreground">
@@ -104,7 +118,7 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
                   </div>
                   <div className="text-[10px] text-primary font-normal">
                     {sel.product.name}
-                    {pricePerBox ? ` • ${pricePerBox.toLocaleString()} RWF` : ""}
+                    {pricePerBox ? ` • ${displayMoney(pricePerBox)}` : ""}
                   </div>
                 </div>
                 <Button
@@ -129,7 +143,7 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
 
 
       {showDsl && (
-        <div className="mt-2.5 p-2.5  bg-dark border  text-[11px] font-mono space-y-1.5">
+        <div className="mt-2.5 p-2.5  bg-inverse border  text-[11px] font-mono space-y-1.5">
           <div>
             <span className="text-muted-foreground block text-[10px]">URL Selection Vector (sel):</span>
             <div className="text-primary break-all select-all">{selString}</div>

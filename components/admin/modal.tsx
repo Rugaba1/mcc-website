@@ -23,7 +23,7 @@ export function Modal({
   children: React.ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/50 p-4 backdrop-blur-sm">
       <div className={`max-h-[90vh] w-full ${maxWidth} overflow-y-auto rounded-2xl bg-background shadow-2xl`}>
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h3 className="font-bold">{title}</h3>

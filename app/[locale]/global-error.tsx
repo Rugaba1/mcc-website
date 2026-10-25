@@ -24,10 +24,10 @@ export default function GlobalError({
           <div className="mx-auto mt-2 h-px w-24 bg-primary" />
 
           <h1 className="mt-8 text-2xl font-bold text-foreground sm:text-3xl">
-            Something went wrong
+            Mountain Ceramic hit a snag
           </h1>
           <p className="mt-3 max-w-md text-base text-muted-foreground">
-            An unexpected error occurred. Please try again, or head back home.
+            We couldn&apos;t load this page right now. Please try again or return to Mountain Ceramic.
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
@@ -41,7 +41,7 @@ export default function GlobalError({
               href="/"
               className="border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
             >
-              Go home
+              Mountain Ceramic home
             </a>
           </div>
         </main>

@@ -6,6 +6,7 @@ import { colord, extend } from "colord";
 import namesPlugin from "colord/plugins/names";
 import { Plus, X } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -47,11 +48,11 @@ export function ColorsField({ value, onChange }: { value: string[]; onChange: (v
   return (
     <div className="flex flex-wrap items-center gap-2">
       {value.map((c) => (
-        <span key={c} className="inline-flex items-center gap-1.5 border bg-secondary px-2 py-1 text-xs capitalize">
+        <Badge key={c} variant="secondary" className="h-auto gap-1.5 border px-2 py-1 text-xs capitalize">
           <Swatch value={c} />
           {colorName(c)}
           <button type="button" aria-label={`Remove ${c}`} onClick={() => onChange(value.filter((x) => x !== c))}><X className="size-3" /></button>
-        </span>
+        </Badge>
       ))}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

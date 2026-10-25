@@ -93,7 +93,7 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
       ref={containerRef}
       onMouseMove={handleContainerMouseMove}
       onClick={handleContainerClick}
-      className={`relative w-full h-full flex items-center justify-center bg-dark overflow-hidden select-none ${className || ""}`}
+      className={`relative w-full h-full flex items-center justify-center bg-inverse overflow-hidden select-none ${className || ""}`}
     >
       {/* 1. Base Layer: Right Side (Design B) */}
       <div className="absolute inset-0 w-full h-full flex items-center justify-center">
@@ -128,7 +128,7 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
 
 
       {/* Informative Hint Pill */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1   bg-dark/90  text-accent text-[11px]   backdrop-blur-md pointer-events-none">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1 bg-inverse/90 text-inverse-foreground border border-inverse-border text-[11px] backdrop-blur-md pointer-events-none">
         Move mouse left/right of slider to customize each side
       </div>
 
@@ -139,7 +139,7 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
       >
-        <div className="w-8 h-8   bg-primary  -2 -stone-900 flex items-center justify-center   hover:scale-110 active:scale-95 transition-transform cursor-grab active:cursor-grabbing">
+        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 active:scale-95 transition-transform cursor-grab active:cursor-grabbing">
           <GripVertical className="w-4 h-4" />
         </div>
       </div>

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth/require-user";
+import { withAuth } from "@/lib/middleware/withAuth";
 import { syncOrderPayment, totalsOf } from "@/lib/payments/sync";
 import { blankToNull } from "@/lib/variant";
 import { sendAdminNotificationEmail } from "@/lib/email";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -39,9 +40,7 @@ const schema = z
   });
 
 // POST /api/me/orders/[id]/payments — the customer says "I paid", staff then verify it
-export async function POST(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireUser(req);
-  if (error) return error;
+export const POST = withAuth(async (req: NextRequest, { user, ...ctx }) => {
   const orderId = Number((await ctx.params).id);
   if (!Number.isSafeInteger(orderId) || orderId <= 0)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
     const result = await prisma.$transaction(async (tx) => {
       const order = await tx.order.findFirst({
-        where: { id: orderId, userId: claims.userId },
+        where: { id: orderId, userId: user.id },
         select: {
           grandTotal: true,
           currency: true,
@@ -102,7 +101,17 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           note: body.note,
         },
       });
-      await syncOrderPayment(tx, orderId, claims.userId);
+      await tx.adminNotification.create({
+        data: {
+          type: "payment",
+          requiredPermission: PERM.PAYMENTS_VIEW,
+          title: "Customer submitted payment",
+          message: `${order.orderNumber} · ${order.currency} ${amount}`,
+          targetPath: "/admin/payments",
+          entityId: payment.id,
+        },
+      });
+      await syncOrderPayment(tx, orderId, user.id);
       return {
         code: 201,
         id: payment.id,
@@ -148,4 +157,4 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

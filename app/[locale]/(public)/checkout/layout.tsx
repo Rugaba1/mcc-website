@@ -1,10 +1,22 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { siteConfig } from "@/config/site.config";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-    title: "Tile Collections — Mountain Ceramics Company",
-    description: "Browse MCC tile collections. Select a collection to visualize tiles in a real room.",
-};
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+    return createPageMetadata({
+      locale,
+      path: "/checkout",
+      title: `Secure Checkout | ${siteConfig.siteName}`,
+      description: "Complete your tile order with Mountain Ceramics Company.",
+      noIndex: true,
+    });
+}
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
     return <>

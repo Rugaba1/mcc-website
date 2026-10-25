@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { COMPANY } from "@/lib/company";
 
 export default function CtaBand() {
   return (
@@ -12,7 +13,7 @@ export default function CtaBand() {
         sizes="100vw"
         unoptimized />
       {/* Dark + gold overlay */}
-      <div className="absolute inset-0 bg-dark/80" />
+      <div className="absolute inset-0 bg-inverse/80" />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent" />
 
       {/* Tile grid overlay */}
@@ -48,7 +49,7 @@ export default function CtaBand() {
           <div className="flex flex-wrap gap-4 justify-center">
             <a
               href="#contact"
-              className="group bg-primary hover:bg-[#f0d080] hover:  font-bold px-10 py-4 transition-all duration-300 shadow-xl shadow-primary/20 flex items-center gap-3 text-sm tracking-widest uppercase"
+              className="group bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-10 py-4 transition-all duration-300 shadow-xl shadow-primary/20 flex items-center gap-3 text-sm tracking-widest uppercase"
             >
               Get Free Quote
               <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -56,8 +57,8 @@ export default function CtaBand() {
               </svg>
             </a>
             <a
-              href="tel:+250788000000"
-              className=" /40 hover:-primary /5 hover:bg-primary/10  font-bold px-10 py-4 transition-all duration-300 flex items-center gap-3 text-sm tracking-widest uppercase backdrop-blur-sm"
+              href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}
+              className="border border-overlay-foreground/40 hover:border-primary bg-overlay/5 hover:bg-primary/10 text-overlay-foreground font-bold px-10 py-4 transition-all duration-300 flex items-center gap-3 text-sm tracking-widest uppercase backdrop-blur-sm"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
@@ -67,7 +68,7 @@ export default function CtaBand() {
           </div>
 
           {/* Trust row */}
-          <div className="flex flex-wrap justify-center gap-8 mt-14 pt-10 -t /10">
+          <div className="flex flex-wrap justify-center gap-8 mt-14 pt-10 border-t border-overlay-foreground/10">
             {[
               { num: "500+", label: "Projects Done" },
               { num: "15+", label: "Years Experience" },

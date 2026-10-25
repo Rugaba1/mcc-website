@@ -10,6 +10,10 @@ import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { DataPagination } from "@/components/admin/data-pagination";
 
 import { Button } from "@/components/ui/button";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { hasPermissions } from "@/lib/permissions/core";
+import { useAuth } from "@/contexts/auth-context";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +33,8 @@ export function FileManager({
   kind?: Kind; // lock the list to images or documents (used by pickers)
   onSelect?: (file: MediaFile) => void;
 }) {
+  const { user } = useAuth();
+  const canUpload = Boolean(user && hasPermissions(user.permissions, PERM.MEDIA_UPLOAD));
   const [kind, setKind] = useState<Kind>(fixedKind ?? "all");
   const [search, setSearch] = useState("");
   const q = useDebouncedValue(search);
@@ -70,6 +76,7 @@ export function FileManager({
 
   const upload = useCallback(
     async (list: FileList | File[] | null) => {
+      if (!canUpload) return;
       const arr = list ? Array.from(list) : [];
       if (!arr.length) return;
       setProgress(0);
@@ -86,7 +93,7 @@ export function FileManager({
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [mode],
+    [canUpload, mode],
   );
 
   const copy = async (f: MediaFile) => {
@@ -142,13 +149,15 @@ export function FileManager({
             </TabsList>
           </Tabs>
         )}
-        <div className="ml-auto">
-          <input ref={inputRef} type="file" multiple accept={accept} className="hidden" onChange={(e) => upload(e.target.files)} />
-          <Button className="rounded-none" disabled={progress !== null} onClick={() => inputRef.current?.click()}>
-            {progress !== null ? <Loader2 className="animate-spin" /> : <Upload />}
-            {progress !== null ? `Uploading ${progress}%` : "Upload"}
-          </Button>
-        </div>
+        <PermissionGate required={PERM.MEDIA_UPLOAD}>
+          <div className="ml-auto">
+            <input ref={inputRef} type="file" multiple accept={accept} className="hidden" onChange={(e) => upload(e.target.files)} />
+            <Button className="rounded-none" disabled={progress !== null} onClick={() => inputRef.current?.click()}>
+              {progress !== null ? <Loader2 className="animate-spin" /> : <Upload />}
+              {progress !== null ? `Uploading ${progress}%` : "Upload"}
+            </Button>
+          </div>
+        </PermissionGate>
       </div>
 
       {/* Grid */}
@@ -194,8 +203,12 @@ export function FileManager({
                     <p className="text-xs text-muted-foreground">{size(f.size)}</p>
                     <div className="flex gap-0.5">
                       <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => copy(f)} aria-label="Copy link"><Copy /></Button>
-                      <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => setRenaming(f)} aria-label="Rename"><Pencil /></Button>
-                      <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(f)} aria-label="Delete"><Trash2 /></Button>
+                      <PermissionGate required={PERM.MEDIA_MANAGE}>
+                        <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => setRenaming(f)} aria-label="Rename"><Pencil /></Button>
+                      </PermissionGate>
+                      <PermissionGate required={PERM.MEDIA_DELETE}>
+                        <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(f)} aria-label="Delete"><Trash2 /></Button>
+                      </PermissionGate>
                     </div>
                   </div>
                 </div>
@@ -218,15 +231,19 @@ export function FileManager({
         </div>
       )}
 
-      <RenameDialog file={renaming} onClose={() => setRenaming(null)} onSaved={refresh} />
-      <ConfirmDelete
-        open={!!deleting}
-        onOpenChange={(o) => !o && setDeleting(null)}
-        title="Delete this file?"
-        description="The file is removed from the server. Any product or page still using its link will show a broken file."
-        busy={busy}
-        onConfirm={remove}
-      />
+      <PermissionGate required={PERM.MEDIA_MANAGE}>
+        <RenameDialog file={renaming} onClose={() => setRenaming(null)} onSaved={refresh} />
+      </PermissionGate>
+      <PermissionGate required={PERM.MEDIA_DELETE}>
+        <ConfirmDelete
+          open={!!deleting}
+          onOpenChange={(o) => !o && setDeleting(null)}
+          title="Delete this file?"
+          description="The file is removed from the server. Any product or page still using its link will show a broken file."
+          busy={busy}
+          onConfirm={remove}
+        />
+      </PermissionGate>
     </div>
   );
 }

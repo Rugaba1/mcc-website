@@ -1,6 +1,7 @@
 import axios from "axios";
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_DOMAIN || "http://localhost:3000";
+import { siteConfig } from "@/config/site.config";
+
+export const API_BASE_URL = siteConfig.apiBaseUrl;
 export const apiServer = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30_000,

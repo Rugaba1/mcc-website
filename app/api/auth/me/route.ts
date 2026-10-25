@@ -1,31 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth/jwt";
 import bcrypt from "bcryptjs";
+import { withAuth } from "@/lib/middleware/withAuth";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { clearRefreshCookie, hasValidAuthRequestHeaders } from "@/lib/auth/csrf";
+import { revokeRefreshSession } from "@/lib/auth/refresh-tokens";
 import {
   checkEmailEligibility,
   normalizeEmail,
   PLUS_ALIASING_DOMAINS,
 } from "@/lib/auth/email-hygiene";
 
-export async function PUT(req: NextRequest) {
+export const PUT = withAuth(async (req: NextRequest, { user: authUser }) => {
   try {
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.substring(7)
-      : req.cookies.get("auth_token")?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = await verifyToken(token);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const numId = Number(userId);
-    if (isNaN(numId))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    const numId = authUser.id;
 
     const body = await req.json();
     const { firstName, lastName, email, phoneNumber } = body;
@@ -139,26 +127,12 @@ export async function PUT(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (_req: NextRequest, { user: authUser }) => {
   try {
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.substring(7)
-      : req.cookies.get("auth_token")?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = await verifyToken(token);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: authUser.id },
       include: { role: true },
     });
 
@@ -189,16 +163,23 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
+export const DELETE = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 30,
+})(async (req: NextRequest) => {
+  if (!hasValidAuthRequestHeaders(req)) {
+    return NextResponse.json({ error: "Invalid auth request" }, { status: 403 });
+  }
+
   try {
+    await revokeRefreshSession(req.cookies.get("refresh_token")?.value);
     const res = NextResponse.json({ success: true });
-    res.cookies.set("auth_token", "", { path: "/", maxAge: 0 });
-    res.cookies.set("refresh_token", "", { path: "/api/auth", maxAge: 0 });
+    clearRefreshCookie(res);
     return res;
   } catch (error) {
     console.error("DELETE /api/auth/me:", error);
     return NextResponse.json({ error: "Failed to sign out" }, { status: 500 });
   }
-}
+});

@@ -19,6 +19,7 @@ import { SurfaceDefinition } from "../data/scenes";
 import { SurfaceSelection, AnyProduct } from "../types/visualizer";
 import { Search, Layers, Grid, Palette, RotateCw, Trash2, Check, Ruler, ShoppingCart } from "lucide-react";
 import { useCart } from "../contexts/cart-context";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
@@ -26,6 +27,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { PurchaseOptions } from "./purchase-option";
 import { Product } from "@/lib/api";
 import { dbProductToTileProduct } from "@/lib/visualizer-adapter";
+import { useFormatters } from "@/contexts/format-context";
 interface ProductPickerProps {
   surface: SurfaceDefinition;
   currentSelection: SurfaceSelection | null;
@@ -45,6 +47,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   dbTiles,
   initialFilter,
 }) => {
+  const { displayMoney } = useFormatters();
   const { addToCart } = useCart();
   const [addedToast, setAddedToast] = useState(false);
 
@@ -207,25 +210,25 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   };
 
   return (
-    <div className="w-full sm:h-full h-[70vh] flex flex-col bg-dark border-l px-3     select-none">
+    <div className="w-full sm:h-full h-[70vh] flex flex-col bg-card text-card-foreground border-l border-border px-3 select-none">
       {/* Header Info */}
-      <div className="p-4 border-b   bg-dark/60 flex items-center justify-between">
+      <div className="p-4 border-b border-border bg-muted flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
               Selected Surface
             </span>
             {activeSide && (
-              <span className="text-[10px] px-2 py-0.5  font-bold bg-primary/20 text-primary border border-primary/30 uppercase">
+              <Badge variant="outline" className="h-auto border-primary/30 bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">
                 Editing: {activeSide === "left" ? "Design A (Left)" : "Design B (Right)"}
-              </span>
+              </Badge>
             )}
           </div>
           <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mt-0.5">
             {surface.name}
-            <span className="text-xs font-normal text-muted-foreground px-2 py-0.5  bg-background">
+            <Badge variant="outline" className="h-auto bg-background px-2 py-0.5 text-xs font-normal text-muted-foreground">
               {surface.type}
-            </span>
+            </Badge>
           </h2>
         </div>
         {isTileSurface && (
@@ -330,11 +333,11 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                   })}
                 </div>
                 {pickedTileView.pricePerBox && (
-                  <div className="flex items-center justify-between pt-1 border-t  /80 text-[11px]">
+                  <div className="flex items-center justify-between pt-1 border-t border-border/80 text-[11px]">
                     <span className="text-muted-foreground">Price per box:</span>
-                    <span className="text-primary font-bold">{pickedTileView.pricePerBox.toLocaleString()} RWF</span>
+                    <span className="text-primary font-bold">{displayMoney(pickedTileView.pricePerBox)}</span>
                     {pickedTileView.pricePerSqm && (
-                      <span className="text-sm">({pickedTileView.pricePerSqm.toLocaleString()} RWF/m²)</span>
+                      <span className="text-sm">({displayMoney(pickedTileView.pricePerSqm)}/m²)</span>
                     )}
                   </div>
                 )}
@@ -348,8 +351,8 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                   key={cat}
                   onClick={() => setSelectedTileCategory(cat)}
                   className={`text-[11px] px-2.5 py-1  whitespace-nowrap transition-colors ${selectedTileCategory === cat
-                    ? "bg-primary text-white font-semibold"
-                    : "bg-background/70 text-muted-foreground hover: "
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "bg-background/70 text-muted-foreground hover:bg-muted"
                     }`}
                 >
                   {cat}
@@ -388,7 +391,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     }}
                     className={`relative p-2  border text-left cursor-pointer transition-all duration-150 group ${isSelected
                       ? "bg-background/90 border-primary shadow-md ring-1 ring-primary/50"
-                      : "bg-dark/60  /80 hover:border-stone-700 hover:bg-background/40"
+                      : "bg-muted text-foreground hover:border-primary/50 hover:bg-accent"
                       }`}
                   >
                     <div className="w-full h-24  bg-background overflow-hidden mb-2 relative">
@@ -403,7 +406,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         unoptimized
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-5 h-5  bg-primary text-white flex items-center justify-center shadow">
+                        <div className="absolute top-1 right-1 w-5 h-5  bg-primary text-primary-foreground flex items-center justify-center shadow">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -413,7 +416,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1">
                       <span>{tile.size}</span>
                       {tile.pricePerBox ? (
-                        <span className="text-primary font-bold">{tile.pricePerBox.toLocaleString()} RWF</span>
+                        <span className="text-primary font-bold">{displayMoney(tile.pricePerBox)}</span>
                       ) : (
                         <span>{tile.availableSizes.length > 1 ? `${tile.availableSizes.length} sizes` : ""}</span>
                       )}
@@ -479,7 +482,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
               })}
             </div>
 
-            <div className="p-3  bg-dark border   flex items-center justify-between">
+            <div className="p-3  bg-inverse border   flex items-center justify-between">
               <div>
                 <span className="text-xs font-medium  ">Rotation Angle</span>
                 <p className="text-[10px] text-muted-foreground">{pickedRotation}° orientation</p>
@@ -510,7 +513,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     onClick={() => setPickedPaint(paint)}
                     className={`p-2  border text-left cursor-pointer transition-all ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
-                      : "bg-dark/60  "
+                      : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
                     <div className="w-full h-16  overflow-hidden mb-1.5 relative border ">
@@ -524,7 +527,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         unoptimized
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-white flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">
                           <Check className="w-3 h-3" />
                         </div>
                       )}
@@ -553,7 +556,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     onClick={() => setPickedCounter(counter)}
                     className={`p-2 border text-left cursor-pointer transition-all ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
-                      : "bg-dark/60 "
+                      : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
                     <div className="w-full h-20  overflow-hidden mb-1.5 relative border  ">
@@ -567,7 +570,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         unoptimized
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-white flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground flex items-center justify-center">
                           <Check className="w-3 h-3" />
                         </div>
                       )}
@@ -596,7 +599,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                     onClick={() => setPickedCabinet(cab)}
                     className={`p-2  border text-left cursor-pointer transition-all ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
-                      : "bg-dark/60    "
+                      : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
                     <div className="w-full h-16  overflow-hidden mb-1.5 relative border ">
@@ -610,7 +613,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         unoptimized
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-white flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">
                           <Check className="w-3 h-3" />
                         </div>
                       )}
@@ -638,7 +641,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           </span>
           <span className="text-primary font-mono text-[11px]">
             {isTileSurface && pickedTileView?.pricePerBox
-              ? `${pickedTileView?.pricePerSqm?.toLocaleString()} RWF/m2`
+              ? `${displayMoney(pickedTileView?.pricePerSqm ?? 0)}/m2`
               : isTileSurface
                 ? pickedTileView?.sku
                 : ""}
@@ -650,7 +653,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
           <Button
             onClick={handleApply}
-            className="flex-1 py-2.5  bg-primary hover:bg-primary/80 text-white font-semibold text-xs tracking-wide uppercase transition-colors shadow-lg flex items-center justify-center gap-2"
+            className="flex-1 py-2.5  bg-primary hover:bg-primary/80 text-primary-foreground font-semibold text-xs tracking-wide uppercase transition-colors shadow-lg flex items-center justify-center gap-2"
           >
             <Check className="w-4 h-4" />
             <span>

@@ -1,21 +1,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type Product, type Category, serverApi } from "@/lib/api";
-import { Button } from "@/components/ui/button";
+import { type Product, serverApi } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 import { PaginationControls } from "@/components/pagination-controls";
-
-
-
-
-
-const CATEGORY_FILTERS: { key: "all" | Category; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "floor", label: "Floor" },
-  { key: "wall", label: "Wall" },
-  { key: "outdoor", label: "Outdoor" },
-  { key: "special", label: "Special Finish" },
-];
+import { CatalogueControls } from "@/components/catalogue-controls";
 
 const BADGE_FILTERS = ["All", "Bestseller", "New", "Premium"] as const;
 
@@ -23,7 +12,7 @@ type ViewMode = "grid" | "list";
 type SortKey = "name" | "category" | "newest";
 
 function badgeStyle(badge: Product["badge"]) {
-  if (badge === "New") return "bg-emerald-500 ";
+  if (badge === "New") return "bg-success text-success-foreground";
   if (badge === "Premium") return "bg-accent ";
   if (badge === "Bestseller") return "bg-primary ";
   return "";
@@ -31,24 +20,54 @@ function badgeStyle(badge: Product["badge"]) {
 
 const PAGE_SIZE = 12
 export default async function CataloguePage({
-  params,
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ search?: string; category?: string, page?: string; viewMode?: ViewMode; sort?: SortKey, badgeFilter?: string }>;
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+    page?: string;
+    viewMode?: ViewMode;
+    sort?: SortKey;
+    badgeFilter?: string;
+  }>;
 }) {
   let totalPages = 1;
-  const { search, badgeFilter, category, page: pageParam, viewMode, sort, } = await searchParams
-  const page = Math.max(1, parseInt(pageParam ?? "1", PAGE_SIZE) || 1);
-  let products = null
+  const {
+    search,
+    badgeFilter: requestedBadgeFilter,
+    category: requestedCategory,
+    page: pageParam,
+    viewMode: requestedViewMode,
+    sort: requestedSort,
+  } = await searchParams;
+  const category = requestedCategory || "all";
+  const badgeFilter = BADGE_FILTERS.includes(
+    (requestedBadgeFilter || "All") as (typeof BADGE_FILTERS)[number],
+  )
+    ? requestedBadgeFilter || "All"
+    : "All";
+  const sort: SortKey = ["name", "category", "newest"].includes(requestedSort ?? "")
+    ? (requestedSort as SortKey)
+    : "newest";
+  const viewMode: ViewMode = requestedViewMode === "list" ? "list" : "grid";
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  let products = null;
+  let total = 0;
   try {
-    const data = (await serverApi.getProducts({ skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, category: encodeURIComponent(category || ""), search: search }))
-    products = data.products
-
-    totalPages = data.totalPages
-
+    const data = await serverApi.getProducts({
+      skip: (page - 1) * PAGE_SIZE,
+      limit: PAGE_SIZE,
+      category: category === "all" ? undefined : category,
+      search,
+      status: "ACTIVE",
+      badge: badgeFilter === "All" ? undefined : badgeFilter,
+      sort,
+    });
+    products = data.products;
+    total = data.total;
+    totalPages = data.totalPages;
   } catch (error) {
-
+    console.error("Could not load catalogue products:", error);
   }
 
   if (!products) {
@@ -74,7 +93,7 @@ export default async function CataloguePage({
     <div className="min-h-screen ">
 
       {/* ── Hero banner ──────────────────────────────────────────────── */}
-      <section className="bg-dark py-20 px-6">
+      <section className="bg-inverse py-20 px-6">
         <div className="max-w-7xl mx-auto ">
           <div className="max-w-7xl mx-auto text-center">
             <div>
@@ -94,25 +113,8 @@ export default async function CataloguePage({
 
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-center flex-wrap gap-8 mt-10 pt-10 -t /10">
-            {CATEGORY_FILTERS.filter((f) => f.key !== "all").map((f) => {
-              const count = products.filter((p) => p.category === f.key).length;
-              return (
-                <Link href={`?category=${f.key}`} key={f.key}>
-                  <Button
-                    className={`text-left transition-all ${category === f.key ? "opacity-100" : "opacity-80 hover:opacity-80"}`}
-                  >
-                    <p className="text-2xl font-bold ">{count}</p>
-                    <p className=" text-xs font-semibold uppercase tracking-widest mt-0.5">{f.label}</p>
-                  </Button>
-                </Link>
-              );
-            })}
-            <div className="text-left">
-              <p className="text-2xl font-bold ">{products.length}</p>
-              <p className=" text-xs font-semibold uppercase tracking-widest mt-0.5">Total</p>
-            </div>
+          <div className="mt-10 border-t border-inverse-border pt-6 text-center text-sm text-inverse-foreground/80">
+            {total} {total === 1 ? "tile" : "tiles"} match your current filters
           </div>
         </div>
       </section>
@@ -135,86 +137,23 @@ export default async function CataloguePage({
         )}
 
         {/* ── Filters & controls ──────────────────────────────────────── */}
-        <div className="   shadow-sm p-4 mb-8 flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-center">
-
-
-
-          {/* Category */}
-          <div className="flex flex-wrap gap-1.5">
-            {CATEGORY_FILTERS.map((f) => (
-              <Link href={`?category=${f.key}`} key={f.key}>
-                <Button
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${category === f.key ? "bg-accent " : "  hover:"
-                    }`}
-                >
-                  {f.label}
-                </Button>
-              </Link>
-            ))}
-          </div>
-
-          {/* Badge filter */}
-          <div className="flex gap-1.5">
-            {BADGE_FILTERS.map((b) => (
-              <Link href={`?badgeFilter=${b}`} key={b}>
-                <Button
-                  key={b}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${badgeFilter === b ? "bg-primary " : "  hover:"
-                    }`}
-                >
-                  {b}
-                </Button>
-              </Link>
-
-            ))}
-          </div>
-
-          {/* Sort */}
-          <select
-            value={sort}
-            className="text-xs font-semibold  -gray-200 px-3 py-2  focus:outline-none focus:-primary "
-          >
-            <Link href={`?sort=name`}> <option value="name">Sort: Name A–Z</option></Link>
-            <Link href={`?sort=category`}>  <option value="category">Sort: Category</option></Link>
-            <Link href={`?sort=newest`}>
-              <option value="newest">Sort: Newest First</option></Link>
-
-          </select>
-
-          {/* View mode */}
-          <div className="flex  -gray-200 overflow-hidden ml-auto">
-            <Link href={`?viewMode=grid`}>
-              <Button
-                className={`p-2 transition-colors ${viewMode === "grid" ? "bg-accent " : "  hover:text-foreground"}`}
-                title="Grid view"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                </svg>
-              </Button></Link>
-            <Link href={`?viewMode=list`}>
-              <Button
-                className={`p-2 transition-colors ${viewMode === "list" ? "bg-accent " : "  hover:text-foreground"}`}
-                title="List view"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
-                </svg>
-              </Button></Link>
-
-          </div>
-        </div>
+        <CatalogueControls
+          category={category}
+          badgeFilter={badgeFilter}
+          sort={sort}
+          viewMode={viewMode}
+        />
 
         {/* Result count */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm ">
-            Showing <span className="font-bold ">{products.length}</span> of {products.length} tiles
+            Showing <span className="font-bold ">{products.length}</span> of {total} tiles
             {search && <span> matching "<span className=" font-semibold">{search}</span>"</span>}
           </p>
-          {(search || category !== "all" || badgeFilter !== "All") && (
+          {(search || category !== "all" || badgeFilter !== "All" || sort !== "newest" || viewMode !== "grid") && (
             <Link
-              href={`?search=""& category=all&badgeFilter!=="All`}
-              className="text-xs  hover:text-red-500 font-semibold transition-colors"
+              href="/catalogue"
+              className="text-xs  hover:text-destructive font-semibold transition-colors"
             >
               Clear filters ×
             </Link>
@@ -248,7 +187,13 @@ export default async function CataloguePage({
           prevLabel={"Previous"}
           nextLabel={"Next"}
           pageLabel={`Page of ${page}/${totalPages}`}
-          extraQuery={{ ...(category ? { category } : {}), ...(page ? { page: String(page) } : {}), ...(badgeFilter ? { badgeFilter } : {}), ...(search ? { search } : {}), ...(sort ? { sort } : {}), ...(viewMode ? { viewMode } : {}) }}
+          extraQuery={{
+            ...(category !== "all" ? { category } : {}),
+            ...(badgeFilter !== "All" ? { badgeFilter } : {}),
+            ...(search ? { search } : {}),
+            ...(sort !== "newest" ? { sort } : {}),
+            ...(viewMode !== "grid" ? { viewMode } : {}),
+          }}
         />
 
         {/* Bottom CTA */}
@@ -295,7 +240,7 @@ function FeaturedCard({ product: p }: { product: Product }) {
           />
         )}
         {/* Hover overlay with dual actions */}
-        <div className="absolute inset-0 bg-dark/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-3">
+        <div className="absolute inset-0 bg-inverse/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-3">
           <Link
             href={`/visualizer?tile=${p.id}&autoApply=1&surface=${surface}`}
             className="bg-primary hover:bg-primary/90   text-xs font-bold px-3 py-1.5 uppercase tracking-wider   shadow flex items-center gap-1.5 transition-transform hover:scale-105"
@@ -307,24 +252,24 @@ function FeaturedCard({ product: p }: { product: Product }) {
             <span>Visualize</span>
           </Link>
           <Link
-            href={`/products/${p.id}`}
-            className="bg-background/90 hover:bg-background text-ivory/80 text-xs font-medium px-3 py-1 uppercase tracking-wider   border border-stone-700 transition-colors"
+            href={`/products/${p.slug ?? p.id}`}
+            className="bg-background/90 hover:bg-background text-foreground text-xs font-medium px-3 py-1 uppercase tracking-wider border border-border transition-colors"
           >
             View Details
           </Link>
         </div>
-        <span className="absolute top-3 left-0 bg-primary   text-[9px] font-bold px-3 py-1 uppercase tracking-widest">
+        <Badge className="absolute left-0 top-3 h-auto rounded-none px-3 py-1 text-[9px] font-bold uppercase tracking-widest">
           Featured
-        </span>
+        </Badge>
         {p.badge && (
-          <span className={`absolute top-3 right-3 text-[9px] font-bold px-2.5 py-1 uppercase tracking-wider ${badgeStyle(p.badge)}`}>
+          <Badge className={`absolute right-3 top-3 h-auto rounded-none px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${badgeStyle(p.badge)}`}>
             {p.badge}
-          </span>
+          </Badge>
         )}
       </div>
       <div className="p-4">
         <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-1 text-primary">{p.categoryLabel}</p>
-        <Link href={`/products/${p.id}`}>
+        <Link href={`/products/${p.slug ?? p.id}`}>
           <h3 className="font-bold text-sm text-foreground hover:text-primary transition-colors">{p.name}</h3>
         </Link>
         <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
@@ -363,7 +308,7 @@ function GridCard({ product: p }: { product: Product }) {
           </div>
         )}
         {/* Hover overlay with dual actions */}
-        <div className="absolute inset-0 bg-dark/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-3">
+        <div className="absolute inset-0 bg-inverse/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-3">
           <Link
             href={`/visualizer?tile=${p.id}&autoApply=1&surface=${surface}`}
             className="bg-primary hover:bg-primary/90   text-xs font-bold px-3 py-1.5 uppercase tracking-wider   shadow flex items-center gap-1.5 transition-transform hover:scale-105"
@@ -375,25 +320,25 @@ function GridCard({ product: p }: { product: Product }) {
             <span>Visualize in Room</span>
           </Link>
           <Link
-            href={`/products/${p.id}`}
-            className="bg-background/90 hover:bg-background text-ivory/80 text-xs font-medium px-3 py-1 uppercase tracking-wider   border border-stone-700 transition-colors"
+            href={`/products/${p.slug ?? p.id}`}
+            className="bg-background/90 hover:bg-background text-foreground text-xs font-medium px-3 py-1 uppercase tracking-wider border border-border transition-colors"
           >
             View Details
           </Link>
         </div>
         {p.badge && (
-          <span className={`absolute top-3 left-0 text-[9px] font-bold px-3 py-1 uppercase tracking-wider ${badgeStyle(p.badge)}`}>
+          <Badge className={`absolute left-0 top-3 h-auto rounded-none px-3 py-1 text-[9px] font-bold uppercase tracking-wider ${badgeStyle(p.badge)}`}>
             {p.badge}
-          </span>
+          </Badge>
         )}
       </div>
       <div className="p-5 border-t  ">
         <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-1.5 text-primary">{p.categoryLabel}</p>
-        <Link href={`/products/${p.id}`}>
+        <Link href={`/products/${p.slug ?? p.id}`}>
           <h3 className="font-bold text-base mb-1 text-foreground hover:text-primary transition-colors">{p.name}</h3>
         </Link>
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">{p.description}</p>
-        <div className="flex items-center justify-between pt-3 border-t  /80">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <span className="text-xs text-muted-foreground">{p.sizes}</span>
           <div className="flex items-center gap-2">
             <Link
@@ -402,9 +347,9 @@ function GridCard({ product: p }: { product: Product }) {
             >
               Visualize
             </Link>
-            <span className="text-stone-600">·</span>
+            <span className="text-muted">·</span>
             <Link
-              href={`/products/${p.id}`}
+              href={`/products/${p.slug ?? p.id}`}
               className="text-muted-foreground hover:text-foreground text-[10px] font-bold uppercase tracking-wider"
             >
               Details →
@@ -439,16 +384,16 @@ function ListCard({ product: p }: { product: Product }) {
           <div className="w-full h-full bg-linear-to-br from-muted to-muted" />
         )}
         {p.badge && (
-          <span className={`absolute top-0 left-0 text-[8px] font-bold px-2 py-0.5 ${badgeStyle(p.badge)}`}>
+          <Badge className={`absolute left-0 top-0 h-auto rounded-none px-2 py-0.5 text-[8px] font-bold ${badgeStyle(p.badge)}`}>
             {p.badge}
-          </span>
+          </Badge>
         )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-0.5 text-primary">{p.categoryLabel}</p>
-            <Link href={`/products/${p.id}`}>
+            <Link href={`/products/${p.slug ?? p.id}`}>
               <h3 className="font-bold text-base truncate text-foreground hover:text-primary transition-colors">{p.name}</h3>
             </Link>
           </div>
@@ -464,7 +409,7 @@ function ListCard({ product: p }: { product: Product }) {
               <span>Visualize</span>
             </Link>
             <Link
-              href={`/products/${p.id}`}
+              href={`/products/${p.slug ?? p.id}`}
               className="bg-primary hover:bg-primary/90   text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest   transition-colors"
             >
               View →
@@ -481,7 +426,7 @@ function ListCard({ product: p }: { product: Product }) {
           )}
           <div className="flex gap-1.5 ml-auto">
             {p.colors.slice(0, 5).map((c, i) => (
-              <span key={i} title={c} className="w-3 h-3  -full border border-stone-700" style={{ background: c }} />
+              <span key={i} title={c} className="w-3 h-3 rounded-full border border-border" style={{ background: c }} />
             ))}
           </div>
         </div>

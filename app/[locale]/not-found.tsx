@@ -9,10 +9,10 @@ export default function NotFound() {
           <div className="mx-auto mt-2 h-px w-24 bg-primary" />
 
           <h1 className="mt-8 text-2xl font-bold text-foreground sm:text-3xl">
-            Page not found
+            Mountain Ceramic page not found
           </h1>
           <p className="mt-3 max-w-md text-base text-muted-foreground">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
+            The page you&apos;re looking for isn&apos;t available. Explore our tile collection or contact the Mountain Ceramic team for help.
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
@@ -20,13 +20,13 @@ export default function NotFound() {
               href="/"
               className=" bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Go home
+              Mountain Ceramic home
             </a>
             <a
-              href="/sermons"
+              href="/products"
               className="border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
             >
-              Sermons
+              Browse tiles
             </a>
             <a
               href="/contact"

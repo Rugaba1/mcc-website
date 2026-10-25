@@ -1,7 +1,8 @@
 "use server";
 
 import Image from "next/image";
-import { serverApi } from "../lib/api";
+import { serverApi } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 
 export default  async function Projects() {
    
@@ -68,11 +69,11 @@ export default  async function Projects() {
                   sizes="(max-width: 768px) 100vw, 58vw"
                   unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-overlay/85 via-overlay/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 mb-3">
+                  <Badge className="mb-3 h-auto rounded-none px-4 py-1.5 text-[10px] font-bold tracking-[0.2em] uppercase">
                     {projects[0].type}
-                  </span>
+                  </Badge>
                   <h3 className="font-playfair  font-bold text-2xl mb-2">{projects[0].title}</h3>
                   <p className="  text-sm leading-relaxed max-w-md">{projects[0].description}</p>
                 </div>
@@ -91,11 +92,11 @@ export default  async function Projects() {
                       sizes="(max-width: 768px) 100vw, 42vw"
                       unoptimized
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-overlay/80 via-overlay/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
+                      <Badge className="mb-2 h-auto rounded-none px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase">
                         {proj.type}
-                      </span>
+                      </Badge>
                       <h3 className=" font-bold text-base">{proj.title}</h3>
                     </div>
                   </div>
@@ -113,11 +114,11 @@ export default  async function Projects() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-overlay/80 via-overlay/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <span className="inline-block bg-primary  text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 mb-2">
+                  <Badge className="mb-2 h-auto rounded-none px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase">
                     {proj.type}
-                  </span>
+                  </Badge>
                   <h3 className=" font-bold text-lg mb-1">{proj.title}</h3>
                   <p className="  text-sm line-clamp-2">{proj.description}</p>
                 </div>

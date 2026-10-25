@@ -3,7 +3,10 @@ export interface AuthUser {
   email: string;
   firstName: string;
   lastName?: string;
+  phoneNumber?: string | null;
+  profilePicture?: string | null;
   role: { id: string; roleName: string };
+  permissions: string[];
 }
 
 export interface Token {

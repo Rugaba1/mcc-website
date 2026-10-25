@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../../lib/prisma";
-import { requireUser } from "../../../../../lib/auth/require-user";
-import { invoicePath } from "../../../../../lib/invoices/url";
+import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/middleware/withAuth";
+import { invoicePath } from "@/lib/invoices/url";
 export const runtime = "nodejs";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
-
+export const GET = withAuth(
+  async (
+    _request: NextRequest,
+    { user, params }: { user: { id: number }; params: Promise<{ id: string }> },
+  ) => {
   const id = Number((await params).id);
   if (!Number.isSafeInteger(id) || id <= 0)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   // userId in the filter: other people's orders look like "not found"
   const o = await prisma.order.findFirst({
-    where: { id, userId: claims.userId },
+    where: { id, userId: user.id },
     include: {
+      coupon: { select: { code: true } },
       items: true,
       history: { orderBy: { createdAt: "asc" } },
       payments: { orderBy: { createdAt: "desc" } },
@@ -42,12 +41,14 @@ export async function GET(
     fulfillment: o.fulfillment,
     subtotal: Number(o.subtotal),
     discountTotal: Number(o.discountTotal),
+    couponCode: o.coupon?.code ?? null,
     shippingFee: Number(o.shippingFee),
     taxTotal: Number(o.taxTotal),
     grandTotal: Number(o.grandTotal),
     customerNote: o.customerNote,
     shipFullName: o.shipFullName,
     shipPhone: o.shipPhone,
+    tin: o.tin,
     shipDistrict: o.shipDistrict,
     shipSector: o.shipSector,
     shipStreet: o.shipStreet,
@@ -84,4 +85,5 @@ export async function GET(
       url: invoicePath(inv.number),
     })),
   });
-}
+  },
+);

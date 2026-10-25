@@ -1,4 +1,5 @@
 import path from "node:path";
+export { COMPANY } from "@/lib/company";
 
 /** Brand tokens, mirrored from globals.css (light theme). */
 export const BRAND = {
@@ -25,17 +26,6 @@ const GL = fontPath("glovar", "glovar.otf");
 export const FONT_FILES = {
   CenturyGothic: { normal: CG, bold: CGB, italics: CG, bolditalics: CGB },
   Glovar: { normal: GL, bold: GL, italics: GL, bolditalics: GL },
-};
-
-export const COMPANY = {
-  name: "Mountain Ceramic Company Limited",
-  address: process.env.COMPANY_ADDRESS ?? "Kigali, Rwanda",
-  tin: process.env.COMPANY_TIN ?? "",
-  phone: process.env.COMPANY_PHONE ?? "",
-  email: process.env.COMPANY_EMAIL ?? "",
-  website: process.env.COMPANY_WEBSITE ?? "",
-  /** Shown on proforma invoices, e.g. "MTN MoMo code 123456 · BK account ..." */
-  paymentInstructions: process.env.INVOICE_PAYMENT_INSTRUCTIONS ?? "",
 };
 
 /** Private directory, must NOT be inside /public. Mount a persistent volume here in production. */

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 import { FactoryIcon } from "./Icons";
 
 const features = [
@@ -21,7 +22,7 @@ const badges = ["ISO 9001", "RSB Certified", "Made in Rwanda", "10-Yr Warranty"]
 export default function About() {
   return (
     <section id="about" className="py-0  overflow-hidden">
-      <div className="grid lg:grid-cols-2 min-h-[680px]">
+      <div className="grid lg:grid-cols-2 min-h-170">
 
         {/* ── Left: Image panel ───────────────────────── */}
         <div className="relative min-h-[500px] lg:min-h-full">
@@ -33,23 +34,23 @@ export default function About() {
             sizes="(max-width: 1024px) 100vw, 50vw"
             unoptimized />
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-black/5 lg:bg-gradient-to-br lg:from-black/30 lg:via-transparent lg:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-overlay/20 to-overlay/5 lg:bg-gradient-to-br lg:from-overlay/30 lg:via-transparent lg:to-transparent" />
 
           {/* Est. badge */}
           <div className="absolute top-8 right-8 bg-primary text-center px-6 py-4 shadow-2xl">
-            <p className="/80 text-[10px] uppercase tracking-[0.25em] font-semibold">Est.</p>
-            <p className=" text-5xl font-bold font-playfair leading-none">2009</p>
-            <p className="/70 text-xs tracking-widest mt-1">Kigali, Rwanda</p>
+            <p className="text-primary-foreground/80 text-[10px] uppercase tracking-[0.25em] font-semibold">Est.</p>
+            <p className="text-primary-foreground text-5xl font-bold font-playfair leading-none">2009</p>
+            <p className="text-primary-foreground/70 text-xs tracking-widest mt-1">Kigali, Rwanda</p>
           </div>
 
           {/* Factory card */}
-          <div className="absolute bottom-8 left-8 /95 backdrop-blur-sm shadow-2xl flex items-center gap-4 px-5 py-4 max-w-[230px]">
+          <div className="absolute bottom-8 left-8 bg-card/95 text-card-foreground backdrop-blur-sm shadow-2xl flex items-center gap-4 px-5 py-4 max-w-[230px]">
             <div className="w-11 h-11 bg-primary/15 flex items-center justify-center  flex-shrink-0">
               <FactoryIcon className="w-6 h-6" />
             </div>
             <div>
-              <p className="font-bold  text-sm leading-tight">Production Facility</p>
-              <p className=" text-xs mt-0.5">Kicukiro Industrial Zone</p>
+              <p className="font-bold text-sm leading-tight">Production Facility</p>
+              <p className="text-muted-foreground text-xs mt-0.5">Kicukiro Industrial Zone</p>
             </div>
           </div>
 
@@ -103,12 +104,13 @@ export default function About() {
           {/* Certification badges */}
           <div className="flex flex-wrap gap-2 mb-10">
             {badges.map((b) => (
-              <span
+              <Badge
+                variant="outline"
                 key={b}
-                className=" -primary/40 text-primary text-xs font-semibold px-4 py-1.5 tracking-wide"
+                className="h-auto border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-primary"
               >
                 {b}
-              </span>
+              </Badge>
             ))}
           </div>
 

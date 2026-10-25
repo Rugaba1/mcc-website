@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 
 const parseColors = (raw: unknown): string[] => {
   if (Array.isArray(raw)) return raw as string[];
@@ -16,10 +17,14 @@ const parseColors = (raw: unknown): string[] => {
 };
 
 // ── GET /api/products ─────────────────────────────────────────────────────────
-// Returns all products (no pagination, no filters)
-export async function GET() {
+// Returns active products for the public visualizer.
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (_request: NextRequest) => {
   try {
     const rows = await prisma.product.findMany({
+      where: { status: "ACTIVE" },
       include: {
         variants: {
           where: { active: true },
@@ -83,4 +88,4 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});

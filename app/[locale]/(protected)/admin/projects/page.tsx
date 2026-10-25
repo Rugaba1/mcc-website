@@ -5,6 +5,8 @@ import { api, type Project } from "@/lib/api";
 import { ResourcePage, type Values } from "@/components/admin/resource-page";
 import { ProductPicker, type Picked } from "@/components/product-picker";
 import { Badge } from "@/components/ui/badge";
+import { PERM } from "@/lib/permissions/catalog";
+import { GradientField } from "@/components/gradient-field";
 
 const toPayload = (v: Values): Omit<Project, "id"> => ({
   title: v.title.trim(),
@@ -25,8 +27,10 @@ export default function AdminProjectsPage() {
       title="Projects"
       description="Finished installations shown in your portfolio."
       entityName="project"
-      load={() => api.getProjects()}
-      searchText={(p) => `${p.title} ${p.type} ${p.location} ${p.description}`}
+      loadPage={api.getProjectsPage}
+      createPermission={PERM.PROJECTS_MANAGE}
+      updatePermission={PERM.PROJECTS_MANAGE}
+      deletePermission={PERM.PROJECTS_MANAGE}
       columns={[
         {
           header: "Project",
@@ -54,7 +58,20 @@ export default function AdminProjectsPage() {
         { name: "year", label: "Year", type: "text", placeholder: "2026" },
         { name: "description", label: "Description", type: "textarea" },
         { name: "image", label: "Cover image", type: "image" },
-        { name: "gradient", label: "Fallback gradient", type: "text", wide: true, placeholder: "linear-gradient(135deg, #ddd, #bbb)" },
+        {
+          name: "gradient",
+          label: "Fallback gradient",
+          type: "custom",
+          wide: true,
+          hint: "Choose a previewable background gradient for the project image.",
+          render: (value, set) => (
+            <GradientField
+              id="project-fallback-gradient"
+              value={value ?? ""}
+              onChange={set}
+            />
+          ),
+        },
         { name: "large", label: "Show as a large card", type: "checkbox" },
         { name: "tiles", label: "Tiles used", type: "custom", render: (v, set) => <ProductPicker value={v ?? []} onChange={set} /> },
       ]}

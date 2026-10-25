@@ -56,6 +56,10 @@ async function loadInvoiceData(
     },
   });
   if (!order) return null;
+  const currency = await prisma.currency.findUnique({
+    where: { code: order.currency },
+    select: { decimalDigits: true },
+  });
 
   const paid = order.payments.filter((p) => p.status === "PAID");
   const amountPaid = paid.reduce((s, p) => s + num(p.amount), 0);
@@ -82,10 +86,12 @@ async function loadInvoiceData(
     issuedAt: new Date(),
     placedAt: order.placedAt,
     currency: order.currency,
+    currencyDigits: currency?.decimalDigits,
     billTo: {
       name: billName,
       email: order.user?.email ?? order.guestEmail,
       phone: order.user?.phoneNumber ?? order.guestPhone ?? order.shipPhone,
+      tin: order.tin,
     },
     fulfillment: order.fulfillment,
     shipTo: {

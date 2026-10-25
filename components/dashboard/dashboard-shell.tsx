@@ -6,11 +6,15 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { useAuth } from "@/contexts/auth-context";
 import { usePathname } from "@/app/i18n/routing";
-import { isStaffUser } from "@/lib/roles";
+import { hasAnyPermission, hasPermissions } from "@/lib/permissions/core";
+import { PERM } from "@/lib/permissions/catalog";
+import { PermissionGate } from "@/components/permission-gate";
 import { adminNav, customerNav } from "./nav";
 import { MobileSidebar, SidebarContent } from "../sidebar";
 import CartButton from "../cart-button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { AdminNotificationsProvider } from "./admin-notifications-provider";
+import { AdminNotificationsBell } from "./admin-notifications-bell";
 
 
 export function DashboardShell({
@@ -25,18 +29,42 @@ export function DashboardShell({
     const { user } = useAuth();
     const pathname = usePathname();
 
-    const nav = area === "admin" ? adminNav : customerNav;
-    const currentPage = [...nav]
+    const allNav = area === "admin" ? adminNav : customerNav;
+    const nav =
+        area === "admin"
+            ? adminNav.filter(
+                (item) =>
+                    !item.permission ||
+                    Boolean(user && hasPermissions(user.permissions, item.permission)),
+            )
+            : customerNav;
+    const currentPage = [...allNav]
         .sort((a, b) => b.href.length - a.href.length)
         .find((item) =>
             item.exact
                 ? pathname === item.href
                 : pathname === item.href || pathname.startsWith(`${item.href}/`),
         );
+    const pagePermission =
+        area === "admin" &&
+        (pathname === "/admin/blog/new" || /^\/admin\/blog\/\d+$/.test(pathname))
+            ? PERM.BLOG_WRITE
+            : currentPage?.permission;
     const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
     const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
+    const isStaff = Boolean(user && hasAnyPermission(user.permissions, Object.values(PERM)));
+    const canViewNotifications = Boolean(
+        user &&
+        hasAnyPermission(user.permissions, [
+            PERM.ORDERS_VIEW,
+            PERM.MESSAGES_VIEW,
+            PERM.REVIEWS_MODERATE,
+            PERM.PAYMENTS_VIEW,
+        ]),
+    );
 
     return (
+      <AdminNotificationsProvider enabled={area === "admin"}>
         <div className="flex h-screen overflow-hidden">
             <aside
                 className={`sticky  hidden h-screen shrink-0 border-r bg-sidebar transition-all duration-300 md:block ${collapsed ? "w-16" : "w-64"
@@ -83,6 +111,7 @@ export function DashboardShell({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2 md:gap-3">
+                        {area === "admin" && canViewNotifications && <AdminNotificationsBell />}
                         {displayName && (
                             <div className="hidden items-center gap-2 sm:flex">
                                 <Avatar className="size-8">
@@ -91,22 +120,32 @@ export function DashboardShell({
                                 <div className="hidden leading-tight md:block">
                                     <p className="max-w-40 truncate text-xs font-medium">{displayName}</p>
                                     <p className="text-[10px] capitalize text-muted-foreground">
-                                        {area === "admin" && isStaffUser(user)
-                                            ? user?.role.roleName.replace(/_/g, " ")
-                                            : "Customer account"}
+                                        {area === "admin" && isStaff ? "Staff account" : "Customer account"}
                                     </p>
                                 </div>
                             </div>
                         )}
-                        {area === "admin" && isStaffUser(user) && (
+                        {area === "admin" && isStaff && (
                             <Badge variant="secondary" className="hidden sm:inline-flex">Staff</Badge>
                         )}
                         {area === "account" && <CartButton />}
                     </div>
                 </header>
 
-                <div className="container mx-auto px-4 pt-4">{children}</div>
+                <div className="container mx-auto px-4 pt-4">
+                    {area === "admin" ? (
+                        <PermissionGate
+                            required={pagePermission ?? PERM.ADMIN}
+                            mode="message"
+                        >
+                            {children}
+                        </PermissionGate>
+                    ) : (
+                        children
+                    )}
+                </div>
             </main>
         </div>
+      </AdminNotificationsProvider>
     );
 }

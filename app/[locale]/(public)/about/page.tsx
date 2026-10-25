@@ -1,10 +1,8 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FactoryIcon } from "@/components/Icons";
-import { seoConfig } from "@/config/seo.config";
 import { siteConfig } from "@/config/site.config";
-import { absolutizeUrl } from "@/lib/absolutize";
-import { generateAlternateLinks } from "@/lib/alternates";
-import { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
 import Image from "next/image";
 
 export async function generateMetadata({
@@ -13,26 +11,13 @@ export async function generateMetadata({
     params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
     const { locale } = await params;
-
-
-    const title = `Rwanda's Most Trusted Tile Manufacturer | ${siteConfig.siteName}`;
-    const description = `From classic ceramics to modern large-format porcelain — covering every design vision.`;
-    const url = `${seoConfig.siteUrl}${`/${locale}`}/about-us/ `;
-
-    const thumb = absolutizeUrl(`/logo.png`)
-    const image = thumb ?? `${seoConfig.siteUrl}/logo.png`;
-
-    return {
-        title,
-        description,
-        openGraph: {
-            title, description, url, siteName: seoConfig.siteName, locale: locale.replace("-", "_"), type: "website",
-            images: [{ url: image, width: 1200, height: 630, alt: title }],
-        },
-        twitter: { card: "summary_large_image", title, description, images: [image] },
-        alternates: { canonical: url, languages: generateAlternateLinks(locale, `/products`) },
-        robots: { index: true, follow: true },
-    };
+    return createPageMetadata({
+        locale,
+        path: "/about",
+        title: `About Our Tile Manufacturing | ${siteConfig.siteName}`,
+        description:
+            "Learn about Mountain Ceramics Company, a Rwanda-based manufacturer of ceramic and porcelain tiles for projects across East Africa.",
+    });
 }
 
 
@@ -88,23 +73,23 @@ export default function About() {
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         unoptimized />
                     {/* Overlay */}
-                    <div className="absolute inset-0 bg-linear-to-r from-black/20 to-black/5 lg:bg-linear-to-br lg:from-black/30 lg:via-transparent lg:to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-r from-overlay/20 to-overlay/5 lg:bg-linear-to-br lg:from-overlay/30 lg:via-transparent lg:to-transparent" />
 
                     {/* Est. badge */}
                     <div className="absolute top-8 right-8 bg-primary text-center px-6 py-4 shadow-2xl">
-                        <p className="/80 text-[10px] uppercase tracking-[0.25em] font-semibold">Est.</p>
-                        <p className=" text-5xl font-bold font-playfair leading-none">2009</p>
-                        <p className="/70 text-xs tracking-widest mt-1">Kigali, Rwanda</p>
+                        <p className="text-primary-foreground/80 text-[10px] uppercase tracking-[0.25em] font-semibold">Est.</p>
+                        <p className="text-primary-foreground text-5xl font-bold font-playfair leading-none">2009</p>
+                        <p className="text-primary-foreground/70 text-xs tracking-widest mt-1">Kigali, Rwanda</p>
                     </div>
 
                     {/* Factory card */}
-                    <div className="absolute bottom-8 left-8 /95 backdrop-blur-sm shadow-2xl flex items-center gap-4 px-5 py-4 max-w-57.5">
+                    <div className="absolute bottom-8 left-8 bg-card/95 text-card-foreground backdrop-blur-sm shadow-2xl flex items-center gap-4 px-5 py-4 max-w-57.5">
                         <div className="w-11 h-11 bg-primary/15 flex items-center justify-center  shrink-0">
                             <FactoryIcon className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="font-bold  text-sm leading-tight">Production Facility</p>
-                            <p className=" text-xs mt-0.5">Kicukiro Industrial Zone</p>
+                            <p className="font-bold text-sm leading-tight">Production Facility</p>
+                            <p className="text-muted-foreground text-xs mt-0.5">Kicukiro Industrial Zone</p>
                         </div>
                     </div>
 
@@ -151,7 +136,7 @@ export default function About() {
                         {badges.map((b) => (
                             <span
                                 key={b}
-                                className=" -primary/40 text-primary text-xs font-semibold px-4 py-1.5 tracking-wide"
+                                className="border border-primary/40 bg-primary/10 text-primary text-xs font-semibold px-4 py-1.5 tracking-wide"
                             >
                                 {b}
                             </span>

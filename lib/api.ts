@@ -1,12 +1,29 @@
 import { isAxiosError } from "axios";
-import apiClient from "./api-client";
+import apiClient, { refreshAccessToken } from "./api-client";
 import { apiServer } from "./api-server";
 
 import { TileProduct } from "@/data/catalog";
 import { CollectionItem } from "./generated/prisma/client";
+import type { Opt } from "@/lib/locations";
+import type { SceneDefinition } from "@/data/scenes";
+import type { LegalDocumentType } from "@/lib/legal/constants";
+import type { CurrencyOption } from "@/lib/currency";
+import type { ReportTable, ReportFormat } from "@/lib/reports/report-data";
+import type { PaginatedResult } from "@/lib/server-pagination";
+
+export { refreshAccessToken };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type ProductStatus = "ACTIVE" | "DRAFT" | "ARCHIVED";
+export type AdminPageQuery = {
+  page: number;
+  limit: number;
+  q: string;
+  filters: Record<string, string>;
+};
+export type InventoryPageResult = PaginatedResult<InventoryItem> & {
+  summary: { variants: number; boxes: number; low: number; out: number };
+};
 export type Badge = "Bestseller" | "New" | "Premium" | null;
 export type Category = "floor" | "wall" | "outdoor" | "special";
 export interface MediaFile {
@@ -252,6 +269,7 @@ export interface OrderDetail extends OrderSummary {
   internalNote: string | null;
   shipFullName: string | null;
   shipPhone: string | null;
+  tin: string | null;
   shipProvince?: string | null;
   shipDistrict: string | null;
   shipSector: string | null;
@@ -303,7 +321,6 @@ export interface CustomerSummary {
   orderCount: number;
   totalSpent: number;
   lastOrderAt?: string | null;
-  orders: OrderDetail[];
 }
 
 export interface PaymentSummary {
@@ -339,7 +356,7 @@ export interface InventoryItem {
   color: string | null;
   stockSqm: number;
   reservedSqm: number;
-  reorderLevel: number; // was lowStockThreshold
+  lowStockThreshold: number;
 }
 
 export interface CustomerDetail extends CustomerSummary {
@@ -409,11 +426,13 @@ export interface MyOrderDetail extends MyOrderSummary {
   fulfillment: string;
   subtotal: number;
   discountTotal: number;
+  couponCode?: string | null;
   shippingFee: number;
   taxTotal: number;
   customerNote: string | null;
   shipFullName: string | null;
   shipPhone: string | null;
+  tin: string | null;
   shipDistrict: string | null;
   shipSector: string | null;
   shipStreet: string | null;
@@ -464,15 +483,159 @@ export interface WishlistEntry {
 
 export interface CheckoutInput {
   items: { variantId: number; saleType: "SQM" | "CONTAINER"; qty: number }[];
+  reservationToken?: string;
   shippingId: string;
   fullName: string;
   phone: string;
+  tin?: string;
   paymentMethod: string;
   province?: string;
   district?: string;
   sector?: string;
   street?: string;
   note?: string;
+  couponCode?: string;
+}
+
+export interface Coupon {
+  id: number;
+  code: string;
+  description: string | null;
+  type: "PERCENT" | "FIXED";
+  value: number;
+  minOrderAmount: number | null;
+  maxUses: number | null;
+  usedCount: number;
+  startsAt: string | null;
+  expiresAt: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface CouponInput {
+  code: string;
+  description?: string | null;
+  type: Coupon["type"];
+  value: number;
+  minOrderAmount?: number | null;
+  maxUses?: number | null;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+  active?: boolean;
+}
+
+export interface CouponValidation {
+  code: string;
+  type: Coupon["type"];
+  value: number;
+  subtotal: number;
+  discount: number;
+  currency: string;
+}
+
+export interface ProductReview {
+  id: number;
+  rating: number;
+  title: string | null;
+  body: string;
+  createdAt: string;
+  author: string;
+}
+
+export interface ProductReviewData {
+  reviews: ProductReview[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  averageRating: number | null;
+  canReview: boolean;
+  authenticated: boolean;
+  myReview: {
+    id: number;
+    rating: number;
+    approved: boolean;
+    title: string | null;
+    body: string;
+  } | null;
+}
+
+export interface LegalAcceptanceState {
+  pending: {
+    id: number;
+    documentType: string;
+    version: number;
+    title: string;
+  }[];
+  legalVersionIds: number[];
+  acceptedVersionIds: number[];
+  accepted: boolean;
+}
+
+export interface LegalVersion {
+  id: number;
+  documentType: LegalDocumentType;
+  version: number;
+  title: string;
+  titleFr: string;
+  titleRw: string;
+  contentMarkdown: string;
+  contentMarkdownFr: string;
+  contentMarkdownRw: string;
+  publishedAt: string | null;
+  createdAt: string;
+}
+
+export interface BlockedEmail {
+  id: number;
+  email: string;
+  reason: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  revokedAt: string | null;
+}
+
+export interface BlockableUser {
+  id: number;
+  name: string;
+  email: string;
+  active: boolean;
+}
+
+export interface TwoFactorStatus {
+  enabled: boolean;
+  method: "email" | "authenticator" | null;
+  required: boolean;
+}
+
+export interface TwoFactorSetup {
+  method: "email" | "authenticator";
+  challenge: string;
+  message: string;
+  secret?: string;
+  authenticatorUri?: string;
+}
+
+export interface AuthLoginResponse {
+  success?: boolean;
+  emailVerificationRequired?: boolean;
+  accountDisabled?: boolean;
+  twoFactorRequired?: boolean;
+  method?: "email" | "authenticator";
+  challenge?: string;
+  message?: string;
+  accessToken?: string;
+  user?: {
+    id: number;
+    firstName: string;
+    lastName: string | null;
+    email: string;
+    phoneNumber: string | null;
+    profilePicture: string | null;
+    role: { id: number; roleName: string };
+    permissions: string[];
+  };
 }
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
@@ -522,6 +685,9 @@ export interface MyPaymentOrder {
   canPay: boolean;
   payments: MyPayment[];
 }
+export type MyPaymentHistoryEntry = MyPayment & {
+  order: Pick<MyPaymentOrder, "id" | "orderNumber" | "currency">;
+};
 export interface MyPaymentsOverview {
   summary: {
     totalPaid: number;
@@ -531,6 +697,7 @@ export interface MyPaymentsOverview {
     refunded: number;
   };
   orders: MyPaymentOrder[];
+  history: PaginatedResult<MyPaymentHistoryEntry>;
 }
 
 export interface PieSlice {
@@ -660,6 +827,23 @@ export interface AdminAnalytics extends AnalyticsBase {
       createdAt: string;
     }[];
   };
+}
+
+export interface AdminNotification {
+  id: number;
+  type: "order" | "message" | "review" | "payment";
+  title: string;
+  message: string | null;
+  targetPath: string;
+  entityId: number | null;
+  createdAt: string;
+}
+
+export interface AdminNotificationSummary {
+  notifications: AdminNotification[];
+  unreadCount: number;
+  unreadMessageCount: number;
+  latestId: number;
 }
 
 // ── Customer ──
@@ -798,6 +982,7 @@ export interface RegularUser {
   phoneNumber: string | null;
   profilePicture: string | null;
   active: boolean;
+  permissions: string[];
   emailVerifiedAt: string | null;
   lastLogin: string | null;
   createdAt: string;
@@ -844,6 +1029,8 @@ const get = <T>(url: string) => apiClient.get<T>(url).then((r) => r.data);
 const serverGet = <T>(url: string) => apiServer.get<T>(url).then((r) => r.data);
 const post = <T>(url: string, body?: unknown) =>
   apiClient.post<T>(url, body).then((r) => r.data);
+const patch = <T>(url: string, body?: unknown) =>
+  apiClient.patch<T>(url, body).then((r) => r.data);
 const put = <T>(url: string, body?: unknown) =>
   apiClient.put<T>(url, body).then((r) => r.data);
 const del = <T = Ok>(url: string) =>
@@ -876,10 +1063,227 @@ export function apiErrorMessage(
 }
 const getBlob = (url: string) =>
   apiClient.get<Blob>(url, { responseType: "blob" }).then((r) => r.data);
+const adminPageQuery = (query: AdminPageQuery) =>
+  qs({
+    page: query.page,
+    limit: query.limit,
+    q: query.q,
+    ...Object.fromEntries(
+      Object.entries(query.filters).filter(([, value]) => value && value !== "all"),
+    ),
+  });
 
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const api = {
+  subscribeNewsletter: (data: { email: string; consent: true; website?: string }) =>
+    post<{ message: string }>("/api/newsletter", data),
+  getAdminNewsletter: () =>
+    get<{
+      counts: Record<string, number>;
+      subscribers: {
+        id: number;
+        email: string;
+        status: string;
+        confirmedAt: string | null;
+        createdAt: string;
+      }[];
+      campaigns: {
+        id: number;
+        subject: string;
+        status: string;
+        createdAt: string;
+        sentAt: string | null;
+        recipientCount: number;
+      }[];
+    }>("/api/admin/newsletter"),
+  createAdminNewsletterCampaign: (data: { subject: string; bodyMarkdown: string }) =>
+    post<{ campaign: { id: number; subject: string; status: string }; recipientCount: number }>(
+      "/api/admin/newsletter",
+      data,
+    ),
+  sendAdminNewsletterCampaignBatch: (id: number, retryFailed = false) =>
+    post<{
+      sent: number;
+      failed: number;
+      skipped: number;
+      pending: number;
+      failedTotal: number;
+      status: string;
+    }>(`/api/admin/newsletter/${id}/send`, { retryFailed }),
+  markAdminNotificationsRead: (notificationIds: number[]) =>
+    patch<{ markedRead: number }>("/api/admin/notifications", {
+      notificationIds,
+    }),
+  getCurrencies: () =>
+    get<{
+      baseCurrency: CurrencyOption;
+      currencies: CurrencyOption[];
+      availableCurrencies: CurrencyOption[];
+    }>("/api/currencies"),
+  getAdminCurrencies: () =>
+    get<{ currencies: CurrencyOption[] }>("/api/admin/currencies"),
+  createCurrency: (currency: Omit<CurrencyOption, "enabled" | "isBase">) =>
+    post<{ currency: CurrencyOption }>("/api/admin/currencies", currency),
+  updateCurrency: (currency: Partial<CurrencyOption> & { code: string }) =>
+    patch<{ currency: CurrencyOption }>("/api/admin/currencies", currency),
+  // Auth and legal
+  getCurrentLegalDocuments: () =>
+    get<{
+      documents: { id: number; slug: string; title: string; version: number }[];
+    }>("/api/legal/current"),
+  getLegalAcceptance: () => get<LegalAcceptanceState>("/api/legal/acceptance"),
+  acceptLegalDocuments: (legalVersionIds: number[]) =>
+    post<{ accepted: boolean }>("/api/legal/acceptance", { legalVersionIds }),
+  getAdminLegalVersions: () =>
+    get<{ versions: LegalVersion[] }>("/api/admin/legal"),
+  createLegalDraft: (
+    draft: Pick<
+      LegalVersion,
+      | "documentType"
+      | "title"
+      | "titleFr"
+      | "titleRw"
+      | "contentMarkdown"
+      | "contentMarkdownFr"
+      | "contentMarkdownRw"
+    >,
+  ) => post<{ version: LegalVersion }>("/api/admin/legal", draft),
+  updateLegalDraft: (
+    id: number,
+    draft: Pick<
+      LegalVersion,
+      | "documentType"
+      | "title"
+      | "titleFr"
+      | "titleRw"
+      | "contentMarkdown"
+      | "contentMarkdownFr"
+      | "contentMarkdownRw"
+    >,
+  ) => put<LegalVersion>(`/api/admin/legal/${id}`, draft),
+  publishLegalVersion: (id: number) =>
+    post<{ version: LegalVersion }>(`/api/admin/legal/${id}/publish`),
+  register: (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string;
+    password: string;
+    acceptedLegalVersionIds: number[];
+    next?: string;
+  }) => post<unknown>("/api/auth/register", data),
+  authenticate: (data: {
+    identifier: string;
+    password: string;
+    next: string;
+    challenge?: string;
+    code?: string;
+  }) =>
+    post<AuthLoginResponse>("/api/auth/login", data),
+  logout: () => post<Ok>("/api/auth/logout"),
+  resendVerification: (data: { email: string; next?: string }) =>
+    post<{ message: string }>("/api/auth/resend-verification", data),
+  verifyEmail: (token: string) =>
+    post<{ message: string }>("/api/auth/verify-email", { token }),
+  requestPasswordReset: (email: string) =>
+    post<{ message: string }>("/api/auth/forgot-password", { email }),
+  resetPassword: (data: {
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => post<Ok>("/api/auth/reset-password", data),
+  getTwoFactorStatus: () => get<TwoFactorStatus>("/api/auth/two-factor"),
+  setupTwoFactor: (data: {
+    method: TwoFactorSetup["method"];
+    currentPassword: string;
+  }) => post<TwoFactorSetup>("/api/auth/two-factor/setup", data),
+  confirmTwoFactor: (data: {
+    method: TwoFactorSetup["method"];
+    challenge: string;
+    code: string;
+  }) => post<TwoFactorStatus>("/api/auth/two-factor/confirm", data),
+  disableTwoFactor: (currentPassword: string) =>
+    apiClient
+      .delete<Ok>("/api/auth/two-factor", { data: { currentPassword } })
+      .then((r) => r.data),
+
+  // Public data
+  getProvinces: (signal?: AbortSignal) =>
+    apiClient.get<Opt[]>("/api/locations/provinces", { signal }).then((r) => r.data),
+  getDistricts: (province: string, signal?: AbortSignal) =>
+    apiClient
+      .get<Opt[]>(`/api/locations/districts${qs({ province })}`, { signal })
+      .then((r) => r.data),
+  getSectors: (province: string, district: string, signal?: AbortSignal) =>
+    apiClient
+      .get<Opt[]>(`/api/locations/sectors${qs({ province, district })}`, { signal })
+      .then((r) => r.data),
+  getVisualizerProducts: () =>
+    get<{ products: Product[]; total: number }>("/api/visualizer-products").then(
+      (result) => result.products,
+    ),
+  getVisualizerScenes: () => get<SceneDefinition[]>("/api/visualizer/scenes"),
+  getProductReviews: (productId: number, page: number, signal?: AbortSignal) =>
+    apiClient
+      .get<ProductReviewData>(
+        `/api/products/${productId}/reviews${qs({ page })}`,
+        { signal },
+      )
+      .then((r) => r.data),
+  submitProductReview: (
+    productId: number,
+    data: { rating: number; title: string; body: string },
+  ) => post<{ message: string }>(`/api/products/${productId}/reviews`, data),
+  getBlockedEmails: () => get<BlockedEmail[]>("/api/admin/blocked-emails"),
+  searchBlockableUsers: (query: string) =>
+    get<{ users: BlockableUser[] }>(
+      `/api/admin/blocked-emails/users${qs({ query })}`,
+    ),
+  createBlockedEmail: (data: {
+    userId?: number;
+    email?: string;
+    reason: string;
+  }) =>
+    post<{ entry: BlockedEmail; disabledAccounts: number }>(
+      "/api/admin/blocked-emails",
+      data,
+    ),
+  deactivateBlockedEmail: (id: number) =>
+    apiClient
+      .patch<BlockedEmail>(`/api/admin/blocked-emails/${id}`, {
+        isActive: false,
+      })
+      .then((r) => r.data),
+  uploadImage: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient
+      .post<{ url: string }>("/api/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120_000,
+      })
+      .then((r) => r.data.url);
+  },
+  getManagedUsers: () =>
+    get<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      active: boolean;
+      canProducts: boolean;
+      canCollections: boolean;
+      canProjects: boolean;
+      canTestimonials: boolean;
+      canUsers: boolean;
+    }[]>("/api/users"),
+  createManagedUser: (data: Record<string, unknown>) =>
+    post<unknown>("/api/users", data),
+  updateManagedUser: (id: number, data: Record<string, unknown>) =>
+    put<unknown>(`/api/users/${id}`, data),
+  deleteManagedUser: (id: number) => del(`/api/users/${id}`),
+
   // Blog
   getAdminBlogPosts: (p: {
     q?: string;
@@ -933,7 +1337,8 @@ export const api = {
     },
   ) => post<{ id: number }>(`/api/orders/${orderId}/payments`, d),
 
-  getMyPayments: () => get<MyPaymentsOverview>("/api/me/payments"),
+  getMyPayments: (page = 1, limit = 8) =>
+    get<MyPaymentsOverview>(`/api/me/payments${qs({ page, limit })}`),
   payMyOrder: (
     orderId: number,
     d: {
@@ -957,6 +1362,7 @@ export const api = {
     password: string;
     active: boolean;
     emailVerified?: boolean;
+    permissions?: string[];
     phoneNumber?: string | null;
     profilePicture?: string | null;
   }) => post<RegularUser>("/api/users", { ...d, accountType: "regular" }),
@@ -968,6 +1374,7 @@ export const api = {
       password: string;
       active: boolean;
       emailVerified: boolean;
+      permissions: string[];
       phoneNumber: string | null;
       profilePicture: string | null;
     }>,
@@ -1023,8 +1430,10 @@ export const api = {
     get<SavedVisualizerDesign[]>("/api/me/visualizer/designs"),
   deleteMyVisualizerDesign: (id: number) =>
     del(`/api/me/visualizer/designs?id=${id}`),
-  getAdminVisualizerDesigns: () =>
-    get<SavedVisualizerDesign[]>("/api/admin/visualizer/designs"),
+  getAdminVisualizerDesignsPage: (page: number, limit: number, q: string) =>
+    get<PaginatedResult<SavedVisualizerDesign>>(
+      `/api/admin/visualizer/designs${qs({ page, limit, q })}`,
+    ),
   deleteAdminVisualizerDesign: (id: number) =>
     del(`/api/admin/visualizer/designs?id=${id}`),
   getAdminReviews: (page: number, status: "pending" | "approved" | "all") =>
@@ -1075,6 +1484,8 @@ export const api = {
     status,
     category,
     type,
+    badge,
+    sort,
   }: {
     search?: string;
     page?: number;
@@ -1083,12 +1494,16 @@ export const api = {
     category?: string;
     status?: string;
     type?: string;
-  }) => {
+    badge?: string;
+    sort?: "name" | "category" | "newest";
+  } = {}) => {
     const p = new URLSearchParams({ skip: String(skip), limit: String(limit) });
     if (search) p.set("query", search);
     if (status) p.set("status", status);
     if (category) p.set("category", category);
     if (type) p.set("type", type);
+    if (badge) p.set("badge", badge);
+    if (sort) p.set("sort", sort);
     return get<{
       products: Product[];
       total: number;
@@ -1112,6 +1527,8 @@ export const api = {
 
   // Collections
   getCollections: () => get<Collection[]>("/api/collections"),
+  getCollectionsPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<Collection>>(`/api/collections${adminPageQuery(query)}`),
   createCollection: (d: Omit<Collection, "id">) =>
     post<Collection>("/api/collections", d),
   updateCollection: (id: number, d: Omit<Collection, "id">) =>
@@ -1120,6 +1537,8 @@ export const api = {
 
   // Projects
   getProjects: () => get<Project[]>("/api/projects"),
+  getProjectsPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<Project>>(`/api/projects${adminPageQuery(query)}`),
   createProject: (d: Omit<Project, "id">) => post<Project>("/api/projects", d),
   updateProject: (id: number, d: Omit<Project, "id">) =>
     put<Project>(`/api/projects/${id}`, d),
@@ -1127,6 +1546,8 @@ export const api = {
 
   // Testimonials
   getTestimonials: () => get<Testimonial[]>("/api/testimonials"),
+  getTestimonialsPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<Testimonial>>(`/api/testimonials${adminPageQuery(query)}`),
   createTestimonial: (d: Omit<Testimonial, "id">) =>
     post<Testimonial>("/api/testimonials", d),
   updateTestimonial: (id: number, d: Omit<Testimonial, "id">) =>
@@ -1145,6 +1566,12 @@ export const api = {
 
   // Orders
   getOrders: () => get<OrderSummary[]>("/api/orders"),
+  getOrdersPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<OrderSummary>>(`/api/orders${adminPageQuery(query)}`),
+  getUnpaidOrdersPage: (page: number, limit: number, q: string) =>
+    get<PaginatedResult<OrderSummary>>(
+      `/api/orders${qs({ page, limit, q, unpaid: 1 })}`,
+    ),
   getOrder: (id: number) => get<OrderDetail>(`/api/orders/${id}`),
   updateOrder: (
     id: number,
@@ -1157,15 +1584,41 @@ export const api = {
 
   // Customers
   getCustomers: () => get<CustomerSummary[]>("/api/customers"),
+  getCustomersPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<CustomerSummary>>(`/api/customers${adminPageQuery(query)}`),
   getCustomer: (id: number) => get<CustomerDetail>(`/api/customers/${id}`),
   // Payments
   getPayments: () => get<PaymentSummary[]>("/api/payments"),
+  getPaymentsPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<PaymentSummary>>(`/api/payments${adminPageQuery(query)}`),
 
   // Inventory
   getInventory: () => get<InventoryItem[]>("/api/inventory"),
+  getInventoryPage: (query: {
+    page: number;
+    limit: number;
+    q: string;
+    state: "all" | "ok" | "low" | "out";
+    sort: string;
+  }) =>
+    get<InventoryPageResult>(
+      `/api/inventory${qs(query)}`,
+    ),
+  getAdminFinancialReport: (from: string, to: string) =>
+    get<ReportTable>(`/api/admin/reports/financial${qs({ from, to })}`),
+  getAdminInventoryReport: () =>
+    get<ReportTable>("/api/admin/reports/inventory"),
+  downloadAdminReport: (
+    report: "financial" | "inventory",
+    format: ReportFormat,
+    dateRange?: { from: string; to: string },
+  ) =>
+    getBlob(
+      `/api/admin/reports/${report}/export${qs({ format, ...dateRange })}`,
+    ),
   updateStock: (
     variantId: number,
-    d: { stockSqm: number; reorderLevel: number },
+    d: { stockSqm: number; lowStockThreshold: number },
   ) => put<InventoryItem>(`/api/inventory/${variantId}`, d),
   // Visualizer textures
   updateVariantTexture: (variantId: number, textureUrl: string | null) =>
@@ -1177,11 +1630,17 @@ export const api = {
     ),
   // Contact
   sendContact: (d: ContactInput) =>
-    post<{ success: boolean; confirmationSent: boolean }>(
+    post<{
+      success: boolean;
+      confirmationSent: boolean;
+      staffAlertSent: boolean;
+    }>(
       "/api/contact",
       d,
     ),
   getContactMessages: () => get<ContactMessage[]>("/api/contact-messages"),
+  getContactMessagesPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<ContactMessage>>(`/api/contact-messages${adminPageQuery(query)}`),
   updateContactStatus: (id: number, status: ContactStatus) =>
     put<{ id: number; status: ContactStatus }>(`/api/contact-messages/${id}`, {
       status,
@@ -1202,6 +1661,8 @@ export const api = {
   changePassword: (d: { currentPassword: string; newPassword: string }) =>
     post<Ok>("/api/auth/change-password", d),
   getMyOrders: () => get<MyOrderSummary[]>("/api/me/orders"),
+  getMyOrdersPage: (page = 1, limit = 10) =>
+    get<PaginatedResult<MyOrderSummary>>(`/api/me/orders${qs({ page, limit })}`),
   getMyOrderRequests: (id: number) =>
     get<OrderRequest[]>(`/api/me/orders/${id}/requests`),
   createMyOrderRequest: (
@@ -1215,6 +1676,24 @@ export const api = {
   removeFromWishlist: (productId: number) => del(`/api/wishlist/${productId}`),
   checkout: (d: CheckoutInput) =>
     post<{ id: number; orderNumber: string }>("/api/checkout", d),
+  reserveCheckoutStock: (data: {
+    items: CheckoutInput["items"];
+    reservationToken?: string;
+  }) =>
+    post<{ reservationToken: string; expiresAt: string }>(
+      "/api/checkout/reservation",
+      data,
+    ),
+  validateCoupon: (body: {
+    code: string;
+    items: CheckoutInput["items"];
+  }) => post<CouponValidation>("/api/coupons/validate", body),
+  getAdminCoupons: () =>
+    get<{ coupons: Coupon[] }>("/api/admin/coupons"),
+  createCoupon: (coupon: CouponInput) =>
+    post<{ coupon: Coupon }>("/api/admin/coupons", coupon),
+  updateCoupon: (id: number, coupon: Partial<CouponInput>) =>
+    patch<{ coupon: Coupon }>(`/api/admin/coupons/${id}`, coupon),
   deleteMyAccount: (password: string) =>
     apiClient
       .delete<Ok>("/api/me/account", { data: { password } })
@@ -1222,6 +1701,15 @@ export const api = {
 };
 
 export const serverApi = {
+  getSitemapTests: async (baseUrl: string | undefined) => {
+    if (!baseUrl) return [];
+    const response = await apiServer.get<
+      | { id: string | number; devotional_date: string | null }[]
+      | { items?: { id: string | number; devotional_date: string | null }[] }
+    >(`${baseUrl}/tests?limit=100`);
+    const data = response.data;
+    return Array.isArray(data) ? data : data.items ?? [];
+  },
   getTeam: () => serverGet<TeamMember[]>("/api/team"),
   // Products
   getProducts: ({
@@ -1231,6 +1719,9 @@ export const serverApi = {
     status,
     category,
     type,
+    featured,
+    badge,
+    sort,
   }: {
     search?: string;
     page?: number;
@@ -1239,9 +1730,24 @@ export const serverApi = {
     category?: string;
     status?: string;
     type?: string;
+    featured?: boolean;
+    badge?: string;
+    sort?: "name" | "category" | "newest";
   }) =>
-    serverGet<{ products: Product[]; totalPages: number }>(
-      `/api/products?skip=${skip}&query=${search}&limit=${limit}&status=${status}&category=${category}&type=${type}`,
+    serverGet<{ products: Product[]; total: number; totalPages: number }>(
+      `/api/products?${new URLSearchParams(
+        Object.entries({
+          skip: String(skip ?? 0),
+          limit: String(limit ?? 12),
+          query: search,
+          status,
+          category,
+          type,
+          featured: featured === undefined ? undefined : String(featured),
+          badge,
+          sort,
+        }).filter((entry): entry is [string, string] => entry[1] !== undefined),
+      )}`,
     ),
   getProductsNumber: () => serverGet<number>("/api/products/count"),
   getProduct: (id: string) =>

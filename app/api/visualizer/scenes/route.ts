@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { ALL_ROOM_SCENES } from "../../../../data/scenes";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 
-export async function GET() {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (_request: NextRequest) => {
   try {
     const scenes = await prisma.visualizerScene.findMany({
       where: { active: true },
@@ -30,4 +34,4 @@ export async function GET() {
     console.error("GET /api/visualizer/scenes error:", err);
     return NextResponse.json(ALL_ROOM_SCENES);
   }
-}
+});

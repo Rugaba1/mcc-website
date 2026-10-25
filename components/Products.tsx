@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { serverApi, type Product } from "../lib/api";
+import { serverApi, type Product } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
 import AddToCartButton from "./add-cart-button";
 import { WishlistButton } from "./wishlist-button";
@@ -18,29 +19,46 @@ const PAGE_SIZE = 12;
 
 export default async function Products() {
 
-  const page = 1
-  let totalPages = 1;
-  let products = null
+  let products: Product[] = [];
+  let loadFailed = false;
   try {
-    const data = (await serverApi.getProducts({ skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, category: encodeURIComponent("") }))
-    products = data.products
+    const featured = await serverApi.getProducts({
+      skip: 0,
+      limit: PAGE_SIZE,
+      status: "ACTIVE",
+      featured: true,
+    });
+    products = featured.products;
 
-    totalPages = data.totalPages
-
+    if (products.length < PAGE_SIZE) {
+      const active = await serverApi.getProducts({
+        skip: 0,
+        limit: PAGE_SIZE,
+        status: "ACTIVE",
+      });
+      const featuredIds = new Set(products.map((product) => product.id));
+      products = [
+        ...products,
+        ...active.products.filter((product) => !featuredIds.has(product.id)),
+      ].slice(0, PAGE_SIZE);
+    }
   } catch (error) {
-
+    console.error("Failed to load homepage products:", error);
+    loadFailed = true;
   }
 
-  if (!products) {
+  if (loadFailed || products.length === 0) {
     return (
-      <div className="min-h-screen  flex items-center justify-center">
+      <section id="products" className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className=" font-semibold text-lg">Tiles not found</p>
+          <p className="font-semibold text-lg">
+            {loadFailed ? "Tiles are temporarily unavailable." : "No tiles are available yet."}
+          </p>
           <Link href="/catalogue" className=" hover:underline text-sm mt-2 inline-block">
-            ← Back to home
+            Browse the catalogue
           </Link>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -69,7 +87,7 @@ export default async function Products() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex flex-wrap gap-2 mb-12 -b -gray-200 pb-6">
+        <div className="flex flex-wrap gap-2 mb-12 border-b border-border pb-6">
           {filters.map((f) => (
             <Link href={`/products?category=${f.key}`} key={f.key}>
               <Button
@@ -83,7 +101,8 @@ export default async function Products() {
         {/* Product grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((p: Product) => (
-            < div
+            <div
+              key={p.id}
               className=" group overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 block"
             >
               {/* Image */}
@@ -97,10 +116,10 @@ export default async function Products() {
                   unoptimized
                 />
                 {/* Hover overlay with dual actions */}
-                <div className="absolute inset-0 bg-dark/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-4">
+                <div className="absolute inset-0 bg-inverse/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-4">
                   <Link
                     href={`/visualizer?tile=${p.id}&autoApply=1&surface=${p.category === "wall" || p.category === "special" ? "wall" : "floor"}`}
-                    className="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider  shadow flex items-center gap-1.5 transition-transform hover:scale-105"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold px-4 py-2 uppercase tracking-wider  shadow flex items-center gap-1.5 transition-transform hover:scale-105"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -109,33 +128,40 @@ export default async function Products() {
                     <span>Visualize in Room</span>
                   </Link>
                   <Link
-                    href={`/products/${p.id}`}
-                    className="bg-background/90 hover:bg-background text-ivory/80 text-xs font-medium px-3.5 py-1.5 uppercase tracking-wider  border transition-colors"
+                    href={`/products/${p.slug ?? p.id}`}
+                    className="bg-background/90 hover:bg-background text-foreground text-xs font-medium px-3.5 py-1.5 uppercase tracking-wider border border-border transition-colors"
                   >
                     View Details
                   </Link>
                 </div>
                 {/* Badge */}
                 {p.badge && (
-                  <span className={`absolute top-4 left-0 text-xs font-bold px-4 py-1.5 tracking-wider uppercase ${p.badge === "New" ? "bg-emerald-500 "
-                    : p.badge === "Premium" ? "bg-accent "
-                      : "bg-primary "
-                    }`}>
+                  <Badge
+                    className={`absolute left-0 top-4 h-auto rounded-none px-4 py-1.5 text-xs font-bold tracking-wider uppercase ${p.badge === "New" ? "bg-success text-success-foreground"
+                      : p.badge === "Premium" ? "bg-accent text-accent-foreground"
+                        : "bg-primary text-primary-foreground"
+                      }`}
+                  >
                     {p.badge}
-                  </span>
+                  </Badge>
+                )}
+                {p.featured && (
+                  <Badge className="absolute right-4 top-4 h-auto rounded-none px-3 py-1.5 text-xs font-bold tracking-wider uppercase">
+                    Featured
+                  </Badge>
                 )}
               </div>
 
               {/* Info */}
-              <div className="p-6 -t ">
+              <div className="p-6 border-t border-border bg-card">
                 <span className=" text-[10px] font-bold tracking-[0.25em] uppercase mb-2 block">
                   {p.categoryLabel}
                 </span>
-                <h3 className="text-lg font-bold  mb-2 group-hover: transition-colors duration-200">
+                <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-200">
                   {p.name}
                 </h3>
                 <p className=" text-sm leading-relaxed mb-5 line-clamp-2">{p.description}</p>
-                <div className="flex items-center justify-between pt-4 -t ">
+                <div className="flex items-center justify-between pt-4 border-t border-border">
                   <AddToCartButton product={p} sm /> <WishlistButton productId={p.id} />
                   <span className=" text-xs font-medium">{p.sizes}</span>
                   <div className="flex items-center gap-3">
@@ -144,7 +170,7 @@ export default async function Products() {
                         <span
                           key={i}
                           title={c}
-                          className="w-4 h-4 -full  -gray-200 shadow-sm"
+                          className="w-4 h-4 rounded-full border border-border shadow-sm"
                           style={{ background: c }}
                         />
                       ))}
@@ -158,7 +184,7 @@ export default async function Products() {
                     </Link>
                     <Link
                       key={p.id}
-                      href={`/products/${p.id}`}
+                      href={`/products/${p.slug ?? p.id}`}
                     >
                       <span className="text-[10px] font-bold  uppercase tracking-wider whitespace-nowrap">
                         View →
@@ -173,14 +199,14 @@ export default async function Products() {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-14 pt-10 -t -gray-200">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-14 pt-10 border-t border-border">
           <p className=" text-sm">
             Showing <strong className="">{products.length}</strong> products.
             Full catalogue available on request.
           </p>
           <Link
             href="/catalogue"
-            className="group bg-accent hover:bg-primary  font-bold px-9 py-4 transition-all duration-300 shadow-lg flex items-center gap-3 text-sm tracking-widest uppercase"
+            className="group bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground font-bold px-9 py-4 transition-all duration-300 shadow-lg flex items-center gap-3 text-sm tracking-widest uppercase"
           >
             View Full Catalogue
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

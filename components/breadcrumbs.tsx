@@ -1,7 +1,8 @@
 import { ChevronRight, Home } from "lucide-react";
 import { headers } from "next/headers";
 import { Link } from "@/app/i18n/routing";
-import { seoConfig } from "@/config/seo.config";
+import { localizedUrl } from "@/lib/alternates";
+import { siteConfig } from "@/config/site.config";
 
 export interface BreadcrumbItem {
   label: string;
@@ -13,8 +14,9 @@ interface BreadcrumbsProps {
 }
 
 export async function Breadcrumbs({ items }: BreadcrumbsProps) {
-   
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const requestHeaders = await headers();
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
+  const locale = requestHeaders.get("x-locale") ?? siteConfig.defaultLanguage;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -22,7 +24,7 @@ export async function Breadcrumbs({ items }: BreadcrumbsProps) {
       "@type": "ListItem",
       position: i + 1,
       name: item.label,
-      item: item.href ? `${seoConfig.siteUrl}${item.href}` : undefined,
+      item: item.href ? localizedUrl(locale, item.href) : undefined,
     })),
   };
 
@@ -31,7 +33,7 @@ export async function Breadcrumbs({ items }: BreadcrumbsProps) {
       <script
         type="application/ld+json"
         nonce={nonce}
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <nav aria-label="breadcrumb" className="">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-2.5">

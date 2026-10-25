@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { fmtDate, fmtDateTime, money, options, pretty } from "@/lib/format";
+import { options, pretty } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { FileText, Loader2 } from "lucide-react";
 import { api, apiErrorMessage, type InvoiceRef, type OrderDetail, type OrderSummary } from "@/lib/api";
 import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 const STATUSES = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"];
 const PAYMENT_STATUSES = ["PENDING", "AUTHORIZED", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"];
@@ -23,6 +26,7 @@ const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   CREDIT_NOTE: "Credit note",
 };
 function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<void> }) {
+  const { money, date, dateTime } = useFormatters();
   const [o, setO] = useState<OrderDetail | null>(null);
   const [status, setStatus] = useState(row.status);
   const [note, setNote] = useState("");
@@ -58,19 +62,25 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2"><StatusBadge status={o.status} /><StatusBadge status={o.paymentStatus} /><span className="text-sm text-muted-foreground">{pretty(o.fulfillment)} · placed {fmtDateTime(o.placedAt)}</span></div>
+      <div className="flex flex-wrap items-center gap-2"><StatusBadge status={o.status} /><StatusBadge status={o.paymentStatus} /><span className="text-sm text-muted-foreground">{pretty(o.fulfillment)} · placed {dateTime(o.placedAt)}</span></div>
 
       <section className="space-y-3 border p-4">
         <h3 className="text-sm font-semibold">Manage order</h3>
-        <div className="space-y-1.5">
-          <Label>Status</Label>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
-            <SelectContent className="rounded-none">{STATUSES.map((s) => <SelectItem key={s} value={s} className="rounded-none">{pretty(s)}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1.5"><Label>Internal note (staff only)</Label><Textarea className="rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
-        <Button className="rounded-none" onClick={save} disabled={saving || !dirty}>{saving && <Loader2 className="animate-spin" />}Save changes</Button>
+        <PermissionGate required={PERM.ORDERS_UPDATE_STATUS}>
+          <div className="space-y-1.5">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
+              <SelectContent className="rounded-none">{STATUSES.map((s) => <SelectItem key={s} value={s} className="rounded-none">{pretty(s)}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+        </PermissionGate>
+        <PermissionGate required={PERM.ORDERS_NOTE}>
+          <div className="space-y-1.5"><Label>Internal note (staff only)</Label><Textarea className="rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
+        </PermissionGate>
+        <PermissionGate required={PERM.ORDERS_UPDATE_STATUS}>
+          <Button className="rounded-none" onClick={save} disabled={saving || !dirty}>{saving && <Loader2 className="animate-spin" />}Save changes</Button>
+        </PermissionGate>
       </section>
 
       <section className="space-y-2">
@@ -92,7 +102,7 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
       </section>
 
       <section className="grid gap-4 text-sm sm:grid-cols-2">
-        <div className="space-y-1"><h3 className="font-semibold">Customer</h3><p>{o.customerName}</p><p className="text-muted-foreground">{o.email ?? "—"} · {o.phone ?? "—"}</p>{o.customerNote && <p className="border-l-2 pl-2 text-muted-foreground">“{o.customerNote}”</p>}</div>
+        <div className="space-y-1"><h3 className="font-semibold">Customer</h3><p>{o.customerName}</p><p className="text-muted-foreground">{o.email ?? "—"} · {o.phone ?? "—"}</p>{o.tin && <p className="text-muted-foreground">Rwanda TIN: {o.tin}</p>}{o.customerNote && <p className="border-l-2 pl-2 text-muted-foreground">“{o.customerNote}”</p>}</div>
         <div className="space-y-1"><h3 className="font-semibold">Ship to</h3>{o.shipFullName ? <><p>{o.shipFullName} · {o.shipPhone}</p><p className="text-muted-foreground">{[o.shipStreet, o.shipSector, o.shipDistrict].filter(Boolean).join(", ")}</p></> : <p className="text-muted-foreground">Pickup, no address</p>}</div>
       </section>
 
@@ -111,11 +121,13 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
             <div key={inv.id} className="flex items-center justify-between gap-3 border p-3 text-sm">
               <div className="min-w-0">
                 <p className="font-medium">{KIND_LABEL[inv.kind]}</p>
-                <p className="truncate text-xs text-muted-foreground">{inv.number} · {fmtDate(inv.issuedAt)}</p>
+                <p className="truncate text-xs text-muted-foreground">{inv.number} · {date(inv.issuedAt)}</p>
               </div>
-              <Button variant="outline" size="sm" className="rounded-none" onClick={() => setInvoice(inv)}>
-                <FileText />View
-              </Button>
+              <PermissionGate required={PERM.INVOICES_VIEW}>
+                <Button variant="outline" size="sm" className="rounded-none" onClick={() => setInvoice(inv)}>
+                  <FileText />View
+                </Button>
+              </PermissionGate>
             </div>
           ))
         )}
@@ -125,7 +137,7 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
         <h3 className="text-sm font-semibold">History</h3>
         <ol className="space-y-3 border-l pl-4">
           {o.history.map((h) => (
-            <li key={h.id} className="text-sm"><StatusBadge status={h.status} /><p className="mt-1 text-xs text-muted-foreground">{fmtDateTime(h.createdAt)}{h.note ? ` · ${h.note}` : ""}</p></li>
+            <li key={h.id} className="text-sm"><StatusBadge status={h.status} /><p className="mt-1 text-xs text-muted-foreground">{dateTime(h.createdAt)}{h.note ? ` · ${h.note}` : ""}</p></li>
           ))}
         </ol>
       </section>
@@ -135,16 +147,16 @@ function OrderView({ row, reload }: { row: OrderSummary; reload: () => Promise<v
 }
 
 export default function AdminOrdersPage() {
+  const { money, date, dateTime } = useFormatters();
   return (
     <ResourcePage<OrderSummary>
       title="Orders"
       description="Review, fulfil and update customer orders."
       entityName="order"
-      load={api.getOrders}
-      searchText={(o) => `${o.orderNumber} ${o.customerName} ${o.email ?? ""} ${o.phone ?? ""}`}
+      loadPage={api.getOrdersPage}
       filters={[
-        { key: "status", label: "Statuses", options: options(STATUSES), match: (o, v) => o.status === v },
-        { key: "payment", label: "Payments", options: options(PAYMENT_STATUSES), match: (o, v) => o.paymentStatus === v },
+        { key: "status", label: "Statuses", options: options(STATUSES) },
+        { key: "payment", label: "Payments", options: options(PAYMENT_STATUSES) },
       ]}
       columns={[
         { header: "Order", cell: (o) => <span className="font-medium">{o.orderNumber}</span> },
@@ -153,7 +165,7 @@ export default function AdminOrdersPage() {
         { header: "Status", cell: (o) => <StatusBadge status={o.status} /> },
         { header: "Payment", cell: (o) => <StatusBadge status={o.paymentStatus} /> },
         { header: "Total", className: "text-right", cell: (o) => <span className="font-medium tabular-nums">{money(o.grandTotal)}</span> },
-        { header: "Placed", cell: (o) => fmtDate(o.placedAt) },
+        { header: "Placed", cell: (o) => date(o.placedAt) },
       ]}
       detail={{ title: (o) => o.orderNumber, description: (o) => o.customerName, render: (o, { reload }) => <OrderView row={o} reload={reload} /> }}
     />

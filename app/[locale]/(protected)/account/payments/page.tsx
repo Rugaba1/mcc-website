@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { Clock, Loader2, Pencil, RefreshCw, RotateCcw, Trash2, Wallet, CreditCard, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -20,18 +20,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { fmtDate, money, pretty } from "@/lib/format";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { pretty } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
+import { COMPANY } from "@/lib/company";
 
-// TODO: replace these placeholders with your real payment details
 const PAY_INFO: Record<ManualMethod, { label: string; steps: string }> = {
     MTN_MOMO: { label: "MTN Mobile Money", steps: "Dial *182*8*1# and pay to merchant code 000000 (Mountain Ceramic). Then enter the transaction ID from the SMS below." },
     AIRTEL_MONEY: { label: "Airtel Money", steps: "Dial *500# and pay to merchant code 000000 (Mountain Ceramic). Then enter the transaction ID from the SMS below." },
-    BANK_TRANSFER: { label: "Bank transfer", steps: "Transfer to account 000-0000000-00 (Mountain Ceramic Ltd, Bank of Kigali) and use your order number as the reference. Enter the slip or transaction number below." },
+    BANK_TRANSFER: { label: "Bank transfer", steps: `${COMPANY.paymentInstructions}\nEnter the slip or transaction number below.` },
     CASH_ON_DELIVERY: { label: "Pay on delivery", steps: "Pay in cash when your order arrives. We’ll confirm the payment on delivery." },
 };
 const PAGE_SIZE = 8;
 
 export default function CustomerPaymentsPage() {
+    const { date, money } = useFormatters();
     const [data, setData] = useState<MyPaymentsOverview | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -46,19 +49,15 @@ export default function CustomerPaymentsPage() {
     const load = useCallback(async () => {
         setLoading(true);
         setError(null);
-        try { setData(await api.getMyPayments()); }
+        try { setData(await api.getMyPayments(page, PAGE_SIZE)); }
         catch (e) { const m = apiErrorMessage(e, "Failed to load your payments"); setError(m); toast.error(m); }
         finally { setLoading(false); }
-    }, []);
+    }, [page]);
     useEffect(() => { load(); }, [load]);
 
-    const due = useMemo(() => (data?.orders ?? []).filter((o) => o.balanceDue > 0 || o.payments.some((p) => p.status === "PENDING")), [data]);
-    const history = useMemo(
-        () => (data?.orders ?? []).flatMap((o) => o.payments.map((p) => ({ ...p, order: o }))).sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)),
-        [data],
-    );
-    const totalPages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
-    const pageRows = history.slice((Math.min(page, totalPages) - 1) * PAGE_SIZE, Math.min(page, totalPages) * PAGE_SIZE);
+    const due = data?.orders ?? [];
+    const history = data?.history.items ?? [];
+    const historyTotal = data?.history.total ?? 0;
 
     const withdraw = async () => {
         if (!withdrawing) return;
@@ -96,7 +95,7 @@ export default function CustomerPaymentsPage() {
                     <Tabs value={tab} onValueChange={setTab}>
                         <TabsList className="rounded-none">
                             <TabsTrigger value="due" className="rounded-none">To pay ({due.length})</TabsTrigger>
-                            <TabsTrigger value="history" className="rounded-none">History ({history.length})</TabsTrigger>
+                            <TabsTrigger value="history" className="rounded-none">History ({historyTotal})</TabsTrigger>
                         </TabsList>
                     </Tabs>
 
@@ -111,7 +110,7 @@ export default function CustomerPaymentsPage() {
                                             <div className="flex flex-wrap items-start justify-between gap-3">
                                                 <div>
                                                     <Link href={`/account/orders/${o.id}`} className="font-semibold hover:underline">{o.orderNumber}</Link>
-                                                    <p className="text-xs text-muted-foreground">Placed {fmtDate(o.placedAt)}</p>
+                                                    <p className="text-xs text-muted-foreground">Placed {date(o.placedAt)}</p>
                                                 </div>
                                                 <div className="flex gap-2"><StatusBadge status={o.status} /><StatusBadge status={o.paymentStatus} /></div>
                                             </div>
@@ -151,9 +150,9 @@ export default function CustomerPaymentsPage() {
                                 <Table>
                                     <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Order</TableHead><TableHead>Method</TableHead><TableHead>Reference</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Amount</TableHead></TableRow></TableHeader>
                                     <TableBody>
-                                        {pageRows.length === 0 ? <TableRow><TableCell colSpan={6} className="py-12 text-center text-sm text-muted-foreground">No payments yet.</TableCell></TableRow> : pageRows.map((p) => (
+                                        {history.length === 0 ? <TableRow><TableCell colSpan={6} className="py-12 text-center text-sm text-muted-foreground">No payments yet.</TableCell></TableRow> : history.map((p) => (
                                             <TableRow key={p.id}>
-                                                <TableCell className="whitespace-nowrap">{fmtDate(p.paidAt ?? p.createdAt)}</TableCell>
+                                                <TableCell className="whitespace-nowrap">{date(p.paidAt ?? p.createdAt)}</TableCell>
                                                 <TableCell className="font-medium">{p.order.orderNumber}</TableCell>
                                                 <TableCell>{pretty(p.method)}</TableCell>
                                                 <TableCell className="font-mono text-xs text-muted-foreground">{p.providerRef ?? "—"}</TableCell>
@@ -163,7 +162,7 @@ export default function CustomerPaymentsPage() {
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <p className="font-medium tabular-nums">{money(p.amount, p.order.currency)}</p>
-                                                    {p.refundedAmount > 0 && <p className="text-xs text-amber-600 dark:text-amber-400">−{money(p.refundedAmount, p.order.currency)} refunded{p.refundedAt ? ` on ${fmtDate(p.refundedAt)}` : ""}</p>}
+                                                    {p.refundedAmount > 0 && <p className="text-xs text-warning dark:text-warning">−{money(p.refundedAmount, p.order.currency)} refunded{p.refundedAt ? ` on ${date(p.refundedAt)}` : ""}</p>}
                                                     {p.refundReason && <p className="text-xs text-muted-foreground">{p.refundReason}</p>}
                                                 </TableCell>
                                             </TableRow>
@@ -171,7 +170,14 @@ export default function CustomerPaymentsPage() {
                                     </TableBody>
                                 </Table>
                             </div>
-                            <DataPagination page={Math.min(page, totalPages)} totalPages={totalPages} total={history.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+                            <DataPagination
+                                page={data.history.page}
+                                totalPages={data.history.totalPages}
+                                total={historyTotal}
+                                pageSize={data.history.pageSize}
+                                onPageChange={setPage}
+                                disabled={loading}
+                            />
                         </div>
                     )}
                 </>
@@ -189,7 +195,7 @@ function Kpi({ icon: Icon, label, value, hint, tone }: { icon: LucideIcon; label
     return (
         <Card className="rounded-none py-0">
             <CardContent className="flex items-center gap-3 p-4">
-                <span className={`flex size-10 shrink-0 items-center justify-center border ${tone === "amber" ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400" : "bg-muted text-muted-foreground"}`}><Icon className="size-5" /></span>
+                <span className={`flex size-10 shrink-0 items-center justify-center border ${tone === "amber" ? "border-warning/30 bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}><Icon className="size-5" /></span>
                 <div className="min-w-0"><p className="truncate text-lg font-semibold tabular-nums">{value}</p><p className="truncate text-xs text-muted-foreground">{label}{hint ? ` · ${hint}` : ""}</p></div>
             </CardContent>
         </Card>
@@ -201,6 +207,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 }
 
 function PayDialog({ order, onClose, onDone }: { order: MyPaymentOrder | null; onClose: () => void; onDone: () => void }) {
+    const { money, baseCurrency } = useFormatters();
     const [method, setMethod] = useState<ManualMethod>("MTN_MOMO");
     const [amount, setAmount] = useState("");
     const [phone, setPhone] = useState("");
@@ -259,8 +266,8 @@ function PayDialog({ order, onClose, onDone }: { order: MyPaymentOrder | null; o
 
                     <p className="border-l-2 border-primary bg-muted/50 p-3 text-sm">{PAY_INFO[method].steps}</p>
 
-                    <Field label="Amount you are paying (RWF)" error={errors.amount}><Input className="rounded-none" type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
-                    {mobile && <Field label="Phone you paid from" error={errors.phone}><Input className="rounded-none" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07…" inputMode="tel" /></Field>}
+                    <Field label={`Amount you are paying (${order?.currency ?? baseCurrency})`} error={errors.amount}><Input className="rounded-none" type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
+                    {mobile && <Field label="Phone you paid from" error={errors.phone}><PhoneInput className="rounded-none" value={phone} onChange={setPhone} international defaultCountry="RW" countryCallingCodeEditable={false} placeholder="Enter phone number" /></Field>}
                     {needsRef && <Field label="Transaction ID or reference" error={errors.ref}><Input className="rounded-none" value={ref} onChange={(e) => setRef(e.target.value)} /></Field>}
                     <Field label="Note (optional)"><Textarea className="min-h-16 rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
 
@@ -296,7 +303,7 @@ function FixDialog({ target, onClose, onDone }: { target: { payment: MyPayment; 
                 <DialogHeader><DialogTitle>Fix payment details</DialogTitle><DialogDescription>Correct a typo in the reference so we can find your payment.</DialogDescription></DialogHeader>
                 <div className="space-y-4">
                     <Field label="Transaction ID or reference"><Input className="rounded-none" value={ref} onChange={(e) => setRef(e.target.value)} /></Field>
-                    <Field label="Phone you paid from"><Input className="rounded-none" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" /></Field>
+                    <Field label="Phone you paid from"><PhoneInput className="rounded-none" value={phone} onChange={setPhone} international defaultCountry="RW" countryCallingCodeEditable={false} placeholder="Enter phone number" /></Field>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" className="rounded-none" onClick={onClose} disabled={saving}>Cancel</Button>

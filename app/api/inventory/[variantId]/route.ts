@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../../lib/prisma";
-import { requireStaff } from "../../../../lib/auth/require-staff";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 
@@ -14,14 +15,10 @@ const bodySchema = z.object({
   lowStockThreshold: sqm,
 });
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ variantId: string }> },
-) {
-  const { claims, error } = await requireStaff(request);
-  if (error) return error;
+export const PUT = withPermission(PERM.INVENTORY_ADJUST)(
+  async (request: NextRequest, context) => {
 
-  const variantId = Number((await params).variantId);
+  const variantId = Number((await context.params!).variantId);
   if (!Number.isSafeInteger(variantId) || variantId <= 0) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
@@ -61,7 +58,7 @@ export async function PUT(
             type: "ADJUSTMENT",
             quantity: r2(data.stockSqm - before),
             note: `Manual: ${before} → ${data.stockSqm} m²`,
-            createdById: claims.userId,
+            createdById: context.user.id,
           },
         });
       }
@@ -96,4 +93,4 @@ export async function PUT(
       { status: 500 },
     );
   }
-}
+});

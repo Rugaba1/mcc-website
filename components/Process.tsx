@@ -1,9 +1,9 @@
-import { processSteps } from "../lib/data";
+import { processSteps } from "@/lib/data";
 import { ProcessIcon } from "./Icons";
 
 export default function Process() {
   return (
-    <section className="py-24 bg-dark relative overflow-hidden">
+    <section className="py-24 bg-inverse relative overflow-hidden">
 
       {/* Background subtle tile grid */}
       <div
@@ -37,7 +37,7 @@ export default function Process() {
             {/* Dashes */}
             <div className="absolute inset-0 flex items-center">
               {Array.from({ length: 20 }).map((_, i) => (
-                <div key={i} className="flex-1 h-px -t -dashed -primary/20" />
+                <div key={i} className="flex-1 h-px border-t border-dashed border-primary/20" />
               ))}
             </div>
           </div>
@@ -47,15 +47,15 @@ export default function Process() {
 
               {/* Step circle */}
               <div className="relative mb-6">
-                <div className="w-[104px] h-[104px]  -primary/20 group-hover:-primary/60 flex items-center justify-center transition-all duration-300 relative">
+                <div className="w-[104px] h-[104px] border border-primary/20 group-hover:border-primary/60 flex items-center justify-center transition-all duration-300 relative">
                   <div className="w-[80px] h-[80px] bg-primary/10 group-hover:bg-primary flex items-center justify-center  group- transition-all duration-300">
                     <ProcessIcon icon={step.icon} className="w-8 h-8" />
                   </div>
                   {/* Corner accents */}
-                  <span className="absolute top-0 left-0 w-2.5 h-2.5 -t -l -primary" />
-                  <span className="absolute top-0 right-0 w-2.5 h-2.5 -t -r -primary" />
-                  <span className="absolute bottom-0 left-0 w-2.5 h-2.5 -b -l -primary" />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 -b -r -primary" />
+                  <span className="absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-primary" />
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-primary" />
+                  <span className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-primary" />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-primary" />
                 </div>
                 {/* Step number */}
                 <span className="absolute -top-3 -right-3 w-7 h-7 bg-primary  text-xs font-bold font-mono flex items-center justify-center">
@@ -75,7 +75,7 @@ export default function Process() {
         <div className="mt-20 text-center">
           <a
             href="#contact"
-            className="group inline-flex items-center gap-3 bg-primary hover:bg-[#f0d080] hover:  font-bold px-10 py-4 transition-all duration-300 text-sm tracking-widest uppercase shadow-lg shadow-primary/20"
+            className="group inline-flex items-center gap-3 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-10 py-4 transition-all duration-300 text-sm tracking-widest uppercase shadow-lg shadow-primary/20"
           >
             Start Your Project Today
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

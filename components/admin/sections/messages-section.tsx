@@ -8,6 +8,7 @@ import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
 import { Modal } from "../modal";
+import { useFormatters } from "@/contexts/format-context";
 
 const STATUSES: ContactStatus[] = ["NEW", "READ", "REPLIED", "ARCHIVED"];
 
@@ -18,6 +19,7 @@ export function MessagesSection({
   messages: ContactMessage[];
   reload: () => void;
 }) {
+  const { dateTime } = useFormatters();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"ALL" | ContactStatus>("ALL");
   const [open, setOpen] = useState<ContactMessage | null>(null);
@@ -111,7 +113,7 @@ export function MessagesSection({
           <tbody className="divide-y divide-border">
             {visible.map((m) => (
               <tr key={m.id} className={`hover:bg-muted/40 ${m.status === "NEW" ? "font-semibold" : ""}`}>
-                <td className="px-4 py-3 text-muted-foreground">{new Date(m.createdAt).toLocaleString()}</td>
+                <td className="px-4 py-3 text-muted-foreground">{dateTime(m.createdAt)}</td>
                 <td className="px-4 py-3">
                   <p>{m.firstName} {m.lastName}</p>
                   <p className="text-xs font-normal text-muted-foreground">{m.email}</p>
@@ -149,7 +151,7 @@ export function MessagesSection({
               {open.phone && <> · <a className="hover:underline" href={`tel:${open.phone}`}>{open.phone}</a></>}
             </p>
             <p>
-              {new Date(open.createdAt).toLocaleString()}
+              {dateTime(open.createdAt)}
               {open.projectType && ` · ${open.projectType}`}
               {" · "}acknowledgement {open.ackSentAt ? "sent" : "not sent"}
             </p>
@@ -159,7 +161,7 @@ export function MessagesSection({
 
           {open.replyText && (
             <div>
-              <Label>Previous reply · {open.repliedAt && new Date(open.repliedAt).toLocaleString()}</Label>
+              <Label>Previous reply · {open.repliedAt && dateTime(open.repliedAt)}</Label>
               <p className="whitespace-pre-wrap rounded-lg border border-border p-4 text-sm">{open.replyText}</p>
             </div>
           )}

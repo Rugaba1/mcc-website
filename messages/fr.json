@@ -2478,6 +2478,10 @@
     "timesValue": "Sunday at 10:00 AM",
     "mapPlaceholder": "Mbarara District, Uganda",
     "mapTitle": "Church location map",
+    "mapEmbedHeading": "Trouver notre usine",
+    "mapEmbedNotice": "Le chargement de la carte vous connecte à Google Maps et peut transmettre votre adresse IP.",
+    "mapEmbedButton": "Charger la carte",
+    "mapEmbedTitle": "Carte de localisation de Mountain Ceramics Co. Ltd.",
     "formTitle": "Send a Message",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
@@ -2699,18 +2703,21 @@
     "codeSent": "Code sent — check your email."
   },
   "cookieConsent": {
-    "title": "Cookie preferences",
-    "message": "Choose which cookies we can use. You can change this anytime from the privacy policy page.",
-    "necessaryLabel": "Necessary",
-    "necessaryDesc": "Keeps you signed in and remembers your language. Always on — the site can't function without these.",
-    "analyticsLabel": "Analytics",
-    "analyticsDesc": "Helps us understand how visitors use the site (Google Analytics). Off by default.",
-    "thirdPartyLabel": "Third-party embeds",
-    "thirdPartyDesc": "YouTube video, PayPal donations, and Google sign-in may set their own cookies when you use those features. We don't control these — see each provider's own privacy policy.",
-    "learnMore": "Learn more",
-    "necessaryOnly": "Necessary only",
-    "savePreferences": "Save preferences",
-    "accept": "Accept all"
+    "title": "Préférences relatives aux cookies",
+    "message": "Nous utilisons le stockage essentiel au fonctionnement du site et à la mémorisation de vos choix. Les statistiques facultatives restent désactivées tant que vous ne les autorisez pas.",
+    "necessaryLabel": "Nécessaires",
+    "necessaryDesc": "Permettent la connexion, la langue, les préférences d’affichage demandées et l’enregistrement de ce choix. Toujours activés.",
+    "analyticsLabel": "Statistiques",
+    "analyticsDesc": "Autorise Google Analytics à recueillir des informations sur l’utilisation du site. Le service ne se charge qu’après votre accord.",
+    "analyticsUnavailable": "Les statistiques facultatives ne sont pas configurées sur ce site actuellement.",
+    "privacyPolicy": "Lire notre politique de confidentialité",
+    "necessaryOnly": "Nécessaires uniquement",
+    "savePreferences": "Enregistrer mes choix",
+    "accept": "Tout accepter",
+    "customize": "Personnaliser",
+    "changeSettings": "Paramètres des cookies",
+    "cancel": "Annuler",
+    "storageError": "Impossible d’enregistrer votre choix sur cet appareil. Il ne s’appliquera que pendant cette visite."
   },
   "profilePage": {
     "not_using_it": "Not using it",
@@ -3744,5 +3751,14 @@
     "login": "Log in",
     "goHome": "Go home",
     "contact": "Contact us"
+  },
+  "accessGate": {
+    "deniedTitle": "Accès indisponible",
+    "deniedDescription": "Votre compte ne dispose pas de l’autorisation nécessaire pour consulter ce contenu. Si vous pensez qu’il s’agit d’une erreur, contactez l’assistance.",
+    "disabledTitle": "Cette page est temporairement indisponible",
+    "disabledDescription": "Cette fonctionnalité a été temporairement désactivée. Contactez l’assistance si vous avez besoin d’aide.",
+    "removedTitle": "Cette page n’est plus disponible",
+    "removedDescription": "Cette fonctionnalité a été supprimée et n’est plus disponible.",
+    "contactSupport": "Contacter l’assistance"
   }
 }

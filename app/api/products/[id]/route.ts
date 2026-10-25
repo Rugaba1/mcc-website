@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { productData, uniqueSlug } from "@/lib/products/payload";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
 
 // ── GET /api/products/:id ─────────────────────────────────────────────────────
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 120,
+})(async (
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) => {
   try {
-    const { id } = await params;
-    console.log(id);
+    const { id } = await context.params!;
     const numId = Number(id);
-    if (isNaN(numId))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
     const product = await prisma.product.findFirst({
-      where: Number.isNaN(Number(id)) ? { slug: id } : { id: Number(id) },
+      where: Number.isSafeInteger(numId) && numId > 0 ? { id: numId } : { slug: id },
 
       include: {
         variants: {
@@ -37,6 +39,8 @@ export async function GET(
             pricePerSqm: true,
             pricePerBox: true,
             compareAtPrice: true,
+            containerPricePerSqm: true,
+            sqmPerContainer: true,
             currency: true,
             image: true,
             textureUrl: true,
@@ -46,27 +50,43 @@ export async function GET(
         collections: {
           select: {
             collection: {
-              include: { items: { include: { product: true } } },
+              include: {
+                items: {
+                  select: {
+                    id: true,
+                    collectionId: true,
+                    productId: true,
+                    product: {
+                      select: { id: true, name: true, slug: true, image: true },
+                    },
+                  },
+                },
+              },
             },
           },
         },
       },
     });
-    console.log(product);
     if (!product)
       return NextResponse.json(
         {
-          error: "Product not",
+          error: "Product not found",
         },
         { status: 404 },
       );
     const related = await prisma.product.findMany({
       where: { collection: product.collection, id: { notIn: [product.id] } },
       take: 4,
+      select: { id: true, name: true, slug: true, image: true },
     });
 
     const productRes = {
       ...product,
+      collections: product.collections.map(({ collection }) => ({
+        ...collection,
+        tileIds: collection.items.map((item) => item.productId),
+        items: collection.items.filter((item) => item.productId !== product.id),
+      })),
       related: related,
 
       colors:
@@ -82,13 +102,16 @@ export async function GET(
             thicknessMm: v.thicknessMm ? Number(v.thicknessMm) : null,
             weightKgPerBox: v.weightKgPerBox ? Number(v.weightKgPerBox) : null,
             compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+            containerPricePerSqm:
+              v.containerPricePerSqm != null
+                ? Number(v.containerPricePerSqm)
+                : null,
+            sqmPerContainer:
+              v.sqmPerContainer != null ? Number(v.sqmPerContainer) : null,
           }))
         : [],
     };
-    return NextResponse.json({
-      ...productRes,
-      colors: JSON.parse(product.colors),
-    });
+    return NextResponse.json(productRes);
   } catch (err: unknown) {
     console.error("GET /api/products/[id]:", err);
     if (
@@ -98,19 +121,15 @@ export async function GET(
     )
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     return NextResponse.json(
-      { error: "Failed to update product" },
+      { error: "Failed to fetch product" },
       { status: 500 },
     );
   }
-}
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+});
+export const PUT = withPermission(PERM.PRODUCTS_UPDATE)(
+  async (req: NextRequest, context) => {
   try {
-    const { error } = await requireStaff(req);
-    if (error) return error;
-    const { id } = await params;
+    const { id } = await context.params!;
     const numId = Number(id);
     if (isNaN(numId))
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
@@ -140,15 +159,14 @@ export async function PUT(
       { status: 500 },
     );
   }
-}
+  },
+);
 
 // ── DELETE /api/products/:id ──────────────────────────────────────────────────
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const DELETE = withPermission(PERM.PRODUCTS_DELETE)(
+  async (_req: NextRequest, context) => {
   try {
-    const { id } = await params;
+    const { id } = await context.params!;
     await prisma.product.delete({ where: { id: Number(id) } });
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
@@ -164,4 +182,5 @@ export async function DELETE(
       { status: 500 },
     );
   }
-}
+  },
+);

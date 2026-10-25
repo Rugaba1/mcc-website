@@ -3,7 +3,8 @@ import { unlink } from "fs/promises";
 import { join, normalize, sep } from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 
@@ -18,10 +19,9 @@ const parseId = async (ctx: Ctx) => {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
-export async function PATCH(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = await parseId(ctx);
+export const PATCH = withPermission(PERM.MEDIA_MANAGE)(
+  async (req: NextRequest, context) => {
+  const id = await parseId(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -33,12 +33,12 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     console.error("PATCH /api/files/[id]:", e);
     return NextResponse.json({ error: "Failed to update file" }, { status: 500 });
   }
-}
+  },
+);
 
-export async function DELETE(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = await parseId(ctx);
+export const DELETE = withPermission(PERM.MEDIA_DELETE)(
+  async (_req: NextRequest, context) => {
+  const id = await parseId(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -52,4 +52,4 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
     console.error("DELETE /api/files/[id]:", e);
     return NextResponse.json({ error: "Failed to delete file" }, { status: 500 });
   }
-}
+});

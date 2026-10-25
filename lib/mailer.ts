@@ -1,6 +1,7 @@
 import "server-only";
 
 import nodemailer, { type SendMailOptions, type Transporter } from "nodemailer";
+import { serverConfig } from "@/config/server.config";
 
 let transporter: Transporter | null | undefined;
 let warnedMissingConfig = false;
@@ -8,8 +9,8 @@ let warnedMissingConfig = false;
 function getTransporter(): Transporter | null {
   if (transporter !== undefined) return transporter;
 
-  const { EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD } = process.env;
-  if (!EMAIL_HOST || !EMAIL_USER || !EMAIL_PASSWORD) {
+  const { host, port, secure, user, password } = serverConfig.smtp;
+  if (!host || !user || !password) {
     if (!warnedMissingConfig) {
       console.warn(
         "Email delivery is disabled. Configure EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD.",
@@ -20,7 +21,6 @@ function getTransporter(): Transporter | null {
     return transporter;
   }
 
-  const port = Number(process.env.EMAIL_PORT || "587");
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     console.error("Email delivery is disabled because EMAIL_PORT is invalid.");
     transporter = null;
@@ -28,10 +28,12 @@ function getTransporter(): Transporter | null {
   }
 
   transporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
+    host,
     port,
-    secure: process.env.EMAIL_SECURE === "true" || port === 465,
-    auth: { user: EMAIL_USER, pass: EMAIL_PASSWORD },
+    secure: secure || port === 465,
+    requireTLS: !(secure || port === 465),
+    tls: { minVersion: "TLSv1.2" },
+    auth: { user, pass: password },
   });
   return transporter;
 }

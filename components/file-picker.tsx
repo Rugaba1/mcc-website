@@ -8,6 +8,8 @@ import { FileManager } from "@/components/admin/file-manager";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 /** Modal that lets the admin upload or pick a file from the library. */
 export function FilePicker({
@@ -70,9 +72,11 @@ export function ImageField({
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" className="rounded-none" onClick={() => setOpen(true)}>
-            {value ? "Replace" : "Choose from library"}
-          </Button>
+          <PermissionGate required={PERM.MEDIA_VIEW}>
+            <Button type="button" variant="outline" className="rounded-none" onClick={() => setOpen(true)}>
+              {value ? "Replace" : "Choose from library"}
+            </Button>
+          </PermissionGate>
           {value && (
             <Button type="button" variant="ghost" className="rounded-none" onClick={() => onChange("")}>
               <X /> Remove
@@ -81,7 +85,9 @@ export function ImageField({
         </div>
       </div>
       <Input className="rounded-none text-xs" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
-      <FilePicker open={open} onOpenChange={setOpen} kind={kind} onSelect={(f) => onChange(f.url)} />
+      <PermissionGate required={PERM.MEDIA_VIEW}>
+        <FilePicker open={open} onOpenChange={setOpen} kind={kind} onSelect={(f) => onChange(f.url)} />
+      </PermissionGate>
     </div>
   );
 }

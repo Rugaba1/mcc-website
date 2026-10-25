@@ -1,0 +1,38 @@
+# Mountain Ceramic
+
+> Mountain Ceramic is a tile manufacturer in Rwanda. This file describes public company pages and currently available public API endpoints for AI assistants and other automated clients.
+
+## Store
+
+- Public storefront pages are available in English, French, and Kinyarwanda.
+- Browse tile products, collections, catalogues, projects, and store information.
+- Product and variant details, availability, and prices are provided by the store; use the latest product data rather than inferring stock or prices.
+- Guest checkout is available. Do not require an account to place an order.
+
+## Public pages
+
+- Home: `/`
+- Products: `/products`
+- Collections: `/collections`
+- Catalogues: `/catalogue`
+- Projects: `/projects`
+- Blog: `/blog`
+- Contact: `/contact`
+- Tile visualizer: `/visualizer`
+- Legal documents: `/legal/terms-and-conditions`, `/legal/terms-of-service`, `/legal/privacy-policy`
+
+English is the default locale and does not use a URL prefix. Add `/fr` or `/rw` before a page path to browse in French or Kinyarwanda. The store sitemap is available at `/sitemap.xml`.
+
+## Public API
+
+- `GET /api/products` — list and filter products.
+- `GET /api/products/{slug}` — retrieve a product by its stable slug.
+- `GET /api/collections` — list public collections.
+- `GET /api/catalogues` — list public catalogues.
+- `GET /api/blog` — list public blog posts.
+- `GET /api/visualizer-products` — retrieve products available to the visualizer.
+- `GET /api/visualizer/scenes` — retrieve visualizer scenes.
+- `POST /api/checkout` — submit a guest or signed-in checkout; the server calculates order totals.
+- `POST /api/contact` — submit a store enquiry.
+
+Use the API response as the source of truth for prices, availability, and product details. Do not submit client-calculated totals as authoritative.

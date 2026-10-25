@@ -2,19 +2,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type Product, serverApi, type ProductReviewSummary } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
+import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Metadata } from "next";
-import { seoConfig } from "@/config/seo.config";
 import { siteConfig } from "@/config/site.config";
 import { absolutizeUrl } from "@/lib/absolutize";
-import { generateAlternateLinks } from "@/lib/alternates";
-import AddToCartButton from "@/components/add-cart-button";
+import { createPageMetadata } from "@/lib/seo/metadata";
 import { WishlistButton } from "@/components/wishlist-button";
 import { ProductReviews } from "@/components/products/product-reviews";
+import { ProductPurchase } from "@/components/product-purchase";
 
 function badgeStyle(badge: Product["badge"]) {
-  if (badge === "New") return "bg-emerald-500 ";
+  if (badge === "New") return "bg-success text-success-foreground";
   if (badge === "Premium") return "bg-accent ";
   if (badge === "Bestseller") return "bg-primary ";
   return "";
@@ -26,8 +27,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string, id: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const { id } = await params;
+  const { locale, id } = await params;
 
   let tile = null;
   let reviews: ProductReviewSummary | null = null;
@@ -40,24 +40,16 @@ export async function generateMetadata({
   const reviewSummary = reviews?.total && reviews.averageRating !== null
     ? ` Rated ${reviews.averageRating.toFixed(1)} out of 5 from ${reviews.total} customer reviews.`
     : "";
-  const title = `${tile?.name ?? "Product"} | ${siteConfig.siteName}`;
-  const description = `${tile?.description ?? ""}${reviewSummary}`.slice(0, 300);
-  const url = `${seoConfig.siteUrl}${`/${locale}`}/products/${tile?.id}`;
-
-  const thumb = tile?.image ? absolutizeUrl(tile?.image) : undefined;
-  const image = thumb ?? `${seoConfig.siteUrl}/products/apollo-grey.jpg`;
-
-  return {
+  const title = `${tile?.name ?? "Tile Product"} | ${siteConfig.siteName}`;
+  const description =
+    `${tile?.description ?? "Explore ceramic and porcelain tiles manufactured in Rwanda."}${reviewSummary}`.slice(0, 300);
+  return createPageMetadata({
+    locale,
+    path: `/products/${tile?.slug ?? id}`,
     title,
     description,
-    openGraph: {
-      title, description, url, siteName: seoConfig.siteName, locale: locale.replace("-", "_"), type: "website",
-      images: [{ url: image, width: 1200, height: 630, alt: title }],
-    },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
-    alternates: { canonical: url, languages: generateAlternateLinks(locale, `/products/${tile?.id}`) },
-    robots: { index: true, follow: true },
-  };
+    image: tile?.image ? absolutizeUrl(tile.image) ?? "/logo.png" : "/logo.png",
+  });
 }
 
 export default async function TileDetailPage({
@@ -98,14 +90,37 @@ export default async function TileDetailPage({
 
 
 
+  const primaryVariant =
+    tile.variants?.find((variant) => variant.active) ?? tile.variants?.[0];
+  const productPath = `/products/${tile.slug ?? id}`;
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: tile.name,
     description: tile.description,
     image: tile.image ? absolutizeUrl(tile.image) : undefined,
-    sku: tile.variants?.[0]?.sku,
+    sku: primaryVariant?.sku,
     brand: { "@type": "Brand", name: siteConfig.siteName },
+    ...(primaryVariant
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: new URL(productPath, siteConfig.siteUrl).toString(),
+            priceCurrency: primaryVariant.currency,
+            price: String(primaryVariant.pricePerSqm),
+            sku: primaryVariant.sku,
+            ...(primaryVariant.inventory
+              ? {
+                  availability:
+                    primaryVariant.inventory.onHandSqm >
+                    primaryVariant.inventory.reservedSqm
+                      ? "https://schema.org/InStock"
+                      : "https://schema.org/OutOfStock",
+                }
+              : {}),
+          },
+        }
+      : {}),
     ...(reviews?.total && reviews.averageRating !== null
       ? {
         aggregateRating: {
@@ -131,29 +146,29 @@ export default async function TileDetailPage({
       }
       : {}),
   };
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <>
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }}
       />
       <Breadcrumbs items={[
         { label: "Home", href: "/" },
         { label: "Products", href: "/products" },
-        { label: tile.name, href: `/products/${id}` },
+        { label: tile.name, href: productPath },
 
       ]} />
-      <div className="min-h-screen ">
+      <div className="min-h-screen bg-background">
 
-
-
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+          <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
 
             {/* ── LEFT — tile image ──────────────────────────────────── */}
             <div>
-              <div className="relative aspect-square  shadow-lg overflow-hidden">
+              <div className="relative aspect-square overflow-hidden border border-border bg-muted shadow-sm">
                 {tile.image ? (
                   <Image
                     src={tile.image}
@@ -165,29 +180,31 @@ export default async function TileDetailPage({
                     unoptimized
                   />
                 ) : (
-                  <div className="absolute inset-0  flex items-center justify-center">
-                    <svg className="w-16 h-16 " fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                    <svg className="size-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 6A2.25 2.25 0 014.5 3.75h15A2.25 2.25 0 0121.75 6v12A2.25 2.25 0 0119.5 20.25H4.5A2.25 2.25 0 012.25 18V6z" />
                     </svg>
                   </div>
                 )}
                 {tile.badge && (
-                  <span className={`absolute top-4 left-0 text-xs font-bold px-4 py-1.5 tracking-wider uppercase ${badgeStyle(tile.badge)}`}>
+                  <Badge className={`absolute left-0 top-4 h-auto rounded-none px-4 py-1.5 text-xs font-bold tracking-wider uppercase ${badgeStyle(tile.badge)}`}>
                     {tile.badge}
-                  </span>
+                  </Badge>
                 )}
               </div>
 
               {/* Color swatches */}
               {tile.colors.length > 0 && (
                 <div className="mt-4 flex items-center gap-3">
-                  <span className="text-xs  font-semibold uppercase tracking-wider">Colors</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider">Colors</span>
                   <div className="flex gap-2">
                     {tile.colors.map((c, i) => (
                       <span
                         key={i}
                         title={c}
-                        className="w-6 h-6   shadow cursor-pointer hover:scale-110 transition-transform"
+                        role="img"
+                        aria-label={c}
+                        className="size-6 border border-border shadow-sm"
                         style={{ background: c }}
                       />
                     ))}
@@ -201,39 +218,39 @@ export default async function TileDetailPage({
 
               {/* Category + name */}
               <div>
-                <span className=" text-xs font-bold tracking-[0.25em] uppercase block mb-2">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground">
                   {tile.categoryLabel}
                 </span>
-                <h1 className="font-playfair text-4xl font-bold  leading-tight">
+                <h1 className="font-playfair text-3xl font-bold leading-tight sm:text-4xl">
                   {tile.name}
                 </h1>
               </div>
 
               {/* Description */}
               {tile.description && (
-                <p className=" text-base leading-relaxed">{tile.description}</p>
+                <p className="text-base leading-relaxed text-muted-foreground">{tile.description}</p>
               )}
 
               {/* Specs grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {tile.sizes && (
-                  <div className=" p-4  ">
-                    <p className="text-[10px] font-bold  uppercase tracking-wider mb-1">Sizes</p>
-                    <p className="text-sm font-semibold ">{tile.sizes}</p>
+                  <div className="border border-border p-4">
+                    <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sizes</p>
+                    <p className="text-sm font-semibold">{tile.sizes}</p>
                   </div>
                 )}
                 {tile.useCase && (
-                  <div className=" p-4  ">
-                    <p className="text-[10px] font-bold  uppercase tracking-wider mb-1">Use Case</p>
-                    <p className="text-sm font-semibold ">{tile.useCase}</p>
+                  <div className="border border-border p-4">
+                    <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Use Case</p>
+                    <p className="text-sm font-semibold">{tile.useCase}</p>
                   </div>
                 )}
-                <div className=" p-4  ">
-                  <p className="text-[10px] font-bold  uppercase tracking-wider mb-1">Category</p>
-                  <p className="text-sm font-semibold ">{tile.categoryLabel}</p>
+                <div className="border border-border p-4">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Category</p>
+                  <p className="text-sm font-semibold">{tile.categoryLabel}</p>
                 </div>
                 {tile.featured && (
-                  <div className="bg-primary/10 p-4  -primary/20">
+                  <div className="bg-primary/10 p-4 border border-primary/20">
                     <p className="text-[10px] font-bold  uppercase tracking-wider mb-1">Status</p>
                     <p className="text-sm font-semibold text-primary">⭐ Featured</p>
                   </div>
@@ -241,13 +258,13 @@ export default async function TileDetailPage({
               </div>
 
               {/* ── Collection card ──────────────────────────────────── */}
-              {tile.collections ? (
+              {tile.collections?.length ? (
                 tile.collections.map((collection, idx) => {
-                  return <div className="p-5" key={idx}>
-                    <p className="text-[10px] font-bold  uppercase tracking-widest mb-3">Part of Collection</p>
+                  return <div className="border border-border bg-muted/20 p-5" key={collection.id ?? idx}>
+                    <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Part of Collection</p>
                     <Link
                       href={`/collections#col-${collection.id}`}
-                      className="flex items-center gap-4 group"
+                      className="group flex items-center gap-4"
                     >
                       {/* Collection thumbnail */}
                       <div className="relative w-16 h-16 shrink-0 overflow-hidden bg-background">
@@ -267,11 +284,11 @@ export default async function TileDetailPage({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className=" font-bold text-base group-hover: transition-colors">
+                        <p className="text-base font-bold text-foreground transition-colors group-hover:text-primary">
                           {collection.name}
                         </p>
                         {collection.description && (
-                          <p className=" text-xs mt-0.5 line-clamp-2">{collection.description}</p>
+                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{collection.description}</p>
                         )}
                         {collection.tileIds && <p className=" text-xs mt-1">
                           {collection.tileIds.length} tile{collection.tileIds.length !== 1 ? "s" : ""} in this collection
@@ -283,8 +300,8 @@ export default async function TileDetailPage({
                     </Link>
 
                     {/* Other tiles in the collection */}
-                    {collection.items && collection.items.length > 0 && (
-                      <div className="mt-4 pt-4 -t /10">
+                    {collection.items?.length ? (
+                      <div className="mt-4 pt-4 border-t border-border/10">
                         <p className="text-[10px]  uppercase tracking-wider font-semibold mb-2">
                           Also in this collection
                         </p>
@@ -293,7 +310,7 @@ export default async function TileDetailPage({
                             const t = item.product
                             return <Link
                               key={t.id}
-                              href={`/products/${t.id}`}
+                              href={`/products/${t.slug ?? t.id}`}
                               title={t.name}
                               className="relative w-12 h-12 shrink-0 overflow-hidden  hover:ring-2 hover:ring-primary transition-all"
                             >
@@ -313,32 +330,34 @@ export default async function TileDetailPage({
                           })}
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 })
               ) : (
-                <div className=" p-4  -gray-200">
+                <div className="bg-muted p-4 border border-border">
                   <p className="text-xs ">This tile is not part of a named collection.</p>
                 </div>
               )}
 
+              <ProductPurchase
+                product={tile}
+                className="space-y-5 border border-border bg-background p-5"
+              />
+
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <AddToCartButton product={tile} className="h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2" /> <WishlistButton productId={tile.id} />
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <WishlistButton productId={tile.id} />
                 <Link
                   href={`/visualizer?tile=${tile.id}&autoApply=1&surface=${tile.category === "wall" || tile.category === "special" ? "wall" : "floor"}`}
-                  className="flex-1 bg-secondary hover:bg-secondary  font-bold py-4 px-6 text-sm tracking-widest uppercase text-center transition-colors flex items-center justify-center gap-2"
+                  className="flex flex-1 items-center justify-center gap-2 bg-secondary px-6 py-4 text-center text-sm font-bold uppercase tracking-widest text-secondary-foreground transition-colors hover:bg-secondary/80"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                   Visualize in Room
                 </Link>
-                <Link
-                  href="/#contact"
-
-                >
-                  <Button variant={"outline"} className="flex-1 h-full font-bold py-8 px-6 text-sm tracking-widest uppercase text-center transition-colors">
+                <Link href="/#contact" className="flex-1">
+                  <Button variant="outline" className="h-full w-full px-6 py-4 text-sm font-bold uppercase tracking-widest">
                     Get a Quote
                   </Button>
                 </Link>
@@ -346,11 +365,11 @@ export default async function TileDetailPage({
             </div>
           </div>
 
-          <ProductReviews productId={tile.id} />
+          <ProductReviews productId={tile.id} initialData={reviews ?? undefined} />
 
           {/* ── Related tiles ──────────────────────────────────────────── */}
           {tile.related && tile.related.length > 0 && (
-            <div className="mt-20 pt-14 -t -gray-200">
+            <div className="mt-20 pt-14 border-t border-border">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-playfair text-2xl font-bold ">
                   More {tile.categoryLabel}
@@ -365,7 +384,7 @@ export default async function TileDetailPage({
                   return (
                     <Link
                       key={r.id}
-                      href={`/products/${r.id}`}
+                      href={`/products/${r.slug ?? r.id}`}
                       className=" group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
                     >
                       <div className="relative h-44 overflow-hidden ">
@@ -384,12 +403,12 @@ export default async function TileDetailPage({
                           </div>
                         )}
                         {r.badge && (
-                          <span className={`absolute top-2 left-0 text-[9px]  font-bold px-2.5 py-0.5 ${badgeStyle(r.badge)}`}>{r.badge}</span>
+                          <Badge className={`absolute left-0 top-2 h-auto rounded-none px-2.5 py-0.5 text-[9px] font-bold ${badgeStyle(r.badge)}`}>{r.badge}</Badge>
                         )}
                       </div>
                       <div className="p-4">
                         <p className=" text-[9px] font-bold uppercase tracking-widest mb-0.5">{r.categoryLabel}</p>
-                        <p className="font-bold  text-sm group-hover: transition-colors">{r.name}</p>
+                        <p className="text-sm font-bold transition-colors group-hover:text-primary">{r.name}</p>
                         <p className=" text-xs mt-0.5">{r.sizes}</p>
                       </div>
                     </Link>

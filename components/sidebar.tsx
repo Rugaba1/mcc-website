@@ -23,6 +23,8 @@ import {
     SheetTitle,
 } from "./ui/sheet";
 import { NavItem } from "./dashboard/nav";
+import { useAdminNotifications } from "@/components/dashboard/admin-notifications-provider";
+import { Badge } from "./ui/badge";
 5
 
 type Area = "account" | "admin";
@@ -46,6 +48,7 @@ export function SidebarContent({
 }) {
     const pathname = usePathname();
     const { user, logout } = useAuth();
+    const { unreadMessageCount } = useAdminNotifications();
     const staff = isStaffUser(user);
     const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
 
@@ -85,14 +88,26 @@ export function SidebarContent({
                             title={collapsed ? item.name : undefined}
                             className={cn(
                                 "flex items-center  px-3 py-2 text-sm font-medium transition-colors",
-                                collapsed ? "justify-center" : "gap-3",
+                                collapsed ? "relative justify-center" : "gap-3",
                                 active
                                     ? "bg-primary text-primary-foreground"
                                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                             )}
                         >
                             <Icon className="h-5 w-5 shrink-0" />
-                            {!collapsed && <span>{item.name}</span>}
+                            {!collapsed && <span className="flex-1">{item.name}</span>}
+                            {area === "admin" &&
+                                item.name === "Messages" &&
+                                unreadMessageCount > 0 && (
+                                    <Badge
+                                        variant="destructive"
+                                        className={`${collapsed ? "absolute right-0 top-0" : "ml-auto"} min-w-5 justify-center px-1 text-[10px]`}
+                                    >
+                                        {unreadMessageCount > 99
+                                            ? "99+"
+                                            : unreadMessageCount}
+                                    </Badge>
+                                )}
                         </Link>
                     );
                 })}

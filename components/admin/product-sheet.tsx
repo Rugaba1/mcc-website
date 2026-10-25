@@ -24,6 +24,10 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Textarea } from "@/components/ui/textarea";
 import { ImageField } from "../file-picker";
 import { ColorsField } from "../color-field";
+import { GradientField } from "@/components/gradient-field";
+import { TileSizesField } from "@/components/tile-sizes-field";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 const STATUS_OPTIONS: { value: ProductStatus; label: string; hint: string }[] = [
   { value: "ACTIVE", label: "Active", hint: "Visible on the public catalog" },
@@ -60,7 +64,7 @@ type FormState = {
 const EMPTY: FormState = {
   name: "",
   category: "",
-  status: "ACTIVE",
+  status: "DRAFT",
   collection: "",
   useCase: "",
   sizes: "",
@@ -211,8 +215,9 @@ export function ProductSheet({
   };
 
   return (
+    <PermissionGate required={product ? PERM.PRODUCTS_UPDATE : PERM.PRODUCTS_CREATE}>
     <Sheet open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
-      <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-xl">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-2xl">
         <form onSubmit={submit} className="flex h-full min-h-0 flex-col">
           <SheetHeader className="border-b">
             <SheetTitle>{product ? "Edit product" : "New product"}</SheetTitle>
@@ -243,20 +248,22 @@ export function ProductSheet({
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Status" hint={STATUS_OPTIONS.find((s) => s.value === form.status)?.hint}>
-                <Select value={form.status} onValueChange={(v) => set("status", v as ProductStatus)}>
-                  <SelectTrigger className="w-full rounded-none">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-none">
-                    {STATUS_OPTIONS.map((s) => (
-                      <SelectItem key={s.value} value={s.value} className="rounded-none">
-                        {s.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
+              <PermissionGate required={PERM.PRODUCTS_PUBLISH}>
+                <Field label="Status" hint={STATUS_OPTIONS.find((s) => s.value === form.status)?.hint}>
+                  <Select value={form.status} onValueChange={(v) => set("status", v as ProductStatus)}>
+                    <SelectTrigger className="w-full rounded-none">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none">
+                      {STATUS_OPTIONS.map((s) => (
+                        <SelectItem key={s.value} value={s.value} className="rounded-none">
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </PermissionGate>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -284,7 +291,7 @@ export function ProductSheet({
                 <Input className="rounded-none" value={form.useCase} onChange={(e) => set("useCase", e.target.value)} placeholder="floor" />
               </Field>
               <Field label="Sizes (display text)" hint="Only a fallback. The table shows sizes from the variants.">
-                <Input className="rounded-none" value={form.sizes} onChange={(e) => set("sizes", e.target.value)} placeholder="60x60, 30x60" />
+                <TileSizesField value={form.sizes} onChange={(value) => set("sizes", value)} />
               </Field>
             </div>
 
@@ -303,17 +310,23 @@ export function ProductSheet({
             </Field>
 
             <Field label="Fallback gradient" hint="CSS gradient used while the image loads (optional)">
-              <Input className="rounded-none" value={form.gradient} onChange={(e) => set("gradient", e.target.value)} placeholder="linear-gradient(135deg, #e5e5e5, #cfcfcf)" />
+              <GradientField
+                id="product-fallback-gradient"
+                value={form.gradient}
+                onChange={(value) => set("gradient", value)}
+              />
             </Field>
 
             <Field label="Description" error={errors.description}>
               <Textarea className="min-h-28 rounded-none" value={form.description} onChange={(e) => set("description", e.target.value)} />
             </Field>
 
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <Checkbox className="rounded-none" checked={form.featured} onCheckedChange={(c) => set("featured", c === true)} />
-              Feature this product on the home page
-            </label>
+            <PermissionGate required={PERM.PRODUCTS_PUBLISH}>
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <Checkbox className="rounded-none" checked={form.featured} onCheckedChange={(c) => set("featured", c === true)} />
+                Feature this product on the home page
+              </label>
+            </PermissionGate>
 
             <Section title="Tile specs (shared by all variants)">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -358,5 +371,6 @@ export function ProductSheet({
         </form>
       </SheetContent>
     </Sheet>
+    </PermissionGate>
   );
 }

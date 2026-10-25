@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Loader2, Search, Undo2 } from "lucide-react";
 import { toast } from "sonner";
@@ -14,7 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { fmtDateTime, money, options, pretty } from "@/lib/format";
+import { options, pretty } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { DataPagination } from "@/components/admin/data-pagination";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 const STATUSES = ["PENDING", "AUTHORIZED", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"];
 const METHODS = ["MTN_MOMO", "AIRTEL_MONEY", "CARD", "BANK_TRANSFER", "CASH_ON_DELIVERY"];
@@ -22,6 +27,7 @@ const METHODS = ["MTN_MOMO", "AIRTEL_MONEY", "CARD", "BANK_TRANSFER", "CASH_ON_D
 // ─── Detail panel: verify, edit, refund ───────────────────────────────────────
 
 function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promise<void> }) {
+  const { money, dateTime } = useFormatters();
   const locked = row.refundedAmount > 0;
   const [status, setStatus] = useState(row.status);
   const [ref, setRef] = useState(row.reference ?? "");
@@ -69,7 +75,7 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
       <div className="flex flex-wrap items-end justify-between gap-3 border p-4">
         <div>
           <p className="text-2xl font-semibold tabular-nums">{money(row.amount, row.currency)}</p>
-          <p className="text-sm text-muted-foreground">{pretty(row.method)}{row.provider ? ` · ${row.provider}` : ""} · {fmtDateTime(row.paidAt ?? row.createdAt)}</p>
+          <p className="text-sm text-muted-foreground">{pretty(row.method)}{row.provider ? ` · ${row.provider}` : ""} · {dateTime(row.paidAt ?? row.createdAt)}</p>
         </div>
         <StatusBadge status={row.status} />
       </div>
@@ -80,8 +86,8 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
       </div>
 
       {row.refundedAmount > 0 && (
-        <p className="border-l-2 border-amber-500 bg-amber-500/10 p-3 text-sm">
-          Refunded {money(row.refundedAmount, row.currency)}{row.refundedAt ? ` on ${fmtDateTime(row.refundedAt)}` : ""}.{row.refundReason ? ` Reason: ${row.refundReason}` : ""}
+        <p className="border-l-2 border-warning bg-warning/10 p-3 text-sm">
+          Refunded {money(row.refundedAmount, row.currency)}{row.refundedAt ? ` on ${dateTime(row.refundedAt)}` : ""}.{row.refundReason ? ` Reason: ${row.refundReason}` : ""}
         </p>
       )}
 
@@ -91,8 +97,10 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
           <h3 className="text-sm font-semibold">Waiting for confirmation</h3>
           <p className="text-sm text-muted-foreground">Check the MoMo message or bank statement against the reference below, then confirm.</p>
           <div className="flex flex-wrap gap-2">
-            <Button className="rounded-none" disabled={busy} onClick={() => save({ status: "PAID" })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Mark as paid</Button>
-            <Button variant="outline" className="rounded-none" disabled={busy} onClick={() => setStatus("FAILED")}>Mark as failed…</Button>
+              <PermissionGate required={PERM.PAYMENTS_RECORD}>
+                <Button className="rounded-none" disabled={busy} onClick={() => save({ status: "PAID" })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Mark as paid</Button>
+                <Button variant="outline" className="rounded-none" disabled={busy} onClick={() => setStatus("FAILED")}>Mark as failed…</Button>
+              </PermissionGate>
           </div>
         </section>
       )}
@@ -119,11 +127,14 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
         <div className="space-y-1.5"><Label>Note</Label><Textarea className="min-h-20 rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
         <div className="space-y-1.5"><Label>Proof of payment</Label><ImageField value={proof} onChange={setProof} /></div>
         {locked && <p className="text-xs text-muted-foreground">This payment has refunds, so its status is locked. You can still edit the details above.</p>}
-        <Button className="rounded-none" disabled={busy} onClick={() => save()}>{busy && <Loader2 className="animate-spin" />}Save changes</Button>
+        <PermissionGate required={PERM.PAYMENTS_RECORD}>
+          <Button className="rounded-none" disabled={busy} onClick={() => save()}>{busy && <Loader2 className="animate-spin" />}Save changes</Button>
+        </PermissionGate>
       </section>
 
       {/* Refund */}
       {canRefund && (
+        <PermissionGate required={PERM.PAYMENTS_REFUND}>
         <section className="space-y-3 border border-destructive/40 p-4">
           <h3 className="text-sm font-semibold">Refund</h3>
           <p className="text-sm text-muted-foreground">Send the money back to the customer first (MoMo, bank…), then record it here. You can refund up to {money(refundable, row.currency)}.</p>
@@ -136,11 +147,12 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
           ) : (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm">Record a refund of <strong>{money(amount, row.currency)}</strong>?</span>
-              <Button className="rounded-none bg-destructive text-white hover:bg-destructive/90" disabled={busy} onClick={() => run(() => api.refundPayment(row.id, { amount, reason: refundWhy.trim() }), "Refund recorded")}>{busy && <Loader2 className="animate-spin" />}Yes, record it</Button>
+              <Button className="rounded-none bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={busy} onClick={() => run(() => api.refundPayment(row.id, { amount, reason: refundWhy.trim() }), "Refund recorded")}>{busy && <Loader2 className="animate-spin" />}Yes, record it</Button>
               <Button variant="ghost" className="rounded-none" onClick={() => setConfirming(false)}>Cancel</Button>
             </div>
           )}
         </section>
+        </PermissionGate>
       )}
     </div>
   );
@@ -149,20 +161,29 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
 // ─── Order picker for "Add payment" ───────────────────────────────────────────
 
 function OrderPicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
-  const [orders, setOrders] = useState<OrderSummary[] | null>(null);
+  const { money } = useFormatters();
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [q, setQ] = useState("");
+  const query = useDebouncedValue(q, 250);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    api.getOrders().then(setOrders).catch((e) => { toast.error(apiErrorMessage(e, "Failed to load orders")); setOrders([]); });
-  }, []);
+    setLoading(true);
+    api.getUnpaidOrdersPage(page, 15, query.trim())
+      .then((result) => {
+        setOrders(result.items);
+        setTotal(result.total);
+        setTotalPages(result.totalPages);
+        if (result.page !== page) setPage(result.page);
+      })
+      .catch((e) => toast.error(apiErrorMessage(e, "Failed to load orders")))
+      .finally(() => setLoading(false));
+  }, [page, query]);
 
-  const list = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    return (orders ?? [])
-      .filter((o) => o.status !== "CANCELLED" && o.status !== "REFUNDED" && o.paymentStatus !== "PAID" && o.paymentStatus !== "REFUNDED")
-      .filter((o) => !term || `${o.orderNumber} ${o.customerName} ${o.phone ?? ""}`.toLowerCase().includes(term))
-      .slice(0, 40);
-  }, [orders, q]);
+  useEffect(() => setPage(1), [query]);
 
   return (
     <div className="space-y-2">
@@ -171,9 +192,9 @@ function OrderPicker({ value, onChange }: { value: string; onChange: (id: string
         <Input className="rounded-none pl-8" placeholder="Search order number or customer" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <div className="max-h-48 overflow-y-auto border">
-        {orders === null ? <p className="flex items-center gap-2 p-3 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Loading…</p>
-          : list.length === 0 ? <p className="p-3 text-sm text-muted-foreground">No unpaid orders found.</p>
-            : list.map((o) => (
+        {loading ? <p className="flex items-center gap-2 p-3 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Loading…</p>
+          : orders.length === 0 ? <p className="p-3 text-sm text-muted-foreground">No unpaid orders found.</p>
+            : orders.map((o) => (
               <button key={o.id} type="button" onClick={() => onChange(String(o.id))}
                 className={`flex w-full items-center justify-between gap-3 border-b p-2.5 text-left text-sm last:border-b-0 hover:bg-accent ${value === String(o.id) ? "bg-accent" : ""}`}>
                 <span className="min-w-0"><span className="block font-medium">{o.orderNumber}</span><span className="block truncate text-xs text-muted-foreground">{o.customerName}</span></span>
@@ -181,6 +202,7 @@ function OrderPicker({ value, onChange }: { value: string; onChange: (id: string
               </button>
             ))}
       </div>
+      {total > 0 && <DataPagination page={page} totalPages={totalPages} total={total} pageSize={15} onPageChange={setPage} disabled={loading} />}
       <p className="text-xs text-muted-foreground">Only orders that still owe money are listed.</p>
     </div>
   );
@@ -189,16 +211,17 @@ function OrderPicker({ value, onChange }: { value: string; onChange: (id: string
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminPaymentsPage() {
+  const { money, dateTime } = useFormatters();
   return (
     <ResourcePage<PaymentSummary>
       title="Payments"
       description="Confirm manual payments, fix details and record refunds."
       entityName="payment"
-      load={api.getPayments}
-      searchText={(p) => `${p.orderNumber} ${p.customerName} ${p.reference ?? ""} ${p.payerPhone ?? ""} ${p.provider ?? ""}`}
+      loadPage={api.getPaymentsPage}
+      createPermission={PERM.PAYMENTS_RECORD}
       filters={[
-        { key: "status", label: "Statuses", options: options(STATUSES), match: (p, v) => p.status === v },
-        { key: "method", label: "Methods", options: options(METHODS), match: (p, v) => p.method === v },
+        { key: "status", label: "Statuses", options: options(STATUSES) },
+        { key: "method", label: "Methods", options: options(METHODS) },
       ]}
       columns={[
         { header: "Order", cell: (p) => <span className="font-medium">{p.orderNumber}</span> },
@@ -206,8 +229,8 @@ export default function AdminPaymentsPage() {
         { header: "Method", cell: (p) => <div><p>{pretty(p.method)}</p>{p.provider && <p className="text-xs text-muted-foreground">{p.provider}</p>}</div> },
         { header: "Reference", cell: (p) => <span className="font-mono text-xs text-muted-foreground">{p.reference ?? "—"}</span> },
         { header: "Status", cell: (p) => <div className="space-y-1"><StatusBadge status={p.status} />{p.failureReason && <p className="max-w-48 text-xs text-destructive">{p.failureReason}</p>}</div> },
-        { header: "Amount", className: "text-right", cell: (p) => <div className="text-right"><p className="font-medium tabular-nums">{money(p.amount, p.currency)}</p>{p.refundedAmount > 0 && <p className="text-xs text-amber-600 dark:text-amber-400">−{money(p.refundedAmount, p.currency)} refunded</p>}</div> },
-        { header: "Date", cell: (p) => fmtDateTime(p.paidAt ?? p.createdAt) },
+        { header: "Amount", className: "text-right", cell: (p) => <div className="text-right"><p className="font-medium tabular-nums">{money(p.amount, p.currency)}</p>{p.refundedAmount > 0 && <p className="text-xs text-warning dark:text-warning">−{money(p.refundedAmount, p.currency)} refunded</p>}</div> },
+        { header: "Date", cell: (p) => dateTime(p.paidAt ?? p.createdAt) },
       ]}
       detail={{
         title: (p) => `Payment for ${p.orderNumber}`,
@@ -218,7 +241,7 @@ export default function AdminPaymentsPage() {
         { name: "orderId", label: "Order", type: "custom", required: true, render: (v, set) => <OrderPicker value={v ?? ""} onChange={set} /> },
         { name: "method", label: "Method", type: "select", required: true, options: options(METHODS) },
         { name: "status", label: "Payment is", type: "select", required: true, options: [{ value: "PAID", label: "Received" }, { value: "PENDING", label: "Waiting for confirmation" }] },
-        { name: "amount", label: "Amount (RWF)", type: "number", required: true },
+        { name: "amount", label: "Amount (base currency)", type: "number", required: true },
         { name: "providerRef", label: "Transaction reference", type: "text", hint: "MoMo transaction ID, bank slip number…" },
         { name: "payerPhone", label: "Payer phone", type: "text" },
         { name: "note", label: "Note", type: "text", wide: true, placeholder: "Paid in cash at the showroom" },

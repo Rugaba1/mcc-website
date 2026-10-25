@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { api, serverApi, type Collection, type Product } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 const PAGE_SIZE = 12
 export default async function CollectionsPage({
   params,
@@ -115,13 +116,13 @@ export default async function CollectionsPage({
       </div>
 
       {/* Footer strip */}
-      <div className="bg-dark py-8 mt-12">
+      <div className="bg-inverse py-8 mt-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className=" text-sm">© {new Date().getFullYear()} Mountain Ceramics Company</p>
           <div className="flex gap-6">
-            <Link href="/" className=" hover: text-sm transition-colors">Home</Link>
-            <Link href="/projects" className=" hover: text-sm transition-colors">Projects</Link>
-            <Link href="/visualizer" className=" hover: text-sm transition-colors">Visualizer</Link>
+            <Link href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">Home</Link>
+            <Link href="/projects" className="text-muted-foreground hover:text-primary text-sm transition-colors">Projects</Link>
+            <Link href="/visualizer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Visualizer</Link>
           </div>
         </div>
       </div>
@@ -150,7 +151,6 @@ function CollectionCard({
   const visualizerUrl = firstTile
     ? `/visualizer?collection=${encodeURIComponent(collection.name)}&tile=${firstTile.id}&surface=${surface}&autoApply=1`
     : `/visualizer?collection=${encodeURIComponent(collection.name)}`;
-  const panoramaUrl = `/visualizer/panorama?collection=${encodeURIComponent(collection.name)}`;
 
   return (
     <div className={` group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col ${large ? "md:flex-row" : ""}`}>
@@ -165,16 +165,19 @@ function CollectionCard({
           sizes={large ? "(max-width: 768px) 100vw, 50vw" : "33vw"}
           unoptimized
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-overlay/60 via-transparent to-transparent" />
         {collection.featured && (
-          <span className="absolute top-4 left-0 bg-primary  text-[10px] font-bold px-4 py-1.5 uppercase tracking-widest">
+          <Badge className="absolute left-0 top-4 h-auto rounded-none px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest">
             Featured
-          </span>
+          </Badge>
         )}
         {/* Tile count badge */}
-        <div className="absolute bottom-4 left-4 bg-dark/80 backdrop-blur-sm px-3 py-1.5">
-          <span className=" text-xs font-bold">{tiles.length} tile{tiles.length !== 1 ? "s" : ""}</span>
-        </div>
+        <Badge
+          variant="outline"
+          className="absolute bottom-4 left-4 h-auto border-inverse-border bg-inverse/80 px-3 py-1.5 text-xs font-bold text-inverse-foreground backdrop-blur-sm"
+        >
+          {tiles.length} tile{tiles.length !== 1 ? "s" : ""}
+        </Badge>
       </div>
 
       {/* Content */}
@@ -193,20 +196,20 @@ function CollectionCard({
           {/* Surface badges */}
           <div className="flex flex-wrap gap-2 mb-5">
             {wallTiles.length > 0 && (
-              <span className="flex items-center gap-1.5 bg-accent/5  text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider">
+              <Badge variant="outline" className="h-auto gap-1.5 bg-accent/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6z" />
                 </svg>
                 Wall ({wallTiles.length})
-              </span>
+              </Badge>
             )}
             {floorTiles.length > 0 && (
-              <span className="flex items-center gap-1.5 bg-accent/5  text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider">
+              <Badge variant="outline" className="h-auto gap-1.5 bg-accent/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v16.5h16.5" />
                 </svg>
                 Floor ({floorTiles.length})
-              </span>
+              </Badge>
             )}
           </div>
 
@@ -237,24 +240,9 @@ function CollectionCard({
 
         {/* CTAs */}
         <div className="flex flex-col gap-2">
-          {/* <Link
-            href={panoramaUrl}
-            className="group/btn w-full bg-primary hover:bg-primary  font-bold py-3.5 text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5"
-          >
-             
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
-            </svg>
-            Panorama View
-            <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link> */}
-
           <Link
             href={visualizerUrl}
-            className="group/btn w-full bg-accent hover:bg-background  font-bold py-3 text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5  /10"
+            className="group/btn w-full bg-accent text-accent-foreground hover:bg-background hover:text-foreground font-bold py-3 text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5 border border-border/10"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -267,4 +255,3 @@ function CollectionCard({
     </div>
   );
 }
-

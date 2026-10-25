@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { verifyToken } from "../../../../lib/auth/jwt";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/middleware/withAuth";
 import { sendPasswordChangedEmail } from "@/lib/email";
 
 const changePasswordSchema = z.object({
@@ -10,48 +10,16 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, { user }) => {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized: Missing or malformed token" },
-        { status: 401 },
-      );
-    }
-    const token = authHeader.substring(7);
-
-    // 2. Verify the token directly in this route
-    const payload = await verifyToken(token);
-    if (!payload) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized: Invalid or expired token" },
-        { status: 401 },
-      );
-    }
-
-    // 3. Get the user ID from the token payload
-    const userId = payload;
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized",
-        },
-        { status: 401 },
-      );
-    }
-
     const body = await request.json();
     const { currentPassword, newPassword } = changePasswordSchema.parse(body);
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
+    const account = await prisma.user.findUnique({
+      where: { id: user.id },
     });
 
-    if (!user) {
+    if (!account) {
       return NextResponse.json(
         {
           success: false,
@@ -61,10 +29,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify current password
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
-      user.password,
+      account.password,
     );
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -76,8 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if new password is same as current
-    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    const isSamePassword = await bcrypt.compare(newPassword, account.password);
     if (isSamePassword) {
       return NextResponse.json(
         {
@@ -88,18 +54,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(
-      newPassword,
-      await bcrypt.genSalt(10),
-    );
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    // Update password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword },
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: account.id },
+        data: { password: hashedPassword },
+      });
+      await tx.refreshToken.updateMany({
+        where: { userId: account.id },
+        data: { revokedAt: new Date(), replacedById: null },
+      });
     });
-    await sendPasswordChangedEmail(user.email, user.firstName);
+    await sendPasswordChangedEmail(account.email, account.firstName);
 
     return NextResponse.json(
       {
@@ -129,4 +96,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

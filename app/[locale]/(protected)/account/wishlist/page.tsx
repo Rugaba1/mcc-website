@@ -4,7 +4,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type WishlistEntry } from "@/lib/api";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { useResource } from "@/hooks/use-resource";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { MIN_SQM } from "@/lib/sale-pricing";
 const fetchWishlist = () => api.getWishlist();
 
 export default function WishlistPage() {
+  const { money } = useFormatters();
   const { data, loading, reload } = useResource<WishlistEntry[]>(fetchWishlist, []);
   const { addToCart } = useCart();
 

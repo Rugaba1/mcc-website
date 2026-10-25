@@ -12,9 +12,8 @@ import React, {
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "@/app/i18n/routing";
-import apiClient, { refreshAccessToken } from "../lib/api-client";
-import { tokenStore, type AuthUser } from "../lib/token-store";
-import { isStaffUser } from "@/lib/roles";
+import { api, refreshAccessToken } from "@/lib/api";
+import { tokenStore, type AuthUser } from "@/lib/token-store";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -22,10 +21,26 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isInitializing: boolean; // true until the first session restore attempt finishes
   isLoading: boolean; // login / logout in progress
-  login: (identifier: string, password: string, redirectTo?: string) => Promise<void>;
+  login: (
+    identifier: string,
+    password: string,
+    redirectTo?: string,
+    verification?: { challenge: string; code: string },
+  ) => Promise<LoginResult>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 }
+
+export type LoginResult =
+  | { accountDisabled: true }
+  | { emailVerificationRequired: true }
+  | {
+      twoFactorRequired: true;
+      method: "email" | "authenticator";
+      challenge: string;
+      message: string;
+    }
+  | { twoFactorRequired: false };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -60,16 +75,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (identifier: string, password: string, redirectTo = "/account") => {
+    async (
+      identifier: string,
+      password: string,
+      redirectTo = "/account",
+      verification?: { challenge: string; code: string },
+    ): Promise<LoginResult> => {
       setIsLoading(true);
       try {
-        const { data } = await apiClient.post("/api/auth/login", {
+        const data = await api.authenticate({
           identifier,
           password,
+          next: redirectTo,
+          ...verification,
         });
 
-        tokenStore.set({ accessToken: data.accessToken, user: data.user });
+        if (data.emailVerificationRequired) {
+          return { emailVerificationRequired: true };
+        }
+
+        if (data.accountDisabled) {
+          return { accountDisabled: true };
+        }
+
+        if (data.twoFactorRequired) {
+          if (!data.method || !data.challenge || !data.message) {
+            throw new Error("The two-factor response was incomplete.");
+          }
+          return {
+            twoFactorRequired: true,
+            method: data.method,
+            challenge: data.challenge,
+            message: data.message,
+          };
+        }
+
+        if (!data.accessToken || !data.user) {
+          throw new Error("The login response was incomplete.");
+        }
+        tokenStore.set({
+          accessToken: data.accessToken,
+          user: {
+            id: String(data.user.id),
+            firstName: data.user.firstName,
+            lastName: data.user.lastName ?? undefined,
+            email: data.user.email,
+            phoneNumber: data.user.phoneNumber,
+            profilePicture: data.user.profilePicture,
+            role: {
+              id: String(data.user.role.id),
+              roleName: data.user.role.roleName,
+            },
+            permissions: data.user.permissions,
+          },
+        });
         router.push(redirectTo);
+        return { twoFactorRequired: false };
       } finally {
         setIsLoading(false);
       }
@@ -79,15 +140,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     setIsLoading(true);
+    let serverLogoutSucceeded = false;
     try {
-      await apiClient.post("/api/auth/logout");
+      await api.logout();
+      serverLogoutSucceeded = true;
     } catch {
-      /* clear locally even if the server call fails */
+      console.error("Logout request failed; clearing the local session.");
     } finally {
       setIsLoading(false);
     }
     tokenStore.clear();
-    toast.success(t("logoutSuccess"));
+    if (serverLogoutSucceeded) {
+      toast.success(t("logoutSuccess"));
+    } else {
+      toast.error("Could not revoke the server session. Please try again.");
+    }
     router.push("/login");
   }, [router, t]);
 

@@ -1,20 +1,18 @@
 import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // <- adjust
-import { requireUser } from "@/lib/auth/require-user";
+import { prisma } from "@/lib/prisma";
 import { readInvoicePdf, verifyInvoiceSignature } from "@/lib/invoices/invoice";
+import { withOptionalAuth } from "@/lib/middleware/withAuth";
 
 export const runtime = "nodejs"; // needs fs
 export const dynamic = "force-dynamic";
 
 const notFound = () => new NextResponse("Not found", { status: 404 });
 
-export async function GET(
+export const GET = withOptionalAuth(async (
   req: NextRequest,
-  { params }: { params: Promise<{ number: string }> },
-) {
-     const { claims, error } = await requireUser(req);
-      if (error) return error;
+  { user, params }: { user: { id: number } | null; params: Promise<{ number: string }> },
+) => {
     
   const { number } = await params;
   const sp = req.nextUrl.searchParams;
@@ -28,10 +26,9 @@ export async function GET(
   
   let allowed = verifyInvoiceSignature(number, sp.get("exp"), sp.get("sig"));
   if (!allowed) {
-    const user =  claims.userId;
     allowed =
       !!user &&
-      (invoice.order.userId === user )
+      invoice.order.userId === user.id;
   }
   if (!allowed) return notFound();
 
@@ -53,4 +50,4 @@ export async function GET(
       "X-Content-Type-Options": "nosniff",
     },
   });
-}
+}, { interval: 60_000, uniqueTokenPerInterval: 120 });

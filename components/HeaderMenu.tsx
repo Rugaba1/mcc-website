@@ -16,6 +16,7 @@ import {
   Layers,
 } from "lucide-react";
 import { TILES_CATALOG, TileProduct } from "../data/catalog";
+import { useFormatters } from "@/contexts/format-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -70,6 +71,7 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
   isSavingDesign = false,
   isExistingDesign = false,
 }) => {
+  const { displayMoney } = useFormatters();
   const [copied, setCopied] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -262,7 +264,7 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
                     className="flex items-center justify-between p-2 -lg bg-background/50 border  hover:border-primary hover:bg-background cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="relative w-10 h-10  overflow-hidden bg-dark shrink-0">
+                      <div className="relative w-10 h-10  overflow-hidden bg-inverse shrink-0">
                         <Image src={t.swatchUrl} alt={t.name} fill className="object-cover" unoptimized />
                       </div>
                       <div>
@@ -274,7 +276,7 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
                     </div>
                     {t.pricePerBox && (
                       <span className="text-xs font-bold text-primary mr-2">
-                        {t.pricePerBox.toLocaleString()} RWF
+                        {displayMoney(t.pricePerBox)}
                       </span>
                     )}
                   </div>

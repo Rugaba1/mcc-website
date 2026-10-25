@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 
-export async function GET(req: NextRequest) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-
+export const GET = withPermission(PERM.MEDIA_VIEW)(async (req: NextRequest) => {
   const sp = req.nextUrl.searchParams;
   const limit = Math.min(Math.max(parseInt(sp.get("limit") ?? "24", 10) || 24, 1), 100);
   const page = Math.max(parseInt(sp.get("page") ?? "1", 10) || 1, 1);
@@ -25,4 +23,4 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({ files, total, page, totalPages: Math.max(1, Math.ceil(total / limit)) });
-}
+});

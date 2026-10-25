@@ -2,10 +2,10 @@ import { Badge } from "@/components/ui/badge";
 import { pretty } from "@/lib/format";
 
 export const TONES = {
-    green: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-    amber: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-    blue: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
-    red: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
+    green: "border-success/30 bg-success/10 text-success",
+    amber: "border-warning/30 bg-warning/10 text-warning",
+    blue: "border-info/30 bg-info/10 text-info",
+    red: "border-destructive/30 bg-destructive/10 text-destructive",
     gray: "border-border bg-muted text-muted-foreground",
 };
 

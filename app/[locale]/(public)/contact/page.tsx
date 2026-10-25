@@ -4,8 +4,10 @@ import { useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2, ArrowRight, ClockIcon, MapPinIcon, PhoneIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { api, apiErrorMessage } from "@/lib/api";
+import { COMPANY } from "@/lib/company";
 import { EnvelopeIcon, FacebookIcon, InstagramIcon, LinkedInIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
+import { GoogleMapEmbed } from "@/components/GoogleMapEmbed";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -19,9 +21,9 @@ import {
 
 
 const contactDetails = [
-  { icon: "pin", title: "Head Office & Factory", lines: ["MH 7 Ave, Muhanga Industrial Zone", "Muhanga, Rwanda"] },
-  { icon: "phone", title: "Phone", lines: ["+250 785 210 005", "+250 780 765 548"] },
-  { icon: "envelope", title: "Email", lines: ["info@mountainceramic.com", "sales@mountainceramic.com"] },
+  { icon: "pin", title: "Head Office & Factory", lines: [COMPANY.address] },
+  { icon: "phone", title: "Phone", lines: [COMPANY.phone, COMPANY.alternatePhone] },
+  { icon: "envelope", title: "Email", lines: [COMPANY.email, COMPANY.salesEmail] },
   { icon: "clock", title: "Working Hours", lines: ["Monday – Sunday 24/7"] },
 ];
 
@@ -65,9 +67,15 @@ export default function Contact() {
       form.reset();
       setPhone("");
       setSent(result.confirmationSent);
-      if (!result.confirmationSent) {
+      const deliveryIssues = [
+        !result.confirmationSent &&
+          "the confirmation email could not be delivered",
+        !result.staffAlertSent &&
+          "our team notification could not be delivered",
+      ].filter(Boolean);
+      if (deliveryIssues.length > 0) {
         toast.warning(
-          "Your message was received, but we couldn't deliver the confirmation email right now. We'll respond to your message; contact us by phone if it's urgent.",
+          `Your message was saved, but ${deliveryIssues.join(" and ")}. We'll respond to your message; contact us by phone if it's urgent.`,
         );
       }
       setTimeout(() => setSent(false), 8000);
@@ -128,6 +136,7 @@ export default function Contact() {
                 ))}
               </div>
             </div>
+            <GoogleMapEmbed />
           </div>
 
           {/* Form side */}
@@ -138,7 +147,7 @@ export default function Contact() {
             </p>
 
             {sent && (
-              <div role="status" className="mb-6 flex items-center gap-2 border-l-4 border-emerald-500 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">
+              <div role="status" className="mb-6 flex items-center gap-2 border-l-4 border-success bg-success/10 p-4 text-sm font-medium text-success">
                 <CheckCircle2 className="h-5 w-5 shrink-0" />
                 Message sent! Check your email for a confirmation.
               </div>

@@ -4,9 +4,7 @@ import { verifyToken } from "./jwt";
 
 export async function getApiUser(req: NextRequest) {
   const header = req.headers.get("authorization");
-  const token = header?.startsWith("Bearer ")
-    ? header.slice(7)
-    : req.cookies.get("auth_token")?.value;
+  const token = header?.startsWith("Bearer ") ? header.slice(7) : undefined;
   if (!token) return null;
 
   const userId = await verifyToken(token);

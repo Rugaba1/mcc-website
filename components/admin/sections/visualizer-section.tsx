@@ -8,6 +8,9 @@ import { Button } from "../../ui/button";
 import { ImageUploader } from "../image-uploader";
 import { Modal } from "../modal";
 import { Input } from "@/components/ui/input";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { Link } from "@/app/i18n/routing";
 
 type Row = ProductVariant & { productName: string };
 
@@ -52,15 +55,20 @@ export function VisualizerSection({
             {ready} of {rows.length} variants ready for the room visualizer
           </p>
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <Input
-            type="checkbox"
-            checked={missingOnly}
-            onChange={(e) => setMissingOnly(e.target.checked)}
-            className="accent-primary"
-          />
-          Missing texture only
-        </label>
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="flex items-center gap-2 text-sm">
+            <Input
+              type="checkbox"
+              checked={missingOnly}
+              onChange={(e) => setMissingOnly(e.target.checked)}
+              className="accent-primary"
+            />
+            Missing texture only
+          </label>
+          <Link href="/visualizer" target="_blank" rel="noreferrer">
+            <Button variant="outline">Open room visualizer</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -81,9 +89,19 @@ export function VisualizerSection({
                   {v.sku} · {v.size}
                 </p>
               </div>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => setEditing({ ...v })}>
-                {v.textureUrl ? "Change texture" : "Add texture"}
-              </Button>
+              <PermissionGate required={PERM.VARIANTS_MANAGE}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => setEditing({ ...v })}>
+                  {v.textureUrl ? "Change texture" : "Add texture"}
+                </Button>
+              </PermissionGate>
+              <Link
+                href={`/visualizer?tile=${v.productId}&autoApply=1`}
+                target="_blank"
+                rel="noreferrer"
+                className="block text-center text-xs font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                Preview this tile
+              </Link>
             </div>
           </div>
         ))}
@@ -95,6 +113,7 @@ export function VisualizerSection({
       </div>
 
       {editing && (
+        <PermissionGate required={PERM.VARIANTS_MANAGE}>
         <Modal
           title={`${editing.productName} · ${editing.sku}`}
           maxWidth="max-w-md"
@@ -112,6 +131,7 @@ export function VisualizerSection({
             the floor or wall in the visualizer.
           </p>
         </Modal>
+        </PermissionGate>
       )}
     </div>
   );

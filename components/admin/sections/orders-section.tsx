@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { api, type OrderDetail, type OrderSummary } from "@/lib/api";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
@@ -17,6 +17,7 @@ export function OrdersSection({
   orders: OrderSummary[];
   reload: () => Promise<void> | void;
 }) {
+  const { money, date, dateTime } = useFormatters();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("ALL");
   const [selected, setSelected] = useState<OrderDetail | null>(null);
@@ -96,7 +97,7 @@ export function OrdersSection({
                   <p>{o.customerName}</p>
                   <p className="text-xs text-muted-foreground">{o.email}</p>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{new Date(o.placedAt).toLocaleDateString()}</td>
+                <td className="px-4 py-3 text-muted-foreground">{date(o.placedAt)}</td>
                 <td className="px-4 py-3">{o.itemCount}</td>
                 <td className="px-4 py-3 font-medium">{money(o.grandTotal)}</td>
                 <td className="px-4 py-3">
@@ -155,7 +156,7 @@ export function OrdersSection({
                       <li key={h.id} className="flex gap-3 text-sm">
                         <Badge variant="outline">{h.status}</Badge>
                         <span className="text-muted-foreground">
-                          {new Date(h.createdAt).toLocaleString()}{h.note ? ` · ${h.note}` : ""}
+                          {dateTime(h.createdAt)}{h.note ? ` · ${h.note}` : ""}
                         </span>
                       </li>
                     ))}

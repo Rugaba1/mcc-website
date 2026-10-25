@@ -35,6 +35,7 @@ import { toast } from "sonner";
 
 import { api, apiErrorMessage, type AdminAnalytics, type PieSlice, type StatCard } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
+import { useFormatters } from "@/contexts/format-context";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,30 +53,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
 
-const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
-const plain = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-
-const money = (n: number, currency = "RWF") => `${plain.format(n)} ${currency}`;
-
-const fmtDate = (iso: string | null) =>
-  iso
-    ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    : "—";
-
-/** "2026-10-18" → "18 Oct", "2026-10" → "Oct" */
-const fmtTick = (label: string) => {
-  const isMonth = label.length === 7;
-  const d = new Date(`${label}${isMonth ? "-01" : ""}T00:00:00Z`);
-  return d.toLocaleDateString("en-GB", isMonth ? { month: "short", timeZone: "UTC" } : { day: "numeric", month: "short", timeZone: "UTC" });
-};
-
 const SLICE_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
 const TONES = {
-  green: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  amber: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  blue: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  red: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
+  green: "border-success/30 bg-success/10 text-success",
+  amber: "border-warning/30 bg-warning/10 text-warning",
+  blue: "border-info/30 bg-info/10 text-info",
+  red: "border-destructive/30 bg-destructive/10 text-destructive",
   gray: "border-border bg-muted text-muted-foreground",
 };
 
@@ -187,6 +171,7 @@ export default function AdminDashboardPage() {
 // ─── Dashboard body ───────────────────────────────────────────────────────────
 
 function Dashboard({ data, days, refreshing }: { data: AdminAnalytics; days: number; refreshing: boolean }) {
+  const { money, number, date } = useFormatters();
   const { cards, charts, pies, tables, currency } = data;
   const byKey = (k: string) => cards.find((c) => c.key === k);
 
@@ -236,7 +221,7 @@ function Dashboard({ data, days, refreshing }: { data: AdminAnalytics; days: num
                 <Icon className="size-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-xl font-semibold leading-none tabular-nums">{plain.format(value)}</span>
+                <span className="block text-xl font-semibold leading-none tabular-nums">{number(value)}</span>
                 <span className="block truncate text-xs text-muted-foreground">{label}</span>
               </span>
               <ArrowUpRight className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -284,7 +269,7 @@ function Dashboard({ data, days, refreshing }: { data: AdminAnalytics; days: num
               <div key={c.key} className="px-4 first:pl-0">
                 <p className="text-xs text-muted-foreground">{c.label}</p>
                 <p className="mt-1 text-lg font-semibold tabular-nums">
-                  {c.format === "currency" ? money(c.value, currency) : plain.format(c.value)}
+                  {c.format === "currency" ? money(c.value, currency) : number(c.value)}
                 </p>
               </div>
             ))}
@@ -317,7 +302,7 @@ function Dashboard({ data, days, refreshing }: { data: AdminAnalytics; days: num
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <StatusBadge status={m.status} />
-                    <span className="text-xs text-muted-foreground">{fmtDate(m.createdAt)}</span>
+                    <span className="text-xs text-muted-foreground">{date(m.createdAt)}</span>
                   </div>
                 </li>
               ))}
@@ -342,7 +327,7 @@ function Dashboard({ data, days, refreshing }: { data: AdminAnalytics; days: num
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1 text-sm tabular-nums">
-                    <Star className="size-4 fill-amber-400 text-amber-400" />
+                    <Star className="size-4 fill-warning text-warning" />
                     {r.rating}
                   </div>
                 </li>
@@ -368,8 +353,9 @@ function KpiCard({
   currency: string;
   days: number;
 }) {
+  const { money, number } = useFormatters();
   const value =
-    card.format === "currency" ? money(card.value, currency) : card.format === "percent" ? `${card.value}%` : plain.format(card.value);
+    card.format === "currency" ? money(card.value, currency) : card.format === "percent" ? `${card.value}%` : number(card.value);
   const change = card.change;
   const up = (change ?? 0) >= 0;
   const Trend = up ? ArrowUpRight : ArrowDownRight;
@@ -387,7 +373,7 @@ function KpiCard({
         {change !== undefined && (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span
-              className={`inline-flex items-center gap-0.5 font-medium ${up ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+              className={`inline-flex items-center gap-0.5 font-medium ${up ? "text-success dark:text-success" : "text-destructive dark:text-destructive"
                 }`}
             >
               <Trend className="size-3.5" />
@@ -419,8 +405,13 @@ function RevenueChart({
   currency: string;
   days: number;
 }) {
+  const { money, number, datePattern } = useFormatters();
   const [view, setView] = useState<"daily" | "monthly">("daily");
   const rows = view === "daily" ? daily : monthly;
+  const formatTick = (label: string) => {
+    const isMonth = label.length === 7;
+    return datePattern(isMonth ? `${label}-01` : label, isMonth ? "MMM" : "d MMM");
+  };
 
   return (
     <Card className="lg:col-span-2">
@@ -446,18 +437,18 @@ function RevenueChart({
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tickFormatter={fmtTick} />
-            <YAxis yAxisId="revenue" tickLine={false} axisLine={false} width={44} tickFormatter={(v) => compact.format(v)} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tickFormatter={formatTick} />
+            <YAxis yAxisId="revenue" tickLine={false} axisLine={false} width={44} tickFormatter={(v) => number(v, { notation: "compact", maximumFractionDigits: 1 })} />
             <YAxis yAxisId="orders" orientation="right" hide />
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(l) => fmtTick(String(l))}
+                  labelFormatter={(l) => formatTick(String(l))}
                   formatter={(value, name) => (
                     <div className="flex w-full items-center justify-between gap-6">
                       <span className="text-muted-foreground">{revenueConfig[name as keyof typeof revenueConfig]?.label}</span>
                       <span className="font-medium tabular-nums">
-                        {name === "revenue" ? money(Number(value), currency) : plain.format(Number(value))}
+                        {name === "revenue" ? money(Number(value), currency) : number(Number(value))}
                       </span>
                     </div>
                   )}
@@ -476,6 +467,7 @@ function RevenueChart({
 const productsConfig = { revenue: { label: "Revenue", color: "var(--chart-1)" } } satisfies ChartConfig;
 
 function TopProductsChart({ items, currency }: { items: AdminAnalytics["charts"]["topProducts"]; currency: string }) {
+  const { money, number } = useFormatters();
   return (
     <Card>
       <CardHeader>
@@ -507,7 +499,7 @@ function TopProductsChart({ items, currency }: { items: AdminAnalytics["charts"]
                       <div className="flex flex-col gap-0.5">
                         <span className="font-medium">{item.payload.label}</span>
                         <span className="tabular-nums text-muted-foreground">
-                          {money(Number(value), currency)} · {plain.format(item.payload.quantity)} m²
+                          {money(Number(value), currency)} · {number(item.payload.quantity)} m²
                         </span>
                       </div>
                     )}
@@ -526,20 +518,22 @@ function TopProductsChart({ items, currency }: { items: AdminAnalytics["charts"]
 const customersConfig = { customers: { label: "New customers", color: "var(--chart-3)" } } satisfies ChartConfig;
 
 function CustomersChart({ items }: { items: AdminAnalytics["charts"]["customersDaily"] }) {
+  const { number, datePattern } = useFormatters();
   const total = items.reduce((s, i) => s + i.customers, 0);
+  const formatTick = (label: string) => datePattern(label, "d MMM");
   return (
     <Card>
       <CardHeader>
         <CardTitle>New customers</CardTitle>
-        <CardDescription>{plain.format(total)} sign-ups in this period</CardDescription>
+        <CardDescription>{number(total)} sign-ups in this period</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={customersConfig} className="h-[260px] w-full">
           <BarChart data={items} margin={{ left: 4, right: 4, top: 8 }}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={28} tickFormatter={fmtTick} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={28} tickFormatter={formatTick} />
             <YAxis tickLine={false} axisLine={false} width={28} allowDecimals={false} />
-            <ChartTooltip content={<ChartTooltipContent labelFormatter={(l) => fmtTick(String(l))} />} />
+            <ChartTooltip content={<ChartTooltipContent labelFormatter={(l) => formatTick(String(l))} />} />
             <Bar dataKey="customers" fill="var(--color-customers)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
@@ -561,9 +555,10 @@ function PieCard({
   sets: PieSet[];
   currency: string;
 }) {
+  const { money, number } = useFormatters();
   const [active, setActive] = useState(sets[0].key);
   const set = sets.find((s) => s.key === active) ?? sets[0];
-  const fmt = (n: number) => (set.money ? money(n, currency) : plain.format(n));
+  const fmt = (n: number) => (set.money ? money(n, currency) : number(n));
 
   return (
     <Card>
@@ -629,6 +624,7 @@ function PieCard({
 // ─── Tables ───────────────────────────────────────────────────────────────────
 
 function ActivityTable({ tables, currency }: { tables: AdminAnalytics["tables"]; currency: string }) {
+  const { money, date } = useFormatters();
   const [tab, setTab] = useState("orders");
 
   return (
@@ -662,7 +658,7 @@ function ActivityTable({ tables, currency }: { tables: AdminAnalytics["tables"];
               <StatusBadge key="s" status={o.status} />,
               <StatusBadge key="p" status={o.paymentStatus} />,
               <span key="t" className="tabular-nums">{money(o.total, o.currency || currency)}</span>,
-              fmtDate(o.placedAt),
+              date(o.placedAt),
             ])}
           />
         )}
@@ -675,7 +671,7 @@ function ActivityTable({ tables, currency }: { tables: AdminAnalytics["tables"];
               <span key="m" className="capitalize">{p.method.replace(/_/g, " ").toLowerCase()}</span>,
               <StatusBadge key="s" status={p.status} />,
               <span key="a" className="tabular-nums">{money(p.amount, p.currency || currency)}</span>,
-              fmtDate(p.createdAt),
+              date(p.createdAt),
             ])}
           />
         )}
@@ -689,8 +685,8 @@ function ActivityTable({ tables, currency }: { tables: AdminAnalytics["tables"];
                 <p className="truncate text-xs text-muted-foreground">{c.email}</p>
               </div>,
               c.phone ?? "—",
-              fmtDate(c.joinedAt),
-              fmtDate(c.lastLogin),
+              date(c.joinedAt),
+              date(c.lastLogin),
             ])}
           />
         )}
@@ -728,7 +724,7 @@ function DataTable({ head, rows, empty }: { head: string[]; rows: ReactNode[][];
 }
 
 function LowStockCard({ rows }: { rows: AdminAnalytics["tables"]["lowStock"] }) {
-  const sqm = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+  const { number } = useFormatters();
   return (
     <Card>
       <CardHeader>
@@ -758,7 +754,7 @@ function LowStockCard({ rows }: { rows: AdminAnalytics["tables"]["lowStock"] }) 
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <StatusBadge status={r.state} />
                   <span className="text-xs tabular-nums text-muted-foreground">
-                    {sqm.format(r.availableSqm)} / {sqm.format(r.reorderLevel)} m²
+                    {number(r.availableSqm, { maximumFractionDigits: 2 })} / {number(r.reorderLevel, { maximumFractionDigits: 2 })} m²
                   </span>
                 </div>
               </li>

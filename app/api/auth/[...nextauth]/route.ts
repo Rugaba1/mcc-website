@@ -1,10 +1,11 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth, { SessionStrategy } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
 import { JWT } from "next-auth/jwt";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { api } from "@/lib/api";
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -14,45 +15,42 @@ export const authOptions = {
           type: "text", 
           placeholder: "email@example.com or phone number" 
         },
-        deviceId: { 
-          label: "Device", 
-          type: "text" 
-        },
         password: { 
           label: "Password", 
           type: "password" 
         },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         try {
-          const res = await axios.post(
-            `${process.env.NEXTAUTH_URL}/api/auth/login`,
-            {
-              identifier: credentials?.identifier,
-              deviceId: credentials?.deviceId,
-              password: credentials?.password,
-            }
-          );
-          
-          const data = res.data;
-          
+          const identifier = credentials?.identifier;
+          const password = credentials?.password;
+          if (!identifier || !password) return null;
+
+          const data = await api.authenticate({
+            identifier,
+            password,
+            next: "/",
+          });
+
           if (data.success && data.user) {
             return {
               id: String(data.user.id),
-              name: data.user.name,
+              name: [data.user.firstName, data.user.lastName]
+                .filter(Boolean)
+                .join(" "),
               email: data.user.email,
-              role: data.user.role,
-              language: data.user.language,
-              timezone: data.user.timezone,
-              device: credentials?.deviceId || "",
-              identifier: credentials?.identifier || "",
+              role: data.user.role.id,
+              language: null,
+              timezone: null,
+              device: "",
+              identifier,
               image: data.user.profilePicture || null,
             };
           }
           
           return null;
-        } catch (error) {
-          console.error("Auth error:", error);
+        } catch {
+          console.error("Legacy credentials authentication failed.");
           return null;
         }
       },
@@ -153,4 +151,9 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const rateLimitedHandler = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 30,
+})(handler);
+
+export { rateLimitedHandler as GET, rateLimitedHandler as POST };

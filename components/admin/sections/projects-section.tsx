@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { api, type Product, type Project } from "../../../lib/api";
+import { api, type Product, type Project } from "@/lib/api";
+import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
 import { ImageUploader } from "../image-uploader";
@@ -127,8 +128,8 @@ export function ProjectsSection({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.image} alt={p.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               )}
-              <span className="absolute left-3 top-3 bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">{p.type}</span>
-              {p.large && <span className="absolute right-3 top-3 bg-black px-2.5 py-1 text-[10px] font-bold text-white">HERO</span>}
+              <Badge className="absolute left-3 top-3 h-auto rounded-none px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{p.type}</Badge>
+              {p.large && <Badge className="absolute right-3 top-3 h-auto bg-overlay px-2.5 py-1 text-[10px] font-bold text-overlay-foreground">HERO</Badge>}
             </div>
             <div className="p-4">
               <h3 className="mb-0.5 text-sm font-bold">{p.title}</h3>

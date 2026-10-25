@@ -1,29 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { sendPasswordResetEmail } from "../../../../lib/email";
-import { prisma } from "../../../../lib/prisma";
-import {
-  generateResetCode,
-  hashResetCode,
-  RESET_CODE_TTL_MS,
-} from "../../../../lib/auth/reset-code";
+import { sendPasswordResetLink } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
 import { normalizeEmail } from "@/lib/auth/email-hygiene";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { issueStatelessChallenge, otpBinding } from "@/lib/auth/stateless-otp";
+import { isEmailBlocklisted } from "@/lib/auth/email-blocklist";
+import { siteConfig } from "@/config/site.config";
 
-export const runtime = "nodejs"; // reset-code.ts uses node:crypto
-
-const RESEND_COOLDOWN_MS = 60 * 1000;
+export const runtime = "nodejs";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-});
+  email: z.string().trim().toLowerCase().email().max(254),
+}).strict();
 
-const GENERIC_OK = {
-  success: true,
-  message:
-    "If an account with that email exists, a password reset code has been sent.",
-};
+const genericMessage =
+  "If an account with that email exists, a password reset link has been sent.";
 
-export async function POST(request: NextRequest) {
+export const POST = withRateLimit({
+  interval: 60 * 60_000,
+  uniqueTokenPerInterval: 5,
+})(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const { email } = forgotPasswordSchema.parse(body);
@@ -35,40 +32,37 @@ export async function POST(request: NextRequest) {
         ? null
         : await prisma.user.findUnique({ where: { email } }));
 
-    if (!user || !user.isActive) {
-      return NextResponse.json(GENERIC_OK, { status: 200 });
-    }
-
-    // Cooldown: ignore a repeat request within a minute of the last code
-    const latest = await prisma.forgetPasswordRequest.findFirst({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-    });
-    if (
-      latest &&
-      Date.now() - latest.createdAt.getTime() < RESEND_COOLDOWN_MS
-    ) {
-      return NextResponse.json(GENERIC_OK, { status: 200 });
-    }
-
-    const code = generateResetCode();
-    const codeHash = hashResetCode(String(user.id), code);
-
-    // Replace any older request so only one code is valid at a time
-    await prisma.$transaction([
-      prisma.forgetPasswordRequest.deleteMany({ where: { userId: user.id } }),
-      prisma.forgetPasswordRequest.create({
-        data: {
-          userId: user.id,
-          codeHash,
-          expiresAt: new Date(Date.now() + RESET_CODE_TTL_MS),
+    if (user?.isActive && !(await isEmailBlocklisted(user.email))) {
+      const token = issueStatelessChallenge(
+        {
+          purpose: "password-reset",
+          subject: String(user.id),
+          binding: otpBinding(user.password),
         },
-      }),
-    ]);
+        30 * 60_000,
+      );
+      const configuredSiteUrl = siteConfig.configuredSiteUrl;
+      if (!configuredSiteUrl && siteConfig.isProduction) {
+        throw new Error("A public site URL must be configured in production");
+      }
+      const siteUrl = new URL(configuredSiteUrl ?? request.nextUrl.origin);
+      if (siteConfig.isProduction && siteUrl.protocol !== "https:") {
+        throw new Error("Password reset links must use HTTPS in production");
+      }
+      const origin = siteUrl.origin;
+      const resetUrl = new URL("/forgot-password", origin);
+      resetUrl.searchParams.set("token", token);
+      await sendPasswordResetLink(
+        user.email,
+        user.firstName,
+        resetUrl.toString(),
+      );
+    }
 
-    await sendPasswordResetEmail(user.email, code, user.firstName);
-
-    return NextResponse.json(GENERIC_OK, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: genericMessage },
+      { status: 200 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -83,4 +77,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

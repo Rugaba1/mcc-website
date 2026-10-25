@@ -6,9 +6,14 @@ import { toast } from "sonner";
 import { Loader2, Pencil, Plus, Star, Trash2, UserRound } from "lucide-react";
 
 import { api, apiErrorMessage, type AdminUser } from "@/lib/api";
-// import { RegularUsersPage } from "@/components/admin/regular-users-page";
-import { fmtDate } from "@/lib/format";
-import { PERMISSION_GROUPS, ROLE_PRESETS } from "@/lib/auth/permissions-catalog";
+import { useFormatters } from "@/contexts/format-context";
+import {
+  DEFAULT_STAFF_PERMISSIONS,
+  PERMISSION_GROUPS,
+  PERM,
+  ROLE_PRESETS,
+} from "@/lib/permissions/catalog";
+import { PermissionGate } from "@/components/permission-gate";
 import { ImageField } from "@/components/file-picker";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +45,8 @@ type Form = {
 const EMPTY: Form = {
   name: "", email: "", password: "", active: true,
   profilePicture: "", jobTitle: "", bio: "",
-  showOnHomepage: false, displayOrder: 0, permissions: [],
+  showOnHomepage: false, displayOrder: 0,
+  permissions: [...DEFAULT_STAFF_PERMISSIONS],
 };
 
 const toForm = (u: AdminUser): Form => ({
@@ -76,6 +81,7 @@ function Field({
   );
 }
 function StaffManagementPage() {
+  const { date } = useFormatters();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -178,7 +184,12 @@ function StaffManagementPage() {
             Create staff accounts, manage access permissions, and control who appears in the homepage team section. Customers are managed separately.
           </p>
         </div>
-        <Button className="rounded-none" onClick={openNew}><Plus /> Add staff</Button>
+        <PermissionGate
+          required={[PERM.USERS_CREATE, PERM.USERS_PERMISSIONS]}
+          mode="hide"
+        >
+          <Button className="rounded-none" onClick={openNew}><Plus /> Add staff</Button>
+        </PermissionGate>
       </div>
 
       <Input className="max-w-sm rounded-none" placeholder="Search name, email or job title…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -216,28 +227,40 @@ function StaffManagementPage() {
                 </td>
                 <td className="p-3">{u.jobTitle ?? <span className="text-muted-foreground">—</span>}</td>
                 <td className="p-3">
-                  {u.role === "admin"
+                  {u.permissions.includes(PERM.ADMIN)
                     ? <Badge className="rounded-none">Admin</Badge>
                     : <span className="text-muted-foreground">{u.permissions.length} permission{u.permissions.length === 1 ? "" : "s"}</span>}
                 </td>
                 <td className="p-3">
-                  <Button
-                    size="sm"
-                    variant={u.showOnHomepage ? "default" : "outline"}
-                    className="rounded-none"
-                    onClick={() => toggleFeatured(u)}
-                    title="Show / hide on the homepage"
+                  <PermissionGate
+                    required={[PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS]}
+                    mode="hide"
                   >
-                    <Star className={u.showOnHomepage ? "fill-current" : ""} />
-                    {u.showOnHomepage ? "Featured" : "Hidden"}
-                  </Button>
+                    <Button
+                      size="sm"
+                      variant={u.showOnHomepage ? "default" : "outline"}
+                      className="rounded-none"
+                      onClick={() => toggleFeatured(u)}
+                      title="Show / hide on the homepage"
+                    >
+                      <Star className={u.showOnHomepage ? "fill-current" : ""} />
+                      {u.showOnHomepage ? "Featured" : "Hidden"}
+                    </Button>
+                  </PermissionGate>
                 </td>
                 <td className="p-3"><StatusBadge status={u.active ? "ACTIVE" : "DISABLED"} /></td>
-                <td className="p-3">{fmtDate(u.createdAt)}</td>
+                <td className="p-3">{date(u.createdAt)}</td>
                 <td className="p-3">
                   <div className="flex justify-end gap-1">
-                    <Button size="icon" variant="ghost" onClick={() => openEdit(u)}><Pencil /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => remove(u)}><Trash2 /></Button>
+                    <PermissionGate
+                      required={[PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS]}
+                      mode="hide"
+                    >
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(u)}><Pencil /></Button>
+                    </PermissionGate>
+                    <PermissionGate required={PERM.USERS_DEACTIVATE} mode="hide">
+                      <Button size="icon" variant="ghost" onClick={() => remove(u)}><Trash2 /></Button>
+                    </PermissionGate>
                   </div>
                 </td>
               </tr>
@@ -246,6 +269,10 @@ function StaffManagementPage() {
         </table>
       </div>
 
+      <PermissionGate
+        required={editing ? [PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS] : [PERM.USERS_CREATE, PERM.USERS_PERMISSIONS]}
+        mode="hide"
+      >
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden rounded-none p-0 sm:max-w-3xl">
           <DialogHeader className="p-6 pb-4">
@@ -333,6 +360,11 @@ function StaffManagementPage() {
                     </Button>
                   </div>
                 </div>
+                {!editing && (
+                  <p className="text-xs text-muted-foreground">
+                    New staff accounts start with the Support staff permissions. You can adjust them before creating the account.
+                  </p>
+                )}
 
                 {form.permissions.includes("admin") && (
                   <Alert className="rounded-none">
@@ -378,6 +410,7 @@ function StaffManagementPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </PermissionGate>
     </div>
   );
 }

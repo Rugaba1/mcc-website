@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-export async function PUT(req: NextRequest, { params }: Ctx) {
+export const PUT = withPermission(PERM.CATALOGUES_MANAGE)(
+  async (req: NextRequest, { params }: Ctx) => {
   try {
     const { id } = await params;
     const numId = Number(id);
@@ -41,9 +44,11 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(_req: NextRequest, { params }: Ctx) {
+export const DELETE = withPermission(PERM.CATALOGUES_MANAGE)(
+  async (_req: NextRequest, { params }: Ctx) => {
   try {
     const { id } = await params;
     await prisma.catalogue.delete({ where: { id: Number(id) } });
@@ -64,4 +69,4 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+});

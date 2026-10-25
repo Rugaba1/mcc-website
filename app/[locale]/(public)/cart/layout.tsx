@@ -1,8 +1,6 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { seoConfig } from "@/config/seo.config";
 import { siteConfig } from "@/config/site.config";
-import { absolutizeUrl } from "@/lib/absolutize";
-import { generateAlternateLinks } from "@/lib/alternates";
+import { createPageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -13,24 +11,13 @@ export async function generateMetadata({
     const { locale } = await params;
 
 
-    const title = `Your cart  | ${siteConfig.siteName}`;
-    const description = `Browse our tiles and add what you like.`;
-    const url = `${seoConfig.siteUrl}${`/${locale}`}/cart/ `;
-
-    const thumb = absolutizeUrl(`/logo.png`)
-    const image = thumb ?? `${seoConfig.siteUrl}/logo.png`;
-
-    return {
-        title,
-        description,
-        openGraph: {
-            title, description, url, siteName: seoConfig.siteName, locale: locale.replace("-", "_"), type: "website",
-            images: [{ url: image, width: 1200, height: 630, alt: title }],
-        },
-        twitter: { card: "summary_large_image", title, description, images: [image] },
-        alternates: { canonical: url, languages: generateAlternateLinks(locale, `/products`) },
-        robots: { index: true, follow: true },
-    };
+    return createPageMetadata({
+        locale,
+        path: "/cart",
+        title: `Your Cart | ${siteConfig.siteName}`,
+        description: "Review the tile products in your shopping cart.",
+        noIndex: true,
+    });
 }
 
 

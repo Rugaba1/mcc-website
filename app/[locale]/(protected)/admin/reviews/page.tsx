@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Loader2, Star, Trash2 } from "lucide-react";
+import { Inbox, Loader2, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { api, apiErrorMessage, type AdminReview } from "@/lib/api";
-import { fmtDateTime } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 export default function AdminReviewsPage() {
+    const { dateTime } = useFormatters();
     const [reviews, setReviews] = useState<AdminReview[]>([]);
     const [status, setStatus] = useState<"pending" | "approved" | "all">("pending");
     const [page, setPage] = useState(1);
@@ -85,7 +88,17 @@ export default function AdminReviewsPage() {
             {loading ? (
                 <div className="flex justify-center border py-16"><Loader2 className="animate-spin text-muted-foreground" /></div>
             ) : reviews.length === 0 ? (
-                <div className="flex min-h-48 items-center justify-center border text-sm text-muted-foreground">No reviews in this queue.</div>
+                <div className="flex min-h-56 flex-col items-center justify-center gap-2 border bg-muted/20 px-6 text-center">
+                    <Inbox className="size-8 text-muted-foreground" aria-hidden="true" />
+                    <h2 className="font-semibold">
+                        {status === "pending" ? "No pending reviews" : status === "approved" ? "No approved reviews" : "No reviews yet"}
+                    </h2>
+                    <p className="max-w-md text-sm text-muted-foreground">
+                        {status === "pending"
+                            ? "New customer reviews will appear here when they are ready for moderation."
+                            : "Reviews matching this filter will appear here."}
+                    </p>
+                </div>
             ) : (
                 <div className="divide-y border">
                     {reviews.map((review) => (
@@ -93,7 +106,7 @@ export default function AdminReviewsPage() {
                             <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
                                     <a href={`/products/${review.productId}#reviews`} className="font-semibold text-primary underline-offset-4 hover:underline">{review.product.name}</a>
-                                    <p className="text-xs text-muted-foreground">{review.author} · {review.user.email} · {fmtDateTime(review.createdAt)}</p>
+                                    <p className="text-xs text-muted-foreground">{review.author} · {review.user.email} · {dateTime(review.createdAt)}</p>
                                 </div>
                                 <div className="flex items-center gap-1" aria-label={`${review.rating} out of 5 stars`}>
                                     {Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-4 ${index < review.rating ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />)}
@@ -104,10 +117,12 @@ export default function AdminReviewsPage() {
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{review.body}</ReactMarkdown>
                             </div>
                             <div className="flex flex-wrap gap-2 pt-1">
-                                <Button size="sm" disabled={busyId === review.id} onClick={() => void moderate(review, !review.approved)}>
-                                    {busyId === review.id ? "Saving…" : review.approved ? "Unpublish" : "Approve"}
-                                </Button>
-                                <Button size="sm" variant="destructive" disabled={busyId === review.id} onClick={() => void remove(review)}><Trash2 /> Delete</Button>
+                                <PermissionGate required={PERM.REVIEWS_MODERATE}>
+                                    <Button size="sm" disabled={busyId === review.id} onClick={() => void moderate(review, !review.approved)}>
+                                        {busyId === review.id ? "Saving…" : review.approved ? "Unpublish" : "Approve"}
+                                    </Button>
+                                    <Button size="sm" variant="destructive" disabled={busyId === review.id} onClick={() => void remove(review)}><Trash2 /> Delete</Button>
+                                </PermissionGate>
                             </div>
                         </article>
                     ))}

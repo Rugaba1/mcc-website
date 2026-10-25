@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 // ── PUT /api/collections/:id ──────────────────────────────────────────────────
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const PUT = withPermission(PERM.COLLECTIONS_MANAGE)(
+  async (
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
   try {
     const { id } = await params;
     const body = await req.json();
@@ -53,13 +56,15 @@ export async function PUT(
       { status: 500 },
     );
   }
-}
+  },
+);
 
 // ── DELETE /api/collections/:id ───────────────────────────────────────────────
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const DELETE = withPermission(PERM.COLLECTIONS_MANAGE)(
+  async (
+    _req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
   try {
     const { id } = await params;
     await prisma.collection.delete({ where: { id: Number(id) } });
@@ -80,4 +85,5 @@ export async function DELETE(
       { status: 500 },
     );
   }
-}
+  },
+);

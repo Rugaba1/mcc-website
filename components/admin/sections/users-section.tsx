@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import apiClient from "@/lib/api-client";
+import { api, apiErrorMessage } from "@/lib/api";
+import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Switch } from "../../ui/switch";
 import { Input, Label, Select } from "../fields";
@@ -47,7 +48,7 @@ export function UsersSection() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setUsers((await apiClient.get("/api/users")).data);
+      setUsers(await api.getManagedUsers());
     } catch {
       toast.error("Failed to load users");
     } finally {
@@ -68,13 +69,13 @@ export function UsersSection() {
     try {
       const { id, password, ...rest } = editing;
       const body = id && !password ? rest : { ...rest, password };
-      if (id) await apiClient.put(`/api/users/${id}`, body);
-      else await apiClient.post("/api/users", body);
+      if (id) await api.updateManagedUser(id, body);
+      else await api.createManagedUser(body);
       toast.success(id ? "User updated" : "User created");
       setEditing(null);
       void load();
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error ?? "Save failed");
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Save failed"));
     } finally {
       setSaving(false);
     }
@@ -83,7 +84,7 @@ export function UsersSection() {
   const remove = async (id: number) => {
     if (!confirm("Delete this user?")) return;
     try {
-      await apiClient.delete(`/api/users/${id}`);
+      await api.deleteManagedUser(id);
       toast.success("User deleted");
       void load();
     } catch {
@@ -135,17 +136,20 @@ export function UsersSection() {
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-bold text-primary">{u.role}</span>
+                      <Badge variant="secondary" className="h-auto bg-primary/15 px-2.5 py-0.5 font-bold text-primary">{u.role}</Badge>
                     </td>
                     <td className="px-5 py-4">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${u.active ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"}`}>
+                      <Badge
+                        variant="outline"
+                        className={`h-auto px-2.5 py-0.5 font-bold ${u.active ? "border-success/30 bg-success/10 text-success" : "border-destructive/30 bg-destructive/10 text-destructive"}`}
+                      >
                         {u.active ? "Active" : "Inactive"}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-wrap gap-1">
                         {granted.map((p) => (
-                          <span key={p.key} className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold">{p.label}</span>
+                          <Badge key={p.key} variant="secondary" className="h-auto px-2 py-0.5 text-[10px] font-semibold">{p.label}</Badge>
                         ))}
                         {granted.length === 0 && <span className="text-xs italic text-muted-foreground">No access</span>}
                       </div>

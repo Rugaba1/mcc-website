@@ -6,7 +6,7 @@ import { FileText } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type InvoiceRef, type MyOrderDetail, type OrderRequest } from "@/lib/api";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { StatusBadge } from "@/components/account/status-badge";
 import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
 };
 
 export default function OrderDetailPage() {
+  const { money, number, date, dateTime } = useFormatters();
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<MyOrderDetail | null>(null);
   const [state, setState] = useState<"loading" | "missing" | "ok">("loading");
@@ -81,7 +82,7 @@ export default function OrderDetailPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-playfair text-3xl font-bold">{order.orderNumber}</h1>
-          <p className="text-sm text-muted-foreground">Placed {new Date(order.placedAt).toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground">Placed {dateTime(order.placedAt)}</p>
         </div>
         <div className="flex gap-2"><StatusBadge status={order.status} /><StatusBadge status={order.paymentStatus} /></div>
       </div>
@@ -98,7 +99,7 @@ export default function OrderDetailPage() {
                   <p className="font-semibold">{i.productName}</p>
                   <p className="text-xs text-muted-foreground">{[i.size, i.finish].filter(Boolean).join(" · ")} · {i.sku}</p>
                   <p className="text-xs text-muted-foreground">
-                    {qty.toLocaleString("en-US", { maximumFractionDigits: 2 })} m² × {money(unit, c)}/m²
+                    {number(qty, { maximumFractionDigits: 2 })} m² × {money(unit, c)}/m²
                   </p>
                 </div>
                 <p className="font-medium">{money(i.lineTotal, c)}</p>
@@ -110,7 +111,7 @@ export default function OrderDetailPage() {
         <aside className="space-y-4">
           <dl className="space-y-2  border border-border bg-background p-5 text-sm">
             <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{money(order.subtotal, c)}</dd></div>
-            {order.discountTotal > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Discount</dt><dd>−{money(order.discountTotal, c)}</dd></div>}
+            {order.discountTotal > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Discount{order.couponCode ? ` (${order.couponCode})` : ""}</dt><dd>−{money(order.discountTotal, c)}</dd></div>}
             <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{order.shippingFee ? money(order.shippingFee, c) : "Free"}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">VAT</dt><dd>{money(order.taxTotal, c)}</dd></div>
             <div className="flex justify-between border-t border-border pt-2 font-bold"><dt>Total</dt><dd>{money(order.grandTotal, c)}</dd></div>
@@ -131,7 +132,7 @@ export default function OrderDetailPage() {
                     <span className="min-w-0">
                       <span className="block text-sm font-medium">{KIND_LABEL[inv.kind]}</span>
                       <span className="block truncate text-xs font-normal text-muted-foreground">
-                        {inv.number} · {new Date(inv.issuedAt).toLocaleDateString()}
+                        {inv.number} · {date(inv.issuedAt)}
                       </span>
                     </span>
                   </Button>
@@ -144,6 +145,7 @@ export default function OrderDetailPage() {
             <p className="mb-1 font-semibold">{order.fulfillment === "PICKUP" ? "Pick up" : "Deliver to"}</p>
             <p>{order.shipFullName}</p>
             <p className="text-muted-foreground">{order.shipPhone}</p>
+            {order.tin && <p className="text-muted-foreground">Rwanda TIN: {order.tin}</p>}
             {order.fulfillment === "DELIVERY" && (
               <p className="text-muted-foreground">{[order.shipStreet, order.shipSector, order.shipDistrict].filter(Boolean).join(", ")}</p>
             )}
@@ -155,7 +157,7 @@ export default function OrderDetailPage() {
               {order.history.map((h) => (
                 <li key={h.id} className="flex items-start gap-3">
                   <StatusBadge status={h.status} />
-                  <span className="text-xs text-muted-foreground">{new Date(h.createdAt).toLocaleString()}{h.note ? ` · ${h.note}` : ""}</span>
+                  <span className="text-xs text-muted-foreground">{dateTime(h.createdAt)}{h.note ? ` · ${h.note}` : ""}</span>
                 </li>
               ))}
             </ol>
@@ -175,7 +177,7 @@ export default function OrderDetailPage() {
                       <StatusBadge status={request.status} />
                     </div>
                     <p className="whitespace-pre-wrap text-muted-foreground">{request.message}</p>
-                    <p className="text-xs text-muted-foreground">Submitted {new Date(request.createdAt).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Submitted {dateTime(request.createdAt)}</p>
                   </li>
                 ))}
               </ul>

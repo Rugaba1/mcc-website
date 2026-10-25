@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
-import { getApiUser, hasApiPermission } from "../../../../lib/auth/api-access";
-import { ROLE_IDS } from "../../../../lib/constants";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
+import { ROLE_IDS } from "@/lib/constants";
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function GET(req: NextRequest, { params }: RouteContext) {
+export const GET = withPermission(PERM.CUSTOMERS_VIEW)(
+  async (_req: NextRequest, context) => {
   try {
-    const user = await getApiUser(req);
-    if (!user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!hasApiPermission(user, "users.manage")) {
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    // }
-
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     if (!Number.isSafeInteger(id) || id < 1)
       return NextResponse.json(
         { error: "Invalid customer id" },
@@ -48,15 +41,25 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
         { status: 404 },
       );
 
+    const guestOrders = await prisma.order.findMany({
+      where: { guestEmail: customer.email },
+      include: { items: true, payments: true },
+      orderBy: { placedAt: "desc" },
+    });
+    const customerOrders = [
+      ...customer.orders,
+      ...guestOrders,
+    ].sort((left, right) => right.placedAt.getTime() - left.placedAt.getTime());
+
     return NextResponse.json({
       ...customer,
-      orderCount: customer.orders.length,
-      totalSpent: customer.orders.reduce(
+      orderCount: customerOrders.length,
+      totalSpent: customerOrders.reduce(
         (total, order) => total + Number(order.grandTotal),
         0,
       ),
-      lastOrderAt: customer.orders[0]?.placedAt ?? null,
-      orders: customer.orders.map((order) => ({
+      lastOrderAt: customerOrders[0]?.placedAt ?? null,
+      orders: customerOrders.map((order) => ({
         ...order,
         customerName: `${customer.firstName} ${customer.lastName ?? ""}`.trim(),
         email: customer.email,
@@ -86,4 +89,5 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       { status: 500 },
     );
   }
-}
+  },
+);

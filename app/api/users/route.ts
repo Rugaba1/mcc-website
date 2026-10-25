@@ -1,24 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getApiUser, hasApiPermission } from "@/lib/auth/api-access";
-import { USER_INCLUDE, formatUser, splitName } from "@/lib/users/format";
-import { syncPermissions } from "@/lib/auth/permissions";
+import { withPermission } from "@/lib/middleware/withPermission";
+import {
+  PERM,
+  REGULAR_PERMISSION_CODES,
+} from "@/lib/permissions/catalog";
+import {
+  USER_INCLUDE,
+  formatRegularUser,
+  formatUser,
+  splitName,
+} from "@/lib/users/format";
+import { syncPermissions } from "@/lib/permissions/permissions";
+import { validatePermissionAssignment } from "@/lib/permissions/assignment";
+import { DEFAULT_STAFF_PERMISSIONS } from "@/lib/permissions/catalog";
+import { isEmailBlocklisted } from "@/lib/auth/email-blocklist";
 import { ROLE_IDS, STAFF_ROLES } from "@/lib/constants";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const canManage = (u: Parameters<typeof hasApiPermission>[0]) =>
-  hasApiPermission(u, "users.manage") || hasApiPermission(u, "admin");
-
-export async function GET(req: NextRequest) {
+export const GET = withPermission(PERM.USERS_VIEW)(
+  async (req: NextRequest) => {
   try {
-    const me = await getApiUser(req);
-    if (!me)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!canManage(me))
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
     const type = req.nextUrl.searchParams.get("type") ?? "staff";
     if (type !== "staff" && type !== "regular")
       return NextResponse.json({ error: "Invalid user type" }, { status: 400 });
@@ -29,14 +33,16 @@ export async function GET(req: NextRequest) {
           ? {
               OR: [
                 { role: { some: { id: { in: STAFF_ROLES } } } },
-                { permissions: { some: {} } },
+                {
+                  AND: [
+                    { permissions: { some: {} } },
+                    { role: { none: { id: ROLE_IDS.CUSTOMER } } },
+                  ],
+                },
               ],
             }
           : {
-              AND: [
-                { role: { none: { id: { in: STAFF_ROLES } } } },
-                { permissions: { none: {} } },
-              ],
+              role: { some: { id: ROLE_IDS.CUSTOMER } },
             },
       include: USER_INCLUDE,
       orderBy: { createdAt: "asc" },
@@ -51,6 +57,9 @@ export async function GET(req: NextRequest) {
         phoneNumber: user.phoneNumber,
         profilePicture: user.profilePicture,
         active: user.isActive,
+        permissions: user.permissions
+          .map(({ permission }) => permission.code)
+          .filter((code) => REGULAR_PERMISSION_CODES.includes(code)),
         emailVerifiedAt: user.emailVerifiedAt,
         lastLogin: user.lastLogin,
         createdAt: user.createdAt,
@@ -63,22 +72,51 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function POST(req: NextRequest) {
+export const POST = withPermission([PERM.USERS_CREATE, PERM.USERS_PERMISSIONS])(
+  async (req: NextRequest, { user }) => {
   try {
-    const me = await getApiUser(req);
-    if (!me)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!canManage(me))
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
     const b = await req.json();
     if (b.accountType !== "staff" && b.accountType !== "regular")
       return NextResponse.json(
         { error: "Invalid account type" },
         { status: 400 },
       );
+    let assignedPermissions: string[] | undefined;
+    if (b.accountType === "staff") {
+      const requestedPermissions =
+        b.permissions === undefined
+          ? DEFAULT_STAFF_PERMISSIONS
+          : b.permissions;
+      if (
+        !Array.isArray(requestedPermissions) ||
+        !requestedPermissions.every((code) => typeof code === "string")
+      ) {
+        return NextResponse.json(
+          { error: "Invalid permissions." },
+          { status: 400 },
+        );
+      }
+      const permissionError = validatePermissionAssignment(
+        requestedPermissions,
+        user.permissions,
+        { accountType: "staff" },
+      );
+      if (permissionError)
+        return NextResponse.json({ error: permissionError }, { status: 400 });
+      assignedPermissions = requestedPermissions;
+    } else if (b.permissions !== undefined) {
+      const permissionError = validatePermissionAssignment(
+        b.permissions,
+        user.permissions,
+        { accountType: "regular" },
+      );
+      if (permissionError)
+        return NextResponse.json({ error: permissionError }, { status: 400 });
+      assignedPermissions = b.permissions;
+    }
     const name = String(b.name ?? "").trim();
     const email = String(b.email ?? "")
       .trim()
@@ -109,6 +147,11 @@ export async function POST(req: NextRequest) {
         { error: "Email already in use" },
         { status: 409 },
       );
+    if (await isEmailBlocklisted(email))
+      return NextResponse.json(
+        { error: "This email address is blocked." },
+        { status: 409 },
+      );
     if (
       phoneNumber &&
       (await prisma.user.findUnique({ where: { phoneNumber } }))
@@ -123,7 +166,7 @@ export async function POST(req: NextRequest) {
     const roleId =
       b.accountType === "regular"
         ? ROLE_IDS.CUSTOMER
-        : Array.isArray(b.permissions) && b.permissions.includes("admin")
+        : assignedPermissions?.includes("admin")
           ? ROLE_IDS.ADMIN
           : ROLE_IDS.SUPPORT_STAFF;
 
@@ -150,15 +193,20 @@ export async function POST(req: NextRequest) {
           role: { connect: [{ id: roleId }] },
         },
       });
-      if (b.accountType === "staff" && Array.isArray(b.permissions))
-        await syncPermissions(tx, u.id, b.permissions, me.id);
+      if (assignedPermissions)
+        await syncPermissions(tx, u.id, assignedPermissions, user.id);
       return tx.user.findUniqueOrThrow({
         where: { id: u.id },
         include: USER_INCLUDE,
       });
     });
 
-    return NextResponse.json(formatUser(created), { status: 201 });
+    return NextResponse.json(
+      b.accountType === "regular"
+        ? formatRegularUser(created)
+        : formatUser(created),
+      { status: 201 },
+    );
   } catch (err) {
     console.error("POST /api/users:", err);
     return NextResponse.json(
@@ -166,4 +214,5 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);

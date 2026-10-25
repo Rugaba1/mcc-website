@@ -4,9 +4,22 @@ const createNextIntlPlugin = require("next-intl/plugin");
 
 const withNextIntl = createNextIntlPlugin("./app/i18n/request.ts");
 
-const imageDomains = process.env.NEXT_PUBLIC_IMAGE_DOMAINS.split(",")
+const imageSources = (process.env.NEXT_PUBLIC_IMAGE_DOMAINS || "")
+  .split(",")
   .map((h) => h.trim())
   .filter(Boolean);
+const imagePatterns = imageSources.map((source) => {
+  const url = new URL(source.includes("://") ? source : `https://${source}`);
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    throw new Error(`Unsupported image source protocol: ${url.protocol}`);
+  }
+  return {
+    protocol: url.protocol.slice(0, -1),
+    hostname: url.hostname,
+    ...(url.port ? { port: url.port } : {}),
+  };
+});
+const imageDomains = imagePatterns.map(({ hostname }) => hostname);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -45,10 +58,7 @@ const nextConfig = {
   },
   images: {
     domains: imageDomains,
-    remotePatterns: imageDomains.map((hostname) => ({
-      protocol: "https",
-      hostname,
-    })),
+    remotePatterns: imagePatterns,
   },
   async headers() {
     return [

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { sendOrderStatusEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -14,10 +15,8 @@ const idOf = async (ctx: Ctx) => {
 
 const n = (v: unknown) => Number(v ?? 0);
 
-export async function GET(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = await idOf(ctx);
+export const GET = withPermission(PERM.ORDERS_VIEW)(async (_req, context) => {
+  const id = await idOf(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   const o = await prisma.order.findUnique({
@@ -70,6 +69,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     internalNote: o.internalNote,
     shipFullName: o.shipFullName,
     shipPhone: o.shipPhone,
+    tin: o.tin,
     shipProvince: o.shipProvince,
     shipDistrict: o.shipDistrict,
     shipSector: o.shipSector,
@@ -114,7 +114,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       url: `/api/invoices/${inv.number}`,
     })),
   });
-}
+});
 
 const statusSchema = z.object({
   status: z.enum([
@@ -138,10 +138,9 @@ const stockState = (s: string): StockState =>
       ? "NONE"
       : "RESERVED"; // PENDING, PAID, PROCESSING
 
-export async function PATCH(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const id = await idOf(ctx);
+export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
+  async (req: NextRequest, context) => {
+  const id = await idOf(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -220,7 +219,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
               quantity: sqm,
               reference: current.orderNumber,
               note: `Order ${current.status} → ${status}`,
-              createdById: claims.userId,
+              createdById: context.user.id,
             },
           });
         }
@@ -241,7 +240,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
           orderId: id,
           status,
           note: note || null,
-          changedById: claims.userId,
+          changedById: context.user.id,
         },
       });
       return {
@@ -275,4 +274,4 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

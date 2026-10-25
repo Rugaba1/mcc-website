@@ -1,4 +1,8 @@
-import { PERMISSION_LABELS } from "../auth/permissions-catalog";
+import {
+  ALL_PERMISSION_CODES,
+  PERMISSION_LABELS,
+  REGULAR_PERMISSION_CODES,
+} from "../permissions/catalog";
 
 export const USER_INCLUDE = {
   permissions: { include: { permission: true } },
@@ -9,6 +13,9 @@ type UserWithPerms = {
   firstName: string;
   lastName: string | null;
   email: string;
+  phoneNumber: string | null;
+  emailVerifiedAt: Date | null;
+  lastLogin: Date | null;
   isActive: boolean;
   profilePicture: string | null;
   jobTitle: string | null;
@@ -20,7 +27,9 @@ type UserWithPerms = {
 };
 
 export function formatUser(u: UserWithPerms) {
-  const permissions = u.permissions.map((p) => p.permission.code);
+  const permissions = u.permissions
+    .map((p) => p.permission.code)
+    .filter((code) => ALL_PERMISSION_CODES.includes(code));
   return {
     id: u.id,
     name: `${u.firstName} ${u.lastName || ""}`.trim(),
@@ -33,6 +42,23 @@ export function formatUser(u: UserWithPerms) {
     showOnHomepage: u.showOnHomepage,
     displayOrder: u.displayOrder,
     permissions,
+    createdAt: u.createdAt,
+  };
+}
+
+export function formatRegularUser(u: UserWithPerms) {
+  return {
+    id: u.id,
+    name: `${u.firstName} ${u.lastName || ""}`.trim(),
+    email: u.email,
+    phoneNumber: u.phoneNumber,
+    profilePicture: u.profilePicture,
+    active: u.isActive,
+    permissions: u.permissions
+      .map(({ permission }) => permission.code)
+      .filter((code) => REGULAR_PERMISSION_CODES.includes(code)),
+    emailVerifiedAt: u.emailVerifiedAt,
+    lastLogin: u.lastLogin,
     createdAt: u.createdAt,
   };
 }

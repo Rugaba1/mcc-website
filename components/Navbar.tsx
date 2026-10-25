@@ -7,6 +7,17 @@ import CartButton from "./cart-button";
 import { Link, usePathname } from "@/app/i18n/routing";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { ChevronRight, Menu } from "lucide-react";
+import { CurrencySelector } from "@/components/currency-selector";
+import { COMPANY } from "@/lib/company";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const links = [
   { label: "Home", href: "/" },
@@ -21,10 +32,19 @@ const links = [
   { label: "Contact", href: "/contact" },
 
 ];
+const primaryLinks = new Set([
+  "/",
+  "/products",
+  "/catalogue",
+  "/collections",
+  "/contact",
+  "/visualizer",
+]);
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
   const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
@@ -44,150 +64,185 @@ export default function Navbar() {
   }, []);
   return (
     <header
-      className={`${scrolled ? "fixed" : "relative"} top-0 left-0 right-0 z-50 border-b transition-all duration-500 ${scrolled
-        ? "bg-dark backdrop-blur-lg   py-0"
+      className={`${scrolled ? "fixed" : "relative"} top-0 left-0 right-0 z-50  transition-all duration-500 ${scrolled
+        ? "bg-inverse backdrop-blur-lg   py-0"
         : "bg-background py-2"
         }`}
     >
-      <div className="w-full mx-auto px-6 flex items-center justify-between h-20">
+      <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+      <div className="mx-auto flex h-20 w-full items-center justify-between px-4 sm:px-6">
+        <div className="flex shrink-0 items-center gap-2">
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open navigation"
+              className="hidden shrink-0 lg:inline-flex"
+            >
+              <Menu />
+            </Button>
+          </SheetTrigger>
 
-        {/* Logo */}
-        <a href="/" className="flex items-center gap-3 group shrink-0">
-          <div className="relative h-10 w-10 shrink-0">
-            <Image
-              src="/logo.png"
-              alt="Mountain Ceramics Company"
-              fill
-              className="object-contain"
-              priority
-              sizes="40px"
-              unoptimized />
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="font-bold font-serif  text-[15px] tracking-wide">Mountain Ceramics</span>
-            <span className=" text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
-          </div>
-        </a>
+          {/* Logo */}
+          <Link href="/" className="group flex shrink-0 items-center gap-3">
+            <div className="relative h-10 w-10 shrink-0">
+              <Image
+                src="/logo.png"
+                alt="Mountain Ceramics Company"
+                fill
+                className="object-contain"
+                priority
+                sizes="40px"
+                unoptimized />
+            </div>
+            <div className="hidden flex-col leading-none sm:flex">
+              <span className="font-bold font-serif  text-[15px] tracking-wide">Mountain Ceramics</span>
+              <span className=" text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
+            </div>
+          </Link>
+        </div>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {links.map((l) => {
-            const isExternal = !l.href.startsWith("#");
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          {links.filter((link) => primaryLinks.has(link.href)).map((l) => {
             const active = isActive(l.href);
-            const cls = `relative px-4 py-2 text-sm font-medium transition-colors duration-200 group ${active ? "text-primary" : ""}`;
+            const cls = `group relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${active ? "text-primary" : ""}`;
             const underline = (
-              <span className={`absolute bottom-0 left-4 right-4 h-px bg-primary transition-all duration-300 ${active ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
+              <span className={`absolute bottom-0 left-3 right-3 h-px bg-primary transition-all duration-300 ${active ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
             );
-            return isExternal ? (
+            return (
               <Link key={l.href} href={l.href} className={cls} aria-current={active ? "page" : undefined}>
                 {l.label}
                 {underline}
               </Link>
-            ) : (
-              <a key={l.href} href={l.href} className={cls}>
-                {l.label}
-                {underline}
-              </a>
             );
           })}
         </nav>
 
-        {/* Right side */}
-        <div className="hidden lg:flex items-center gap-4">
-          <a
-            href="tel:+250785210005"
-            className="flex items-center gap-2  hover: text-sm transition-colors duration-200"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-            </svg>
-            +250 785 210 005
-          </a>
-
-          <Link
-            href="/contact"
-            className="bg-primary hover:bg-[#f0d080] hover:  text-sm font-bold px-6 py-2.5 transition-all duration-300 tracking-widest uppercase"
-          >
-            Get Quote
-          </Link>
-          {user ? <Link href={"/account"} className=" flex items-center gap-1 text-sm font-bold px-6 py-5 text-center tracking-widest uppercase" >
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>{initials || "U"} </AvatarFallback>
-            </Avatar>
-            {user.firstName}
-
-          </Link> : <Link href="/login"
-
-          >
-            <Button className="  w-full  text-sm font-bold px-6 py-5 text-center tracking-widest uppercase" variant={"outline"}> Login</Button>
-          </Link>}
-
+        <div className="flex items-center gap-2">
+          <CurrencySelector />
           <CartButton />
-        </div>
-        <div className="flex gap-2 lg:hidden items-center justify-center ">
-          <CartButton />
-          {/* Hamburger */}
           <Button
-            className="flex flex-col gap-1.25 p-2 z-50"
-            variant={"ghost"}
-            onClick={() => setOpen(!open)}
+            className="flex flex-col gap-1.25 p-2 z-50 lg:hidden"
+            variant="ghost"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
-            aria-expanded={open}
+            aria-expanded={mobileMenuOpen}
           >
-            <span className={`block w-6 h-0.5 bg-primary transition-all duration-300 ${open ? "rotate-45 translate-y-1.75" : ""}`} />
-            <span className={`block w-4 h-0.5  bg-primary transition-all duration-300 ${open ? "opacity-0 w-6" : ""}`} />
-            <span className={`block w-6 h-0.5 bg-primary  transition-all duration-300 ${open ? "-rotate-45 -translate-y-1.75" : ""}`} />
+            <span className={`block w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-1.75" : ""}`} />
+            <span className={`block w-4 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? "opacity-0 w-6" : ""}`} />
+            <span className={`block w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-1.75" : ""}`} />
           </Button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       <div
-        className={`lg:hidden   backdrop-blur-xl overflow-hidden transition-all duration-400 ${open ? "max-h-300 " : "max-h-0"
-          }`}
+        className={`lg:hidden overflow-hidden backdrop-blur-xl transition-all duration-300 ${mobileMenuOpen ? "max-h-[80vh] overflow-y-auto" : "max-h-0"}`}
       >
-        <nav className="flex flex-col px-6 py-6 gap-1">
-          {links.map((l) => {
-            const isExternal = !l.href.startsWith("#");
-            const active = isActive(l.href);
-            const cls = `flex items-center justify-between border-b py-3.5 text-base font-medium transition-colors ${active ? "border-primary text-primary" : "border-border/50"}`;
-            const arrow = (
-              <svg className="w-4 h-4 /50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            );
-            return isExternal ? (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={cls} aria-current={active ? "page" : undefined}>
-                <div className="font-serif flex justify-between w-full"> <span>{l.label}</span> <span>{arrow}</span></div>
+        <nav className="flex flex-col gap-1 px-6 py-6" aria-label="Mobile navigation">
+          {links.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-between border-b py-3.5 text-base font-medium transition-colors ${active ? "border-primary text-primary" : "border-border/50"}`}
+                aria-current={active ? "page" : undefined}
+              >
+                <span className="flex w-full justify-between font-serif">
+                  {link.label}
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </span>
               </Link>
-            ) : (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className={cls}>
-                <div className="font-serif flex justify-between w-full"> <span>{l.label}</span> <span>{arrow}</span></div>
-
-              </a>
             );
           })}
-          {user ? <Link href={"/account"} className=" flex items-center  gap-1  text-sm font-bold px-6 py-5 text-center tracking-widest uppercase" >
+          {user ? (
+            <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-5 text-sm font-bold uppercase tracking-widest">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>{initials || "U"}</AvatarFallback>
+              </Avatar>
+              {user.firstName}
+            </Link>
+          ) : (
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+              <Button className="mt-4 w-full text-sm font-bold uppercase tracking-widest" variant="outline">Login</Button>
+            </Link>
+          )}
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            className="mt-4 bg-primary px-5 py-4 text-center text-sm font-bold uppercase tracking-widest text-primary-foreground"
+          >
+            Get a Free Quote
+          </Link>
+        </nav>
+      </div>
+
+      <SheetContent side="left" className="w-full overflow-y-auto sm:max-w-sm">
+        <SheetHeader className="border-b pr-12">
+          <SheetTitle>Explore Mountain Ceramics</SheetTitle>
+          <SheetDescription>Browse the store and company information.</SheetDescription>
+        </SheetHeader>
+        <nav className="flex flex-col gap-1 px-4 pb-6" aria-label="More navigation">
+          {links.filter((link) => !primaryLinks.has(link.href)).map((l) => {
+            const active = isActive(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setDesktopMenuOpen(false)}
+                className={`border-b py-3 text-sm font-medium transition-colors ${active ? "border-primary text-primary" : "border-border/50 hover:text-primary"}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+          <div className="grid gap-1 border-b py-3">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Legal</p>
+            <Link href="/legal/terms-and-conditions" onClick={() => setDesktopMenuOpen(false)} className="py-1 text-sm hover:text-primary">Terms and Conditions</Link>
+            <Link href="/legal/terms-of-service" onClick={() => setDesktopMenuOpen(false)} className="py-1 text-sm hover:text-primary">Terms of Service</Link>
+            <Link href="/legal/privacy-policy" onClick={() => setDesktopMenuOpen(false)} className="py-1 text-sm hover:text-primary">Privacy Policy</Link>
+          </div>
+          {links.filter((link) => primaryLinks.has(link.href)).map((l) => {
+            const active = isActive(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setDesktopMenuOpen(false)}
+                className={`border-b py-3 text-sm font-medium transition-colors lg:hidden ${active ? "border-primary text-primary" : "border-border/50 hover:text-primary"}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+          {user ? <Link href="/account" onClick={() => setDesktopMenuOpen(false)} className="flex items-center gap-2 border-b py-4 text-sm font-bold uppercase tracking-widest">
             <Avatar className="h-8 w-8">
               <AvatarFallback>{initials || "U"}</AvatarFallback>
             </Avatar>
             {user.firstName}
-
-          </Link> : <Link href="/login"
-
-          >
-            <Button className="mt-4  w-full  text-sm font-bold px-5 py-4 text-center tracking-widest uppercase" variant={"outline"}> Login</Button>
+          </Link> : <Link href="/login" onClick={() => setDesktopMenuOpen(false)} className="mt-4">
+            <Button className="w-full text-sm font-bold uppercase tracking-widest" variant="outline">Login</Button>
           </Link>}
-
-          <Link href="#contact"
-            onClick={() => setOpen(false)}
-            className="mt-4 bg-primary  text-sm font-bold px-5 py-4 text-center tracking-widest uppercase"
+          <a
+            href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}
+            className="mt-3 py-2 text-sm text-muted-foreground hover:text-primary"
+          >
+            Call us: {COMPANY.phone}
+          </a>
+          <Link
+            href="/contact"
+            onClick={() => setDesktopMenuOpen(false)}
+            className="mt-3 bg-primary px-5 py-4 text-center text-sm font-bold uppercase tracking-widest text-primary-foreground"
           >
             Get a Free Quote
           </Link>
-
         </nav>
-      </div>
+      </SheetContent>
+      </Sheet>
     </header>
   );
 }

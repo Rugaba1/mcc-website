@@ -1,12 +1,14 @@
 import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import {
   sendContactAcknowledgement,
   sendContactStaffAlert,
-} from "../../../lib/email";
+} from "@/lib/email";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 
@@ -39,17 +41,26 @@ const schema = z.object({
 
 const OK = { success: true, message: "Message sent" };
 
-export async function POST(request: NextRequest) {
+export const POST = withRateLimit({
+  interval: 60 * 60_000,
+  uniqueTokenPerInterval: 5,
+})(async (
+  request: NextRequest,
+  { clientIp }: { clientIp: string | null },
+) => {
   try {
     const data = schema.parse(await request.json());
 
     // Bots fill hidden fields. Pretend it worked, store nothing.
-    if (data.website) return NextResponse.json(OK);
+    if (data.website) {
+      return NextResponse.json({
+        ...OK,
+        confirmationSent: false,
+        staffAlertSent: false,
+      });
+    }
 
-    const ip =
-      request.headers.get("cf-connecting-ip") ??
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      "unknown";
+    const ip = clientIp ?? "unknown";
     const ipHash = createHash("sha256")
       .update(ip + (process.env.CONTACT_IP_SALT ?? ""))
       .digest("hex");
@@ -71,16 +82,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const saved = await prisma.contactMessage.create({
-      data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone || null,
-        projectType: data.projectType || null,
-        message: data.message,
-        ipHash,
-      },
+    const saved = await prisma.$transaction(async (tx) => {
+      const message = await tx.contactMessage.create({
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone || null,
+          projectType: data.projectType || null,
+          message: data.message,
+          ipHash,
+        },
+      });
+      await tx.adminNotification.create({
+        data: {
+          type: "message",
+          requiredPermission: PERM.MESSAGES_VIEW,
+          title: "New contact message",
+          message: `${data.firstName} ${data.lastName}${data.projectType ? ` · ${data.projectType}` : ""}`,
+          targetPath: "/admin/messages",
+          entityId: message.id,
+        },
+      });
+      return message;
     });
 
     // The message is already stored, so a mail failure must not fail the request
@@ -115,7 +139,7 @@ export async function POST(request: NextRequest) {
       });
 
     return NextResponse.json(
-      { ...OK, confirmationSent: ackSent },
+      { ...OK, confirmationSent: ackSent, staffAlertSent },
       { status: 201 },
     );
   } catch (error) {
@@ -134,4 +158,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

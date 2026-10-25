@@ -15,6 +15,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { hasPermissions } from "@/lib/permissions/core";
+import { useAuth } from "@/contexts/auth-context";
 
 type Form = Required<Pick<BlogPostInput, "title" | "slug" | "locale" | "excerpt" | "content" | "coverImage" | "coverAlt" | "tags" | "status" | "featured" | "seoTitle" | "seoDescription">>;
 
@@ -31,6 +35,7 @@ const Counter = ({ value, max }: { value: string; max: number }) => (
 
 export function BlogForm({ postId }: { postId?: number }) {
     const router = useRouter();
+    const { user } = useAuth();
     const [form, setForm] = useState<Form>(empty);
     const [tagsText, setTagsText] = useState("");
     const [slugTouched, setSlugTouched] = useState(!!postId);
@@ -96,10 +101,12 @@ export function BlogForm({ postId }: { postId?: number }) {
                         <Link href={`/admin/blog/${id}/preview`} target="_blank"><ExternalLink /> Preview</Link>
                     </Button>
                 )}
-                <Button className="rounded-none" onClick={save} disabled={saving}>
-                    {saving && <Loader2 className="animate-spin" />}
-                    {form.status === "PUBLISHED" ? (id ? "Save & publish" : "Publish") : "Save"}
-                </Button>
+                <PermissionGate required={PERM.BLOG_WRITE}>
+                    <Button className="rounded-none" onClick={save} disabled={saving}>
+                        {saving && <Loader2 className="animate-spin" />}
+                        {form.status === "PUBLISHED" ? (id ? "Save & publish" : "Publish") : "Save"}
+                    </Button>
+                </PermissionGate>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
@@ -128,8 +135,19 @@ export function BlogForm({ postId }: { postId?: number }) {
                         </CardContent>
                     </Card>
                     <Card className="rounded-none shadow-none">
-                        <CardHeader><CardTitle className="text-base">Content (MDX)</CardTitle></CardHeader>
-                        <CardContent><MdxEditor value={form.content ?? ""} onChange={(v) => set("content", v)} /></CardContent>
+                        <CardHeader>
+                            <CardTitle className="text-base">Content (MDX)</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                                Use the post preview to review any embedded MDX components.
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <MdxEditor
+                                value={form.content ?? ""}
+                                onChange={(v) => set("content", v)}
+                                enableImages={hasPermissions(user?.permissions ?? [], PERM.MEDIA_VIEW)}
+                            />
+                        </CardContent>
                     </Card>
                 </div>
 
@@ -140,14 +158,16 @@ export function BlogForm({ postId }: { postId?: number }) {
                         <CardContent className="space-y-4">
                             <div className="space-y-1.5">
                                 <Label>Status</Label>
-                                <Select value={form.status} onValueChange={(v) => set("status", v as BlogStatus)}>
-                                    <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
-                                    <SelectContent className="rounded-none">
-                                        <SelectItem value="DRAFT">Draft</SelectItem>
-                                        <SelectItem value="PUBLISHED">Published</SelectItem>
-                                        <SelectItem value="ARCHIVED">Archived</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <PermissionGate required={PERM.BLOG_PUBLISH}>
+                                    <Select value={form.status} onValueChange={(v) => set("status", v as BlogStatus)}>
+                                        <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                                        <SelectContent className="rounded-none">
+                                            <SelectItem value="DRAFT">Draft</SelectItem>
+                                            <SelectItem value="PUBLISHED">Published</SelectItem>
+                                            <SelectItem value="ARCHIVED">Archived</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </PermissionGate>
                             </div>
                             <div className="space-y-1.5">
                                 <Label>Language</Label>
@@ -160,10 +180,12 @@ export function BlogForm({ postId }: { postId?: number }) {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="featured">Featured</Label>
-                                <Switch id="featured" checked={form.featured} onCheckedChange={(v) => set("featured", v)} />
-                            </div>
+                            <PermissionGate required={PERM.BLOG_PUBLISH}>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="featured">Featured</Label>
+                                    <Switch id="featured" checked={form.featured} onCheckedChange={(v) => set("featured", v)} />
+                                </div>
+                            </PermissionGate>
                         </CardContent>
                     </Card>
 
@@ -178,9 +200,11 @@ export function BlogForm({ postId }: { postId?: number }) {
                                         onClick={() => { set("coverImage", ""); set("coverAlt", ""); }} aria-label="Remove cover"><X /></Button>
                                 </div>
                             ) : null}
-                            <Button type="button" variant="outline" className="w-full rounded-none" onClick={() => setPickingCover(true)}>
-                                <ImageIcon /> {form.coverImage ? "Change image" : "Choose image"}
-                            </Button>
+                            <PermissionGate required={PERM.MEDIA_VIEW}>
+                                <Button type="button" variant="outline" className="w-full rounded-none" onClick={() => setPickingCover(true)}>
+                                    <ImageIcon /> {form.coverImage ? "Change image" : "Choose image"}
+                                </Button>
+                            </PermissionGate>
                             {form.coverImage && (
                                 <div className="space-y-1.5">
                                     <Label>Alt text</Label>
@@ -215,8 +239,10 @@ export function BlogForm({ postId }: { postId?: number }) {
                 </div>
             </div>
 
-            <ImagePickerDialog open={pickingCover} onOpenChange={setPickingCover}
-                onSelect={(f) => { set("coverImage", f.url); set("coverAlt", f.alt ?? ""); }} />
+            <PermissionGate required={PERM.MEDIA_VIEW}>
+                <ImagePickerDialog open={pickingCover} onOpenChange={setPickingCover}
+                    onSelect={(f) => { set("coverImage", f.url); set("coverAlt", f.alt ?? ""); }} />
+            </PermissionGate>
         </div>
     );
 }

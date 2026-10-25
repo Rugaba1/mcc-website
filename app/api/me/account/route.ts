@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getApiUser } from "@/lib/auth/api-access";
+import { withAuth } from "@/lib/middleware/withAuth";
 import {
   AccountDeleteError,
   deleteUserAccount,
 } from "@/lib/users/delete-account";
+import { clearRefreshCookie } from "@/lib/auth/csrf";
 
-const AUTH_COOKIES = ["access_token", "refresh_token", "auth_token"];
-
-export async function DELETE(req: NextRequest) {
+export const DELETE = withAuth(async (req: NextRequest, { user }) => {
   try {
-    const me = await getApiUser(req);
-    if (!me)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const { password } = await req.json().catch(() => ({ password: "" }));
     const row = await prisma.user.findUnique({
-      where: { id: me.id },
+      where: { id: user.id },
       select: { password: true },
     });
     if (!password || !row || !(await bcrypt.compare(password, row.password)))
@@ -26,10 +21,10 @@ export async function DELETE(req: NextRequest) {
         { status: 403 },
       );
 
-    await deleteUserAccount(me.id);
+    await deleteUserAccount(user.id);
 
     const res = NextResponse.json({ ok: true });
-    AUTH_COOKIES.forEach((c) => res.cookies.delete(c));
+    clearRefreshCookie(res);
     return res;
   } catch (err) {
     if (err instanceof AccountDeleteError)
@@ -40,4 +35,4 @@ export async function DELETE(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

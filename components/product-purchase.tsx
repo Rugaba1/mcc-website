@@ -6,8 +6,7 @@ import { toast } from "sonner";
 import type { ProductWithVariantsAndRelated } from "@/lib/api";
 import { useCart } from "@/contexts/cart-context";
 import { PurchaseOptions } from "./purchase-option";
-
-const nf = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+import { useFormatters } from "@/contexts/format-context";
 
 export function ProductPurchase({
     product,
@@ -21,6 +20,7 @@ export function ProductPurchase({
     className?: string;
 }) {
     const { addToCart } = useCart();
+    const { displayMoney } = useFormatters();
     const variants = (product.variants ?? []).filter((v) => v.active && v.pricePerSqm > 0);
     const [selectedId, setSelectedId] = useState(initialVariantId ?? variants[0]?.id);
     const v = variants.find((x) => x.id === selectedId) ?? variants[0];
@@ -45,7 +45,7 @@ export function ProductPurchase({
                                 {x.color && <span className="size-4 shrink-0 border" style={{ background: x.color }} />}
                                 <span>
                                     <span className="block font-semibold">{x.size}{x.finish ? ` · ${x.finish}` : ""}</span>
-                                    <span className="block text-xs text-muted-foreground">{nf.format(x.pricePerSqm)} RWF / m²</span>
+                                    <span className="block text-xs text-muted-foreground">{displayMoney(x.pricePerSqm, x.currency)} / m²</span>
                                 </span>
                             </button>
                         ))}
@@ -56,6 +56,7 @@ export function ProductPurchase({
             <PurchaseOptions
                 key={v.id}
                 variant={{ pricePerSqm: v.pricePerSqm, containerPricePerSqm: v.containerPricePerSqm ?? null, sqmPerContainer: v.sqmPerContainer ?? null }}
+                currency={v.currency}
                 onAdd={({ saleType, qty }) => {
                     addToCart(
                         {
@@ -66,6 +67,7 @@ export function ProductPurchase({
                             size: v.size,
                             finish: v.finish,
                             color: v.color,
+                            currency: v.currency,
                             saleType,
                             pricePerSqm: v.pricePerSqm,
                             containerPricePerSqm: v.containerPricePerSqm ?? null,

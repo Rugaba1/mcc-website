@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { serverApi } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import AddToCartButton from "@/components/add-cart-button";
 import { PaginationControls } from "@/components/pagination-controls";
@@ -83,13 +84,13 @@ export default async function Products({
 
 
                 {/* Filter tabs */}
-                <div className="flex flex-wrap gap-2 mb-12 -b -gray-200 pb-6 justify-center pt-10">
+                <div className="flex flex-wrap gap-2 mb-12 border-b border-border pb-6 justify-center pt-10">
                     {filters.map((f) => (
                         <Link href={`/products?category=${f.key}`} key={f.key}>
                             <Button
                                 className={`px-5 py-2 text-sm font-semibold transition-all duration-200 ${category === f.key
-                                    ? "bg-accent "
-                                    : "  hover:  -gray-200"
+                                    ? "bg-accent text-accent-foreground"
+                                    : "bg-background text-foreground border border-border hover:bg-muted"
                                     }`}
                             >
                                 {f.label}
@@ -114,10 +115,10 @@ export default async function Products({
                                     unoptimized
                                 />
                                 {/* Hover overlay with dual actions */}
-                                <div className="absolute inset-0 bg-dark/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-4">
+                                <div className="absolute inset-0 bg-inverse/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-4">
                                     <Link
                                         href={`/visualizer?tile=${p.id}&autoApply=1&surface=${p.category === "wall" || p.category === "special" ? "wall" : "floor"}`}
-                                        className="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider  shadow flex items-center gap-1.5 transition-transform hover:scale-105"
+                                        className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold px-4 py-2 uppercase tracking-wider  shadow flex items-center gap-1.5 transition-transform hover:scale-105"
                                     >
                                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -126,33 +127,33 @@ export default async function Products({
                                         <span>Visualize in Room</span>
                                     </Link>
                                     <Link
-                                        href={`/products/${p.id}`}
-                                        className="bg-background/90 hover:bg-background text-ivory/80 text-xs font-medium px-3.5 py-1.5 uppercase tracking-wider  border transition-colors"
+                                        href={`/products/${p.slug ?? p.id}`}
+                                        className="bg-background/90 hover:bg-background text-foreground text-xs font-medium px-3.5 py-1.5 uppercase tracking-wider border border-border transition-colors"
                                     >
                                         View Details
                                     </Link>
                                 </div>
                                 {/* Badge */}
                                 {p.badge && (
-                                    <span className={`absolute top-4 left-0 text-xs font-bold px-4 py-1.5 tracking-wider uppercase ${p.badge === "New" ? "bg-emerald-500 "
-                                        : p.badge === "Premium" ? "bg-accent "
-                                            : "bg-primary "
+                                    <Badge className={`absolute left-0 top-4 h-auto rounded-none px-4 py-1.5 text-xs font-bold tracking-wider uppercase ${p.badge === "New" ? "bg-success text-success-foreground"
+                                        : p.badge === "Premium" ? "bg-accent text-accent-foreground"
+                                            : "bg-primary text-primary-foreground"
                                         }`}>
                                         {p.badge}
-                                    </span>
+                                    </Badge>
                                 )}
                             </div>
 
                             {/* Info */}
-                            <div className="p-6 -t ">
+                            <div className="p-6 border-t border-border bg-card">
                                 <span className=" text-[10px] font-bold tracking-[0.25em] uppercase mb-2 block">
                                     {p.categoryLabel}
                                 </span>
-                                <h3 className="text-lg font-bold  mb-2 group-hover: transition-colors duration-200">
+                                <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-200">
                                     {p.name}
                                 </h3>
                                 <p className=" text-sm leading-relaxed mb-5 line-clamp-2">{p.description}</p>
-                                <div className="flex items-center justify-between pt-4 -t ">
+                                <div className="flex items-center justify-between pt-4 border-t border-border">
                                     <AddToCartButton product={p} sm /> <WishlistButton productId={p.id} />
                                     <span className=" text-xs font-medium">{p.sizes}</span>
                                     <div className="flex items-center gap-3">
@@ -161,7 +162,7 @@ export default async function Products({
                                                 <span
                                                     key={i}
                                                     title={c}
-                                                    className="w-4 h-4 -full  -gray-200 shadow-sm"
+                                                    className="w-4 h-4 rounded-full border border-border shadow-sm"
                                                     style={{ background: c }}
                                                 />
                                             ))}
@@ -175,7 +176,7 @@ export default async function Products({
                                         </Link>
                                         <Link
                                             key={p.id}
-                                            href={`/products/${p.id}`}
+                                            href={`/products/${p.slug ?? p.id}`}
                                         >
                                             <span className="text-[10px] font-bold  uppercase tracking-wider whitespace-nowrap">
                                                 View →

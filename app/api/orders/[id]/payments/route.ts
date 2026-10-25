@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { blankToNull } from "@/lib/variant";
 import { METHODS, syncOrderPayment, totalsOf } from "@/lib/payments/sync";
 import { issueInvoiceSafely } from "@/lib/invoices/invoice";
@@ -23,10 +24,9 @@ const schema = z.object({
 });
 
 // POST /api/orders/[id]/payments — staff record cash, MoMo, bank transfer… received outside the website
-export async function POST(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const orderId = Number((await ctx.params).id);
+export const POST = withPermission(PERM.PAYMENTS_RECORD)(
+  async (req: NextRequest, context) => {
+  const orderId = Number((await context.params!).id);
   if (!Number.isSafeInteger(orderId) || orderId <= 0) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -54,11 +54,21 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
       const payment = await tx.payment.create({
         data: {
-          ...body, orderId, currency: order.currency, provider: "manual", recordedById: claims.userId,
+          ...body, orderId, currency: order.currency, provider: "manual", recordedById: context.user.id,
           paidAt: body.status === "PAID" ? (paidAt ? new Date(paidAt) : new Date()) : null,
         },
       });
-      const sync = await syncOrderPayment(tx, orderId, claims.userId);
+      await tx.adminNotification.create({
+        data: {
+          type: "payment",
+          requiredPermission: PERM.PAYMENTS_VIEW,
+          title: body.status === "PAID" ? "Payment recorded" : "Payment submitted",
+          message: `${order.orderNumber} · ${order.currency} ${body.amount}`,
+          targetPath: "/admin/payments",
+          entityId: payment.id,
+        },
+      });
+      const sync = await syncOrderPayment(tx, orderId, context.user.id);
       return {
         code: 201,
         payment,
@@ -110,4 +120,4 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     console.error("POST /api/orders/[id]/payments:", e);
     return NextResponse.json({ error: "Failed to record payment" }, { status: 500 });
   }
-}
+});

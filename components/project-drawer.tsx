@@ -6,19 +6,10 @@ import { Button } from "./ui/button";
 import { Link } from "@/app/i18n/routing";
 import { Sheet, SheetContent, SheetHeader } from "./ui/sheet";
 import { useRouter } from "next/navigation";
-const TYPE_COLORS: Record<string, string> = {
-    Hospitality: "bg-primary",
-    Commercial: "bg-blue-500",
-    Residential: "bg-emerald-500",
-    Infrastructure: "bg-muted",
-    Healthcare: "bg-rose-500",
-    Education: "bg-purple-500",
-    Industrial: "bg-primary",
-    Other: "bg-muted",
-};
-
 function typeColor(type: string) {
-    return TYPE_COLORS[type] ?? "bg-muted";
+    return type
+        ? "bg-secondary text-secondary-foreground"
+        : "bg-muted text-muted-foreground";
 }
 export default function ProjectDrawer({
     project,
@@ -35,7 +26,7 @@ export default function ProjectDrawer({
         <Sheet open onOpenChange={(open) => {
             if (!open) router.back()
         }}>
-            <SheetContent side="right" className="sm:w-75 w-full">
+            <SheetContent side="right" className="w-full sm:max-w-2xl">
 
                 <SheetHeader>
                     {/* Header */}
@@ -48,10 +39,10 @@ export default function ProjectDrawer({
                             sizes="580px"
                             unoptimized
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-overlay/80 via-overlay/20 to-transparent" />
                         
                         <div className="absolute bottom-0 left-0 right-0 p-6">
-                            <span className={`inline-block ${typeColor(project.type)}  text-[10px] font-bold px-3 py-1 uppercase tracking-widest mb-2`}>
+                            <span className={`inline-block ${typeColor(project.type)} text-[10px] font-bold px-3 py-1 uppercase tracking-widest mb-2`}>
                                 {project.type}
                             </span>
                             <h2 className="font-playfair  font-bold text-2xl leading-tight">{project.title}</h2>
@@ -126,7 +117,7 @@ export default function ProjectDrawer({
                             <p className="text-xs  text-center">See how these tiles look in a room</p>
                             <Link
                                 href={`/visualizer?tile=${tiles[0].id}&surface=${tiles[0].category === "wall" || tiles[0].category === "special" ? "wall" : "floor"}&autoApply=1`}
-                                className="w-full bg-primary hover:bg-primary  font-bold py-3.5 text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-3.5 text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
                             >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -136,7 +127,7 @@ export default function ProjectDrawer({
                             </Link>
                             <Link
                                 href="/contact"
-                                className="w-full bg-accent hover:bg-primary  font-bold py-3.5 text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground font-bold py-3.5 text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
                             >
                                 Request Similar Tiles
                             </Link>
@@ -167,7 +158,7 @@ function TileRow({ tile, surface }: { tile: Product; surface: "wall" | "floor" }
             </div>
             <Link
                 href={`/visualizer?tile=${tile.id}&surface=${surface}&autoApply=1`}
-                className="shrink-0 bg-accent group-hover:bg-primary  text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider transition-colors"
+                className="shrink-0 bg-accent text-accent-foreground group-hover:bg-primary group-hover:text-primary-foreground text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider transition-colors"
             >
                 Try it
             </Link>

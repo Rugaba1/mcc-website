@@ -1,6 +1,6 @@
 
 import Image from "next/image";
-import { Product, serverApi } from "../lib/api";
+import { Product, serverApi } from "@/lib/api";
 
 // Static fallback images per category in case the DB has no products yet
 const FALLBACKS: Record<string, string> = {
@@ -97,7 +97,7 @@ export default async function Products() {
                   unoptimized
                 />
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-dark/85 via-dark/20 to-transparent group-hover:from-dark/90 transition-all duration-300" />
+                <div className="absolute inset-0 bg-linear-to-t from-inverse/85 via-inverse/20 to-transparent group-hover:from-inverse/90 transition-all duration-300" />
 
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">

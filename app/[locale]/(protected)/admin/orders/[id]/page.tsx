@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type InvoiceRef, type OrderDetail } from "@/lib/api";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { StatusBadge } from "@/components/account/status-badge";
 import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
 
@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
 
 const STATUSES = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"];
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
@@ -22,10 +24,8 @@ const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   INVOICE: "Invoice",
   CREDIT_NOTE: "Credit note",
 };
-const sqm = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : "—");
-
 export default function AdminOrderPage() {
+  const { money, number, date, dateTime } = useFormatters();
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [state, setState] = useState<"loading" | "missing" | "ok">("loading");
@@ -83,7 +83,7 @@ export default function AdminOrderPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{order.orderNumber}</h1>
-          <p className="text-sm text-muted-foreground">Placed {when(order.placedAt)}</p>
+          <p className="text-sm text-muted-foreground">Placed {dateTime(order.placedAt)}</p>
         </div>
         <div className="flex gap-2">
           <StatusBadge status={order.status} />
@@ -111,7 +111,7 @@ export default function AdminOrderPage() {
                       {[i.size, i.finish].filter(Boolean).join(" · ")} · {i.sku}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {sqm.format(i.quantity)} m² × {money(i.unitPrice, c)}/m²
+                      {number(i.quantity, { maximumFractionDigits: 2 })} m² × {money(i.unitPrice, c)}/m²
                       {i.saleType === "CONTAINER" && i.containers
                         ? ` · ${i.containers} container${i.containers > 1 ? "s" : ""}`
                         : ""}
@@ -133,7 +133,7 @@ export default function AdminOrderPage() {
                   <div>
                     <p className="font-medium capitalize">{p.method.replace(/_/g, " ").toLowerCase()}</p>
                     <p className="text-xs text-muted-foreground">
-                      {[p.provider, p.reference].filter(Boolean).join(" · ") || "—"} · {when(p.paidAt ?? p.createdAt)}
+                      {[p.provider, p.reference].filter(Boolean).join(" · ") || "—"} ·                       {dateTime(p.paidAt ?? p.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -154,7 +154,7 @@ export default function AdminOrderPage() {
                   <li key={h.id} className="flex items-start gap-3">
                     <StatusBadge status={h.status} />
                     <span className="text-xs text-muted-foreground">
-                      {when(h.createdAt)}{h.note ? ` · ${h.note}` : ""}
+                      {dateTime(h.createdAt)}{h.note ? ` · ${h.note}` : ""}
                     </span>
                   </li>
                 ))}
@@ -165,25 +165,27 @@ export default function AdminOrderPage() {
 
         <aside className="space-y-5">
           {/* Status update */}
-          <Card className="rounded-none">
-            <CardHeader><CardTitle>Update status</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
-                <SelectContent className="rounded-none">
-                  {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s} className="rounded-none capitalize">
-                      {s.toLowerCase()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input className="rounded-none" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-              <Button className="w-full rounded-none" onClick={saveStatus} disabled={saving || status === order.status}>
-                {saving && <Loader2 className="animate-spin" />} Save status
-              </Button>
-            </CardContent>
-          </Card>
+          <PermissionGate required={PERM.ORDERS_UPDATE_STATUS}>
+            <Card className="rounded-none">
+              <CardHeader><CardTitle>Update status</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
+                  <SelectContent className="rounded-none">
+                    {STATUSES.map((s) => (
+                      <SelectItem key={s} value={s} className="rounded-none capitalize">
+                        {s.toLowerCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input className="rounded-none" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+                <Button className="w-full rounded-none" onClick={saveStatus} disabled={saving || status === order.status}>
+                  {saving && <Loader2 className="animate-spin" />} Save status
+                </Button>
+              </CardContent>
+            </Card>
+          </PermissionGate>
 
           {/* Totals */}
           <Card className="rounded-none">
@@ -207,6 +209,7 @@ export default function AdminOrderPage() {
               <p>{order.customerName}</p>
               {order.email && <p className="text-muted-foreground">{order.email}</p>}
               {order.phone && <p className="text-muted-foreground">{order.phone}</p>}
+              {order.tin && <p className="text-muted-foreground">Rwanda TIN: {order.tin}</p>}
             </CardContent>
           </Card>
 
@@ -229,20 +232,21 @@ export default function AdminOrderPage() {
               <CardContent className="space-y-2 p-5 text-sm">
                 <p className="font-semibold">Documents</p>
                 {order.invoices.map((inv) => (
-                  <Button
-                    key={inv.id}
-                    variant="outline"
-                    className="h-auto w-full justify-start gap-3 rounded-none px-3 py-2 text-left"
-                    onClick={() => setInvoice(inv)}
-                  >
-                    <FileText className="size-4 shrink-0 text-primary" />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-medium">{KIND_LABEL[inv.kind]}</span>
-                      <span className="block truncate text-xs font-normal text-muted-foreground">
-                        {inv.number} · {new Date(inv.issuedAt).toLocaleDateString()}
+                  <PermissionGate key={inv.id} required={PERM.INVOICES_VIEW}>
+                    <Button
+                      variant="outline"
+                      className="h-auto w-full justify-start gap-3 rounded-none px-3 py-2 text-left"
+                      onClick={() => setInvoice(inv)}
+                    >
+                      <FileText className="size-4 shrink-0 text-primary" />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium">{KIND_LABEL[inv.kind]}</span>
+                        <span className="block truncate text-xs font-normal text-muted-foreground">
+                          {inv.number} · {date(inv.issuedAt)}
+                        </span>
                       </span>
-                    </span>
-                  </Button>
+                    </Button>
+                  </PermissionGate>
                 ))}
               </CardContent>
             </Card>

@@ -6,10 +6,11 @@ import { toast } from "sonner";
 
 import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type SavedVisualizerDesign } from "@/lib/api";
-import { fmtDate } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 
 export default function AccountDesignsPage() {
+    const { date } = useFormatters();
     const [designs, setDesigns] = useState<SavedVisualizerDesign[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -74,7 +75,7 @@ export default function AccountDesignsPage() {
                                 <div>
                                     <h2 className="truncate font-semibold">{design.name || "Untitled design"}</h2>
                                     <p className="text-sm text-muted-foreground">{design.scene?.name ?? "Custom room"} · {design.items.length} surfaces</p>
-                                    <p className="mt-1 text-xs text-muted-foreground">Updated {fmtDate(design.updatedAt)}</p>
+                                    <p className="mt-1 text-xs text-muted-foreground">Updated {date(design.updatedAt)}</p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {design.shareToken && <Button asChild size="sm"><Link href={`/visualizer?design=${design.shareToken}`}><ExternalLink /> Open</Link></Button>}

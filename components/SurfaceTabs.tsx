@@ -20,7 +20,7 @@ export const SurfaceTabs: React.FC<SurfaceTabsProps> = ({
   selections,
 }) => {
   return (
-    <div className="w-full bg-dark -b -stone-800 py-2 px-3 overflow-x-auto no-scrollbar flex items-center gap-1.5 select-none">
+    <div className="w-full bg-inverse text-inverse-foreground border-b border-inverse-border py-2 px-3 overflow-x-auto no-scrollbar flex items-center gap-1.5 select-none">
       <span className="text-[11px] font-semibold  uppercase tracking-wider pl-1 pr-2 whitespace-nowrap">
         Surfaces:
       </span>

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getApiUser } from "@/lib/auth/api-access";
-import { requireUser } from "@/lib/auth/require-user";
+import { withAuth, withOptionalAuth } from "@/lib/middleware/withAuth";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 import { sendReviewSubmittedAlert } from "@/lib/email";
+import { CUSTOMER_PERM, PERM } from "@/lib/permissions/catalog";
+import { hasPermissions } from "@/lib/permissions/core";
 
 const PAGE_SIZE = 5;
 const reviewSchema = z.object({
@@ -19,15 +21,17 @@ function productIdOf(id: string) {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
 }
 
-export async function GET(request: NextRequest, context: Context) {
-  const productId = productIdOf((await context.params).id);
+export const GET = withOptionalAuth(
+  async (
+    request: NextRequest,
+    { user, params }: { user: { id: number; permissions: string[] } | null; params: Promise<{ id: string }> },
+  ) => {
+  const productId = productIdOf((await params).id);
   if (!productId)
     return NextResponse.json({ error: "Invalid product id" }, { status: 400 });
 
   const pageParam = Number(request.nextUrl.searchParams.get("page") ?? 1);
   const page = Number.isSafeInteger(pageParam) && pageParam > 0 ? pageParam : 1;
-  const user = await getApiUser(request);
-
   try {
     const where = { productId, approved: true };
     const [total, aggregate, reviews, myReview, purchase] = await Promise.all([
@@ -84,7 +88,12 @@ export async function GET(request: NextRequest, context: Context) {
       totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
       averageRating: aggregate._avg.rating ?? null,
       authenticated: Boolean(user),
-      canReview: Boolean(user && purchase && !myReview),
+      canReview: Boolean(
+        user &&
+          hasPermissions(user.permissions, CUSTOMER_PERM.REVIEWS_CREATE) &&
+          purchase &&
+          !myReview,
+      ),
       myReview,
     });
   } catch (error) {
@@ -94,13 +103,21 @@ export async function GET(request: NextRequest, context: Context) {
       { status: 500 },
     );
   }
-}
+  },
+  { interval: 60_000, uniqueTokenPerInterval: 120 },
+);
 
-export async function POST(request: NextRequest, context: Context) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
+export const POST = withAuth(async (
+  request: NextRequest,
+  { user, params }: { user: { id: number; permissions: string[] }; params: Promise<{ id: string }> },
+) => {
+  if (!hasPermissions(user.permissions, CUSTOMER_PERM.REVIEWS_CREATE))
+    return NextResponse.json(
+      { error: "Your account is not permitted to submit product reviews." },
+      { status: 403 },
+    );
 
-  const productId = productIdOf((await context.params).id);
+  const productId = productIdOf((await params).id);
   if (!productId)
     return NextResponse.json({ error: "Invalid product id" }, { status: 400 });
 
@@ -115,7 +132,7 @@ export async function POST(request: NextRequest, context: Context) {
     const purchased = await prisma.orderItem.findFirst({
       where: {
         variant: { is: { productId } },
-        order: { userId: claims.userId, paymentStatus: "PAID" },
+        order: { userId: user.id, paymentStatus: "PAID" },
       },
       select: { id: true },
     });
@@ -128,19 +145,32 @@ export async function POST(request: NextRequest, context: Context) {
         { status: 403 },
       );
 
-    const review = await prisma.review.create({
-      data: {
-        productId,
-        userId: claims.userId,
-        rating: parsed.data.rating,
-        title: parsed.data.title || null,
-        body: parsed.data.body,
-        approved: false,
-      },
-      include: {
-        product: { select: { name: true } },
-        user: { select: { firstName: true, lastName: true, email: true } },
-      },
+    const review = await prisma.$transaction(async (tx) => {
+      const created = await tx.review.create({
+        data: {
+          productId,
+          userId: user.id,
+          rating: parsed.data.rating,
+          title: parsed.data.title || null,
+          body: parsed.data.body,
+          approved: false,
+        },
+        include: {
+          product: { select: { name: true } },
+          user: { select: { firstName: true, lastName: true, email: true } },
+        },
+      });
+      await tx.adminNotification.create({
+        data: {
+          type: "review",
+          requiredPermission: PERM.REVIEWS_MODERATE,
+          title: "Review awaiting moderation",
+          message: `${created.product.name} · ${created.rating}/5`,
+          targetPath: "/admin/reviews",
+          entityId: created.id,
+        },
+      });
+      return created;
     });
     await sendReviewSubmittedAlert({
       name: [review.user.firstName, review.user.lastName]
@@ -171,4 +201,4 @@ export async function POST(request: NextRequest, context: Context) {
       { status: 500 },
     );
   }
-}
+});

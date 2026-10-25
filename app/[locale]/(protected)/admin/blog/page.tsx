@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { useFormatters } from "@/contexts/format-context";
 
 const PAGE_SIZE = 15;
 type Filter = "all" | BlogStatus;
@@ -21,6 +24,7 @@ const variant: Record<BlogStatus, "default" | "secondary" | "outline"> = {
 };
 
 export default function AdminBlogPage() {
+    const { date } = useFormatters();
     const [filter, setFilter] = useState<Filter>("all");
     const [search, setSearch] = useState("");
     const q = useDebouncedValue(search);
@@ -69,9 +73,11 @@ export default function AdminBlogPage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
                 <h1 className="mr-auto text-2xl">Blog</h1>
-                <Button asChild className="rounded-none">
-                    <Link href="/admin/blog/new"><Plus /> New post</Link>
-                </Button>
+                <PermissionGate required={PERM.BLOG_WRITE}>
+                    <Button asChild className="rounded-none">
+                        <Link href="/admin/blog/new"><Plus /> New post</Link>
+                    </Button>
+                </PermissionGate>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -123,20 +129,24 @@ export default function AdminBlogPage() {
                                 <TableCell className="hidden uppercase md:table-cell">{p.locale}</TableCell>
                                 <TableCell className="hidden md:table-cell">{p.authorName ?? "—"}</TableCell>
                                 <TableCell className="hidden lg:table-cell">
-                                    {p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : "—"}
+                                    {date(p.publishedAt)}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex justify-end gap-0.5">
-                                        <Button asChild variant="ghost" size="icon" className="size-8 rounded-none" aria-label="Edit">
-                                            <Link href={`/admin/blog/${p.id}`}><Pencil /></Link>
-                                        </Button>
+                                        <PermissionGate required={PERM.BLOG_WRITE}>
+                                            <Button asChild variant="ghost" size="icon" className="size-8 rounded-none" aria-label="Edit">
+                                                <Link href={`/admin/blog/${p.id}`}><Pencil /></Link>
+                                            </Button>
+                                        </PermissionGate>
                                         {p.status === "PUBLISHED" && (
                                             <Button asChild variant="ghost" size="icon" className="size-8 rounded-none" aria-label="View live">
                                                 <a href={`/${p.locale}/blog/${p.slug}`} target="_blank" rel="noopener noreferrer"><ExternalLink /></a>
                                             </Button>
                                         )}
-                                        <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive"
-                                            onClick={() => setDeleting(p)} aria-label="Delete"><Trash2 /></Button>
+                                        <PermissionGate required={PERM.BLOG_DELETE}>
+                                            <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive"
+                                                onClick={() => setDeleting(p)} aria-label="Delete"><Trash2 /></Button>
+                                        </PermissionGate>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -148,14 +158,16 @@ export default function AdminBlogPage() {
                 </div>
             </div>
 
-            <ConfirmDelete
-                open={!!deleting}
-                onOpenChange={(o) => !o && setDeleting(null)}
-                title="Delete this post?"
-                description="The post is removed permanently and its URL will return a 404. Consider archiving instead."
-                busy={busy}
-                onConfirm={remove}
-            />
+            <PermissionGate required={PERM.BLOG_DELETE}>
+                <ConfirmDelete
+                    open={!!deleting}
+                    onOpenChange={(o) => !o && setDeleting(null)}
+                    title="Delete this post?"
+                    description="The post is removed permanently and its URL will return a 404. Consider archiving instead."
+                    busy={busy}
+                    onConfirm={remove}
+                />
+            </PermissionGate>
         </div>
     );
 }

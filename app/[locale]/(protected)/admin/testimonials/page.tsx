@@ -2,6 +2,7 @@
 
 import { api, type Testimonial } from "@/lib/api";
 import { ResourcePage, type Values } from "@/components/admin/resource-page";
+import { PERM } from "@/lib/permissions/catalog";
 
 const initialsOf = (name: string) =>
   name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
@@ -19,8 +20,10 @@ export default function AdminTestimonialsPage() {
       title="Testimonials"
       description="What customers say about you, shown on the public site."
       entityName="testimonial"
-      load={api.getTestimonials}
-      searchText={(t) => `${t.name} ${t.role} ${t.text}`}
+      loadPage={api.getTestimonialsPage}
+      createPermission={PERM.TESTIMONIALS_MANAGE}
+      updatePermission={PERM.TESTIMONIALS_MANAGE}
+      deletePermission={PERM.TESTIMONIALS_MANAGE}
       columns={[
         {
           header: "Customer",

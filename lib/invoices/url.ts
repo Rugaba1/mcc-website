@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { siteConfig } from "@/config/site.config";
 
 export const invoicePath = (number: string) =>
   `/api/invoices/${encodeURIComponent(number)}`;
@@ -18,7 +19,7 @@ export function signedInvoiceUrl(
   ttlSeconds = 60 * 60 * 24 * 7,
 ) {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const base = siteConfig.configuredSiteUrl ?? "";
   return `${base}${invoicePath(number)}?exp=${exp}&sig=${sign(number, exp)}`;
 }
 

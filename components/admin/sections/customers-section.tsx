@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { api, type CustomerDetail, type CustomerSummary } from "@/lib/api";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input } from "../fields";
 
 export function CustomersSection({ customers }: { customers: CustomerSummary[] }) {
+  const { money, date } = useFormatters();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<CustomerDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -90,7 +91,7 @@ export function CustomersSection({ customers }: { customers: CustomerSummary[] }
             {[
               ["Orders", String(selected.orderCount)],
               ["Lifetime spend", money(selected.totalSpent)],
-              ["Customer since", new Date(selected.createdAt).toLocaleDateString()],
+              ["Customer since", date(selected.createdAt)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md bg-muted/50 p-3">
                 <p className="text-xs text-muted-foreground">{label}</p>
@@ -123,7 +124,7 @@ export function CustomersSection({ customers }: { customers: CustomerSummary[] }
                 {selected.orders.map((o) => (
                   <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
                     <span className="font-medium">{o.orderNumber}</span>
-                    <span className="text-muted-foreground">{new Date(o.placedAt).toLocaleDateString()}</span>
+                    <span className="text-muted-foreground">{date(o.placedAt)}</span>
                     <Badge variant="outline">{o.status}</Badge>
                     <span>{money(o.grandTotal, o.currency)}</span>
                   </li>

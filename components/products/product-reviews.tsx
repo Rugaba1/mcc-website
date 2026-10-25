@@ -7,35 +7,16 @@ import { Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { Link } from "@/app/i18n/routing";
-import apiClient from "@/lib/api-client";
-import { apiErrorMessage } from "@/lib/api";
+import { api, apiErrorMessage, type ProductReviewData, type ProductReviewSummary } from "@/lib/api";
+import { PermissionGate } from "@/components/permission-gate";
+import { CUSTOMER_PERM } from "@/lib/permissions/catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ReviewMarkdownEditor } from "@/components/products/review-markdown-editor";
+import { useFormatters } from "@/contexts/format-context";
 
-type Review = {
-    id: number;
-    rating: number;
-    title: string | null;
-    body: string;
-    createdAt: string;
-    author: string;
-};
-
-type ReviewData = {
-    reviews: Review[];
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    averageRating: number | null;
-    canReview: boolean;
-    authenticated: boolean;
-    myReview: { id: number; rating: number; approved: boolean; title: string | null; body: string } | null;
-};
-
-const emptyData: ReviewData = {
+const emptyData: ProductReviewData = {
     reviews: [], total: 0, page: 1, pageSize: 5, totalPages: 1,
     averageRating: null, canReview: false, authenticated: false, myReview: null,
 };
@@ -50,10 +31,19 @@ function Stars({ rating }: { rating: number }) {
     );
 }
 
-export function ProductReviews({ productId }: { productId: number }) {
-    const [data, setData] = useState<ReviewData>(emptyData);
+export function ProductReviews({
+    productId,
+    initialData,
+}: {
+    productId: number;
+    initialData?: ProductReviewSummary;
+}) {
+    const { date } = useFormatters();
+    const [data, setData] = useState<ProductReviewData>(() => initialData
+        ? { ...initialData, canReview: false, authenticated: false, myReview: null }
+        : emptyData);
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialData);
     const [submitting, setSubmitting] = useState(false);
     const [rating, setRating] = useState(5);
     const [title, setTitle] = useState("");
@@ -62,12 +52,9 @@ export function ProductReviews({ productId }: { productId: number }) {
     const load = useCallback(async (requestedPage: number, signal?: AbortSignal) => {
         setLoading(true);
         try {
-            const response = await apiClient.get<ReviewData>(
-                `/api/products/${productId}/reviews?page=${requestedPage}`,
-                { signal },
-            );
-            setData(response.data);
-            setPage(response.data.page);
+            const response = await api.getProductReviews(productId, requestedPage, signal);
+            setData(response);
+            setPage(response.page);
         } catch (error) {
             if (!signal?.aborted) toast.error(apiErrorMessage(error, "Could not load reviews"));
         } finally {
@@ -85,11 +72,8 @@ export function ProductReviews({ productId }: { productId: number }) {
         event.preventDefault();
         setSubmitting(true);
         try {
-            const response = await apiClient.post<{ message: string }>(
-                `/api/products/${productId}/reviews`,
-                { rating, title, body },
-            );
-            toast.success(response.data.message);
+            const response = await api.submitProductReview(productId, { rating, title, body });
+            toast.success(response.message);
             setTitle("");
             setBody("");
             setRating(5);
@@ -129,7 +113,7 @@ export function ProductReviews({ productId }: { productId: number }) {
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                     <Stars rating={review.rating} />
                                     <time className="text-xs text-muted-foreground" dateTime={review.createdAt}>
-                                        {new Date(review.createdAt).toLocaleDateString()}
+                                        {date(review.createdAt)}
                                     </time>
                                 </div>
                                 {review.title && <h3 className="mt-2 font-semibold">{review.title}</h3>}
@@ -158,6 +142,7 @@ export function ProductReviews({ productId }: { productId: number }) {
                             {data.myReview.approved ? "You have already reviewed this product." : "Your review is awaiting staff approval."}
                         </div>
                     ) : data.canReview ? (
+                        <PermissionGate required={CUSTOMER_PERM.REVIEWS_CREATE}>
                         <form onSubmit={submit} className="mt-5 space-y-4">
                             <fieldset>
                                 <legend className="mb-2 text-sm font-medium">Rating</legend>
@@ -197,8 +182,9 @@ export function ProductReviews({ productId }: { productId: number }) {
                                 {submitting ? "Submitting…" : "Submit review"}
                             </Button>
                         </form>
+                        </PermissionGate>
                     ) : data.authenticated ? (
-                        <p className="mt-4 text-sm text-muted-foreground">A paid order for this product is required before you can review it.</p>
+                        <p className="mt-4 text-sm text-muted-foreground">A paid order for this product and review access are required before you can submit a review.</p>
                     ) : (
                         <p className="mt-4 text-sm text-muted-foreground">
                             <Link href="/login" className="text-primary underline underline-offset-4">Sign in</Link> with the account used for your purchase to leave a review.

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
-export async function GET(_req: NextRequest) {
+export const GET = withPermission(PERM.REPORTS_VIEW)(async (_req: NextRequest) => {
   try {
     const [
       productCount,
@@ -50,4 +52,4 @@ export async function GET(_req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

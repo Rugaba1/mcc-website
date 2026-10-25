@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
+import { pageForTotal, paginatedResult, parsePagination } from "@/lib/server-pagination";
 
 // Only what a collection card needs. The old `product: true` pulled every column
 // (description, gradient, colors, image...) of every product in every collection.
@@ -16,10 +20,35 @@ const PRODUCT_CARD = {
 } satisfies Prisma.ProductSelect;
 
 // ── GET /api/collections ──────────────────────────────────────────────────────
-export async function GET() {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (req: NextRequest) => {
   try {
+    const pagination = parsePagination(req.nextUrl.searchParams);
+    if (!pagination) {
+      return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
+    }
+    const where: Prisma.CollectionWhereInput = pagination.search
+      ? {
+          OR: [
+            { name: { contains: pagination.search } },
+            { description: { contains: pagination.search } },
+          ],
+        }
+      : {};
+    let total = 0;
+    let page = pagination.page;
+    if (pagination.requested) {
+      total = await prisma.collection.count({ where });
+      page = pageForTotal(total, pagination.page, pagination.pageSize).page;
+    }
     const rows = await prisma.collection.findMany({
+      where,
       orderBy: { id: "asc" },
+      ...(pagination.requested
+        ? { skip: (page - 1) * pagination.pageSize, take: pagination.pageSize }
+        : {}),
       include: {
         items: {
           select: {
@@ -43,7 +72,11 @@ export async function GET() {
       items: c.items,
     }));
 
-    return NextResponse.json(collections);
+    return NextResponse.json(
+      pagination.requested
+        ? paginatedResult(collections, total, page, pagination.pageSize)
+        : collections,
+    );
   } catch (err) {
     console.error("GET /api/collections error:", err);
     return NextResponse.json(
@@ -51,10 +84,11 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});
 
 // ── POST /api/collections ─────────────────────────────────────────────────────
-export async function POST(req: NextRequest) {
+export const POST = withPermission(PERM.COLLECTIONS_MANAGE)(
+  async (req: NextRequest) => {
   try {
     const body = await req.json();
     const collection = await prisma.collection.create({
@@ -82,4 +116,5 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);

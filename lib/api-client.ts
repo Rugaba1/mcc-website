@@ -1,9 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { tokenStore } from "./token-store";
 import { defaultLocale, supportedLocales } from "./constants";
+import { siteConfig } from "@/config/site.config";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_DOMAIN || "http://localhost:3000";
+export const API_BASE_URL = siteConfig.apiBaseUrl;
 
 const REFRESH_URL = "/api/auth/refresh";
 
@@ -23,7 +23,10 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 30_000,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  },
 });
 
 const currentLocale = (): string => {
@@ -38,16 +41,8 @@ const currentLocale = (): string => {
 let refreshPromise: Promise<string> | null = null;
 
 export function refreshAccessToken(): Promise<string> {
-  refreshPromise ??= axios
-    .post(
-      `${API_BASE_URL}${REFRESH_URL}`,
-      {},
-      {
-        withCredentials: true,
-        timeout: 15_000,
-        headers: { "Accept-Language": currentLocale() },
-      },
-    )
+  refreshPromise ??= api
+    .post(REFRESH_URL, {}, { timeout: 15_000 })
     .then(({ data }) => {
       const { accessToken, user } = data;
       tokenStore.set({ accessToken, user });
@@ -82,6 +77,23 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original = error.config as RetriableConfig | undefined;
+
+    if (
+      error.response?.status === 428 &&
+      (error.response.data as { code?: string } | undefined)?.code === "LEGAL_ACCEPTANCE_REQUIRED" &&
+      typeof window !== "undefined"
+    ) {
+      const path = window.location.pathname;
+      if (!path.includes("/legal/accept") && !path.includes("/admin/legal")) {
+        const locale = currentLocale();
+        const prefix = locale === defaultLocale ? "" : `/${locale}`;
+        const next = path.replace(/^\/(en|fr|rw)(?=\/|$)/, "") || "/";
+        const destination = new URL(`${prefix}/legal/accept`, window.location.origin);
+        destination.searchParams.set("next", next);
+        window.location.assign(destination.toString());
+      }
+      return Promise.reject(error);
+    }
 
     const shouldRefresh =
       original &&

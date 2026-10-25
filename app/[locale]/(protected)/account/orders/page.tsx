@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FileText } from "lucide-react";
+import { toast } from "sonner";
 import { Link } from "@/app/i18n/routing";
-import { api, type InvoiceRef, type MyOrderSummary } from "@/lib/api";
-import { money } from "@/lib/format";
-import { useResource } from "@/hooks/use-resource";
+import { api, apiErrorMessage, type InvoiceRef, type MyOrderSummary } from "@/lib/api";
+import { useFormatters } from "@/contexts/format-context";
 import { StatusBadge } from "@/components/account/status-badge";
 import { InvoiceViewerDialog } from "@/components/invoices/invoice-viewer-dialog";
 import { Button } from "@/components/ui/button";
+import { DataPagination } from "@/components/admin/data-pagination";
 
-const fetchOrders = () => api.getMyOrders();
+const PAGE_SIZE = 10;
 
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   PROFORMA: "Proforma",
@@ -19,8 +20,32 @@ const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
 };
 
 export default function OrdersPage() {
-  const { data, loading, error } = useResource<MyOrderSummary[]>(fetchOrders, []);
+  const { money, date } = useFormatters();
+  const [data, setData] = useState<MyOrderSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [invoice, setInvoice] = useState<InvoiceRef | null>(null);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await api.getMyOrdersPage(page, PAGE_SIZE);
+      setData(result.items);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      if (result.page !== page) setPage(result.page);
+    } catch (e) {
+      const message = apiErrorMessage(e, "Failed to load your orders");
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
+  useEffect(() => { void load(); }, [load]);
 
   return (
     <div className="space-y-5">
@@ -47,7 +72,7 @@ export default function OrdersPage() {
               {data.map((o) => (
                 <tr key={o.id} className="hover:bg-muted/40">
                   <td className="px-4 py-3 font-semibold"><Link href={`/account/orders/${o.id}`} className="text-primary hover:underline">{o.orderNumber}</Link></td>
-                  <td className="px-4 py-3 text-muted-foreground">{new Date(o.placedAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{date(o.placedAt)}</td>
                   <td className="px-4 py-3">{o.itemCount}</td>
                   <td className="px-4 py-3 font-medium">{money(o.grandTotal, o.currency)}</td>
                   <td className="px-4 py-3"><StatusBadge status={o.status} /></td>
@@ -77,6 +102,16 @@ export default function OrdersPage() {
             </tbody>
           </table>
         </div>
+      )}
+      {total > 0 && (
+        <DataPagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+          disabled={loading}
+        />
       )}
 
       <InvoiceViewerDialog invoice={invoice} onClose={() => setInvoice(null)} />

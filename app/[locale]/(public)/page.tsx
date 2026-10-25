@@ -10,11 +10,31 @@ import Testimonials from "@/components/Testimonials";
 import Process from "@/components/Process";
 import CtaBand from "@/components/CtaBand";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
-import BackToTop from "@/components/BackToTop";
 import { TeamSection } from "@/components/team-section";
+import { siteConfig } from "@/config/site.config";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
+import { connection } from "next/server";
 
-export default function Home() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return createPageMetadata({
+    locale,
+    path: "/",
+    title: `Ceramic & Porcelain Tile Manufacturer in Rwanda | ${siteConfig.siteName}`,
+    description:
+      "Discover ceramic and porcelain floor, wall, and outdoor tiles manufactured in Rwanda by Mountain Ceramics Company.",
+    image: "/logo.png",
+  });
+}
+
+export default async function Home() {
+  await connection();
+
   return (
     <>
 

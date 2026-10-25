@@ -17,7 +17,8 @@ import {
   toPie,
 } from "@/lib/analytics/helpers";
 import { prisma } from "@/lib/prisma";
-import { withAuth } from "@/lib/auth/withAuth";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 // An order counts as revenue when it is paid and not cancelled/refunded.
 const REVENUE_ORDER: Prisma.OrderWhereInput = {
@@ -25,9 +26,18 @@ const REVENUE_ORDER: Prisma.OrderWhereInput = {
   status: { notIn: ["CANCELLED", "REFUNDED"] },
 };
 
-// TODO: add permission check (e.g. reports.view) before shipping — right now ANY logged-in user can call this.
-export const GET = withAuth(async (request) => {
+export const GET = withPermission(PERM.REPORTS_VIEW)(async (request) => {
   try {
+    const baseCurrency = await prisma.currency.findFirst({
+      where: { isBase: true, enabled: true },
+      select: { code: true },
+    });
+    if (!baseCurrency) {
+      return NextResponse.json(
+        { error: "Store base currency is not configured" },
+        { status: 503 },
+      );
+    }
     const days = parseDays(request.nextUrl.searchParams);
 
     const rangeStart = daysAgo(days - 1); // includes today
@@ -249,32 +259,34 @@ export const GET = withAuth(async (request) => {
     ]);
 
     // ── inventory health ──
-   const stockList = inventoryRows.map((r) => {
-     const onHand = num(r.onHandSqm);
-     const reserved = num(r.reservedSqm);
-     const reorder = num(r.reorderLevel);
-     const available = round(onHand - reserved, 2);
-     const state =
-       available <= 0
-         ? "OUT_OF_STOCK"
-         : available <= reorder
-           ? "LOW"
-           : "IN_STOCK";
-     return {
-       variantId: r.variant.id,
-       sku: r.variant.sku,
-       product: r.variant.product.name,
-       image: r.variant.product.image,
-       size: r.variant.size,
-       finish: r.variant.finish,
-       onHandSqm: onHand,
-       reservedSqm: reserved,
-       availableSqm: available,
-       reorderLevel: reorder,
-       state,
-     };
-   });
-    const outOfStock = stockList.filter((s) => s.state === "OUT_OF_STOCK").length;
+    const stockList = inventoryRows.map((r) => {
+      const onHand = num(r.onHandSqm);
+      const reserved = num(r.reservedSqm);
+      const reorder = num(r.reorderLevel);
+      const available = round(onHand - reserved, 2);
+      const state =
+        available <= 0
+          ? "OUT_OF_STOCK"
+          : available <= reorder
+            ? "LOW"
+            : "IN_STOCK";
+      return {
+        variantId: r.variant.id,
+        sku: r.variant.sku,
+        product: r.variant.product.name,
+        image: r.variant.product.image,
+        size: r.variant.size,
+        finish: r.variant.finish,
+        onHandSqm: onHand,
+        reservedSqm: reserved,
+        availableSqm: available,
+        reorderLevel: reorder,
+        state,
+      };
+    });
+    const outOfStock = stockList.filter(
+      (s) => s.state === "OUT_OF_STOCK",
+    ).length;
     const lowStock = stockList.filter((s) => s.state === "LOW").length;
     const inStock = stockList.length - outOfStock - lowStock;
     const lowStockTable = stockList
@@ -284,7 +296,9 @@ export const GET = withAuth(async (request) => {
 
     // ── time series ──
     const isRevenue = (o: { status: string; paymentStatus: string }) =>
-      o.paymentStatus === "PAID" && o.status !== "CANCELLED" && o.status !== "REFUNDED";
+      o.paymentStatus === "PAID" &&
+      o.status !== "CANCELLED" &&
+      o.status !== "REFUNDED";
 
     const rowValues = (o: (typeof seriesOrders)[number]) => ({
       revenue: isRevenue(o) ? num(o.grandTotal) : 0,
@@ -317,7 +331,10 @@ export const GET = withAuth(async (request) => {
     const categoryRevenue = new Map<string, number>();
     for (const item of soldItems) {
       const label = item.variant?.product.categoryLabel ?? "Uncategorized";
-      categoryRevenue.set(label, (categoryRevenue.get(label) ?? 0) + num(item.lineTotal));
+      categoryRevenue.set(
+        label,
+        (categoryRevenue.get(label) ?? 0) + num(item.lineTotal),
+      );
     }
 
     // ── cards ──
@@ -327,11 +344,28 @@ export const GET = withAuth(async (request) => {
     const cards = [
       card("revenue", "Revenue", revenue, "currency", revenuePrev),
       card("orders", "Orders", ordersCur, "number", ordersPrev),
-      card("avgOrderValue", "Avg. Order Value", num(revCur._avg.grandTotal), "currency", num(revPrev._avg.grandTotal)),
-      card("newCustomers", "New Customers", customersNew, "number", customersPrev),
+      card(
+        "avgOrderValue",
+        "Avg. Order Value",
+        num(revCur._avg.grandTotal),
+        "currency",
+        num(revPrev._avg.grandTotal),
+      ),
+      card(
+        "newCustomers",
+        "New Customers",
+        customersNew,
+        "number",
+        customersPrev,
+      ),
       card("totalCustomers", "Total Customers", customersTotal),
       card("activeCustomers", "Active Customers", customersActive),
-      card("lifetimeRevenue", "Lifetime Revenue", num(revAll._sum.grandTotal), "currency"),
+      card(
+        "lifetimeRevenue",
+        "Lifetime Revenue",
+        num(revAll._sum.grandTotal),
+        "currency",
+      ),
       card("ordersToProcess", "Orders To Process", actionNeeded),
       card("activeProducts", "Active Products", productsActive),
       card("activeVariants", "Active Variants", variantsActive),
@@ -345,16 +379,15 @@ export const GET = withAuth(async (request) => {
       data: {
         range: { days, from: rangeStart, to: new Date() },
         generatedAt: new Date(),
-        currency: "RWF",
+        currency: baseCurrency.code,
         cards,
         charts: {
           revenueDaily, // [{ label: "2026-10-18", revenue, orders }]
           revenueMonthly, // last 12 months [{ label: "2026-10", revenue, orders }]
           customersDaily, // [{ label, customers }]
-          topProducts: topProducts.map((p, i) => ({
-            rank: i + 1,
-            product: p.productName,
-            sqmSold: num(p._sum.quantity), // was boxesSold
+          topProducts: topProducts.map((p) => ({
+            label: p.productName,
+            quantity: num(p._sum.quantity),
             revenue: num(p._sum.lineTotal),
           })),
         },
@@ -458,6 +491,9 @@ export const GET = withAuth(async (request) => {
     });
   } catch (error) {
     console.error("Error fetching admin analytics:", error);
-    return NextResponse.json({ error: "Failed to fetch admin analytics" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch admin analytics" },
+      { status: 500 },
+    );
   }
 });

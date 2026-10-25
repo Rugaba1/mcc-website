@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import type { PaymentSummary } from "../../../lib/api";
-import { money } from "../../../lib/format";
+import type { PaymentSummary } from "@/lib/api";
+import { useFormatters } from "@/contexts/format-context";
 import { Badge } from "../../ui/badge";
 import { Input, Select } from "../fields";
 
 
 
 export function PaymentsSection({ payments }: { payments: PaymentSummary[] }) {
+  const { money, dateTime } = useFormatters();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("ALL");
   const STATUSES = [...new Set(payments.map((p) => p.status))].sort();
@@ -68,7 +69,7 @@ export function PaymentsSection({ payments }: { payments: PaymentSummary[] }) {
             {visible.map((p) => (
               <tr key={p.id} className="hover:bg-muted/40">
                 <td className="px-4 py-3 text-muted-foreground">
-                  {new Date(p.createdAt).toLocaleString()}
+                  {dateTime(p.createdAt)}
                 </td>
                 <td className="px-4 py-3 font-semibold">{p.orderNumber}</td>
                 <td className="px-4 py-3">{p.customerName}</td>

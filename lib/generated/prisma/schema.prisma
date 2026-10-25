@@ -63,6 +63,32 @@ enum DiscountType {
   FIXED
 }
 
+enum EmailBlocklistAction {
+  BLOCKED
+  UNBLOCKED
+}
+
+enum LegalDocumentType {
+  TERMS_AND_CONDITIONS
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+}
+
+model Currency {
+  code          String   @id @db.VarChar(3)
+  name          String   @db.VarChar(80)
+  symbol        String   @db.VarChar(8)
+  decimalDigits Int      @default(2) @map("decimal_digits")
+  enabled       Boolean  @default(true)
+  isBase        Boolean  @default(false) @map("is_base")
+  rateToBase    Decimal  @map("rate_to_base") @db.Decimal(20, 10)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([enabled])
+  @@map("currency")
+}
+
 // ════════════════════════════════════════════════════════════
 //  USERS & PERMISSIONS (permission-based access, no roles)
 //  Customers and staff are the same table. What a user can do
@@ -73,18 +99,22 @@ enum DiscountType {
 // ════════════════════════════════════════════════════════════
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique @db.VarChar(255)
-  phoneNumber     String?   @unique @map("phone_number") @db.VarChar(20)
-  firstName       String    @map("first_name") @db.VarChar(255)
-  lastName        String?   @map("last_name") @db.VarChar(255)
-  password        String    @db.Text
-  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
-  isActive        Boolean   @default(true) @map("is_active")
-  emailVerifiedAt DateTime? @map("email_verified_at")
-  lastLogin       DateTime? @map("last_login")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique @db.VarChar(255)
+  phoneNumber            String?   @unique @map("phone_number") @db.VarChar(20)
+  firstName              String    @map("first_name") @db.VarChar(255)
+  lastName               String?   @map("last_name") @db.VarChar(255)
+  password               String    @db.Text
+  profilePicture         String?   @map("profile_picture") @db.VarChar(255)
+  isActive               Boolean   @default(true) @map("is_active")
+  emailVerifiedAt        DateTime? @map("email_verified_at")
+  twoFactorEnabled       Boolean   @default(false) @map("two_factor_enabled")
+  twoFactorMethod        String?   @map("two_factor_method") @db.VarChar(30)
+  twoFactorSecret        String?   @map("two_factor_secret") @db.Text
+  twoFactorPendingSecret String?   @map("two_factor_pending_secret") @db.Text
+  lastLogin              DateTime? @map("last_login")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
 
   permissions            UserPermission[]        @relation("UserPermissions")
   grantedPerms           UserPermission[]        @relation("PermissionGrantor")
@@ -106,6 +136,13 @@ model User {
   role                   Role[]
   payments               Payment[]
   blogPosts              BlogPost[]
+  emailBlocksCreated     EmailBlocklist[]        @relation("EmailBlocklistCreator")
+  emailBlocksRevoked     EmailBlocklist[]        @relation("EmailBlocklistRevoker")
+  emailBlocklistEvents   EmailBlocklistEvent[]   @relation("EmailBlocklistEventActor")
+  notificationReads      AdminNotificationRead[]
+  newsletterCampaigns    NewsletterCampaign[]    @relation("NewsletterCampaignCreator")
+  legalVersionsCreated   LegalDocumentVersion[]  @relation("LegalDocumentVersionCreator")
+  legalAcceptances       LegalAcceptance[]
 
   @@index([showOnHomepage, displayOrder])
   @@map("users")
@@ -165,6 +202,180 @@ model RefreshToken {
   @@index([familyId])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+model EmailBlocklist {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique @db.VarChar(255)
+  reason      String?   @db.VarChar(500)
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdById Int?      @map("created_by_id")
+  revokedAt   DateTime? @map("revoked_at")
+  revokedById Int?      @map("revoked_by_id")
+
+  createdBy User? @relation("EmailBlocklistCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  revokedBy User? @relation("EmailBlocklistRevoker", fields: [revokedById], references: [id], onDelete: SetNull)
+
+  @@index([isActive, createdAt])
+  @@map("email_blocklist")
+}
+
+model EmailBlocklistEvent {
+  id          Int                  @id @default(autoincrement())
+  email       String               @db.VarChar(255)
+  action      EmailBlocklistAction
+  reason      String?              @db.VarChar(500)
+  actorUserId Int?                 @map("actor_user_id")
+  createdAt   DateTime             @default(now()) @map("created_at")
+
+  actor User? @relation("EmailBlocklistEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([email, createdAt])
+  @@index([actorUserId])
+  @@map("email_blocklist_events")
+}
+
+model NewsletterSubscription {
+  id                    Int                           @id @default(autoincrement())
+  email                 String                        @unique @db.VarChar(255)
+  status                String                        @default("PENDING") @db.VarChar(20)
+  consentAt             DateTime                      @map("consent_at")
+  confirmedAt           DateTime?                     @map("confirmed_at")
+  unsubscribedAt        DateTime?                     @map("unsubscribed_at")
+  confirmationTokenHash String?                       @unique @map("confirmation_token_hash") @db.VarChar(64)
+  confirmationExpiresAt DateTime?                     @map("confirmation_expires_at")
+  unsubscribeTokenHash  String?                       @unique @map("unsubscribe_token_hash") @db.VarChar(64)
+  createdAt             DateTime                      @default(now()) @map("created_at")
+  updatedAt             DateTime                      @updatedAt @map("updated_at")
+  campaignRecipients    NewsletterCampaignRecipient[]
+
+  @@index([status, createdAt])
+  @@map("newsletter_subscriptions")
+}
+
+model NewsletterCampaign {
+  id           Int                           @id @default(autoincrement())
+  subject      String                        @db.VarChar(200)
+  bodyMarkdown String                        @map("body_markdown") @db.LongText
+  status       String                        @default("QUEUED") @db.VarChar(20)
+  createdById  Int?                          @map("created_by_id")
+  createdAt    DateTime                      @default(now()) @map("created_at")
+  sentAt       DateTime?                     @map("sent_at")
+  createdBy    User?                         @relation("NewsletterCampaignCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  recipients   NewsletterCampaignRecipient[]
+
+  @@index([status, createdAt])
+  @@map("newsletter_campaigns")
+}
+
+model NewsletterCampaignRecipient {
+  id                   Int                    @id @default(autoincrement())
+  campaignId           Int                    @map("campaign_id")
+  subscriptionId       Int                    @map("subscription_id")
+  unsubscribeTokenHash String                 @unique @map("unsubscribe_token_hash") @db.VarChar(64)
+  status               String                 @default("PENDING") @db.VarChar(20)
+  sentAt               DateTime?              @map("sent_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+  campaign             NewsletterCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscription         NewsletterSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, subscriptionId])
+  @@index([campaignId, status, id])
+  @@map("newsletter_campaign_recipients")
+}
+
+model CheckoutReservation {
+  id        Int                       @id @default(autoincrement())
+  tokenHash String                    @unique @map("token_hash") @db.VarChar(64)
+  status    String                    @default("ACTIVE") @db.VarChar(20)
+  expiresAt DateTime                  @map("expires_at")
+  createdAt DateTime                  @default(now()) @map("created_at")
+  updatedAt DateTime                  @updatedAt @map("updated_at")
+  items     CheckoutReservationItem[]
+
+  @@index([status, expiresAt])
+  @@map("checkout_reservations")
+}
+
+model CheckoutReservationItem {
+  id            Int                 @id @default(autoincrement())
+  reservationId Int                 @map("reservation_id")
+  variantId     Int                 @map("variant_id")
+  quantitySqm   Decimal             @map("quantity_sqm") @db.Decimal(12, 2)
+  reservation   CheckoutReservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  variant       ProductVariant      @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([reservationId, variantId])
+  @@index([variantId])
+  @@map("checkout_reservation_items")
+}
+
+model AdminNotification {
+  id                 Int                     @id @default(autoincrement())
+  type               String                  @db.VarChar(40)
+  requiredPermission String                  @map("required_permission") @db.VarChar(80)
+  title              String                  @db.VarChar(255)
+  message            String?                 @db.VarChar(500)
+  targetPath         String                  @map("target_path") @db.VarChar(500)
+  entityId           Int?                    @map("entity_id")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  reads              AdminNotificationRead[]
+
+  @@index([requiredPermission, id])
+  @@index([createdAt])
+  @@map("admin_notifications")
+}
+
+model AdminNotificationRead {
+  notificationId Int               @map("notification_id")
+  userId         Int               @map("user_id")
+  readAt         DateTime          @default(now()) @map("read_at")
+  notification   AdminNotification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, userId])
+  @@index([userId, readAt])
+  @@map("admin_notification_reads")
+}
+
+model LegalDocumentVersion {
+  id                Int               @id @default(autoincrement())
+  documentType      LegalDocumentType @map("document_type")
+  version           Int
+  title             String            @db.VarChar(255)
+  titleFr           String            @map("title_fr") @db.VarChar(255)
+  titleRw           String            @map("title_rw") @db.VarChar(255)
+  contentMarkdown   String            @map("content_markdown") @db.LongText
+  contentMarkdownFr String            @map("content_markdown_fr") @db.LongText
+  contentMarkdownRw String            @map("content_markdown_rw") @db.LongText
+  createdById       Int?              @map("created_by_id")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  publishedAt       DateTime?         @map("published_at")
+
+  createdBy   User?             @relation("LegalDocumentVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  acceptances LegalAcceptance[]
+
+  @@unique([documentType, version])
+  @@index([documentType, publishedAt, version])
+  @@map("legal_document_versions")
+}
+
+model LegalAcceptance {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  legalVersionId Int      @map("legal_version_id")
+  acceptedAt     DateTime @default(now()) @map("accepted_at")
+  ip             String?  @db.VarChar(45)
+  userAgent      String?  @map("user_agent") @db.VarChar(500)
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  legalVersion LegalDocumentVersion @relation(fields: [legalVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, legalVersionId])
+  @@index([legalVersionId, acceptedAt])
+  @@map("legal_acceptances")
 }
 
 model Permission {
@@ -324,7 +535,7 @@ model ProductVariant {
   containerPricePerSqm Decimal? @db.Decimal(12, 2) // 11,000, null = not sold by container
   sqmPerContainer      Decimal? @db.Decimal(10, 2) // m² in one container
   compareAtPrice       Decimal? @db.Decimal(12, 2) // strike-through price per m²
-  currency             String   @default("RWF") @db.VarChar(3)
+  currency             String   @db.VarChar(3)
 
   piecesPerBox   Int      @default(1)
   sqmPerBox      Decimal  @default(1) @db.Decimal(8, 3)
@@ -337,12 +548,13 @@ model ProductVariant {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  product        Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
-  inventory      Inventory?
-  stockMovements StockMovement[]
-  cartItems      CartItem[]
-  orderItems     OrderItem[]
-  designItems    VisualizerDesignItem[]
+  product              Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventory            Inventory?
+  stockMovements       StockMovement[]
+  cartItems            CartItem[]
+  orderItems           OrderItem[]
+  designItems          VisualizerDesignItem[]
+  checkoutReservations CheckoutReservationItem[]
 
   @@index([productId])
   @@map("productvariant")
@@ -502,6 +714,7 @@ model Order {
   userId      Int?
   guestEmail  String? @db.VarChar(255)
   guestPhone  String? @db.VarChar(20)
+  tin         String? @db.VarChar(9)
 
   status        OrderStatus       @default(PENDING)
   paymentStatus PaymentStatus     @default(PENDING)
@@ -512,7 +725,7 @@ model Order {
   shippingFee   Decimal @default(0) @db.Decimal(12, 2)
   taxTotal      Decimal @default(0) @db.Decimal(12, 2)
   grandTotal    Decimal @db.Decimal(12, 2)
-  currency      String  @default("RWF") @db.VarChar(3)
+  currency      String  @db.VarChar(3)
 
   couponId       Int?
   deliveryZoneId Int?
@@ -585,7 +798,7 @@ model Invoice {
   sha256    String      @db.VarChar(64)
   sizeBytes Int
   total     Decimal     @db.Decimal(12, 2)
-  currency  String      @default("RWF") @db.VarChar(3)
+  currency  String      @db.VarChar(3)
   issuedAt  DateTime    @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -616,7 +829,7 @@ model Payment {
   method         PaymentMethod
   status         PaymentStatus @default(PENDING)
   amount         Decimal       @db.Decimal(12, 2)
-  currency       String        @default("RWF") @db.VarChar(3)
+  currency       String        @db.VarChar(3)
   provider       String?       @db.VarChar(50) // gateway name (e.g. Flutterwave, Paypack)
   providerRef    String?       @unique @db.VarChar(150) // gateway transaction id
   payerPhone     String?       @db.VarChar(20) // mobile money number

@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth/require-user";
+import { withAuth } from "@/lib/middleware/withAuth";
 import { totalsOf } from "@/lib/payments/sync";
+import { pageForTotal, paginatedResult, parsePagination } from "@/lib/server-pagination";
 
 export const runtime = "nodejs";
 
-export async function GET(req: NextRequest) {
-  const { claims, error } = await requireUser(req);
-  if (error) return error;
-
+export const GET = withAuth(async (req: NextRequest, { user }) => {
   try {
+    const pagination = parsePagination(req.nextUrl.searchParams, 8);
+    if (!pagination) {
+      return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
+    }
     const orders = await prisma.order.findMany({
-      where: { userId: claims.userId },
+      where: { userId: user.id },
       orderBy: { placedAt: "desc" },
-      take: 100,
       select: {
         id: true,
         orderNumber: true,
@@ -100,7 +101,34 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ summary, orders: mapped });
+    const dueOrders = mapped.filter(
+      (order) =>
+        order.balanceDue > 0 ||
+        order.payments.some((payment) => payment.status === "PENDING" || payment.status === "AUTHORIZED"),
+    );
+    const history = mapped
+      .flatMap((order) =>
+        order.payments.map((payment) => ({
+          ...payment,
+          order: {
+            id: order.id,
+            orderNumber: order.orderNumber,
+            currency: order.currency,
+          },
+        })),
+      )
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    const total = history.length;
+    const { page } = pageForTotal(total, pagination.page, pagination.pageSize);
+    const pageRows = history.slice(
+      (page - 1) * pagination.pageSize,
+      page * pagination.pageSize,
+    );
+    return NextResponse.json({
+      summary,
+      orders: dueOrders,
+      history: paginatedResult(pageRows, total, page, pagination.pageSize),
+    });
   } catch (e) {
     console.error("GET /api/me/payments:", e);
     return NextResponse.json(
@@ -108,4 +136,4 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

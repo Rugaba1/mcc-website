@@ -2,31 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { postData, uniquePostSlug } from "@/lib/blog/payload";
 import { checkMdx } from "@/lib/blog/validate";
+import { toSummary } from "@/lib/blog/summary";
 
-export const toSummary = (p: any) => ({
-  id: p.id,
-  slug: p.slug,
-  locale: p.locale,
-  title: p.title,
-  excerpt: p.excerpt,
-  coverImage: p.coverImage,
-  status: p.status,
-  featured: p.featured,
-  readingMinutes: p.readingMinutes,
-  publishedAt: p.publishedAt,
-  updatedAt: p.updatedAt,
-  authorName: p.author
-    ? [p.author.firstName, p.author.lastName].filter(Boolean).join(" ")
-    : null,
-});
-
-export async function GET(req: NextRequest) {
+export const GET = withPermission(PERM.BLOG_VIEW)(async (req: NextRequest) => {
   try {
-    const { error } = await requireStaff(req);
-    if (error) return error;
     const sp = req.nextUrl.searchParams;
     const page = Math.max(parseInt(sp.get("page") ?? "1", 10) || 1, 1);
     const limit = Math.min(
@@ -71,12 +54,11 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withPermission(PERM.BLOG_WRITE)(
+  async (req: NextRequest, { user }) => {
   try {
-    const { error, user } = (await requireStaff(req)) as any;
-    if (error) return error;
     const body = await req.json();
     const data = postData(body);
     if (!data.title || !data.content)
@@ -92,7 +74,7 @@ export async function POST(req: NextRequest) {
       data: {
         ...data,
         slug: await uniquePostSlug(body.slug || data.title),
-        authorId: user?.id ?? null,
+        authorId: user.id,
       },
     });
     revalidatePath("/[locale]/blog", "page");
@@ -107,4 +89,5 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);

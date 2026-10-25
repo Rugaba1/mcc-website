@@ -33,6 +33,7 @@ import { toast } from "sonner";
 
 import { api, apiErrorMessage, type CustomerAnalytics, type PieSlice, type StatCard } from "@/lib/api";
 import { lineOf, useCart } from "@/contexts/cart-context";
+import { useFormatters } from "@/contexts/format-context";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,24 +50,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
-const sqm = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
-const plain = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-const money = (n: number, currency = "RWF") => `${plain.format(n)} ${currency}`;
-
-const fmtDate = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
-
-const fmtMonth = (label: string) =>
-  new Date(`${label}-01T00:00:00Z`).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-
 const SLICE_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
 const TONES = {
-  green: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  amber: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  blue: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  red: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
+  green: "border-success/30 bg-success/10 text-success",
+  amber: "border-warning/30 bg-warning/10 text-warning",
+  blue: "border-info/30 bg-info/10 text-info",
+  red: "border-destructive/30 bg-destructive/10 text-destructive",
   gray: "border-border bg-muted text-muted-foreground",
 };
 
@@ -172,6 +162,7 @@ export default function CustomerDashboardPage() {
 // ─── Body ─────────────────────────────────────────────────────────────────────
 
 function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: number; refreshing: boolean }) {
+  const { money, number, date } = useFormatters();
   const { cards, charts, pies, tables, currency } = data;
   const byKey = (k: string) => cards.find((c) => c.key === k);
 
@@ -221,7 +212,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
             <div key={c.key} className="px-4 first:pl-0">
               <p className="text-xs text-muted-foreground">{c.label}</p>
               <p className="mt-1 text-lg font-semibold tabular-nums">
-                {c.format === "currency" ? money(c.value, currency) : plain.format(c.value)}
+                {c.format === "currency" ? money(c.value, currency) : number(c.value)}
               </p>
             </div>
           ))}
@@ -314,12 +305,12 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{r.title ?? r.product}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {r.product} · {fmtDate(r.createdAt)}
+                      {r.product} · {date(r.createdAt)}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     <span className="flex items-center gap-1 text-sm tabular-nums">
-                      <Star className="size-4 fill-amber-400 text-amber-400" />
+                      <Star className="size-4 fill-warning text-warning" />
                       {r.rating}
                     </span>
                     <Badge variant="outline" className={r.approved ? TONES.green : TONES.amber}>
@@ -339,7 +330,8 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
 // ─── KPI ──────────────────────────────────────────────────────────────────────
 
 function KpiCard({ card, icon: Icon, currency, days }: { card: StatCard; icon: LucideIcon; currency: string; days: number }) {
-  const value = card.format === "currency" ? money(card.value, currency) : plain.format(card.value);
+  const { money, number } = useFormatters();
+  const value = card.format === "currency" ? money(card.value, currency) : number(card.value);
   const up = (card.change ?? 0) >= 0;
   const Trend = up ? ArrowUpRight : ArrowDownRight;
 
@@ -356,7 +348,7 @@ function KpiCard({ card, icon: Icon, currency, days }: { card: StatCard; icon: L
         {card.change !== undefined && (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span
-              className={`inline-flex items-center gap-0.5 font-medium ${up ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+              className={`inline-flex items-center gap-0.5 font-medium ${up ? "text-success dark:text-success" : "text-destructive dark:text-destructive"
                 }`}
             >
               <Trend className="size-3.5" />
@@ -375,6 +367,7 @@ function KpiCard({ card, icon: Icon, currency, days }: { card: StatCard; icon: L
 const STEPS = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED"];
 
 function ActiveOrders({ orders, currency }: { orders: CustomerAnalytics["tables"]["activeOrders"]; currency: string }) {
+  const { money, date } = useFormatters();
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -396,7 +389,7 @@ function ActiveOrders({ orders, currency }: { orders: CustomerAnalytics["tables"
                         {o.orderNumber}
                       </Link>
                       <p className="text-xs text-muted-foreground">
-                        Placed {fmtDate(o.placedAt)}
+                        Placed {date(o.placedAt)}
                         {o.estimatedDays ? ` · usually ${o.estimatedDays} days to deliver` : ""}
                       </p>
                     </div>
@@ -412,7 +405,7 @@ function ActiveOrders({ orders, currency }: { orders: CustomerAnalytics["tables"
                   </div>
                   {o.lastUpdate?.note && (
                     <p className="text-xs text-muted-foreground">
-                      {o.lastUpdate.note} · {fmtDate(o.lastUpdate.createdAt)}
+                      {o.lastUpdate.note} · {date(o.lastUpdate.createdAt)}
                     </p>
                   )}
                 </li>
@@ -428,6 +421,7 @@ function ActiveOrders({ orders, currency }: { orders: CustomerAnalytics["tables"
 // ─── Cart ─────────────────────────────────────────────────────────────────────
 
 function CartCard({ currency }: { currency: string }) {
+  const { number, money } = useFormatters();
   const { items, ready } = useCart();
   const subtotal = items.reduce((total, item) => total + (lineOf(item)?.total ?? 0), 0);
 
@@ -459,18 +453,18 @@ function CartCard({ currency }: { currency: string }) {
                     <div className="size-12 shrink-0 overflow-hidden  bg-muted">
                       {i.image && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={i.image} alt={i.product} className="size-full object-cover" />
+                        <img src={i.image} alt={i.name} className="size-full object-cover" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{i.product}</p>
+                      <p className="truncate text-sm font-medium">{i.name}</p>
                       <p className="truncate text-xs text-muted-foreground">
                         {i.size} · {i.saleType === "CONTAINER"
-                          ? `${line?.containers ?? i.qty} container(s) · ${sqm.format(line?.sqm ?? 0)} m²`
-                          : `${sqm.format(i.qty)} m²`}
+                          ? `${line?.containers ?? i.qty} container(s) · ${number(line?.sqm ?? 0, { maximumFractionDigits: 2 })} m²`
+                          : `${number(i.qty, { maximumFractionDigits: 2 })} m²`}
                       </p>
                     </div>
-                    <span className="text-sm tabular-nums">{compact.format(line?.total ?? 0)}</span>
+                    <span className="text-sm tabular-nums">{number(line?.total ?? 0, { notation: "compact", maximumFractionDigits: 1 })}</span>
                   </li>
                 );
               })}
@@ -502,6 +496,8 @@ const spendConfig = {
 } satisfies ChartConfig;
 
 function SpendChart({ rows, currency }: { rows: CustomerAnalytics["charts"]["spendMonthly"]; currency: string }) {
+  const { money, number, datePattern } = useFormatters();
+  const formatMonth = (label: string) => datePattern(`${label}-01`, "MMM");
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -518,20 +514,20 @@ function SpendChart({ rows, currency }: { rows: CustomerAnalytics["charts"]["spe
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmtMonth} />
-            <YAxis yAxisId="spent" tickLine={false} axisLine={false} width={44} tickFormatter={(v) => compact.format(v)} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={formatMonth} />
+            <YAxis yAxisId="spent" tickLine={false} axisLine={false} width={44} tickFormatter={(v) => number(v, { notation: "compact", maximumFractionDigits: 1 })} />
             <YAxis yAxisId="orders" orientation="right" hide />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   labelFormatter={(l) =>
-                    new Date(`${l}-01T00:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })
+                    datePattern(`${l}-01`, "MMMM yyyy")
                   }
                   formatter={(value, name) => (
                     <div className="flex w-full items-center justify-between gap-6">
                       <span className="text-muted-foreground">{spendConfig[name as keyof typeof spendConfig]?.label}</span>
                       <span className="font-medium tabular-nums">
-                        {name === "spent" ? money(Number(value), currency) : plain.format(Number(value))}
+                        {name === "spent" ? money(Number(value), currency) : number(Number(value))}
                       </span>
                     </div>
                   )}
@@ -550,9 +546,10 @@ function SpendChart({ rows, currency }: { rows: CustomerAnalytics["charts"]["spe
 type PieSet = { key: string; label: string; slices: PieSlice[]; money?: boolean };
 
 function PieCard({ sets, currency }: { sets: PieSet[]; currency: string }) {
+  const { money, number } = useFormatters();
   const [active, setActive] = useState(sets[0].key);
   const set = sets.find((s) => s.key === active) ?? sets[0];
-  const fmt = (n: number) => (set.money ? money(n, currency) : plain.format(n));
+  const fmt = (n: number) => (set.money ? money(n, currency) : number(n));
 
   return (
     <Card>
@@ -618,6 +615,7 @@ function PieCard({ sets, currency }: { sets: PieSet[]; currency: string }) {
 // ─── History table ────────────────────────────────────────────────────────────
 
 function HistoryTable({ tables, currency }: { tables: CustomerAnalytics["tables"]; currency: string }) {
+  const { money, date } = useFormatters();
   const [tab, setTab] = useState("orders");
 
   return (
@@ -647,7 +645,7 @@ function HistoryTable({ tables, currency }: { tables: CustomerAnalytics["tables"
               <StatusBadge key="s" status={o.status} />,
               <StatusBadge key="p" status={o.paymentStatus} />,
               <span key="t" className="tabular-nums">{money(o.total, o.currency || currency)}</span>,
-              fmtDate(o.placedAt),
+              date(o.placedAt),
             ])}
           />
         ) : (
@@ -659,7 +657,7 @@ function HistoryTable({ tables, currency }: { tables: CustomerAnalytics["tables"
               <span key="m" className="capitalize">{p.method.replace(/_/g, " ").toLowerCase()}</span>,
               <StatusBadge key="s" status={p.status} />,
               <span key="a" className="tabular-nums">{money(p.amount, p.currency || currency)}</span>,
-              fmtDate(p.createdAt),
+              date(p.createdAt),
             ])}
           />
         )}

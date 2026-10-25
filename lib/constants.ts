@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site.config";
+
 export const COMPANY = {
   name: "Mountain Ceramics Company",
   shortName: "MCC",
@@ -10,25 +12,24 @@ export const localesConfig = [
   { code: "fr" as const, label: "Français" },
   { code: "rw" as const, label: "Kinyarwanda" },
 ];
-export const supportedLocales = localesConfig.map((l) => l.code);
-export const defaultLocale = "en";
+export const supportedLocales = siteConfig.languages;
+export const defaultLocale = siteConfig.defaultLanguage;
 export const EXPLICIT_LOCALE_PREFIX = /^\/(en|rw|fr)(\/|$)/;
 
 // Commerce
-export const DEFAULT_CURRENCY = "RWF";
-export const SUPPORTED_CURRENCIES = ["RWF", "USD"] as const;
+export const DEFAULT_CURRENCY = siteConfig.defaultCurrency;
 export const VAT_RATE = 0.18; // Rwanda standard VAT
 
 // Time
-export const IS_PROD = process.env.NODE_ENV === "production";
+export const IS_PROD = siteConfig.isProduction;
 export const DAY = 60 * 60 * 24;
 export const WEEK = DAY * 7;
 
 // Origins
-export const CDN = process.env.NEXT_CDN_DOMAIN; // tile images, visualizer textures
+export const CDN = siteConfig.cdnUrl; // tile images, visualizer textures
 export const GCS = "https://storage.googleapis.com";
-export const API_ORIGIN = process.env.NEXT_API_URL;
-export const WS_ORIGIN = process.env.NEXT_WS_ORIGIN;
+export const API_ORIGIN = siteConfig.apiUrl;
+export const WS_ORIGIN = siteConfig.websocketUrl;
 
 export const CLOUDFLARE_CHALLENGES = "https://challenges.cloudflare.com"; // Turnstile
 export const YOUTUBE_NOCOOKIE = "https://www.youtube-nocookie.com"; // product / install videos
@@ -44,14 +45,18 @@ export const SCRIPT_HOSTS = [
   "https://checkout.flutterwave.com",
   CLOUDFLARE_CHALLENGES,
   "https://static.cloudflareinsights.com",
+  ...(siteConfig.googleAnalyticsId ? ["https://www.googletagmanager.com"] : []),
 ];
 
 export const IMG_HOSTS = [
   GCS,
   CDN,
+  ...siteConfig.imageOrigins,
+  "https://images.unsplash.com",
   "https://checkout.flutterwave.com",
   "https://i.ytimg.com",
   "https://*.tile.openstreetmap.org", // showroom map, if used
+  ...(siteConfig.googleAnalyticsId ? ["https://*.google-analytics.com"] : []),
 ];
 
 export const CONNECT_HOSTS = [
@@ -61,6 +66,9 @@ export const CONNECT_HOSTS = [
   GCS,
   CLOUDFLARE_CHALLENGES,
   "https://cloudflareinsights.com",
+  ...(siteConfig.googleAnalyticsId
+    ? ["https://*.google-analytics.com", "https://*.googletagmanager.com"]
+    : []),
 ];
 
 export const FRAME_HOSTS = [

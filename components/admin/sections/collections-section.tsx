@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ImageIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { api, type Collection, type Product } from "@/lib/api";
+import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Textarea } from "../fields";
 import { ImageUploader } from "../image-uploader";
@@ -133,13 +134,13 @@ export function CollectionsSection({
                   </div>
                 )}
                 {col.featured && (
-                  <span className="absolute left-0 top-3 bg-primary px-3 py-1 text-[10px] font-bold uppercase text-primary-foreground">
+                  <Badge className="absolute left-0 top-3 h-auto rounded-none px-3 py-1 text-[10px] font-bold uppercase">
                     Featured
-                  </span>
+                  </Badge>
                 )}
-                <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold text-white">
+                <Badge className="absolute bottom-3 right-3 h-auto bg-overlay/70 px-2.5 py-1 text-[10px] font-bold text-overlay-foreground">
                   {tiles.length} tiles
-                </span>
+                </Badge>
               </div>
               <div className="p-4">
                 <h3 className="mb-1 text-sm font-bold">{col.name}</h3>

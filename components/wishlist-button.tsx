@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "@/app/i18n/routing";
 import { useAuth } from "@/contexts/auth-context";
-import { api, apiErrorMessage } from "../lib/api";
+import { api, apiErrorMessage } from "@/lib/api";
 import { Button } from "./ui/button";
 
 export function WishlistButton({ productId }: { productId: number }) {

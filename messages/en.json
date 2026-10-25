@@ -2478,6 +2478,10 @@
     "timesValue": "Sunday at 10:00 AM",
     "mapPlaceholder": "Mbarara District, Uganda",
     "mapTitle": "Church location map",
+    "mapEmbedHeading": "Find our factory",
+    "mapEmbedNotice": "Loading the map connects to Google Maps and may share your IP address.",
+    "mapEmbedButton": "Load map",
+    "mapEmbedTitle": "Mountain Ceramics Co. Ltd. location map",
     "formTitle": "Send a Message",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
@@ -2700,17 +2704,20 @@
   },
   "cookieConsent": {
     "title": "Cookie preferences",
-    "message": "Choose which cookies we can use. You can change this anytime from the privacy policy page.",
+    "message": "We use essential storage to keep the site working and remember choices you make. Optional analytics is off unless you choose to allow it.",
     "necessaryLabel": "Necessary",
-    "necessaryDesc": "Keeps you signed in and remembers your language. Always on — the site can't function without these.",
+    "necessaryDesc": "Supports sign-in, language, and requested display preferences, and stores this consent choice. Always on.",
     "analyticsLabel": "Analytics",
-    "analyticsDesc": "Helps us understand how visitors use the site (Google Analytics). Off by default.",
-    "thirdPartyLabel": "Third-party embeds",
-    "thirdPartyDesc": "YouTube video, PayPal donations, and Google sign-in may set their own cookies when you use those features. We don't control these — see each provider's own privacy policy.",
-    "learnMore": "Learn more",
+    "analyticsDesc": "Allows Google Analytics to collect site usage information. It loads only after you opt in.",
+    "analyticsUnavailable": "Optional analytics is not currently configured on this website.",
+    "privacyPolicy": "Read our privacy policy",
     "necessaryOnly": "Necessary only",
     "savePreferences": "Save preferences",
-    "accept": "Accept all"
+    "accept": "Accept all",
+    "customize": "Customize",
+    "changeSettings": "Cookie settings",
+    "cancel": "Cancel",
+    "storageError": "Your choice could not be saved on this device. It will apply for this visit only."
   },
   "profilePage": {
     "not_using_it": "Not using it",
@@ -3744,5 +3751,14 @@
     "login": "Log in",
     "goHome": "Go home",
     "contact": "Contact us"
+  },
+  "accessGate": {
+    "deniedTitle": "Access unavailable",
+    "deniedDescription": "Your account does not have permission to view this content. If you think this is a mistake, contact support.",
+    "disabledTitle": "This page is temporarily unavailable",
+    "disabledDescription": "This feature has been temporarily disabled. Please contact support if you need help.",
+    "removedTitle": "This page is no longer available",
+    "removedDescription": "This feature has been removed and is no longer available.",
+    "contactSupport": "Contact support"
   }
 }

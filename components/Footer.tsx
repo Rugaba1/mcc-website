@@ -1,36 +1,54 @@
 import Image from "next/image";
-import { FacebookIcon, InstagramIcon, LinkedInIcon, XIcon } from "./Icons";
+import { Link } from "@/app/i18n/routing";
+import { COMPANY } from "@/lib/company";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 
-const footerLinks = {
-  Products: ["Floor Tiles", "Wall Tiles", "Outdoor Tiles", "Special Finish", "Custom Orders"],
-  Company: ["About Us", "Projects", "Why Choose MCC", "Careers", "News & Media"],
-  Support: ["Get a Quote", "Design Consultation", "Installation Guide", "Warranty Claims", "Dealer Programme"],
-};
-
-const socials = [
-  { label: "Facebook", icon: FacebookIcon, href: "#" },
-  { label: "Instagram", icon: InstagramIcon, href: "#" },
-  { label: "LinkedIn", icon: LinkedInIcon, href: "#" },
-  { label: "X", icon: XIcon, href: "#" },
-];
+const footerLinks = [
+  {
+    title: "Products",
+    items: [
+      { label: "Floor Tiles", href: { pathname: "/catalogue", query: { category: "floor" } } },
+      { label: "Wall Tiles", href: { pathname: "/catalogue", query: { category: "wall" } } },
+      { label: "Outdoor Tiles", href: { pathname: "/catalogue", query: { category: "outdoor" } } },
+      { label: "Special Finish", href: { pathname: "/catalogue", query: { category: "special" } } },
+      { label: "Custom Orders", href: "/contact" },
+    ],
+  },
+  {
+    title: "Company",
+    items: [
+      { label: "About Us", href: "/about" },
+      { label: "Projects", href: "/projects" },
+      { label: "Why Choose MCC", href: "/why-us" },
+      { label: "Careers", href: "/contact" },
+      { label: "News & Media", href: "/blog" },
+    ],
+  },
+  {
+    title: "Support",
+    items: [
+      { label: "Get a Quote", href: "/contact" },
+      { label: "Design Consultation", href: "/contact" },
+      { label: "Installation Guide", href: "/contact" },
+      { label: "Warranty Claims", href: "/contact" },
+      { label: "Dealer Programme", href: "/contact" },
+    ],
+  },
+] as const;
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t-0">
-
-
-
-      {/* Main footer */}
-      <div className=" px-6 pt-16 pb-10">
+    <footer className="w-full border-t-0 bg-inverse text-inverse-foreground">
+      <div className="px-6 pt-16 pb-10">
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-12 mb-14">
 
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex flex-wrap items-start ">
               <div className="flex flex-col gap-3 group">
-                <a href="#home" className="flex flex-wrap items-center gap-2">
+                <Link href="/" className="flex flex-wrap items-center gap-2">
                   <div className="relative h-10 w-10 shrink-0">
                     <Image
                       src="/logo.png"
@@ -41,42 +59,35 @@ export default function Footer() {
                       unoptimized />
                   </div>
                   <div className="flex flex-col leading-none">
-                    <span className="font-bold  text-[15px] tracking-wide">Mountain Ceramics</span>
-                    <span className=" text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
+                    <span className="font-bold text-[15px] tracking-wide">Mountain Ceramics</span>
+                    <span className="text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
                   </div>
-                </a>
+                </Link>
+                <a href={`tel:${COMPANY.phone}`} className="text-[10px] tracking-[0.25em] uppercase">{COMPANY.phone}</a>
 
 
 
-                <p className=" text-sm leading-relaxed mb-6 max-w-xs">
-                  Rwanda&apos;s leading ceramic tile manufacturer since 2025. Building better spaces, one tile at a time.
+                <p className="mb-6 max-w-xs text-sm leading-relaxed text-inverse-foreground/80">
+                  Rwanda&apos;s ceramic tile manufacturer since 2009. Building better spaces, one tile at a time.
                 </p>
+                <NewsletterSignup />
               </div>
               <div className=" flex flex-col md:flex-row items-center  gap-1">
 
-                <a
+                <Link
                   href="/contact"
-                  className="bg-primary hover:bg-[#f0d080] hover:  text-xs font-bold px-8 py-3 tracking-widest uppercase transition-all duration-300"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold px-8 py-3 tracking-widest uppercase transition-all duration-300"
                 >
                   Get Free Quote
-                </a>
+                </Link>
               </div>
             </div>
 
 
 
-            {/* Social icons */}
-            <div className="flex gap-2 mb-8">
-              {socials.map(({ label, icon: Icon, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9  /10 hover:-primary hover:bg-primary   flex items-center justify-center transition-all duration-200"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
+            <div className="mb-8 flex flex-col items-start gap-2 text-sm text-inverse-foreground/80">
+              <a className="transition-colors hover:text-inverse-foreground" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+              <Link className="transition-colors hover:text-inverse-foreground" href="/contact">Contact our team</Link>
             </div>
 
             {/* Certs */}
@@ -84,7 +95,7 @@ export default function Footer() {
               {["ISO 9001", "RSB Certified", "Made in Rwanda"].map((cert) => (
                 <span
                   key={cert}
-                  className="text-xs  -primary/30 /80 px-3 py-1 tracking-wide"
+                  className="border border-inverse-border px-3 py-1 text-xs tracking-wide text-inverse-foreground/80"
                 >
                   {cert}
                 </span>
@@ -93,19 +104,19 @@ export default function Footer() {
           </div>
 
           {/* Link columns */}
-          {Object.entries(footerLinks).map(([title, items]) => (
+          {footerLinks.map(({ title, items }) => (
             <div key={title}>
-              <h4 className=" font-bold mb-5 text-xs tracking-[0.2em] uppercase">{title}</h4>
+              <h4 className="mb-5 text-xs font-bold tracking-[0.2em] uppercase">{title}</h4>
               <ul className="space-y-3">
-                {items.map((item) => (
-                  <li key={item}>
-                    <a
-                      href="#contact"
-                      className=" hover: text-sm transition-colors duration-200 flex items-center gap-2 group"
+                {items.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="group flex items-center gap-2 text-sm text-inverse-foreground/75 transition-colors duration-200 hover:text-inverse-foreground"
                     >
-                      <span className="w-1 h-1 bg-primary/40 group-hover:bg-primary transition-colors shrink-0" />
-                      {item}
-                    </a>
+                      <span className="h-1 w-1 shrink-0 bg-primary/40 transition-colors group-hover:bg-primary" />
+                      {label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -119,16 +130,20 @@ export default function Footer() {
         <div className="h-px bg-linear-to-r from-transparent via-primary/30 to-transparent mb-8" />
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className=" text-xs text-center sm:text-left">
-            © {year} Mountain Ceramics Company (MCC). All rights reserved. · Kigali, Rwanda
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <p className="text-center text-xs text-inverse-foreground/70 sm:text-left">
+            © {year} Mountain Ceramics Company (MCC). All rights reserved. · {COMPANY.address}
           </p>
-          <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Use", "Sitemap"].map((l) => (
-              <a key={l} href="#" className=" hover: text-xs transition-colors">
-                {l}
-              </a>
-            ))}
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <Link href="/legal/terms-and-conditions" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+              Terms and Conditions
+            </Link>
+            <Link href="/legal/terms-of-service" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+              Terms of Service
+            </Link>
+            <Link href="/legal/privacy-policy" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </div>

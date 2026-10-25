@@ -11,7 +11,7 @@ import { cn } from "cn";
  
 export default function AddToCartButton({
     product, variantId, className, sm = false,
-}: { product: Product; variantId?: number; sm?: boolean; className?: string }) {
+}: { product: Pick<Product, "id" | "name" | "image" | "variants">; variantId?: number; sm?: boolean; className?: string }) {
     const [open, setOpen] = useState(false);
     const available = (product.variants ?? []).some((v) => v.active && Number(v.pricePerSqm) > 0);
 

@@ -7,20 +7,10 @@ import { PaginationControls } from "@/components/pagination-controls";
 import ProjectDrawer from "@/components/project-drawer";
 import { Product } from "@/lib/generated/prisma";
 const PAGE_SIZE = 12
-const TYPE_COLORS: Record<string, string> = {
-  Hospitality: "bg-primary",
-  Commercial: "bg-blue-500",
-  Residential: "bg-emerald-500",
-  Infrastructure: "bg-muted",
-  Healthcare: "bg-rose-500",
-  Education: "bg-purple-500",
-  Industrial: "bg-primary",
-  Other: "bg-muted",
-
-};
-
 function typeColor(type: string) {
-  return TYPE_COLORS[type] ?? "bg-muted";
+  return type
+    ? "bg-secondary text-secondary-foreground"
+    : "bg-muted text-muted-foreground";
 }
 
 export default async function ProjectsPage({
@@ -70,7 +60,7 @@ export default async function ProjectsPage({
 
 
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="bg-dark px-6">
+      <section className="bg-inverse px-6">
 
         <div className="max-w-7xl mx-auto text-center py-5">
           <span className="inline-flex items-center gap-3  text-xs font-bold tracking-[0.25em] uppercase mb-4">
@@ -117,8 +107,8 @@ export default async function ProjectsPage({
               <Button
                 key={t}
                 className={`px-5 py-2 text-xs font-bold tracking-widest uppercase transition-all duration-200 ${activeType === t
-                  ? "bg-accent "
-                  : "   -gray-200 hover:-gray-400"
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-background text-foreground border border-border hover:bg-muted"
                   }`}
               >
                 {t}
@@ -155,16 +145,16 @@ export default async function ProjectsPage({
                         sizes="(max-width: 768px) 100vw, 33vw"
                         unoptimized
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-overlay/70 via-transparent to-transparent" />
                       {/* Type badge */}
-                      <span className={`absolute top-4 left-0 ${typeColor(proj.type)}  text-[10px] font-bold px-4 py-1.5 uppercase tracking-widest`}>
+                      <span className={`absolute top-4 left-0 ${typeColor(proj.type)} text-[10px] font-bold px-4 py-1.5 uppercase tracking-widest`}>
                         {proj.type}
                       </span>
                       {/* Tile thumbnails on hover */}
                       {tiles.length > 0 && (
                         <div className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           {tiles.slice(0, 3).map((t) => (
-                            <div key={t.id} className="w-8 h-8 overflow-hidden -2 /60">
+                            <div key={t.id} className="w-8 h-8 overflow-hidden rounded-sm border border-border/60">
                               <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" unoptimized />
                             </div>
                           ))}
@@ -174,14 +164,14 @@ export default async function ProjectsPage({
 
                     {/* Info */}
                     <div className="p-5 flex-1 flex flex-col">
-                      <h3 className="font-playfair text-lg font-bold  mb-2 group-hover: transition-colors leading-snug">
+                      <h3 className="font-playfair text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
                         {proj.title}
                       </h3>
                       <p className=" text-sm leading-relaxed line-clamp-2 mb-4 flex-1">
                         {proj.description}
                       </p>
                       {/* Meta row */}
-                      <div className="flex flex-wrap items-center gap-3 pt-3 -t ">
+                      <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-border">
                         {proj.location && (
                           <span className="flex items-center gap-1 text-xs ">
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -225,6 +215,3 @@ export default async function ProjectsPage({
     </div>
   );
 }
-
-
-

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { postData, uniquePostSlug } from "@/lib/blog/payload";
 import { checkMdx } from "@/lib/blog/validate";
-import { toSummary } from "../route";
+import { toSummary } from "@/lib/blog/summary";
 
 type Ctx = { params: Promise<{ id: string }> };
 const detail = (p: any) => ({
@@ -20,10 +21,8 @@ const refresh = () => {
   revalidatePath("/[locale]/blog/[slug]", "page");
 };
 
-export async function GET(req: NextRequest, { params }: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = Number((await params).id);
+export const GET = withPermission(PERM.BLOG_VIEW)(async (req, context) => {
+  const id = Number((await context.params!).id);
   const post = await prisma.blogPost.findUnique({
     where: { id },
     include: { author: { select: { firstName: true, lastName: true } } },
@@ -31,13 +30,12 @@ export async function GET(req: NextRequest, { params }: Ctx) {
   return post
     ? NextResponse.json(detail(post))
     : NextResponse.json({ error: "Not found" }, { status: 404 });
-}
+});
 
-export async function PUT(req: NextRequest, { params }: Ctx) {
+export const PUT = withPermission([PERM.BLOG_WRITE, PERM.BLOG_EDIT_ANY])(
+  async (req, context) => {
   try {
-    const { error } = await requireStaff(req);
-    if (error) return error;
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     const existing = await prisma.blogPost.findUnique({ where: { id } });
     if (!existing)
       return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -77,13 +75,15 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(req: NextRequest, { params }: Ctx) {
+export const DELETE = withPermission(PERM.BLOG_DELETE)(
+  async (req, context) => {
   try {
-    const { error } = await requireStaff(req);
-    if (error) return error;
-    await prisma.blogPost.delete({ where: { id: Number((await params).id) } });
+    await prisma.blogPost.delete({
+      where: { id: Number((await context.params!).id) },
+    });
     refresh();
     return NextResponse.json({ ok: true });
   } catch (err) {
@@ -93,4 +93,5 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);

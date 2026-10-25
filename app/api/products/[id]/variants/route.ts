@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import { blankToNull, serializeVariant, variantSchema } from "@/lib/variant";
 
 export const runtime = "nodejs";
@@ -33,10 +34,9 @@ const productIdOf = async (ctx: Ctx) => {
 };
 
 // Admin list: includes inactive variants and current stock (in m²)
-export async function GET(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const productId = await productIdOf(ctx);
+export const GET = withPermission(PERM.VARIANTS_MANAGE)(
+  async (_req: NextRequest, context) => {
+  const productId = await productIdOf(context as Ctx);
   if (!productId)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
@@ -53,12 +53,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       reorderLevel: Number(inventory?.reorderLevel ?? 0),
     })),
   );
-}
+  },
+);
 
-export async function POST(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireStaff(req);
-  if (error) return error;
-  const productId = await productIdOf(ctx);
+export const POST = withPermission(PERM.VARIANTS_MANAGE)(
+  async (req: NextRequest, context) => {
+  const productId = await productIdOf(context as Ctx);
   if (!productId)
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
@@ -66,10 +66,20 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const { stockSqm, reorderLevel, ...rest } = createSchema.parse(
       await req.json(),
     );
+    const baseCurrency = await prisma.currency.findFirst({
+      where: { isBase: true, enabled: true },
+      select: { code: true },
+    });
+    if (!baseCurrency) {
+      return NextResponse.json(
+        { error: "Store base currency is not configured" },
+        { status: 503 },
+      );
+    }
 
     const created = await prisma.$transaction(async (tx) => {
       const variant = await tx.productVariant.create({
-        data: { ...blankToNull(rest), productId },
+        data: { ...blankToNull(rest), productId, currency: baseCurrency.code },
       });
       await tx.inventory.create({
         data: {
@@ -86,7 +96,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
             type: "PURCHASE",
             quantity: stockSqm,
             note: "Initial stock",
-            createdById: claims.userId,
+            createdById: context.user.id,
           },
         });
       }
@@ -117,4 +127,4 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+});

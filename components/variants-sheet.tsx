@@ -17,8 +17,9 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-const money = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-const qty = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { useFormatters } from "@/contexts/format-context";
 const FINISHES = ["Matt", "Glossy"] as const;
 const NO_FINISH = "__none__";
 
@@ -57,6 +58,7 @@ function Field({ label, error, hint, children }: { label: string; error?: string
 }
 
 export function VariantsSheet({ product, onOpenChange, onChanged }: { product: Product | null; onOpenChange: (o: boolean) => void; onChanged: () => void }) {
+  const { money, number, baseCurrency } = useFormatters();
   const [rows, setRows] = useState<AdminVariant[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<F | null>(null); // null = list view
@@ -132,7 +134,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
       else {
         const createPayload = {
           ...payload,
-          stockBoxes: Number(form.stockSqm) || 0,
+          stockSqm: Number(form.stockSqm) || 0,
           lowStockThreshold: Number(form.reorderLevel) || 0,
         };
         await api.createVariant(product.id, createPayload);
@@ -170,6 +172,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
   };
 
   return (
+    <PermissionGate required={PERM.VARIANTS_MANAGE}>
     <Sheet open={!!product} onOpenChange={(o) => !saving && onOpenChange(o)}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 rounded-none p-0 sm:max-w-[min(90vw,1200px)]">
         <SheetHeader className="border-b">
@@ -180,7 +183,9 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {!form ? (
             <div className="space-y-4">
-              <Button className="rounded-none" onClick={startNew}><Plus /> Add variant</Button>
+              <PermissionGate required={[PERM.VARIANTS_MANAGE, PERM.PRICING_MANAGE]}>
+                <Button className="rounded-none" onClick={startNew}><Plus /> Add variant</Button>
+              </PermissionGate>
               <div className="border">
                 <Table>
                   <TableHeader>
@@ -210,19 +215,19 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                             <span className="text-xs capitalize text-muted-foreground">{v.color ? colorName(v.color) : "No color"}{v.shadeCode ? ` · shade ${v.shadeCode}` : ""}</span>
                           </TableCell>
                           <TableCell className="tabular-nums">
-                            {money.format(Number(v.pricePerSqm))} RWF
+                            {money(Number(v.pricePerSqm), v.currency)}
                             <span className="block text-xs text-muted-foreground">
-                              {container > 0 ? `Container: ${money.format(container)} RWF/m²` : "Not sold by container"}
+                              {container > 0 ? `Container: ${money(container, v.currency)}/m²` : "Not sold by container"}
                             </span>
                           </TableCell>
                           <TableCell>
                             <Badge
                               variant="outline"
-                              className={`rounded-none ${available <= 0 ? "border-red-500/40 text-red-600" : low ? "border-amber-500/40 text-amber-600" : ""}`}
+                              className={`rounded-none ${available <= 0 ? "border-destructive/40 text-destructive" : low ? "border-warning/40 text-warning" : ""}`}
                             >
-                              {qty.format(available)} m²
+                              {number(available, { maximumFractionDigits: 2 })} m²
                             </Badge>
-                            {reserved > 0 && <span className="block text-xs text-muted-foreground">{qty.format(reserved)} m² reserved</span>}
+                            {reserved > 0 && <span className="block text-xs text-muted-foreground">{number(reserved, { maximumFractionDigits: 2 })} m² reserved</span>}
                           </TableCell>
                           <TableCell><Checkbox className="rounded-none" checked={v.active} onCheckedChange={(c) => toggleActive(v, c === true)} aria-label="Active" /></TableCell>
                           <TableCell>
@@ -272,30 +277,35 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
               <Field label="Color"><ColorField value={form.color} onChange={(v) => set("color", v)} /></Field>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <Field label="Price per m² (RWF)" error={errors.pricePerSqm}>
-                  <Input className="rounded-none" type="number" min={1} value={form.pricePerSqm} onChange={(e) => set("pricePerSqm", e.target.value)} />
-                </Field>
-                <Field label="Compare-at price / m²" hint="Strike-through price">
-                  <Input className="rounded-none" type="number" min={0} value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} />
-                </Field>
+                <PermissionGate required={PERM.PRICING_MANAGE}>
+                  <Field label={`Price per m² (${baseCurrency})`} error={errors.pricePerSqm}>
+                    <Input className="rounded-none" type="number" min={1} value={form.pricePerSqm} onChange={(e) => set("pricePerSqm", e.target.value)} />
+                  </Field>
+                  <Field label="Compare-at price / m²" hint="Strike-through price">
+                    <Input className="rounded-none" type="number" min={0} value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} />
+                  </Field>
+                </PermissionGate>
                 <Field label="Thickness (mm)">
                   <Input className="rounded-none" type="number" step="0.1" value={form.thicknessMm} onChange={(e) => set("thicknessMm", e.target.value)} />
                 </Field>
               </div>
 
-              <div className="space-y-3 border-t pt-4">
-                <p className="text-sm font-medium">Container sale (optional)</p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Container price per m² (RWF)" error={errors.containerPricePerSqm} hint="Leave empty if not sold by container">
-                    <Input className="rounded-none" type="number" min={0} value={form.containerPricePerSqm} onChange={(e) => set("containerPricePerSqm", e.target.value)} />
-                  </Field>
-                  <Field label="m² in one container" error={errors.sqmPerContainer}>
-                    <Input className="rounded-none" type="number" min={0} step="0.01" value={form.sqmPerContainer} onChange={(e) => set("sqmPerContainer", e.target.value)} />
-                  </Field>
+              <PermissionGate required={PERM.PRICING_MANAGE}>
+                <div className="space-y-3 border-t pt-4">
+                  <p className="text-sm font-medium">Container sale (optional)</p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label={`Container price per m² (${baseCurrency})`} error={errors.containerPricePerSqm} hint="Leave empty if not sold by container">
+                      <Input className="rounded-none" type="number" min={0} value={form.containerPricePerSqm} onChange={(e) => set("containerPricePerSqm", e.target.value)} />
+                    </Field>
+                    <Field label="m² in one container" error={errors.sqmPerContainer}>
+                      <Input className="rounded-none" type="number" min={0} step="0.01" value={form.sqmPerContainer} onChange={(e) => set("sqmPerContainer", e.target.value)} />
+                    </Field>
+                  </div>
                 </div>
-              </div>
+              </PermissionGate>
 
               {!editId && (
+                <PermissionGate required={PERM.INVENTORY_ADJUST}>
                 <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
                   <Field label="Starting stock (m²)" error={errors.stockSqm}>
                     <Input className="rounded-none" type="number" min={0} step="0.01" value={form.stockSqm} onChange={(e) => set("stockSqm", e.target.value)} />
@@ -304,6 +314,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                     <Input className="rounded-none" type="number" min={0} step="0.01" value={form.reorderLevel} onChange={(e) => set("reorderLevel", e.target.value)} />
                   </Field>
                 </div>
+                </PermissionGate>
               )}
 
               <Field label="Swatch image"><ImageField value={form.image} onChange={(v) => set("image", v)} /></Field>
@@ -324,5 +335,6 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
         description={`${deleting?.sku ?? ""} and its stock record will be removed. Past orders keep their own copy. Untick “Active” instead to just hide it.`}
         busy={false} onConfirm={remove} />
     </Sheet>
+    </PermissionGate>
   );
 }

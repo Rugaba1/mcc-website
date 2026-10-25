@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
-import { getApiUser } from "@/lib/auth/api-access";
+import { prisma } from "@/lib/prisma";
+import { withOptionalAuth } from "@/lib/middleware/withAuth";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 import crypto from "crypto";
 import { z } from "zod";
 
@@ -22,7 +23,10 @@ const saveSchema = z.object({
 });
 
 // ── GET /api/visualizer/designs?token=xxx ─────────────────────────────────────
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 120,
+})(async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
@@ -59,12 +63,11 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 // ── POST /api/visualizer/designs ──────────────────────────────────────────────
-export async function POST(req: NextRequest) {
+export const POST = withOptionalAuth(async (req, { user }) => {
   try {
-    const user = await getApiUser(req);
     const parsed = saveSchema.safeParse(await req.json());
     if (!parsed.success) {
       return NextResponse.json(
@@ -112,12 +115,11 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 // ── PUT /api/visualizer/designs — update an owned saved design ───────────────
-export async function PUT(req: NextRequest) {
+export const PUT = withOptionalAuth(async (req, { user }) => {
   try {
-    const user = await getApiUser(req);
     const bodySchema = saveSchema.extend({
       shareToken: z.string().trim().min(1).max(64),
     });
@@ -181,4 +183,4 @@ export async function PUT(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

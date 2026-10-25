@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 import {
   blankToNull,
   serializeVariant,
@@ -16,10 +17,9 @@ const idOf = async (ctx: Ctx) => {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
-export async function PUT(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = await idOf(ctx);
+export const PUT = withPermission(PERM.VARIANTS_MANAGE)(
+  async (req: NextRequest, context) => {
+  const id = await idOf(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -46,12 +46,12 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(req: NextRequest, ctx: Ctx) {
-  const { error } = await requireStaff(req);
-  if (error) return error;
-  const id = await idOf(ctx);
+export const DELETE = withPermission(PERM.VARIANTS_MANAGE)(
+  async (_req: NextRequest, context) => {
+  const id = await idOf(context as Ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -66,4 +66,5 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);

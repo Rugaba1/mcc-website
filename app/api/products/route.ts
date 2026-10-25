@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
-import { requireStaff } from "@/lib/auth/require-staff";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
 import { productData, uniqueSlug } from "@/lib/products/payload";
 
 const DEFAULT_LIMIT = 12;
@@ -36,8 +38,11 @@ const parseColors = (raw: unknown): string[] => {
 };
 
 // ── GET /api/products ─────────────────────────────────────────────────────────
-// Supports: limit, page OR skip, search OR query, category, status
-export async function GET(req: NextRequest) {
+// Supports: limit, page OR skip, search OR query, category, status, badge, sort
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 120,
+})(async (req: NextRequest) => {
   try {
     const sp = req.nextUrl.searchParams;
 
@@ -53,10 +58,25 @@ export async function GET(req: NextRequest) {
     const query = clean(sp.get("search")) ?? clean(sp.get("query"));
     const category = clean(sp.get("category"));
     const status = clean(sp.get("status"));
+    const featured = clean(sp.get("featured"));
+    const badge = clean(sp.get("badge"));
+    const sort = clean(sp.get("sort"));
 
     const where: Prisma.ProductWhereInput = {};
     if (category) where.category = category;
     if (status) where.status = status;
+    if (badge) where.badge = badge;
+    if (featured === "true") where.featured = true;
+    if (featured === "false") where.featured = false;
+
+    const orderBy: Prisma.ProductOrderByWithRelationInput =
+      sort === "name"
+        ? { name: "asc" }
+        : sort === "category"
+          ? { category: "asc" }
+          : sort === "newest"
+            ? { createdAt: "desc" }
+            : { id: "asc" };
 
     if (query) {
       // MySQL collations are already case-insensitive, and Prisma's `mode: "insensitive"`
@@ -107,7 +127,7 @@ export async function GET(req: NextRequest) {
         },
         take: limit,
         skip,
-        orderBy: { id: "asc" },
+        orderBy,
       }),
     ]);
 
@@ -144,13 +164,12 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 // ── POST /api/products ────────────────────────────────────────────────────────
-export async function POST(req: NextRequest) {
+export const POST = withPermission(PERM.PRODUCTS_CREATE)(
+  async (req: NextRequest) => {
   try {
-    const { error } = await requireStaff(req);
-    if (error) return error;
     const body = await req.json();
     const product = await prisma.product.create({
       data: {
@@ -169,4 +188,5 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+  },
+);

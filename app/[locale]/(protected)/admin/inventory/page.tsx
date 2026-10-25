@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Boxes, Download, Loader2, PackageX, Search, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,20 +19,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { colorName, Swatch } from "@/components/color-field";
+import { Swatch } from "@/components/color-field";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { useFormatters } from "@/contexts/format-context";
 
 const PAGE_SIZE = 15;
 type State = "ok" | "low" | "out";
-const stateOf = (i: InventoryItem): State => (i.stockSqm <= 0 ? "out" : i.stockSqm <= i.lowStockThreshold ? "low" : "ok");
+const stateOf = (i: InventoryItem): State => {
+  const available = i.stockSqm - i.reservedSqm;
+  return available <= 0 ? "out" : available <= i.lowStockThreshold ? "low" : "ok";
+};
 const STATE_STYLE: Record<State, string> = {
-  ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  low: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  out: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
+  ok: "border-success/30 bg-success/10 text-success",
+  low: "border-warning/30 bg-warning/10 text-warning",
+  out: "border-destructive/30 bg-destructive/10 text-destructive",
 };
 const STATE_LABEL: Record<State, string> = { ok: "In stock", low: "Low stock", out: "Out of stock" };
 
 export default function AdminInventoryPage() {
+  const { number } = useFormatters();
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [totals, setTotals] = useState({ variants: 0, boxes: 0, low: 0, out: 0 });
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const q = useDebouncedValue(search, 250);
@@ -40,45 +50,47 @@ export default function AdminInventoryPage() {
   const [sort, setSort] = useState("product");
   const [page, setPage] = useState(1);
   const [adjusting, setAdjusting] = useState<InventoryItem | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { setItems(await api.getInventory()); }
+    try {
+      const result = await api.getInventoryPage({
+        page,
+        limit: PAGE_SIZE,
+        q: q.trim(),
+        state: filter,
+        sort,
+      });
+      setItems(result.items);
+      setTotals(result.summary);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      if (result.page !== page) setPage(result.page);
+    }
     catch (e) { toast.error(apiErrorMessage(e, "Failed to load inventory")); }
     finally { setLoading(false); }
-  }, []);
+  }, [filter, page, q, sort]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => setPage(1), [q, filter, sort]);
 
-  const totals = useMemo(() => ({
-    variants: items.length,
-    boxes: items.reduce((n, i) => n + i.stockSqm, 0),
-    low: items.filter((i) => stateOf(i) === "low").length,
-    out: items.filter((i) => stateOf(i) === "out").length,
-  }), [items]);
+  const rows = items;
 
-  const filtered = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    const list = items.filter((i) =>
-      (filter === "all" || stateOf(i) === filter) &&
-      (!term || [i.productName, i.sku, i.size, i.finish, i.color && colorName(i.color)].some((v) => v?.toLowerCase().includes(term))));
-    return [...list].sort((a, b) =>
-      sort === "stock-asc" ? a.stockSqm - b.stockSqm : sort === "stock-desc" ? b.stockSqm - a.stockSqm : a.productName.localeCompare(b.productName));
-  }, [items, q, filter, sort]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const current = Math.min(page, totalPages);
-  const rows = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
-
-  const exportCsv = () => {
-    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const csv = [["Product", "SKU", "Size", "Finish", "Color", "m²", "Alert at", "Status"].join(","),
-    ...filtered.map((i) => [i.productName, i.sku, i.size, i.finish, i.color ? colorName(i.color) : "", i.stockSqm, i.lowStockThreshold, STATE_LABEL[stateOf(i)]].map(esc).join(","))].join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = `inventory-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      const blob = await api.downloadAdminReport("inventory", "csv");
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `inventory-${new Date().toISOString().slice(0, 10)}.csv`;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Failed to export inventory"));
+    } finally {
+      setExporting(false);
+    }
   };
 
   const stats = [
@@ -95,7 +107,11 @@ export default function AdminInventoryPage() {
           <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
           <p className="text-sm text-muted-foreground">Stock levels for every variant, counted in m².</p>
         </div>
-        <Button variant="outline" className="rounded-none" onClick={exportCsv} disabled={!filtered.length}><Download /> Export CSV</Button>
+        <PermissionGate required={[PERM.REPORTS_VIEW, PERM.REPORTS_EXPORT]}>
+          <Button variant="outline" className="rounded-none" onClick={exportCsv} disabled={exporting}>
+            <Download /> {exporting ? "Exporting…" : "Export full CSV"}
+          </Button>
+        </PermissionGate>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -103,7 +119,7 @@ export default function AdminInventoryPage() {
           <Card key={label} className="rounded-none py-0">
             <CardContent className="flex items-center gap-3 p-4">
               <span className={`flex size-10 items-center justify-center border ${tone || "bg-muted text-muted-foreground"}`}><Icon className="size-5" /></span>
-              <div><p className="text-2xl font-semibold tabular-nums">{loading ? "–" : value.toLocaleString()}</p><p className="text-xs text-muted-foreground">{label}</p></div>
+              <div><p className="text-2xl font-semibold tabular-nums">{loading ? "–" : number(value)}</p><p className="text-xs text-muted-foreground">{label}</p></div>
             </CardContent>
           </Card>
         ))}
@@ -154,15 +170,21 @@ export default function AdminInventoryPage() {
                 <TableCell className="text-right font-semibold tabular-nums">{i.stockSqm}</TableCell>
                 <TableCell className="text-right tabular-nums text-muted-foreground">{i.lowStockThreshold}</TableCell>
                 <TableCell><Badge variant="outline" className={`rounded-none ${STATE_STYLE[stateOf(i)]}`}>{STATE_LABEL[stateOf(i)]}</Badge></TableCell>
-                <TableCell className="text-right"><Button size="sm" variant="outline" className="rounded-none" onClick={() => setAdjusting(i)}><SlidersHorizontal /> Adjust</Button></TableCell>
+                <TableCell className="text-right">
+                  <PermissionGate required={PERM.INVENTORY_ADJUST}>
+                    <Button size="sm" variant="outline" className="rounded-none" onClick={() => setAdjusting(i)}><SlidersHorizontal /> Adjust</Button>
+                  </PermissionGate>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <DataPagination page={current} totalPages={totalPages} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+        <DataPagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} disabled={loading} />
       </div>
 
-      <AdjustDialog item={adjusting} onClose={() => setAdjusting(null)} onSaved={load} />
+      <PermissionGate required={PERM.INVENTORY_ADJUST}>
+        <AdjustDialog item={adjusting} onClose={() => setAdjusting(null)} onSaved={load} />
+      </PermissionGate>
     </main>
   );
 }

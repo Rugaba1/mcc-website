@@ -4,6 +4,7 @@ import type {
   TableCell,
 } from "pdfmake/interfaces";
 import { BRAND, COMPANY } from "./config";
+import { fmtDate, money as formatMoney } from "@/lib/format";
 
 export type InvoiceKindName = "PROFORMA" | "INVOICE" | "CREDIT_NOTE";
 
@@ -28,7 +29,8 @@ export interface InvoiceData {
   issuedAt: Date;
   placedAt: Date;
   currency: string;
-  billTo: { name: string; email?: string | null; phone?: string | null };
+  currencyDigits?: number;
+  billTo: { name: string; email?: string | null; phone?: string | null; tin?: string | null };
   fulfillment: "DELIVERY" | "PICKUP";
   shipTo: { name?: string | null; phone: string; lines: string[] };
   items: InvoiceItemData[];
@@ -46,19 +48,12 @@ export interface InvoiceData {
 
 const TITLES: Record<InvoiceKindName, string> = {
   PROFORMA: "PROFORMA INVOICE",
-  INVOICE: "INVOICE",
+  INVOICE: "COMMERCIAL INVOICE",
   CREDIT_NOTE: "CREDIT NOTE",
 };
 
-const dateFmt = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  timeZone: "Africa/Kigali",
-});
-const numFmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-const money = (n: number, cur: string) =>
-  `${cur} ${numFmt.format(Math.round(n))}`;
+const money = (n: number, cur: string, digits?: number) =>
+  formatMoney(n, cur, "en", digits);
 
 function badgeFor(d: InvoiceData) {
   if (d.kind === "CREDIT_NOTE")
@@ -90,7 +85,16 @@ export function buildInvoiceDefinition(
   const companyLines = [
     COMPANY.address,
     COMPANY.tin && `TIN: ${COMPANY.tin}`,
-    [COMPANY.phone, COMPANY.email].filter(Boolean).join("  ·  "),
+    COMPANY.registrationNumber &&
+      `Registration no.: ${COMPANY.registrationNumber}`,
+    [
+      COMPANY.phone,
+      COMPANY.alternatePhone,
+      COMPANY.email,
+      COMPANY.salesEmail,
+    ]
+      .filter(Boolean)
+      .join("  ·  "),
     COMPANY.website,
   ].filter(Boolean) as string[];
 
@@ -183,8 +187,8 @@ export function buildInvoiceDefinition(
   ];
   const metaBody: TableCell[][] = [
     metaRow("Order no.", d.orderNumber),
-    metaRow("Order date", dateFmt.format(d.placedAt)),
-    metaRow("Issued", dateFmt.format(d.issuedAt)),
+    metaRow("Order date", fmtDate(d.placedAt)),
+    metaRow("Issued", fmtDate(d.issuedAt)),
   ];
   if (d.relatedInvoiceNumber)
     metaBody.push(metaRow("Original invoice", d.relatedInvoiceNumber));
@@ -198,7 +202,12 @@ export function buildInvoiceDefinition(
         stack: [
           label("Billed to"),
           {
-            text: [d.billTo.name, d.billTo.email, d.billTo.phone]
+            text: [
+              d.billTo.name,
+              d.billTo.email,
+              d.billTo.phone,
+              d.billTo.tin && `Buyer TIN: ${d.billTo.tin}`,
+            ]
               .filter(Boolean)
               .join("\n"),
             fontSize: 9,
@@ -269,8 +278,8 @@ export function buildInvoiceDefinition(
             : []),
         ],
       },
-      { text: money(it.unitPrice, cur), alignment: "right" },
-      { text: money(it.lineTotal, cur), alignment: "right", bold: true },
+      { text: money(it.unitPrice, cur, d.currencyDigits), alignment: "right" },
+      { text: money(it.lineTotal, cur, d.currencyDigits), alignment: "right", bold: true },
     ];
   });
 
@@ -313,20 +322,20 @@ export function buildInvoiceDefinition(
     { text: k, color: opts.color ?? BRAND.muted, bold: opts.bold },
     { text: v, alignment: "right", color: opts.color, bold: opts.bold },
   ];
-  const totals: TableCell[][] = [tRow("Subtotal", money(d.subtotal, cur))];
+  const totals: TableCell[][] = [tRow("Subtotal", money(d.subtotal, cur, d.currencyDigits))];
   if (d.discount > 0)
     totals.push(
       tRow(
         d.couponCode ? `Discount (${d.couponCode})` : "Discount",
-        `- ${money(d.discount, cur)}`,
+        `- ${money(d.discount, cur, d.currencyDigits)}`,
         { color: BRAND.success },
       ),
     );
   if (d.fulfillment === "DELIVERY")
     totals.push(
-      tRow("Delivery", d.shipping > 0 ? money(d.shipping, cur) : "Free"),
+      tRow("Delivery", d.shipping > 0 ? money(d.shipping, cur, d.currencyDigits) : "Free"),
     );
-  if (d.tax > 0) totals.push(tRow("Tax", money(d.tax, cur)));
+  if (d.tax > 0) totals.push(tRow("VAT (18%)", money(d.tax, cur, d.currencyDigits)));
 
   const grandIndex = totals.length;
   totals.push([
@@ -337,7 +346,7 @@ export function buildInvoiceDefinition(
       fontSize: 10,
     },
     {
-      text: money(d.total, cur),
+      text: money(d.total, cur, d.currencyDigits),
       bold: true,
       color: BRAND.ink,
       fontSize: 10,
@@ -345,9 +354,9 @@ export function buildInvoiceDefinition(
     },
   ]);
   if (d.kind !== "CREDIT_NOTE") {
-    totals.push(tRow("Amount paid", money(d.amountPaid, cur)));
+    totals.push(tRow("Amount paid", money(d.amountPaid, cur, d.currencyDigits)));
     totals.push(
-      tRow("Balance due", money(d.balance, cur), {
+      tRow("Balance due", money(d.balance, cur, d.currencyDigits), {
         bold: true,
         color: d.balance > 0 ? BRAND.danger : BRAND.success,
       }),
@@ -366,6 +375,14 @@ export function buildInvoiceDefinition(
     });
     notes.push({
       text: "This is not a tax invoice. A final invoice is issued once payment is received.",
+      fontSize: 8,
+      color: BRAND.muted,
+      margin: [0, 6, 0, 0],
+    });
+  }
+  if (d.kind !== "PROFORMA") {
+    notes.push({
+      text: "This system-generated document is not fiscalized through Rwanda Revenue Authority's EBM system and is not an EBM tax invoice or credit note.",
       fontSize: 8,
       color: BRAND.muted,
       margin: [0, 6, 0, 0],
@@ -405,7 +422,7 @@ export function buildInvoiceDefinition(
 
   /* ── closing ────────────────────────────────────────── */
   const thanks: Content = {
-    text: "Thank you for choosing Mountain Ceramic.",
+    text: `Thank you for choosing ${COMPANY.name}.`,
     font: "Glovar",
     bold: true,
     fontSize: 11,

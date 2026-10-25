@@ -17,12 +17,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { VariantsSheet } from "@/components/variants-sheet";
+import { PermissionGate } from "@/components/permission-gate";
+import { PERM } from "@/lib/permissions/catalog";
+import { useFormatters } from "@/contexts/format-context";
 
 const PAGE_SIZE = 10;
-const money = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const STATUS_STYLES: Record<string, string> = {
-  ACTIVE: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-  DRAFT: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  ACTIVE: "bg-success/10 text-success",
+  DRAFT: "bg-warning/10 text-warning",
   ARCHIVED: "bg-muted text-muted-foreground",
 };
 function summarize(p: Product) {
@@ -43,6 +45,7 @@ function summarize(p: Product) {
   };
 }
 export default function AdminProductsPage() {
+  const { number, baseCurrency } = useFormatters();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search);
   const [category, setCategory] = useState("all");
@@ -124,9 +127,11 @@ export default function AdminProductsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Products</h1>
           <p className="text-sm text-muted-foreground">Tile designs shown on the public catalog.</p>
         </div>
-        <Button className="rounded-none" onClick={openCreate}>
-          <Plus /> Add product
-        </Button>
+        <PermissionGate required={PERM.PRODUCTS_CREATE}>
+          <Button className="rounded-none" onClick={openCreate}>
+            <Plus /> Add product
+          </Button>
+        </PermissionGate>
       </header>
 
       {/* Toolbar */}
@@ -200,9 +205,11 @@ export default function AdminProductsPage() {
                 <Package className="size-7" />
                 {hasFilters ? "No products match your filters." : "No products yet."}
                 {!hasFilters && (
-                  <Button className="mt-1 rounded-none" onClick={openCreate}>
-                    <Plus /> Add your first product
-                  </Button>
+                  <PermissionGate required={PERM.PRODUCTS_CREATE}>
+                    <Button className="mt-1 rounded-none" onClick={openCreate}>
+                      <Plus /> Add your first product
+                    </Button>
+                  </PermissionGate>
                 )}
               </div>
             </TableCell>
@@ -223,7 +230,7 @@ export default function AdminProductsPage() {
             <TableCell>
               <div className="flex items-center gap-1.5">
                 <span className="font-medium">{p.name}</span>
-                {p.featured && <Star className="size-3.5 fill-amber-400 text-amber-400" aria-label="Featured" />}
+                {p.featured && <Star className="size-3.5 fill-warning text-warning" aria-label="Featured" />}
               </div>
               <p className="text-xs text-muted-foreground">{p.collection || "No collection"}</p>
             </TableCell>
@@ -239,16 +246,16 @@ export default function AdminProductsPage() {
                     <span className="text-xs text-muted-foreground"> (+{s.inactive} inactive)</span>
                   )}
                   {s.fromSqm !== null && (
-                    <p className="text-xs text-muted-foreground">from {money.format(s.fromSqm)} RWF/m²</p>
+                    <p className="text-xs text-muted-foreground">from {number(s.fromSqm)} {baseCurrency}/m²</p>
                   )}
                   {s.fromContainer !== null && (
                     <p className="text-xs text-muted-foreground">
-                      container from {money.format(s.fromContainer)} RWF/m²
+                      container from {number(s.fromContainer)} {baseCurrency}/m²
                     </p>
                   )}
                 </>
               ) : (
-                <span className="text-xs text-amber-600 dark:text-amber-400">
+                <span className="text-xs text-warning dark:text-warning">
                   {s.total ? "All inactive, can’t be bought" : "None, can’t be bought"}
                 </span>
               )}
@@ -272,21 +279,27 @@ export default function AdminProductsPage() {
 
             <TableCell>
               <div className="flex justify-end gap-1">
-                <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(p)} aria-label={`Edit ${p.name}`}>
-                  <Pencil />
-                </Button>
-                <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => setVariantsFor(p)} aria-label={`Variants of ${p.name}`}>
-                  <Boxes />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-none text-destructive hover:text-destructive"
-                  onClick={() => setDeleting(p)}
-                  aria-label={`Delete ${p.name}`}
-                >
-                  <Trash2 />
-                </Button>
+                <PermissionGate required={PERM.PRODUCTS_UPDATE}>
+                  <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(p)} aria-label={`Edit ${p.name}`}>
+                    <Pencil />
+                  </Button>
+                </PermissionGate>
+                <PermissionGate required={PERM.VARIANTS_MANAGE}>
+                  <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => setVariantsFor(p)} aria-label={`Variants of ${p.name}`}>
+                    <Boxes />
+                  </Button>
+                </PermissionGate>
+                <PermissionGate required={PERM.PRODUCTS_DELETE}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 rounded-none text-destructive hover:text-destructive"
+                    onClick={() => setDeleting(p)}
+                    aria-label={`Delete ${p.name}`}
+                  >
+                    <Trash2 />
+                  </Button>
+                </PermissionGate>
               </div>
             </TableCell>
           </TableRow>
@@ -299,18 +312,24 @@ export default function AdminProductsPage() {
       <DataPagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} disabled={loading} />
     </div>
 
-    <ProductSheet open={sheetOpen} onOpenChange={setSheetOpen} product={editing} onSaved={refresh} />
+    <PermissionGate required={editing ? PERM.PRODUCTS_UPDATE : PERM.PRODUCTS_CREATE}>
+      <ProductSheet open={sheetOpen} onOpenChange={setSheetOpen} product={editing} onSaved={refresh} />
+    </PermissionGate>
 
-    <ConfirmDelete
-      open={!!deleting}
-      onOpenChange={(o) => !o && setDeleting(null)}
-      title="Delete this product?"
-      description={`“${deleting?.name ?? ""}” and all of its variants will be removed. This can’t be undone.`}
-      busy={deleteBusy}
-      onConfirm={confirmDelete}
-    />
+    <PermissionGate required={PERM.PRODUCTS_DELETE}>
+      <ConfirmDelete
+        open={!!deleting}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title="Delete this product?"
+        description={`“${deleting?.name ?? ""}” and all of its variants will be removed. This can’t be undone.`}
+        busy={deleteBusy}
+        onConfirm={confirmDelete}
+      />
+    </PermissionGate>
   </main >
-    <VariantsSheet product={variantsFor} onOpenChange={(o) => !o && setVariantsFor(null)} onChanged={refresh} />
+    <PermissionGate required={PERM.VARIANTS_MANAGE}>
+      <VariantsSheet product={variantsFor} onOpenChange={(o) => !o && setVariantsFor(null)} onChanged={refresh} />
+    </PermissionGate>
   </>
   );
 }

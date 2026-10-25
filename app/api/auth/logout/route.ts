@@ -1,24 +1,19 @@
 // app/api/auth/logout/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { getUserFromToken } from "@/lib/auth/auth-helpers";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { clearRefreshCookie, hasValidAuthRequestHeaders } from "@/lib/auth/csrf";
+import { revokeRefreshSession } from "@/lib/auth/refresh-tokens";
 
-import { prisma } from "@/lib/prisma";
+export const POST = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 30,
+})(async (request: NextRequest) => {
+  if (!hasValidAuthRequestHeaders(request)) {
+    return NextResponse.json({ error: "Invalid auth request" }, { status: 403 });
+  }
 
-export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromToken(request);
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized",
-        },
-        { status: 401 },
-      );
-    }
-
+    await revokeRefreshSession(request.cookies.get("refresh_token")?.value);
     const resp = NextResponse.json(
       {
         success: true,
@@ -26,8 +21,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 },
     );
-    resp.cookies.delete("refresh_token");
-    resp.cookies.delete("auth_token");
+    clearRefreshCookie(resp);
     return resp;
   } catch (error) {
     console.error("Logout error:", error);
@@ -39,4 +33,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

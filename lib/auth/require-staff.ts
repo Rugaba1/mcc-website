@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessPayload, type AccessClaims } from "./jwt";
-import { STAFF_ROLES } from "../constants";
 
 type Result =
   | { claims: AccessClaims; error?: undefined }
@@ -8,9 +7,7 @@ type Result =
 
 export async function requireStaff(request: NextRequest): Promise<Result> {
   const auth = request.headers.get("authorization");
-  const token = auth?.startsWith("Bearer ")
-    ? auth.slice(7)
-    : request.cookies.get("auth_token")?.value;
+  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : undefined;
 
   const claims = token ? await verifyAccessPayload(token) : null;
   if (!claims) {
@@ -22,7 +19,7 @@ export async function requireStaff(request: NextRequest): Promise<Result> {
     };
   }
 
-  if (!(STAFF_ROLES as readonly number[]).includes(claims.role ?? -1)) {
+  if (claims.permissions.length === 0) {
     return {
       error: NextResponse.json(
         { success: false, message: "Forbidden" },

@@ -74,7 +74,7 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
 
 
           {/* Category Filters Bar */}
-          <div className="px-5 py-3 -b -stone-800 bg-dark/30 flex gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="px-5 py-3 border-b border-border bg-muted flex gap-1.5 overflow-x-auto no-scrollbar">
             {categories.map((cat) => {
               const isCatActive = activeCategory === cat;
               const count = ALL_ROOM_SCENES.filter(s =>
@@ -86,8 +86,8 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`text-xs px-3 py-1.5  font-medium whitespace-nowrap transition-all  ${isCatActive
-                    ? "bg-primary  -primary font-semibold shadow-sm"
-                    : "bg-background/80 -stone-700/80    hover:bg-background"
+                    ? "bg-primary text-primary-foreground border border-primary font-semibold shadow-sm"
+                    : "bg-background/80 text-foreground border border-border hover:bg-background"
                     }`}
                 >
                   <span>{cat}</span>
@@ -109,12 +109,12 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
                     onClose();
                   }}
                   className={`group relative   overflow-hidden  cursor-pointer transition-all duration-200 text-left ${isSelected
-                    ? "-primary ring-2 ring-primary/50 bg-background/90 shadow-xl"
-                    : "-stone-800 hover:-stone-600 bg-dark/60 hover:bg-background/50"
+                    ? "border border-primary ring-2 ring-primary/50 bg-background/90 shadow-xl"
+                    : "border border-border bg-card hover:bg-background"
                     }`}
                 >
                   {/* Scene Preview Image */}
-                  <div className="relative w-full h-40 bg-dark overflow-hidden">
+                  <div className="relative w-full h-40 bg-inverse overflow-hidden">
                     <Image
                       src={scene.baseImage}
                       alt={scene.name}
@@ -126,7 +126,7 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
                     <div className="absolute inset-0 bg-linear-to-t from-muted via-transparent to-transparent opacity-80" />
 
                     {/* Surface count pill */}
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5   bg-black/70  -stone-700/80 text-[11px] font-medium   backdrop-blur-sm">
+                    <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-overlay/70 text-overlay-foreground border border-overlay/70 text-[11px] font-medium backdrop-blur-sm">
                       {scene.surfaces.length} Surfaces
                     </div>
 

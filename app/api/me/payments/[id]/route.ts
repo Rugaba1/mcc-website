@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth/require-user";
+import { withAuth } from "@/lib/middleware/withAuth";
 import { syncOrderPayment } from "@/lib/payments/sync";
 import { blankToNull } from "@/lib/variant";
 
@@ -26,15 +26,13 @@ const findEditable = (id: number, userId: number) =>
     select: { id: true, orderId: true },
   });
 
-export async function PATCH(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireUser(req);
-  if (error) return error;
+export const PATCH = withAuth(async (req: NextRequest, { user, ...ctx }) => {
   const id = await idOf(ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
     const data = blankToNull(schema.parse(await req.json()));
-    const p = await findEditable(id, claims.userId);
+    const p = await findEditable(id, user.id);
     if (!p) return NextResponse.json({ error: "This payment can no longer be edited" }, { status: 409 });
     await prisma.payment.update({ where: { id }, data });
     return NextResponse.json({ ok: true });
@@ -44,24 +42,22 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     console.error("PATCH /api/me/payments/[id]:", e);
     return NextResponse.json({ error: "Failed to update payment" }, { status: 500 });
   }
-}
+});
 
-export async function DELETE(req: NextRequest, ctx: Ctx) {
-  const { claims, error } = await requireUser(req);
-  if (error) return error;
+export const DELETE = withAuth(async (req: NextRequest, { user, ...ctx }) => {
   const id = await idOf(ctx);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
-    const p = await findEditable(id, claims.userId);
+    const p = await findEditable(id, user.id);
     if (!p) return NextResponse.json({ error: "This payment can no longer be withdrawn" }, { status: 409 });
     await prisma.$transaction(async (tx) => {
       await tx.payment.delete({ where: { id } });
-      await syncOrderPayment(tx, p.orderId, claims.userId);
+      await syncOrderPayment(tx, p.orderId, user.id);
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE /api/me/payments/[id]:", e);
     return NextResponse.json({ error: "Failed to withdraw payment" }, { status: 500 });
   }
-}
+});

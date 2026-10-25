@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
 
 // ── GET /api/products ─────────────────────────────────────────────────────────
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (_req: NextRequest) => {
   try {
     const rows = await prisma.product.count();
 
@@ -14,4 +18,4 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

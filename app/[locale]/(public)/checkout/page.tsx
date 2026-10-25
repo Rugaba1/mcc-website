@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useRouter } from "@/app/i18n/routing";
@@ -15,25 +15,40 @@ import { PaymentSummary } from "@/components/checkout/payment-summary";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useAuth } from "@/contexts/auth-context";
-import { useCart } from "@/contexts/cart-context";
-import { api, apiErrorMessage } from "@/lib/api";
-import { money } from "@/lib/format";
+import { lineOf, useCart } from "@/contexts/cart-context";
+import { api, apiErrorMessage, type CouponValidation } from "@/lib/api";
+import { useFormatters } from "@/contexts/format-context";
 import { getShipping, SHIPPING_OPTIONS, ShippingId } from "@/lib/shipping";
 import { computeTotals } from "@/lib/pricing";
 import { PAYMENT_OPTIONS, type PaymentMethodId } from "@/lib/payments";
 import type { Opt } from "@/lib/locations"; // type-only, so the JSON isn't bundled
 import { COMPANY } from "@/lib/company";
-function useOptions(url: string | null) {
+import { RwandaTinInput } from "@/components/ui/rwanda-tin-input";
+import { isValidRwandaTin } from "@/lib/rwanda-tin";
+
+const createReservationToken = () => {
+    const bytes = window.crypto.getRandomValues(new Uint8Array(32));
+    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    return window.btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+};
+type CheckoutReservation = Awaited<ReturnType<typeof api.reserveCheckoutStock>>;
+function useOptions(
+    request: ((signal: AbortSignal) => Promise<Opt[]>) | null,
+) {
     const [opts, setOpts] = useState<Opt[]>([]);
     useEffect(() => {
-        if (!url) { setOpts([]); return; }
+        if (!request) { setOpts([]); return; }
         const ctrl = new AbortController();
-        fetch(url, { signal: ctrl.signal })
-            .then((r) => (r.ok ? r.json() : []))
+        request(ctrl.signal)
             .then(setOpts)
-            .catch(() => { });
+            .catch((error: unknown) => {
+                if (!ctrl.signal.aborted) {
+                    console.error("Could not load checkout locations", error);
+                    setOpts([]);
+                }
+            });
         return () => ctrl.abort();
-    }, [url]);
+    }, [request]);
     return opts;
 }
 
@@ -59,6 +74,7 @@ function LocationSelect({ id, label, value, onChange, options, placeholder, disa
 }
 
 function CheckoutForm() {
+    const { displayMoney, baseCurrency } = useFormatters();
     const { user } = useAuth();
     const { items, ready, clearCart } = useCart();
     const router = useRouter();
@@ -66,32 +82,199 @@ function CheckoutForm() {
     const [shippingId, setShippingId] = useState<ShippingId>("pickup");
     const [f, setF] = useState({
         fullName: [user?.firstName, user?.lastName].filter(Boolean).join(" "),
-        phone: "", province: "", district: "", sector: "", street: "", note: "",
+        phone: "", tin: "", province: "", district: "", sector: "", street: "", note: "",
     });
 
-    const provinces = useOptions("/api/locations/provinces");
-    const districts = useOptions(
-        f.province ? `/api/locations/districts?province=${encodeURIComponent(f.province)}` : null,
+    const loadProvinces = useCallback(
+        (signal: AbortSignal) => api.getProvinces(signal),
+        [],
     );
+    const loadDistricts = useCallback(
+        (signal: AbortSignal) => api.getDistricts(f.province, signal),
+        [f.province],
+    );
+    const loadSectors = useCallback(
+        (signal: AbortSignal) => api.getSectors(f.province, f.district, signal),
+        [f.district, f.province],
+    );
+    const provinces = useOptions(loadProvinces);
+    const districts = useOptions(f.province ? loadDistricts : null);
     const sectors = useOptions(
-        f.province && f.district
-            ? `/api/locations/sectors?province=${encodeURIComponent(f.province)}&district=${encodeURIComponent(f.district)}`
-            : null,
+        f.province && f.district ? loadSectors : null,
     );
     const [error, setError] = useState("");
+    const [tinError, setTinError] = useState("");
     const [busy, setBusy] = useState(false);
+    const [couponCode, setCouponCode] = useState("");
+    const [coupon, setCoupon] = useState<CouponValidation | null>(null);
+    const [couponError, setCouponError] = useState("");
+    const [couponBusy, setCouponBusy] = useState(false);
+    const [reservationToken, setReservationToken] = useState("");
+    const [reservationExpiresAt, setReservationExpiresAt] = useState("");
+    const [reservationBusy, setReservationBusy] = useState(false);
+    const [reservationError, setReservationError] = useState("");
+    const reservationTokenRef = useRef("");
+    const reservationRequestRef = useRef<{
+        key: string;
+        promise: Promise<CheckoutReservation>;
+    } | null>(null);
+    const reservationItems = useMemo(
+        () => items.map((item) => ({
+            variantId: item.variantId,
+            saleType: item.saleType,
+            qty: item.qty,
+        })),
+        [items],
+    );
+    const reservationKey = JSON.stringify(reservationItems);
+
+    const reserveStock = useCallback(async (token?: string) => {
+        const reservation = await api.reserveCheckoutStock({
+            items: reservationItems,
+            ...(token ? { reservationToken: token } : {}),
+        });
+        reservationTokenRef.current = reservation.reservationToken;
+        setReservationToken(reservation.reservationToken);
+        setReservationExpiresAt(reservation.expiresAt);
+        setReservationError("");
+    }, [reservationItems]);
+
+    async function retryStockHold() {
+        const token = reservationTokenRef.current || createReservationToken();
+        reservationTokenRef.current = token;
+        setReservationBusy(true);
+        try {
+            await reserveStock(token);
+        } catch (retryError) {
+            setReservationError(
+                apiErrorMessage(retryError, "Some items could not be reserved. Update your cart and try again."),
+            );
+        } finally {
+            setReservationBusy(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!ready || reservationItems.length === 0) return;
+        let active = true;
+        setReservationBusy(true);
+        setReservationToken("");
+        setReservationError("");
+        let request = reservationRequestRef.current;
+        if (!request || request.key !== reservationKey) {
+            const token = reservationTokenRef.current || createReservationToken();
+            reservationTokenRef.current = token;
+            const previous = request?.promise;
+            const promise = previous
+                ? previous.catch(() => null).then(() =>
+                    api.reserveCheckoutStock({
+                        items: reservationItems,
+                        reservationToken: token,
+                    }),
+                )
+                : api.reserveCheckoutStock({
+                    items: reservationItems,
+                    reservationToken: token,
+                });
+            request = { key: reservationKey, promise };
+            reservationRequestRef.current = request;
+        }
+        void request.promise.then((reservation) => {
+            if (!active) return;
+            reservationTokenRef.current = reservation.reservationToken;
+            setReservationToken(reservation.reservationToken);
+            setReservationExpiresAt(reservation.expiresAt);
+        }).catch((reserveError: unknown) => {
+            if (!active) return;
+            setReservationError(
+                apiErrorMessage(reserveError, "Some items could not be reserved. Update your cart and try again."),
+            );
+        }).finally(() => {
+            if (active) setReservationBusy(false);
+            if (reservationRequestRef.current === request) {
+                reservationRequestRef.current = null;
+            }
+        });
+        return () => { active = false; };
+    // The serialized item key avoids re-reserving when cart objects are recreated.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ready, reservationKey]);
+
+    useEffect(() => {
+        if (!reservationToken || !reservationExpiresAt) return;
+        const refreshDelay = Math.max(
+            1_000,
+            new Date(reservationExpiresAt).getTime() - Date.now() - 2 * 60_000,
+        );
+        const timeout = window.setTimeout(() => {
+            setReservationBusy(true);
+            void reserveStock(reservationToken).catch((reserveError: unknown) => {
+                setReservationError(
+                    apiErrorMessage(reserveError, "Your stock hold could not be renewed."),
+                );
+                setReservationToken("");
+            }).finally(() => setReservationBusy(false));
+        }, refreshDelay);
+        return () => window.clearTimeout(timeout);
+    }, [reservationExpiresAt, reservationToken, reserveStock]);
 
     const set = (k: keyof typeof f) =>
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
             setF((p) => ({ ...p, [k]: e.target.value }));
 
+    async function applyCoupon() {
+        if (!couponCode.trim()) {
+            setCouponError("Enter a coupon code.");
+            return;
+        }
+        setCouponBusy(true);
+        setCouponError("");
+        try {
+            const result = await api.validateCoupon({
+                code: couponCode,
+                items: items.map((item) => ({
+                    variantId: item.variantId,
+                    saleType: item.saleType,
+                    qty: item.qty,
+                })),
+            });
+            setCoupon(result);
+            setCouponCode(result.code);
+        } catch (validationError) {
+            setCoupon(null);
+            setCouponError(
+                apiErrorMessage(validationError, "Could not validate coupon."),
+            );
+        } finally {
+            setCouponBusy(false);
+        }
+    }
+
     const ship = getShipping(shippingId);
     const delivery = ship.fulfillment === "DELIVERY";
-    const totals = computeTotals(items.map((i) => ({ price: i.pricePerSqm, qty: i.qty })), ship.fee);
+    const subtotal = useMemo(
+        () => items.reduce((sum, item) => sum + (lineOf(item)?.total ?? 0), 0),
+        [items],
+    );
+    const totals = computeTotals([{ price: subtotal, qty: 1 }], ship.fee);
+    const discountedTotals = computeTotals(
+        [{ price: Math.max(0, totals.subtotal - (coupon?.discount ?? 0)), qty: 1 }],
+        ship.fee,
+    );
+
+    useEffect(() => {
+        setCoupon(null);
+        setCouponError("");
+    }, [items]);
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault();
         setError("");
+        if (f.tin && !isValidRwandaTin(f.tin)) {
+            setTinError("Enter a valid 9-digit Rwanda TIN, or clear the field.");
+            return;
+        }
+        setTinError("");
         if (!f.phone || !isValidPhoneNumber(f.phone)) {
             setError("Please enter a valid phone number.");
             return;
@@ -103,15 +286,18 @@ function CheckoutForm() {
         setBusy(true);
         try {
             const order = await api.checkout({
-                items: items.map((i) => ({ variantId: i.variantId, saleType: i.saleType, qty: i.qty })),
+                items: reservationItems,
+                reservationToken,
                 shippingId,
                 paymentMethod,
                 fullName: f.fullName, phone: f.phone,
+                tin: f.tin || undefined,
                 province: delivery ? f.province : undefined,
                 district: delivery ? f.district : undefined,
                 sector: delivery ? f.sector || undefined : undefined,
                 street: delivery ? f.street : undefined,
                 note: f.note || undefined,
+                couponCode: coupon?.code,
             });
             clearCart();
             toast.success(`Order ${order.orderNumber} placed`);
@@ -154,9 +340,35 @@ function CheckoutForm() {
                                 />
                                 <span>{o.label}</span>
                             </div>
-                            <span className="font-medium">{o.fee ? money(o.fee) : "Free"}</span>
+                            <span className="font-medium">{o.fee ? displayMoney(o.fee, baseCurrency) : "Free"}</span>
                         </label>
                     ))}
+                </fieldset>
+
+                <fieldset className="space-y-3 border border-border p-5">
+                    <legend className="px-2 font-semibold">Discount code</legend>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <Input
+                            aria-label="Coupon code"
+                            autoComplete="off"
+                            maxLength={50}
+                            value={couponCode}
+                            disabled={Boolean(coupon) || couponBusy}
+                            onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                        />
+                        {coupon ? (
+                            <Button type="button" variant="outline" onClick={() => { setCoupon(null); setCouponCode(""); setCouponError(""); }}>
+                                Remove
+                            </Button>
+                        ) : (
+                            <Button type="button" variant="outline" disabled={couponBusy || !couponCode.trim()} onClick={() => void applyCoupon()}>
+                                {couponBusy && <Loader2 className="mr-2 size-4 animate-spin" />}
+                                Apply code
+                            </Button>
+                        )}
+                    </div>
+                    {coupon && <p className="text-sm text-primary">{coupon.code} applied — {displayMoney(coupon.discount, baseCurrency)} off</p>}
+                    {couponError && <p role="alert" className="text-sm text-destructive">{couponError}</p>}
                 </fieldset>
 
                 <fieldset className="space-y-4 border border-border p-5">
@@ -180,6 +392,16 @@ function CheckoutForm() {
                             />
                         </div>
                     </div>
+                    <RwandaTinInput
+                        id="checkout-tin"
+                        value={f.tin}
+                        onChange={(tin) => {
+                            setF((previous) => ({ ...previous, tin }));
+                            setTinError("");
+                            setError("");
+                        }}
+                        error={tinError}
+                    />
 
                     {delivery && (
                         <>
@@ -237,7 +459,7 @@ function CheckoutForm() {
                             </div>
                         </label>
                     ))}
-                    <PaymentSummary method={paymentMethod} phone={f.phone} total={totals.total} />
+                    <PaymentSummary method={paymentMethod} phone={f.phone} total={discountedTotals.total} />
                 </fieldset>
             </div>
 
@@ -247,18 +469,35 @@ function CheckoutForm() {
                     {items.map((i) => (
                         <li key={i.variantId} className="flex justify-between gap-3">
                             <span className="truncate">{i.qty} × {i.name} <span className="text-muted-foreground">({i.size})</span></span>
-                            <span>{money(i.pricePerSqm * i.qty)}</span>
+                            <span>{displayMoney(i.pricePerSqm * i.qty, i.currency ?? baseCurrency)}</span>
                         </li>
                     ))}
                 </ul>
                 <dl className="space-y-2 border-t border-border pt-3 text-sm">
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{money(totals.subtotal)}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{totals.shippingFee ? money(totals.shippingFee) : "Free"}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{money(totals.tax)}</dd></div>
-                    <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Total</dt><dd>{money(totals.total)}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{displayMoney(totals.subtotal, baseCurrency)}</dd></div>
+                    {coupon && <div className="flex justify-between text-primary"><dt>Discount ({coupon.code})</dt><dd>−{displayMoney(coupon.discount, baseCurrency)}</dd></div>}
+                    <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{totals.shippingFee ? displayMoney(totals.shippingFee, baseCurrency) : "Free"}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{displayMoney(discountedTotals.tax, baseCurrency)}</dd></div>
+                    <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Total</dt><dd>{displayMoney(discountedTotals.total, baseCurrency)}</dd></div>
+                    <p className="text-xs text-muted-foreground">
+                        Checkout and payment are processed in {baseCurrency}. Display currency changes do not change the amount charged.
+                    </p>
                 </dl>
-                <FormError message={error} />
-                <Button type="submit" className="w-full" disabled={busy}>
+                <FormError message={error || reservationError} />
+                {reservationError && !reservationToken && (
+                    <Button type="button" variant="outline" className="w-full rounded-none" disabled={reservationBusy} onClick={() => void retryStockHold()}>
+                        {reservationBusy && <Loader2 className="mr-2 size-4 animate-spin" />}
+                        Retry stock check
+                    </Button>
+                )}
+                <p aria-live="polite" className="text-xs text-muted-foreground">
+                    {reservationBusy
+                        ? "Checking and holding available stock…"
+                        : reservationToken
+                            ? `Stock is reserved until ${new Date(reservationExpiresAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`
+                            : "Stock has not been reserved yet."}
+                </p>
+                <Button type="submit" className="w-full" disabled={busy || reservationBusy || !reservationToken}>
                     {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {busy ? "Placing order…" : "Place order"}
                 </Button>

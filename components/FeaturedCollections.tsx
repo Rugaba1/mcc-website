@@ -1,7 +1,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { serverApi, type Product } from "../lib/api";
+import { serverApi, type Product } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 
 export default async function FeaturedCollections() {
   
@@ -82,7 +83,7 @@ export default async function FeaturedCollections() {
               <Link
                 key={col.id}
                 href={`/collections#col-${col.id}`}
-                className={`group relative overflow-hidden bg-dark ${i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}
+                className={`group relative overflow-hidden bg-inverse ${i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}
               >
                 {/* Cover image */}
                 <div className="relative h-64 overflow-hidden">
@@ -103,19 +104,22 @@ export default async function FeaturedCollections() {
                     </div>
                   )}
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-linear-to-t from-dark/90 via-dark/20 to-transparent group-hover:from-dark/95 transition-all duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-t from-inverse/90 via-inverse/20 to-transparent group-hover:from-inverse/95 transition-all duration-300" />
 
                   {/* Featured badge */}
                   {col.featured && (
-                    <span className="absolute top-3 left-0 bg-primary  text-[9px] font-bold px-3 py-1 uppercase tracking-widest">
+                    <Badge className="absolute left-0 top-3 h-auto rounded-none px-3 py-1 text-[9px] font-bold uppercase tracking-widest">
                       Featured
-                    </span>
+                    </Badge>
                   )}
 
                   {/* Tile count */}
-                  <span className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm  text-[10px] font-bold px-2.5 py-1 rounded-full">
+                  <Badge
+                    variant="outline"
+                    className="absolute right-3 top-3 h-auto border-overlay/50 bg-overlay/50 px-2.5 py-1 text-[10px] font-bold text-overlay-foreground backdrop-blur-sm"
+                  >
                     {tiles.length} tile{tiles.length !== 1 ? "s" : ""}
-                  </span>
+                  </Badge>
                 </div>
 
                 {/* Info */}
@@ -167,16 +171,16 @@ export default async function FeaturedCollections() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="flex items-center justify-center gap-6 mt-12 pt-10 -t /10">
+        <div className="flex items-center justify-center gap-6 mt-12 pt-10 border-t border-border">
           <Link
             href="/collections"
-            className="bg-primary hover:bg-primary  font-bold px-8 py-4 text-sm tracking-widest uppercase transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 py-4 text-sm tracking-widest uppercase transition-colors"
           >
             All Collections
           </Link>
           <Link
             href="/visualizer"
-            className=" /20 hover:-primary  hover: font-bold px-8 py-4 text-sm tracking-widest uppercase transition-colors"
+            className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-bold px-8 py-4 text-sm tracking-widest uppercase transition-colors"
           >
             Visualize Tiles
           </Link>

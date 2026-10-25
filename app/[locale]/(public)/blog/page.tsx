@@ -1,46 +1,37 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/app/i18n/routing";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PaginationControls } from "@/components/pagination-controls";
 import { getPublishedPosts } from "@/lib/blog/queries";
-import { seoConfig } from "@/config/seo.config";
 import { siteConfig } from "@/config/site.config";
-import { absolutizeUrl } from "@/lib/absolutize";
-import { generateAlternateLinks } from "@/lib/alternates";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { fmtDate } from "@/lib/format";
 
 export const revalidate = 300;
 type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ page?: string; tag?: string }> };
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL!;
 
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
     const { locale } = await params;
     const n = Math.max(parseInt((await searchParams).page ?? "1", 10) || 1, 1);
-    const base = `${seoConfig.siteUrl}/${locale}/blog`;
-    const url = n > 1 ? `${base}?page=${n}` : base;
     const title = `Tile Guides, Trends & Project Stories | ${siteConfig.siteName}`;
     const description = "Practical advice on choosing, installing and caring for ceramic and porcelain tiles in Rwanda.";
-    const image = absolutizeUrl("/logo.png") ?? `${seoConfig.siteUrl}/logo.png`;
-    return {
+    return createPageMetadata({
+        locale,
+        path: n > 1 ? `/blog?page=${n}` : "/blog",
         title: n > 1 ? `${title} – Page ${n}` : title,
         description,
-        openGraph: {
-            title, description, url, siteName: seoConfig.siteName, locale: locale.replace("-", "_"), type: "website",
-            images: [{ url: image, width: 1200, height: 630, alt: title }]
-        },
-        twitter: { card: "summary_large_image", title, description, images: [image] },
-        alternates: { canonical: url, languages: generateAlternateLinks(locale, "/blog") },
-        robots: { index: true, follow: true },
-    };
+    });
 }
 
 export default async function BlogPage({ params, searchParams }: Props) {
     const { locale } = await params;
+    const timeZone = (await headers()).get("x-timezone") ?? siteConfig.defaultTimeZone;
     const sp = await searchParams;
     const page = Math.max(parseInt(sp.page ?? "1", 10) || 1, 1);
     const t = await getTranslations({ locale, namespace: "blog" });
@@ -48,6 +39,10 @@ export default async function BlogPage({ params, searchParams }: Props) {
 
     return (
         <main className="container mx-auto px-4 py-16">
+            <Breadcrumbs items={[
+                { label: "Home", href: "/" },
+                { label: "Blog" },
+            ]} />
             <h1 className="text-4xl font-bold tracking-tight">{t("title")}</h1>
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.map((p) => (
@@ -63,7 +58,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
                                 <CardDescription className="line-clamp-3">{p.excerpt}</CardDescription>
                             </CardHeader>
                             <CardContent className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <time dateTime={p.publishedAt?.toISOString()}>{p.publishedAt?.toLocaleDateString(locale)}</time>
+                                <time dateTime={p.publishedAt?.toISOString()}>{fmtDate(p.publishedAt, locale, timeZone)}</time>
                                 <span>· {p.readingMinutes} min</span>
                                 {p.tags?.split(",").slice(0, 2).map((tg) => <Badge key={tg} variant="secondary">{tg}</Badge>)}
                             </CardContent>

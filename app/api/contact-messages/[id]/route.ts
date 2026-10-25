@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../../lib/prisma";
-import { requireStaff } from "../../../../lib/auth/require-staff";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs";
 
@@ -14,13 +15,9 @@ async function parseId(params: Promise<{ id: string }>) {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { error } = await requireStaff(request);
-  if (error) return error;
-  const id = await parseId(params);
+export const PUT = withPermission(PERM.MESSAGES_MANAGE)(
+  async (request: NextRequest, context) => {
+  const id = await parseId(context.params!);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -42,15 +39,12 @@ export async function PUT(
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { error } = await requireStaff(request);
-  if (error) return error;
-  const id = await parseId(params);
+export const DELETE = withPermission(PERM.MESSAGES_MANAGE)(
+  async (request: NextRequest, context) => {
+  const id = await parseId(context.params!);
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
@@ -65,4 +59,4 @@ export async function DELETE(
       { status: 500 },
     );
   }
-}
+});

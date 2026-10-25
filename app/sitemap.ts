@@ -1,78 +1,88 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "../config/site.config";
+import { prisma } from "@/lib/prisma";
+import { LEGAL_DOCUMENTS } from "@/lib/legal/constants";
+import { localizedUrl, generateAlternateLinks } from "@/lib/alternates";
+import { supportedLocales } from "@/lib/constants";
 
-const base = siteConfig.siteUrl.replace(/\/$/, "");
-const locales = siteConfig.languages as string[];
-const apiUrl = siteConfig.apiUrl;
-
-const staticRoutes: Array<{
-  path: string;
-  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
-  priority: number;
-}> = [
-  { path: "", changeFrequency: "weekly", priority: 1.0 },
-  { path: "/tests", changeFrequency: "weekly", priority: 1.0 },
-  { path: "/about", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/blog", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/prayer", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/resources", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/faq", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
+const staticPaths = [
+  "/",
+  "/about",
+  "/why-us",
+  "/products",
+  "/catalogue",
+  "/collections",
+  "/projects",
+  "/blog",
+  "/contact",
 ];
- 
-async function safeFetchList<T>(path: string): Promise<T[]> {
-  try {
-    const res = await fetch(`${apiUrl}${path}`, { next: { revalidate: 3600 } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data.items ?? []);
-  } catch {
-    return [];
-  }
-}
 
 function localizedEntries(
-  section: string,
-  id: string,
-  dateStr: string | null | undefined,
-  priority: number,
-  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "monthly",
+  path: string,
+  lastModified: Date = new Date(),
+  priority = 0.7,
 ): MetadataRoute.Sitemap {
-  return locales.map((locale) => ({
-    url: `${base}/${locale}/${section}/${id}`,
-    lastModified: dateStr ? new Date(dateStr) : new Date(),
-    changeFrequency,
+  return supportedLocales.map((locale) => ({
+    url: localizedUrl(locale, path),
+    lastModified,
+    changeFrequency: "weekly",
     priority,
-    alternates: {
-      languages: Object.fromEntries(
-        locales.map((l) => [l, `${base}/${l}/${section}/${id}`]),
-      ),
-    },
+    alternates: { languages: generateAlternateLinks(locale, path) },
   }));
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [tests] = await Promise.all([safeFetchList<any>("/tests?limit=100")]);
+  const [productsResult, postsResult, legalResult] = await Promise.allSettled([
+    prisma.product.findMany({
+      where: { status: "ACTIVE" },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.blogPost.findMany({
+      where: { status: "PUBLISHED", publishedAt: { lte: new Date() } },
+      select: { slug: true, locale: true, updatedAt: true },
+      orderBy: { publishedAt: "desc" },
+    }),
+    prisma.legalDocumentVersion.findMany({
+      where: { publishedAt: { not: null } },
+      select: { documentType: true, publishedAt: true },
+      orderBy: { publishedAt: "desc" },
+    }),
+  ]);
 
-  const staticEntries: MetadataRoute.Sitemap = locales.flatMap((locale) =>
-    staticRoutes.map(({ path, changeFrequency, priority }) => ({
-      url: `${base}/${locale}${path}`,
-      lastModified: new Date(),
-      changeFrequency,
-      priority,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, `${base}/${l}${path}`]),
-        ),
-      },
-    })),
+  if (productsResult.status === "rejected") {
+    console.error("Could not load products for sitemap:", productsResult.reason);
+  }
+  if (postsResult.status === "rejected") {
+    console.error("Could not load blog posts for sitemap:", postsResult.reason);
+  }
+  if (legalResult.status === "rejected") {
+    console.error("Could not load legal documents for sitemap:", legalResult.reason);
+  }
+
+  const products =
+    productsResult.status === "fulfilled" ? productsResult.value : [];
+  const posts = postsResult.status === "fulfilled" ? postsResult.value : [];
+  const legalDocuments =
+    legalResult.status === "fulfilled" ? legalResult.value : [];
+
+  const staticEntries = staticPaths.flatMap((path) =>
+    localizedEntries(path, new Date(), path === "/" ? 1 : 0.7),
   );
+  const productEntries = products.flatMap(({ slug, updatedAt }) =>
+    slug ? localizedEntries(`/products/${slug}`, updatedAt, 0.8) : [],
+  );
+  const blogEntries = posts.map(({ slug, locale, updatedAt }) => ({
+    url: localizedUrl(locale, `/blog/${slug}`),
+    lastModified: updatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+  const legalEntries = legalDocuments.flatMap(({ documentType, publishedAt }) => {
+    const document = LEGAL_DOCUMENTS.find(({ type }) => type === documentType);
+    return document
+      ? localizedEntries(`/legal/${document.slug}`, publishedAt ?? new Date(), 0.3)
+      : [];
+  });
 
-  const dynamicEntries: MetadataRoute.Sitemap = [
-    ...tests.flatMap((d) =>
-      localizedEntries("devotionals", d.id, d.devotional_date, 0.6),
-    ),
-  ];
-
-  return [...staticEntries, ...dynamicEntries];
+  return [...staticEntries, ...productEntries, ...blogEntries, ...legalEntries];
 }

@@ -6,11 +6,9 @@ import { Link } from "@/app/i18n/routing";
 import { clampQty, lineOf, useCart, type CartItem } from "@/contexts/cart-context";
 import { computeTotals } from "@/lib/pricing";
 import { MIN_SQM } from "@/lib/sale-pricing";
-import { money } from "@/lib/format";
+import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const nf = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
 /** Number box that only commits on blur or Enter, so typing "12.5" isn't fought by clamping. */
 function QtyInput({ item, onCommit }: { item: CartItem; onCommit: (n: number) => void }) {
@@ -40,6 +38,7 @@ function QtyInput({ item, onCommit }: { item: CartItem; onCommit: (n: number) =>
 }
 
 export default function CartPage() {
+    const { displayMoney, number, baseCurrency } = useFormatters();
     const { items, ready, setQty, removeFromCart, clearCart } = useCart();
 
     if (!ready) return <div className="mx-auto max-w-6xl px-6 py-24 text-center text-sm text-muted-foreground">Loading your cart…</div>;
@@ -83,13 +82,13 @@ export default function CartPage() {
                                         {line ? (
                                             <p className="text-xs text-muted-foreground">
                                                 {i.saleType === "CONTAINER"
-                                                    ? `${line.containers} container${line.containers === 1 ? "" : "s"} · ${nf.format(line.sqm)} m² × ${money(line.pricePerSqm)}`
-                                                    : `${nf.format(line.sqm)} m² × ${money(line.pricePerSqm)}`}
+                                                    ? `${line.containers} container${line.containers === 1 ? "" : "s"} · ${number(line.sqm, { maximumFractionDigits: 2 })} m² × ${displayMoney(line.pricePerSqm, i.currency ?? baseCurrency)}`
+                                                    : `${number(line.sqm, { maximumFractionDigits: 2 })} m² × ${displayMoney(line.pricePerSqm, i.currency ?? baseCurrency)}`}
                                             </p>
                                         ) : (
                                             <p className="text-xs text-destructive">This item can’t be priced. Please remove it.</p>
                                         )}
-                                        {line && line.saved > 0 && <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Container price, you save {money(line.saved)}</p>}
+                                        {line && line.saved > 0 && <p className="text-xs font-medium text-success dark:text-success">Container price, you save {displayMoney(line.saved, i.currency ?? baseCurrency)}</p>}
                                     </div>
                                     <div className="mt-2 flex items-center justify-between">
                                         <div className="flex items-center border border-border">
@@ -102,7 +101,7 @@ export default function CartPage() {
                                             </Button>
                                             <span className="px-2 text-xs text-muted-foreground">{i.saleType === "CONTAINER" ? "containers" : "m²"}</span>
                                         </div>
-                                        <p className="font-semibold">{line ? money(line.total) : "—"}</p>
+                                        <p className="font-semibold">{line ? displayMoney(line.total, i.currency ?? baseCurrency) : "—"}</p>
                                     </div>
                                 </div>
                                 <Button variant="ghost" size="icon" aria-label={`Remove ${i.name}`} onClick={() => removeFromCart(i.variantId, i.saleType)}>
@@ -117,12 +116,14 @@ export default function CartPage() {
                     <h2 className="font-playfair text-xl font-bold">Order summary</h2>
                     <dl className="space-y-2 text-sm">
                         <div className="flex justify-between"><dt className="text-muted-foreground">Items</dt><dd>{items.length}</dd></div>
-                        <div className="flex justify-between"><dt className="text-muted-foreground">Total area</dt><dd>{nf.format(totalSqm)} m²</dd></div>
-                        <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{money(totals.subtotal)}</dd></div>
-                        <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{money(totals.tax)}</dd></div>
-                        <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Estimated total</dt><dd>{money(totals.total)}</dd></div>
+                        <div className="flex justify-between"><dt className="text-muted-foreground">Total area</dt><dd>{number(totalSqm, { maximumFractionDigits: 2 })} m²</dd></div>
+                        <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{displayMoney(totals.subtotal, baseCurrency)}</dd></div>
+                        <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{displayMoney(totals.tax, baseCurrency)}</dd></div>
+                        <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Estimated total</dt><dd>{displayMoney(totals.total, baseCurrency)}</dd></div>
                     </dl>
-                    <p className="text-xs text-muted-foreground">Delivery is added at checkout. Prices are confirmed when you place the order.</p>
+                    <p className="text-xs text-muted-foreground">
+                        Delivery is added at checkout. Converted prices are estimates; payment is processed in {baseCurrency}.
+                    </p>
                     <Button asChild className="w-full" disabled={priced.length !== items.length}><Link href="/checkout">Checkout</Link></Button>
                     <Button asChild variant="outline" className="w-full"><Link href="/products">Continue shopping</Link></Button>
                 </aside>

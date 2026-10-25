@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
 
-export async function GET(req: NextRequest) {
+export const GET = withPermission(PERM.CUSTOMERS_VIEW)(
+  async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("id");
@@ -64,4 +67,4 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth/require-user";
+import { withAuth } from "@/lib/middleware/withAuth";
 import { sendContactAcknowledgement, sendContactStaffAlert } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -13,16 +13,14 @@ const schema = z.object({
 const marker = (kind: "CANCEL" | "REFUND", orderId: number) =>
   `[ORDER_REQUEST:${kind}:${orderId}]`;
 
-export async function GET(request: NextRequest, context: Context) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
+export const GET = withAuth(async (_request: NextRequest, { user, ...context }) => {
   const orderId = Number((await context.params).id);
   if (!Number.isSafeInteger(orderId) || orderId < 1)
     return NextResponse.json({ error: "Invalid order id" }, { status: 400 });
 
   try {
     const order = await prisma.order.findFirst({
-      where: { id: orderId, userId: claims.userId },
+      where: { id: orderId, userId: user.id },
       select: { id: true, user: { select: { email: true } } },
     });
     if (!order)
@@ -71,11 +69,9 @@ export async function GET(request: NextRequest, context: Context) {
       { status: 500 },
     );
   }
-}
+});
 
-export async function POST(request: NextRequest, context: Context) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
+export const POST = withAuth(async (request: NextRequest, { user, ...context }) => {
   const orderId = Number((await context.params).id);
   if (!Number.isSafeInteger(orderId) || orderId < 1)
     return NextResponse.json({ error: "Invalid order id" }, { status: 400 });
@@ -89,7 +85,7 @@ export async function POST(request: NextRequest, context: Context) {
 
   try {
     const order = await prisma.order.findFirst({
-      where: { id: orderId, userId: claims.userId },
+      where: { id: orderId, userId: user.id },
       select: {
         id: true,
         orderNumber: true,
@@ -195,4 +191,4 @@ export async function POST(request: NextRequest, context: Context) {
       { status: 500 },
     );
   }
-}
+});

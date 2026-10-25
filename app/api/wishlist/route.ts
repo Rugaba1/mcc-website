@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "../../../lib/prisma";
-import { requireUser } from "../../../lib/auth/require-user";
+import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/middleware/withAuth";
 
 export const runtime = "nodejs";
 
-export async function GET(request: NextRequest) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
-
+export const GET = withAuth(async (_request: NextRequest, { user }) => {
   const rows = await prisma.wishlistItem.findMany({
-    where: { userId: claims.userId, product: { status: "ACTIVE" } },
+    where: { userId: user.id, product: { status: "ACTIVE" } },
     orderBy: { createdAt: "desc" },
     include: {
       product: {
@@ -55,10 +52,8 @@ export async function GET(request: NextRequest) {
       };
     }),
   );
-}
-export async function POST(request: NextRequest) {
-  const { claims, error } = await requireUser(request);
-  if (error) return error;
+});
+export const POST = withAuth(async (request: NextRequest, { user }) => {
 
   try {
     const { productId } = z
@@ -72,8 +67,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
     await prisma.wishlistItem.upsert({
-      where: { userId_productId: { userId: claims.userId, productId } },
-      create: { userId: claims.userId, productId },
+      where: { userId_productId: { userId: user.id, productId } },
+      create: { userId: user.id, productId },
       update: {},
     });
     return NextResponse.json({ ok: true }, { status: 201 });
@@ -86,4 +81,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

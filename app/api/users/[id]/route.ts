@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getApiUser, hasApiPermission } from "@/lib/auth/api-access";
-import { USER_INCLUDE, formatUser, splitName } from "@/lib/users/format";
-import { syncPermissions } from "@/lib/auth/permissions";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { PERM } from "@/lib/permissions/catalog";
+import { expandPermissions } from "@/lib/permissions/core";
+import {
+  USER_INCLUDE,
+  formatRegularUser,
+  formatUser,
+  splitName,
+} from "@/lib/users/format";
+import { syncPermissions } from "@/lib/permissions/permissions";
+import { validatePermissionAssignment } from "@/lib/permissions/assignment";
+import { isEmailBlocklisted } from "@/lib/auth/email-blocklist";
+import { normalizeEmail } from "@/lib/auth/email-hygiene";
 import {
   AccountDeleteError,
   deleteUserAccount,
@@ -13,18 +23,10 @@ import { ROLE_IDS, STAFF_ROLES } from "@/lib/constants";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Ctx = { params: Promise<{ id: string }> };
 
-const canManage = (u: Parameters<typeof hasApiPermission>[0]) =>
-  hasApiPermission(u, "users.manage") || hasApiPermission(u, "admin");
-
-export async function PUT(req: NextRequest, { params }: Ctx) {
+export const PUT = withPermission([PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS])(
+  async (req: NextRequest, context) => {
   try {
-    const me = await getApiUser(req);
-    if (!me)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // if (!canManage(me))
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     const existing = await prisma.user.findUnique({
       where: { id },
       include: { role: true, permissions: { include: { permission: true } } },
@@ -38,16 +40,28 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
         { error: "Invalid account type" },
         { status: 400 },
       );
+    if (b.permissions !== undefined) {
+      const permissionError = validatePermissionAssignment(
+        b.permissions,
+        context.user.permissions,
+        { accountType: b.accountType },
+      );
+      if (permissionError)
+        return NextResponse.json({ error: permissionError }, { status: 400 });
+    }
+    const hasCustomerRole = existing.role.some(
+      (role) => role.id === ROLE_IDS.CUSTOMER,
+    );
     const isStaffAccount =
       existing.role.some((role) =>
         STAFF_ROLES.includes(role.id as (typeof STAFF_ROLES)[number]),
-      ) || existing.permissions.length > 0;
+      ) || (!hasCustomerRole && existing.permissions.length > 0);
     if ((b.accountType === "staff") !== isStaffAccount)
       return NextResponse.json(
         { error: "Account type does not match this page" },
         { status: 409 },
       );
-    const isSelf = me.id === id;
+    const isSelf = context.user.id === id;
 
     // don't let admins lock themselves out
     if (isSelf && b.active === false)
@@ -55,16 +69,19 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
         { error: "You can't disable your own account" },
         { status: 400 },
       );
-    if (
-      isSelf &&
-      Array.isArray(b.permissions) &&
-      !b.permissions.includes("admin") &&
-      !b.permissions.includes("users.manage")
-    )
-      return NextResponse.json(
-        { error: "You can't remove your own user-management access" },
-        { status: 400 },
-      );
+    if (isSelf && Array.isArray(b.permissions)) {
+      const effectivePermissions = expandPermissions(b.permissions);
+      if (
+        !effectivePermissions.has(PERM.ADMIN) &&
+        (!effectivePermissions.has(PERM.USERS_UPDATE) ||
+          !effectivePermissions.has(PERM.USERS_PERMISSIONS))
+      ) {
+        return NextResponse.json(
+          { error: "You can't remove your own user-management access" },
+          { status: 400 },
+        );
+      }
+    }
 
     const data: Record<string, unknown> = {};
 
@@ -92,6 +109,14 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
           { error: "Email already in use" },
           { status: 409 },
         );
+      if (
+        normalizeEmail(email) !== normalizeEmail(existing.email) &&
+        (await isEmailBlocklisted(email))
+      )
+        return NextResponse.json(
+          { error: "This email address is blocked." },
+          { status: 409 },
+        );
       data.email = email;
     }
     if (b.phoneNumber !== undefined) {
@@ -116,6 +141,16 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       data.password = await bcrypt.hash(b.password, 12);
     }
     if (b.active !== undefined) data.isActive = !!b.active;
+    if (
+      b.active === true &&
+      (await isEmailBlocklisted(
+        (data.email as string | undefined) ?? existing.email,
+      ))
+    )
+      return NextResponse.json(
+        { error: "Remove the email block before reactivating this account." },
+        { status: 409 },
+      );
     if (b.email !== undefined && data.email !== existing.email)
       data.emailVerifiedAt = null;
     else if (b.emailVerified !== undefined)
@@ -160,15 +195,25 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
             ...(roleId !== undefined && { role: { set: [{ id: roleId }] } }),
           },
         });
-      if (b.accountType === "staff" && Array.isArray(b.permissions))
-        await syncPermissions(tx, id, b.permissions, me.id);
+      if (Array.isArray(b.permissions))
+        await syncPermissions(tx, id, b.permissions, context.user.id);
+      if (b.active === false || b.password) {
+        await tx.refreshToken.updateMany({
+          where: { userId: id },
+          data: { revokedAt: new Date(), replacedById: null },
+        });
+      }
       return tx.user.findUniqueOrThrow({
         where: { id },
         include: USER_INCLUDE,
       });
     });
 
-    return NextResponse.json(formatUser(updated));
+    return NextResponse.json(
+      b.accountType === "regular"
+        ? formatRegularUser(updated)
+        : formatUser(updated),
+    );
   } catch (err) {
     console.error("PUT /api/users/[id]:", err);
     return NextResponse.json(
@@ -176,24 +221,20 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);
 
-export async function DELETE(req: NextRequest, { params }: Ctx) {
+export const DELETE = withPermission(PERM.USERS_DEACTIVATE)(
+  async (req: NextRequest, context) => {
   try {
-    const me = await getApiUser(req);
-    if (!me)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!canManage(me))
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
-    const id = Number((await params).id);
+    const id = Number((await context.params!).id);
     const type = req.nextUrl.searchParams.get("type") ?? "staff";
     if (type !== "staff" && type !== "regular")
       return NextResponse.json(
         { error: "Invalid account type" },
         { status: 400 },
       );
-    if (me.id === id)
+    if (context.user.id === id)
       return NextResponse.json(
         { error: "Use Settings → Delete account to remove your own account" },
         { status: 400 },
@@ -205,10 +246,13 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
     });
     if (!existing)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const hasCustomerRole = existing.role.some(
+      (role) => role.id === ROLE_IDS.CUSTOMER,
+    );
     const isStaffAccount =
       existing.role.some((role) =>
         STAFF_ROLES.includes(role.id as (typeof STAFF_ROLES)[number]),
-      ) || existing.permissions.length > 0;
+      ) || (!hasCustomerRole && existing.permissions.length > 0);
     if ((type === "staff") !== isStaffAccount)
       return NextResponse.json(
         { error: "Account type does not match this page" },
@@ -226,4 +270,5 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
       { status: 500 },
     );
   }
-}
+  },
+);

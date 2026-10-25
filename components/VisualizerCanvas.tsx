@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { SceneDefinition, SurfaceDefinition } from "../data/scenes";
 import { SelectionMap } from "../types/visualizer";
-import { Loader2 } from "lucide-react";
+import { LuxuryLoading } from "@/components/luxury-loading";
 
 interface VisualizerCanvasProps {
   scene: SceneDefinition;
@@ -416,12 +416,14 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative h-full flex items-center justify-center bg-dark select-none overflow-hidden ${className || ""}`}
+      className={`relative h-full flex items-center justify-center bg-inverse select-none overflow-hidden ${className || ""}`}
     >
       {isLoading && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-dark/80 backdrop-blur-sm  ">
-          <Loader2 className="w-10 h-10 animate-spin  mb-3" />
-          <p className="text-sm tracking-wide font-medium">Loading Scene...</p>
+        <div className="absolute inset-0 z-50 bg-inverse/80 backdrop-blur-sm">
+          <LuxuryLoading
+            label="Loading scene"
+            className="min-h-full bg-transparent text-inverse-foreground"
+          />
         </div>
       )}
 
@@ -441,7 +443,7 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
       {/* Surface Name Tooltip near cursor */}
       {hoveredSurface && cursorPos && !isDragging && (
         <div
-          className="pointer-events-none absolute z-30 px-3 py-1.5  bg-dark/90  -stone-700 shadow-xl  text-xs font-semibold backdrop-blur-md transition-opacity"
+          className="pointer-events-none absolute z-30 px-3 py-1.5 bg-inverse/90 text-inverse-foreground border border-inverse-border shadow-xl text-xs font-semibold backdrop-blur-md transition-opacity"
           style={{
             left: `${cursorPos.x + 16}px`,
             top: `${cursorPos.y + 16}px`,
@@ -463,7 +465,7 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
       )}
 
       {/* Surface indicator badge at top left */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5  bg-dark/80  -stone-800 backdrop-blur-md   text-xs shadow-md">
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-inverse/80 text-inverse-foreground border border-inverse-border backdrop-blur-md text-xs shadow-md">
         <span className="w-2 h-2  bg-success" />
         <span className="font-medium ">{scene.name}</span>
         <span className="">•</span>

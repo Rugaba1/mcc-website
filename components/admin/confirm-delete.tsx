@@ -37,7 +37,7 @@ export function ConfirmDelete({
                 <AlertDialogFooter>
                     <AlertDialogCancel className="rounded-none" disabled={busy}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                        className="rounded-none bg-destructive text-white hover:bg-destructive/90"
+                        className="rounded-none bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         disabled={busy}
                         onClick={(e) => {
                             e.preventDefault();

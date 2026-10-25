@@ -5,7 +5,12 @@ import { Loader2, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { api, apiErrorMessage, type RegularUser } from "@/lib/api";
-import { fmtDate } from "@/lib/format";
+import {
+    CUSTOMER_PERMISSION_GROUPS,
+    PERM,
+} from "@/lib/permissions/catalog";
+import { PermissionGate } from "@/components/permission-gate";
+import { useFormatters } from "@/contexts/format-context";
 import { ImageField } from "@/components/file-picker";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -13,11 +18,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-
-type UserForm = { name: string; email: string; phoneNumber: string; password: string; profilePicture: string; active: boolean; emailVerified: boolean };
-const EMPTY_FORM: UserForm = { name: "", email: "", phoneNumber: "", password: "", profilePicture: "", active: true, emailVerified: false };
+import { PhoneInput } from "../ui/phone-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
+type UserForm = { name: string; email: string; phoneNumber: string; password: string; profilePicture: string; active: boolean; emailVerified: boolean; permissions: string[] };
+const EMPTY_FORM: UserForm = { name: "", email: "", phoneNumber: "", password: "", profilePicture: "", active: true, emailVerified: false, permissions: [] };
 
 export function RegularUsersPage() {
+    const { date } = useFormatters();
     const [users, setUsers] = useState<RegularUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -46,12 +53,16 @@ export function RegularUsersPage() {
 
     const openEdit = (user: RegularUser) => {
         setEditing(user);
-        setForm({ name: user.name, email: user.email, phoneNumber: user.phoneNumber ?? "", password: "", profilePicture: user.profilePicture ?? "", active: user.active, emailVerified: Boolean(user.emailVerifiedAt) });
+        setForm({ name: user.name, email: user.email, phoneNumber: user.phoneNumber ?? "", password: "", profilePicture: user.profilePicture ?? "", active: user.active, emailVerified: Boolean(user.emailVerifiedAt), permissions: user.permissions.filter((permission) => permission !== PERM.ADMIN) });
         setOpen(true);
     };
 
     const save = async () => {
         if (!form.name.trim() || !form.email.trim() || (!editing && form.password.length < 6)) return;
+        if (form.phoneNumber && !isValidPhoneNumber(form.phoneNumber)) {
+            toast.error("Please enter a valid phone number.");
+            return;
+        }
         setSaving(true);
         try {
             const payload = {
@@ -61,6 +72,7 @@ export function RegularUsersPage() {
                 profilePicture: form.profilePicture || null,
                 active: form.active,
                 emailVerified: form.emailVerified,
+                permissions: form.permissions,
                 ...(form.password ? { password: form.password } : {}),
             };
             if (editing) await api.updateUser(editing.id, payload);
@@ -98,7 +110,9 @@ export function RegularUsersPage() {
                     <h1 className="text-2xl font-semibold">Users</h1>
                     <p className="text-sm text-muted-foreground">Manage regular accounts. Customers with orders are listed separately.</p>
                 </div>
-                <Button className="rounded-none" onClick={openNew}><Plus /> Add user</Button>
+                <PermissionGate required={[PERM.USERS_CREATE, PERM.USERS_PERMISSIONS]} mode="hide">
+                    <Button className="rounded-none" onClick={openNew}><Plus /> Add user</Button>
+                </PermissionGate>
             </div>
 
             <Input
@@ -137,11 +151,15 @@ export function RegularUsersPage() {
                                 </td>
                                 <td className="p-3"><StatusBadge status={user.active ? "ACTIVE" : "DISABLED"} /></td>
                                 <td className="p-3"><StatusBadge status={user.emailVerifiedAt ? "VERIFIED" : "UNVERIFIED"} /></td>
-                                <td className="p-3">{fmtDate(user.createdAt)}</td>
+                                <td className="p-3">{date(user.createdAt)}</td>
                                 <td className="p-3">
                                     <div className="flex justify-end gap-1">
-                                        <Button size="icon" variant="ghost" aria-label={`Edit ${user.name}`} onClick={() => openEdit(user)}><Pencil /></Button>
-                                        <Button size="icon" variant="ghost" aria-label={`Delete ${user.name}`} onClick={() => void remove(user)}><Trash2 /></Button>
+                                        <PermissionGate required={[PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS]} mode="hide">
+                                            <Button size="icon" variant="ghost" aria-label={`Edit ${user.name}`} onClick={() => openEdit(user)}><Pencil /></Button>
+                                        </PermissionGate>
+                                        <PermissionGate required={PERM.USERS_DEACTIVATE} mode="hide">
+                                            <Button size="icon" variant="ghost" aria-label={`Delete ${user.name}`} onClick={() => void remove(user)}><Trash2 /></Button>
+                                        </PermissionGate>
                                     </div>
                                 </td>
                             </tr>
@@ -150,32 +168,90 @@ export function RegularUsersPage() {
                 </table>
             </div>
 
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="rounded-none sm:max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>{editing ? "Edit user" : "Add user"}</DialogTitle>
-                        <DialogDescription>Manage a regular account. Staff access is managed separately.</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                        <div className="space-y-1.5"><Label>Profile photo</Label><ImageField value={form.profilePicture} onChange={(profilePicture) => setForm((current) => ({ ...current, profilePicture }))} /></div>
-                        <div className="space-y-1.5"><Label htmlFor="regular-user-name">Full name</Label><Input id="regular-user-name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} /></div>
-                        <div className="space-y-1.5"><Label htmlFor="regular-user-email">Email</Label><Input id="regular-user-email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></div>
-                        <div className="space-y-1.5"><Label htmlFor="regular-user-phone">Phone number (optional)</Label><Input id="regular-user-phone" type="tel" value={form.phoneNumber} onChange={(event) => setForm((current) => ({ ...current, phoneNumber: event.target.value }))} /></div>
-                        <div className="space-y-1.5"><Label htmlFor="regular-user-password">{editing ? "New password (optional)" : "Password (minimum 6 characters)"}</Label><Input id="regular-user-password" type="password" autoComplete="new-password" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /></div>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            <div className="flex items-center justify-between border p-3"><Label htmlFor="regular-user-active">Account {form.active ? "active" : "disabled"}</Label><Switch id="regular-user-active" checked={form.active} onCheckedChange={(active) => setForm((current) => ({ ...current, active }))} /></div>
-                            <div className="flex items-center justify-between border p-3"><Label htmlFor="regular-user-email-verified">Email {form.emailVerified ? "verified" : "unverified"}</Label><Switch id="regular-user-email-verified" checked={form.emailVerified} onCheckedChange={(emailVerified) => setForm((current) => ({ ...current, emailVerified }))} /></div>
+            <PermissionGate
+                required={editing ? [PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS] : [PERM.USERS_CREATE, PERM.USERS_PERMISSIONS]}
+            >
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogContent className="flex max-h-[92dvh] flex-col gap-0 overflow-hidden rounded-none p-0 sm:max-w-2xl">
+                        <DialogHeader className="shrink-0 border-b px-6 py-5">
+                            <DialogTitle>{editing ? "Edit user" : "Add user"}</DialogTitle>
+                            <DialogDescription>Manage a regular account. Staff access is managed separately.</DialogDescription>
+                        </DialogHeader>
+                        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+                            <div className="space-y-1.5"><Label>Profile photo</Label><ImageField value={form.profilePicture} onChange={(profilePicture) => setForm((current) => ({ ...current, profilePicture }))} /></div>
+                            <div className="space-y-1.5"><Label htmlFor="regular-user-name">Full name</Label><Input id="regular-user-name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} /></div>
+                            <div className="space-y-1.5"><Label htmlFor="regular-user-email">Email</Label><Input id="regular-user-email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></div>
+                            <div className="space-y-1.5"><Label htmlFor="regular-user-phone">Phone number (optional)</Label>
+
+                                <PhoneInput
+                                    id="phone"
+                                    name="phone"
+                                    international
+                                    defaultCountry="RW"
+                                    countryCallingCodeEditable={false}
+                                    autoComplete="tel"
+                                    placeholder="Enter phone number"
+
+                                    value={form.phoneNumber}
+                                    onChange={(value) => setForm((current) => ({ ...current, phoneNumber: value }))}
+                                />
+                            </div>
+                            <div className="space-y-1.5"><Label htmlFor="regular-user-password">{editing ? "New password (optional)" : "Password (minimum 6 characters)"}</Label><Input id="regular-user-password" type="password" autoComplete="new-password" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /></div>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <div className="flex items-center justify-between border p-3"><Label htmlFor="regular-user-active">Account {form.active ? "active" : "disabled"}</Label><Switch id="regular-user-active" checked={form.active} onCheckedChange={(active) => setForm((current) => ({ ...current, active }))} /></div>
+                                <div className="flex items-center justify-between border p-3"><Label htmlFor="regular-user-email-verified">Email {form.emailVerified ? "verified" : "unverified"}</Label><Switch id="regular-user-email-verified" checked={form.emailVerified} onCheckedChange={(emailVerified) => setForm((current) => ({ ...current, emailVerified }))} /></div>
+                            </div>
+                            <PermissionGate required={PERM.USERS_PERMISSIONS}>
+                                <section className="space-y-3 border-t pt-4">
+                                    <div>
+                                        <h3 className="font-semibold">User permissions</h3>
+                                        <p className="text-xs text-muted-foreground">
+                                            These customer permissions are separate from staff and administrator access.
+                                        </p>
+                                    </div>
+                                    <div className="max-h-[45vh] space-y-4 overflow-y-auto border p-3">
+                                        {CUSTOMER_PERMISSION_GROUPS.map((group) => {
+                                            return (
+                                                <fieldset key={group.group} className="space-y-2">
+                                                    <legend className="text-sm font-semibold">{group.group}</legend>
+                                                    {group.items.map((permission) => (
+                                                        <label key={permission.code} className="flex items-start gap-2 text-sm">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={form.permissions.includes(permission.code)}
+                                                                onChange={(event) =>
+                                                                    setForm((current) => ({
+                                                                        ...current,
+                                                                        permissions: event.target.checked
+                                                                            ? [...current.permissions, permission.code]
+                                                                            : current.permissions.filter((code) => code !== permission.code),
+                                                                    }))
+                                                                }
+                                                                className="mt-1 accent-primary"
+                                                            />
+                                                            <span>
+                                                                <span className="block">{permission.label}</span>
+                                                                <span className="block text-xs text-muted-foreground">{permission.description}</span>
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </fieldset>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
+                            </PermissionGate>
+                            {editing?.lastLogin && <p className="text-xs text-muted-foreground">Last login: {date(editing.lastLogin)}</p>}
                         </div>
-                        {editing?.lastLogin && <p className="text-xs text-muted-foreground">Last login: {fmtDate(editing.lastLogin)}</p>}
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" className="rounded-none" onClick={() => setOpen(false)}>Cancel</Button>
-                        <Button className="rounded-none" disabled={saving || !form.name.trim() || !form.email.trim() || (!editing && form.password.length < 6)} onClick={() => void save()}>
-                            {saving && <Loader2 className="animate-spin" />}{editing ? "Save changes" : "Create user"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        <DialogFooter className="shrink-0 border-t px-6 py-4">
+                            <Button variant="outline" className="rounded-none" onClick={() => setOpen(false)}>Cancel</Button>
+                            <Button className="rounded-none" disabled={saving || !form.name.trim() || !form.email.trim() || (!editing && form.password.length < 6)} onClick={() => void save()}>
+                                {saving && <Loader2 className="animate-spin" />}{editing ? "Save changes" : "Create user"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </PermissionGate>
         </div>
     );
 }

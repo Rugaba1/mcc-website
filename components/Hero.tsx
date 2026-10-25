@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { stats } from "@/lib/data";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 
 const slides = [
@@ -67,7 +68,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col justify-end overflow-hidden text-white"
+      className="relative min-h-screen flex flex-col justify-end overflow-hidden text-overlay-foreground"
     >
       {/* Slides */}
       {slides.map((s, i) => (
@@ -86,8 +87,8 @@ export default function Hero() {
             unoptimized
           />
           {/* Overlay: darker overall + extra darkening on the left behind the text */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-overlay/70 via-overlay/50 to-overlay/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-overlay/60 via-overlay/20 to-transparent" />
         </div>
       ))}
 
@@ -95,16 +96,19 @@ export default function Hero() {
       <div className="relative z-20 max-w-7xl mx-auto px-6 pb-28 pt-48 w-full">
         {/* Tag */}
         <div key={`tag-${current}`} className="animate-fade-up mb-5">
-          <span className="inline-flex items-center gap-2 bg-primary/20 border border-primary/50 text-white text-xs font-bold tracking-[0.2em] uppercase px-5 py-2 rounded-full backdrop-blur-sm">
+          <Badge
+            variant="outline"
+            className="h-auto gap-2 border-primary/50 bg-primary/20 px-5 py-2 text-xs font-bold tracking-[0.2em] text-overlay-foreground uppercase backdrop-blur-sm"
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             {slide.tag}
-          </span>
+          </Badge>
         </div>
 
         {/* Heading */}
         <h1
           key={`h-${current}`}
-          className="font-playfair text-white text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] mb-6 max-w-4xl animate-fade-up delay-100"
+          className="font-playfair text-overlay-foreground text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] mb-6 max-w-4xl animate-fade-up delay-100"
         >
           {lines[0]}
           <br />
@@ -116,7 +120,7 @@ export default function Hero() {
         {/* Sub */}
         <p
           key={`p-${current}`}
-          className="text-white/80 text-lg max-w-2xl mb-10 leading-relaxed animate-fade-up delay-200"
+          className="text-overlay-foreground/80 text-lg max-w-2xl mb-10 leading-relaxed animate-fade-up delay-200"
         >
           {slide.sub}
         </p>
@@ -125,7 +129,7 @@ export default function Hero() {
         <div className="flex flex-wrap gap-4 mb-20 animate-fade-up delay-300">
           <a
             href="#products"
-            className="group bg-primary hover:bg-[#f0d080] text-white hover:text-black font-bold px-9 py-4 transition-all duration-300 shadow-lg shadow-primary/30 flex items-center gap-3 text-sm tracking-widest uppercase"
+            className="group bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-9 py-4 transition-all duration-300 shadow-lg shadow-primary/30 flex items-center gap-3 text-sm tracking-widest uppercase"
           >
             Explore Products
             <svg
@@ -140,22 +144,22 @@ export default function Hero() {
           </a>
           <a
             href="#contact"
-            className="border border-white/50 hover:border-primary bg-white/5 hover:bg-primary/10 text-white font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase backdrop-blur-sm"
+            className="border border-overlay-foreground/50 hover:border-primary bg-card/5 hover:bg-primary/10 text-overlay-foreground font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase backdrop-blur-sm"
           >
             Get a Quote
           </a>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 border border-white/10 w-fit">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-card/10 border border-overlay-foreground/10 w-fit">
           {stats.map((s, i) => (
             <div
               key={s.label}
-              className="px-8 py-5 bg-black/30 backdrop-blur-md text-center animate-fade-up"
+              className="px-8 py-5 bg-overlay/30 text-overlay-foreground backdrop-blur-md text-center animate-fade-up"
               style={{ animationDelay: `${300 + i * 100}ms` }}
             >
-              <div className="text-3xl font-bold text-white font-playfair">{s.num}</div>
-              <div className="text-white/70 text-xs tracking-wider uppercase mt-1">
+              <div className="text-3xl font-bold text-overlay-foreground font-playfair">{s.num}</div>
+              <div className="text-overlay-foreground/70 text-xs tracking-wider uppercase mt-1">
                 {s.label}
               </div>
             </div>
@@ -172,14 +176,14 @@ export default function Hero() {
             aria-label={`Slide ${i + 1}`}
             className={`p-0 rounded-none transition-all duration-500 ${i === current
                 ? "w-10 h-1 bg-primary hover:bg-primary"
-                : "w-4 h-1 bg-white/40 hover:bg-white/70"
+                : "w-4 h-1 bg-card/40 hover:bg-card/70"
               }`}
           />
         ))}
       </div>
 
       {/* Slide counter */}
-      <div className="absolute bottom-6 right-8 z-30 text-white/60 text-xs tracking-widest font-mono">
+      <div className="absolute bottom-6 right-8 z-30 text-overlay-foreground/60 text-xs tracking-widest font-mono">
         {String(current + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
       </div>
 
@@ -187,7 +191,7 @@ export default function Hero() {
       <Button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-none text-white bg-transparent border border-white/30 hover:border-primary hover:bg-primary flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-none text-overlay-foreground bg-transparent border border-overlay-foreground/30 hover:border-primary hover:bg-primary flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
       >
         <svg
           className="w-5 h-5"
@@ -201,7 +205,7 @@ export default function Hero() {
       </Button>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-8 left-8 z-30 hidden md:flex flex-col items-center gap-2 text-white/60 text-xs tracking-[0.2em] uppercase">
+      <div className="absolute bottom-8 left-8 z-30 hidden md:flex flex-col items-center gap-2 text-overlay-foreground/60 text-xs tracking-[0.2em] uppercase">
         <span>Scroll</span>
         <div className="w-px h-10 bg-gradient-to-b from-primary to-transparent animate-bounce-y" />
       </div>

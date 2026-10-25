@@ -13,6 +13,7 @@ export interface CartItem {
     size: string;
     finish: string | null;
     color: string | null;
+    currency?: string;
     saleType: SaleType;
     qty: number; // m² when saleType is SQM, number of containers when CONTAINER
     // display only: the server re-prices every order

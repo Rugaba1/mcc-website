@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { withPermission } from "@/lib/middleware/withPermission";
+import { withRateLimit } from "@/lib/middleware/withRateLimit";
+import { PERM } from "@/lib/permissions/catalog";
 
-export async function GET() {
+export const GET = withRateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+})(async (_req: NextRequest) => {
   try {
     const rows = await prisma.catalogue.findMany({
       orderBy: { createdAt: "desc" },
@@ -14,9 +20,10 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withPermission(PERM.CATALOGUES_MANAGE)(
+  async (req: NextRequest) => {
   try {
     const body = await req.json();
     if (!body.title?.trim())
@@ -42,4 +49,4 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
