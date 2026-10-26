@@ -38,6 +38,7 @@ export function CartProductPickerDialog() {
     setError("");
     api.getProducts({
       search: debouncedQuery.trim() || undefined,
+      status: "ACTIVE",
       skip: (page - 1) * PAGE_SIZE,
       limit: PAGE_SIZE,
     })
