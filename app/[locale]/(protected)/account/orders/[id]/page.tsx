@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CheckoutProgress } from "@/components/checkout-progress";
 
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   PROFORMA: "Proforma invoice",
@@ -81,6 +82,7 @@ export default function OrderDetailPage() {
   return (
     <div className="space-y-6">
       <Link href="/account/orders" className="text-sm text-muted-foreground hover:underline">← All orders</Link>
+      <CheckoutProgress currentStep={3} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-playfair text-3xl font-bold">{order.orderNumber}</h1>

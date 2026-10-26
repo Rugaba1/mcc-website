@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
 import { sendOrderStatusEmail } from "@/lib/email";
+import { canTransitionOrderStatus } from "@/lib/orders/status";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -127,6 +128,7 @@ const statusSchema = z.object({
     "REFUNDED",
   ]),
   note: z.string().trim().max(255).optional(),
+  paidAt: z.string().datetime().optional(),
 });
 class OrderError extends Error {}
 
@@ -144,7 +146,8 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
-    const { status, note } = statusSchema.parse(await req.json());
+    const { status, note, paidAt } = statusSchema.parse(await req.json());
+    const receivedAt = paidAt ? new Date(paidAt) : null;
     const now = new Date();
 
     const notification = await prisma.$transaction(async (tx) => {
@@ -164,6 +167,14 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
       if (!current)
         throw Object.assign(new Error("not found"), { code: "NOT_FOUND" });
       if (current.status === status) return null;
+      if (!canTransitionOrderStatus(current.status, status))
+        throw new OrderError(
+          `Order status cannot move from ${current.status} back to ${status}`,
+        );
+      if (status === "PAID" && !receivedAt)
+        throw new OrderError(
+          "Enter when payment was received before marking the order paid",
+        );
 
       const from = stockState(current.status);
       const to = stockState(status);
@@ -229,7 +240,10 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         where: { id },
         data: {
           status,
-          ...(status === "PAID" && { paymentStatus: "PAID", paidAt: now }),
+          ...(status === "PAID" && {
+            paymentStatus: "PAID",
+            paidAt: receivedAt,
+          }),
           ...(status === "SHIPPED" && { shippedAt: now }),
           ...(status === "DELIVERED" && { deliveredAt: now }),
           ...(status === "CANCELLED" && { cancelledAt: now }),

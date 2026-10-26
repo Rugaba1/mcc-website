@@ -25,6 +25,7 @@ import type { Opt } from "@/lib/locations"; // type-only, so the JSON isn't bund
 import { COMPANY } from "@/lib/company";
 import { RwandaTinInput } from "@/components/ui/rwanda-tin-input";
 import { isValidRwandaTin } from "@/lib/rwanda-tin";
+import { CheckoutProgress } from "@/components/checkout-progress";
 
 const createReservationToken = () => {
     const bytes = window.crypto.getRandomValues(new Uint8Array(32));
@@ -147,7 +148,7 @@ function CheckoutForm() {
             await reserveStock(token);
         } catch (retryError) {
             setReservationError(
-                apiErrorMessage(retryError, "Some items could not be reserved. Update your cart and try again."),
+                apiErrorMessage(retryError, "Some items could not be reserved. Update your order and try again."),
             );
         } finally {
             setReservationBusy(false);
@@ -187,7 +188,7 @@ function CheckoutForm() {
         }).catch((reserveError: unknown) => {
             if (!active) return;
             setReservationError(
-                apiErrorMessage(reserveError, "Some items could not be reserved. Update your cart and try again."),
+                apiErrorMessage(reserveError, "Some items could not be reserved. Update your order and try again."),
             );
         }).finally(() => {
             if (active) setReservationBusy(false);
@@ -312,16 +313,20 @@ function CheckoutForm() {
     if (items.length === 0) {
         return (
             <div className="mx-auto max-w-md px-6 py-24 text-center">
-                <p className="text-muted-foreground">Your cart is empty.</p>
+                <p className="text-muted-foreground">Your order is empty.</p>
                 <Button asChild className="mt-4"><Link href="/#products">Browse tiles</Link></Button>
             </div>
         );
     }
 
     return (
-        <form onSubmit={onSubmit} className="mx-auto grid max-w-6xl items-start gap-8 px-6 py-12 lg:grid-cols-[1fr_360px]">
+        <form onSubmit={onSubmit} className="mx-auto max-w-6xl px-6 py-12">
+            <div className="mb-10">
+                <CheckoutProgress currentStep={2} />
+            </div>
+            <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px]">
             <div className="space-y-6">
-                <h1 className="font-playfair text-4xl font-bold">Checkout</h1>
+                <h1 className="font-playfair text-4xl font-bold">Finish ordering</h1>
 
                 <fieldset className="space-y-2 border border-border p-5">
                     <legend className="px-2 font-semibold">Delivery</legend>
@@ -480,7 +485,7 @@ function CheckoutForm() {
                     <div className="flex justify-between"><dt className="text-muted-foreground">VAT (18%)</dt><dd>{displayMoney(discountedTotals.tax, baseCurrency)}</dd></div>
                     <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Total</dt><dd>{displayMoney(discountedTotals.total, baseCurrency)}</dd></div>
                     <p className="text-xs text-muted-foreground">
-                        Checkout and payment are processed in {baseCurrency}. Display currency changes do not change the amount charged.
+                        Ordering and payment are processed in {baseCurrency}. Display currency changes do not change the amount charged.
                     </p>
                 </dl>
                 <FormError message={error || reservationError} />
@@ -499,13 +504,14 @@ function CheckoutForm() {
                 </p>
                 <Button type="submit" className="w-full" disabled={busy || reservationBusy || !reservationToken}>
                     {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {busy ? "Placing order…" : "Place order"}
+                    {busy ? "Finishing your order…" : "Finish ordering"}
                 </Button>
                 <p className="text-xs text-muted-foreground">
                     Our team will contact you to confirm payment (MTN MoMo, Airtel Money, card or bank transfer).
                     Need help? Call {COMPANY.phone}.
                 </p>
             </aside>
+            </div>
         </form>
     );
 }

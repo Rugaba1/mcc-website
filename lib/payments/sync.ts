@@ -12,7 +12,12 @@ const CAPTURED = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"];
 const n = (v: unknown) => Number(v ?? 0);
 const r2 = (v: number) => Math.round(v * 100) / 100;
 
-type Pay = { amount: unknown; refundedAmount: unknown; status: string };
+type Pay = {
+  amount: unknown;
+  refundedAmount: unknown;
+  status: string;
+  paidAt?: Date | null;
+};
 
 /** Money actually received, money given back, and what is still owed. */
 export function totalsOf(payments: Pay[], grandTotal: number) {
@@ -48,7 +53,7 @@ export async function syncOrderPayment(
       status: true,
       paidAt: true,
       payments: {
-        select: { amount: true, refundedAmount: true, status: true },
+        select: { amount: true, refundedAmount: true, status: true, paidAt: true },
       },
     },
   });
@@ -84,7 +89,15 @@ export async function syncOrderPayment(
   } | null = null;
 
   if (paymentStatus === "PAID") {
-    data.paidAt = order.paidAt ?? new Date();
+    const receipts = order.payments
+      .filter((payment) => CAPTURED.includes(payment.status) && payment.paidAt)
+      .sort((a, b) => a.paidAt!.getTime() - b.paidAt!.getTime());
+    let received = 0;
+    const completion = receipts.find((payment) => {
+      received += n(payment.amount);
+      return received >= grand - 0.005;
+    })?.paidAt;
+    data.paidAt = completion ?? order.paidAt ?? new Date();
     if (order.status === "PENDING") {
       data.status = "PAID";
       history = { status: "PAID", note: "Payment received in full" };
@@ -94,14 +107,6 @@ export async function syncOrderPayment(
       data.status = "REFUNDED";
       history = { status: "REFUNDED", note: "Order fully refunded" };
     }
-  } else if (order.status === "PAID") {
-    // a payment was reversed, so the order is no longer covered
-    data.status = "PENDING";
-    data.paidAt = null;
-    history = {
-      status: "PENDING",
-      note: "Payment no longer covers the order total",
-    };
   }
 
   await tx.order.update({ where: { id: orderId }, data });

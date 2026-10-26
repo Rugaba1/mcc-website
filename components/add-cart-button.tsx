@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingCartPlus } from "lucide-react";
+import { PackagePlus } from "lucide-react";
 import type { Product } from "@/lib/api";
 import { ProductPurchase } from "@/components/product-purchase";
 import { Button } from "./ui/button";
@@ -17,7 +17,7 @@ export default function AddToCartButton({
 
     if (!available) {
         return <Button size={sm ? "icon" : "default"} variant="outline" disabled title="Currently unavailable">
-            <ShoppingCartPlus className="h-4 w-4 mx-1" />{!sm && <span className="ml-2">Unavailable</span>}
+            <PackagePlus className="mx-1 h-4 w-4" />{!sm && <span className="ml-2">Unavailable</span>}
         </Button>;
     }
 
@@ -25,13 +25,13 @@ export default function AddToCartButton({
         <>
             <Button
                 size={sm ? "icon" : "default"}
-                title="Add to cart"
+                title="Add to order"
                 className={cn("mx-1", className)}
-                aria-label={`Add ${product.name} to cart`}
+                aria-label={`Add ${product.name} to order`}
                 onClick={() => setOpen(true)}
             >
-                <ShoppingCartPlus className="h-4 w-4" />
-                {!sm && <span className="ml-2">Add to cart</span>}
+                <PackagePlus className="h-4 w-4" />
+                {!sm && <span className="ml-2">Add to order</span>}
             </Button>
 
             <Dialog open={open} onOpenChange={setOpen}>

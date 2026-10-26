@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, PackagePlus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,7 +94,7 @@ export function PurchaseOptions({
       )}
 
       <Button className="w-full rounded-none" disabled={disabled || !line} onClick={() => line && onAdd({ saleType: type, qty }, line)}>
-        <ShoppingCart /> Add to cart
+        <PackagePlus /> Add to order
       </Button>
     </div>
   );

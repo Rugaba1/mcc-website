@@ -75,7 +75,7 @@ export function ProductPurchase({
                         },
                         qty,
                     );
-                    toast.success(`${product.name} added to your cart`);
+                    toast.success(`${product.name} added to your order`);
                     onAdded?.();
                 }}
             />

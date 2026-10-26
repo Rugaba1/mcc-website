@@ -1345,9 +1345,14 @@ export const api = {
   deleteBlogPost: (id: number) => del(`/api/admin/blog/${id}`),
   getAdminOrder: (id: number) => get<OrderDetail>(`/api/admin/orders/${id}`),
 
-  updateOrderStatus: (id: number, status: string, note?: string) =>
+  updateOrderStatus: (
+    id: number,
+    status: string,
+    note?: string,
+    paidAt?: string,
+  ) =>
     apiClient
-      .patch<Ok>(`/api/admin/orders/${id}`, { status, note })
+      .patch<Ok>(`/api/admin/orders/${id}`, { status, note, paidAt })
       .then((r) => r.data),
   updatePayment: (
     id: number,
@@ -1358,6 +1363,7 @@ export const api = {
       note?: string | null;
       proofUrl?: string | null;
       failureReason?: string | null;
+      paidAt?: string;
     },
   ) =>
     put<{ id: number; status: string; orderPaymentStatus?: string }>(
@@ -1376,6 +1382,7 @@ export const api = {
       payerPhone?: string;
       note?: string;
       proofUrl?: string;
+      paidAt?: string;
     },
   ) => post<{ id: number }>(`/api/orders/${orderId}/payments`, d),
 
@@ -1624,7 +1631,11 @@ export const api = {
   getOrder: (id: number) => get<OrderDetail>(`/api/orders/${id}`),
   updateOrder: (
     id: number,
-    data: Partial<{ status: string; internalNote: string | null }>,
+    data: Partial<{
+      status: string;
+      internalNote: string | null;
+      paidAt: string;
+    }>,
   ) =>
     put<{ id: number; status: string; internalNote: string | null }>(
       `/api/orders/${id}`,

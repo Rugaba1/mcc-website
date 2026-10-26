@@ -17,7 +17,7 @@ import {
 } from "../data/catalog";
 import { SurfaceDefinition } from "../data/scenes";
 import { SurfaceSelection, AnyProduct } from "../types/visualizer";
-import { Search, Layers, Grid, Palette, RotateCw, Trash2, Check, Ruler, ShoppingCart } from "lucide-react";
+import { Search, Layers, Grid, Palette, RotateCw, Trash2, Check, Ruler, PackagePlus } from "lucide-react";
 import { useCart } from "../contexts/cart-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
@@ -236,10 +236,10 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           <Button
             onClick={handleAddToCart}
             variant={"secondary"}
-            title="Add 1 box of this tile to cart"
+            title="Add 1 box of this tile to your order"
           >
-            <ShoppingCart className="w-4 h-4" />
-            <span>{addedToast ? "Added!" : "Add to Cart"}</span>
+            <PackagePlus className="w-4 h-4" />
+            <span>{addedToast ? "Added!" : "Add to order"}</span>
           </Button>
         )}
         {currentSelection && (

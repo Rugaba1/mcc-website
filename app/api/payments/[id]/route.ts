@@ -71,6 +71,18 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
         rest.status !== current.status
       )
         return { code: 409 } as const;
+      if (
+        current.status === "PAID" &&
+        rest.status &&
+        rest.status !== "PAID"
+      )
+        return { code: 410 } as const;
+      if (
+        rest.status === "PAID" &&
+        current.status !== "PAID" &&
+        !paidAt
+      )
+        return { code: 400 } as const;
 
       const data: Prisma.PaymentUncheckedUpdateInput = {
         ...rest,
@@ -81,7 +93,7 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
           ? new Date(paidAt)
           : (current.paidAt ?? new Date());
         data.failureReason = null;
-      } else if (rest.status) {
+      } else if (rest.status && rest.status !== "PAID") {
         data.paidAt = null;
         if (rest.status === "FAILED" && !rest.failureReason)
           data.failureReason = "Marked as failed by staff";
@@ -137,6 +149,19 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
             "This payment has refunds, so its status can’t be changed. You can still edit the note.",
         },
         { status: 409 },
+      );
+    if (result.code === 410)
+      return NextResponse.json(
+        {
+          error:
+            "A received payment can’t be changed back to pending, authorized, or failed. Use the refund action to record money returned.",
+        },
+        { status: 409 },
+      );
+    if (result.code === 400)
+      return NextResponse.json(
+        { error: "Enter when the payment was received before confirming it" },
+        { status: 400 },
       );
     if (result.notification?.to) {
       await sendPaymentStatusEmail({

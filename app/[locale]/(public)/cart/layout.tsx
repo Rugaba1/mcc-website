@@ -14,8 +14,8 @@ export async function generateMetadata({
     return createPageMetadata({
         locale,
         path: "/cart",
-        title: `Your Cart | ${siteConfig.siteName}`,
-        description: "Review the tile products in your shopping cart.",
+        title: `My Order | ${siteConfig.siteName}`,
+        description: "Review the tile products in your order.",
         noIndex: true,
     });
 }

@@ -31,6 +31,11 @@ export const POST = withPermission(PERM.PAYMENTS_RECORD)(
 
   try {
     const { paidAt, ...body } = blankToNull(schema.parse(await req.json()));
+    if (body.status === "PAID" && !paidAt)
+      return NextResponse.json(
+        { error: "Enter when the payment was received before recording it" },
+        { status: 400 },
+      );
 
     const result = await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({

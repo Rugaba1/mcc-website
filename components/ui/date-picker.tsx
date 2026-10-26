@@ -88,11 +88,13 @@ export function DateTimePicker({
   value,
   onChange,
   placeholder,
+  allowPast = false,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  allowPast?: boolean;
 }) {
   const dateValue = value.slice(0, 10);
   const timeValue = value.slice(11, 16) || "00:00";
@@ -106,7 +108,7 @@ export function DateTimePicker({
   function updateTime(nextHour: string, nextMinute: string) {
     if (!dateValue) return;
     const candidate = new Date(`${dateValue}T${nextHour}:${nextMinute}`);
-    if (candidate <= minimumTime) return;
+    if (!allowPast && candidate <= minimumTime) return;
     onChange(`${dateValue}T${nextHour}:${nextMinute}`);
   }
 
@@ -116,7 +118,7 @@ export function DateTimePicker({
         id={id}
         value={dateValue}
         placeholder={placeholder}
-        disablePast
+        disablePast={!allowPast}
         onChange={(date) => {
           if (!date) {
             onChange("");
@@ -125,7 +127,7 @@ export function DateTimePicker({
 
           const candidate = new Date(`${date}T${timeValue}`);
           const nextTime =
-            date === today && candidate <= minimumTime
+            !allowPast && date === today && candidate <= minimumTime
               ? format(minimumTime, "HH:mm")
               : timeValue;
           onChange(`${date}T${nextTime}`);
@@ -152,7 +154,7 @@ export function DateTimePicker({
                 <SelectItem
                   key={option}
                   value={option}
-                  disabled={isToday && Number(option) < minimumTime.getHours()}
+                  disabled={!allowPast && isToday && Number(option) < minimumTime.getHours()}
                 >
                   {option}
                 </SelectItem>
@@ -177,6 +179,7 @@ export function DateTimePicker({
                   key={option}
                   value={option}
                   disabled={
+                    !allowPast &&
                     isToday &&
                     Number(hour) === minimumTime.getHours() &&
                     Number(option) < minimumTime.getMinutes()

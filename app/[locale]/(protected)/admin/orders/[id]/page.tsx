@@ -19,8 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
+import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
+import { canTransitionOrderStatus, ORDER_STATUSES, type OrderStatus } from "@/lib/orders/status";
 
-const STATUSES = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"];
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   PROFORMA: "Proforma invoice",
   INVOICE: "Invoice",
@@ -35,6 +36,7 @@ export default function AdminOrderPage() {
   const [status, setStatus] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [paidAtDialogOpen, setPaidAtDialogOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -51,16 +53,22 @@ export default function AdminOrderPage() {
     load();
   }, [load]);
 
-  async function saveStatus() {
-    if (!order || status === order.status) return;
+  async function saveStatus(paidAt?: string): Promise<boolean> {
+    if (!order || status === order.status) return false;
+    if (status === "PAID" && order.status !== "PAID" && !paidAt) {
+      setPaidAtDialogOpen(true);
+      return false;
+    }
     setSaving(true);
     try {
-      await api.updateOrderStatus(order.id, status, note.trim() || undefined);
+      await api.updateOrderStatus(order.id, status, note.trim() || undefined, paidAt);
       toast.success("Order status updated");
       setNote("");
       await load();
+      return true;
     } catch (e) {
       toast.error(apiErrorMessage(e, "Could not update the order"));
+      return false;
     } finally {
       setSaving(false);
     }
@@ -172,7 +180,10 @@ export default function AdminOrderPage() {
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
                   <SelectContent className="rounded-none">
-                    {STATUSES.map((s) => (
+                    {ORDER_STATUSES.filter((candidate) =>
+                      candidate === order.status ||
+                      canTransitionOrderStatus(order.status as OrderStatus, candidate)
+                    ).map((s) => (
                       <SelectItem key={s} value={s} className="rounded-none capitalize">
                         {s.toLowerCase()}
                       </SelectItem>
@@ -180,7 +191,7 @@ export default function AdminOrderPage() {
                   </SelectContent>
                 </Select>
                 <Input className="rounded-none" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-                <Button className="w-full rounded-none" onClick={saveStatus} disabled={saving || status === order.status}>
+                <Button className="w-full rounded-none" onClick={() => void saveStatus()} disabled={saving || status === order.status}>
                   {saving && <Loader2 className="animate-spin" />} Save status
                 </Button>
               </CardContent>
@@ -255,6 +266,18 @@ export default function AdminOrderPage() {
       </div>
 
       <InvoiceViewerDialog invoice={invoice} onClose={() => setInvoice(null)} />
+      <PaidAtAlertDialog
+        open={paidAtDialogOpen}
+        onOpenChange={(open) => {
+          setPaidAtDialogOpen(open);
+          if (!open && order.status !== "PAID") setStatus(order.status as OrderStatus);
+        }}
+        initialValue={order.paidAt}
+        busy={saving}
+        onConfirm={async (paidAt) => {
+          if (await saveStatus(paidAt)) setPaidAtDialogOpen(false);
+        }}
+      />
     </main>
   );
 }

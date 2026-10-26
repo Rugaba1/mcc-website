@@ -38,7 +38,11 @@ export type FieldDef = {
     hint?: string;
     required?: boolean;
     wide?: boolean; // span both columns
-    render?: (value: any, onChange: (v: any) => void) => ReactNode; // type "custom"
+    render?: (
+        value: any,
+        onChange: (v: any) => void,
+        setField: (name: string, value: any) => void,
+    ) => ReactNode; // type "custom"
 };
 
 export type FilterDef = { key: string; label: string; options: Option[] };
@@ -77,7 +81,12 @@ export interface ResourcePageProps<T extends { id: number }> {
     detail?: DetailDef<T>;
 }
 
-function Control({ f, value, onChange }: { f: FieldDef; value: any; onChange: (v: any) => void }) {
+function Control({ f, value, onChange, setField }: {
+    f: FieldDef;
+    value: any;
+    onChange: (v: any) => void;
+    setField: (name: string, value: any) => void;
+}) {
     switch (f.type) {
         case "textarea":
             return <Textarea className="min-h-24 rounded-none" value={value ?? ""} placeholder={f.placeholder} onChange={(e) => onChange(e.target.value)} />;
@@ -99,7 +108,7 @@ function Control({ f, value, onChange }: { f: FieldDef; value: any; onChange: (v
         case "image":
             return <ImageField value={value ?? ""} onChange={onChange} />;
         case "custom":
-            return <>{f.render?.(value, onChange)}</>;
+            return <>{f.render?.(value, onChange, setField)}</>;
         default:
             return <Input className="rounded-none" type={f.type} value={value ?? ""} placeholder={f.placeholder} onChange={(e) => onChange(e.target.value)} autoComplete="off" />;
     }
@@ -292,7 +301,12 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                                 {p.fields.map((f) => (
                                     <div key={f.name} className={`space-y-1.5 ${f.wide || f.type === "textarea" || f.type === "image" || f.type === "custom" ? "sm:col-span-2" : ""}`}>
                                         {f.type !== "checkbox" && <Label>{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>}
-                                        <Control f={f} value={values[f.name]} onChange={(v) => { setValues((s) => ({ ...s, [f.name]: v })); setErrors((s) => ({ ...s, [f.name]: "" })); }} />
+                                        <Control
+                                            f={f}
+                                            value={values[f.name]}
+                                            onChange={(v) => { setValues((s) => ({ ...s, [f.name]: v })); setErrors((s) => ({ ...s, [f.name]: "" })); }}
+                                            setField={(name, value) => setValues((s) => ({ ...s, [name]: value }))}
+                                        />
                                         {f.hint && !errors[f.name] && f.type !== "checkbox" && <p className="text-xs text-muted-foreground">{f.hint}</p>}
                                         {errors[f.name] && <p className="text-xs text-destructive">{errors[f.name]}</p>}
                                     </div>

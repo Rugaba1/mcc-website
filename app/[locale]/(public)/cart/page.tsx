@@ -11,6 +11,8 @@ import { MIN_SQM } from "@/lib/sale-pricing";
 import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CheckoutProgress } from "@/components/checkout-progress";
+import { CartProductPickerDialog } from "@/components/cart-product-picker-dialog";
 
 /** Number box that only commits on blur or Enter, so typing "12.5" isn't fought by clamping. */
 function QtyInput({ item, onCommit }: { item: CartItem; onCommit: (n: number) => void }) {
@@ -43,14 +45,14 @@ export default function CartPage() {
     const { displayMoney, number, baseCurrency } = useFormatters();
     const { items, ready, setQty, removeFromCart, clearCart } = useCart();
 
-    if (!ready) return <div className="mx-auto max-w-6xl px-6 py-24 text-center text-sm text-muted-foreground">Loading your cart…</div>;
+    if (!ready) return <div className="mx-auto max-w-6xl px-6 py-24 text-center text-sm text-muted-foreground">Loading your order…</div>;
 
     if (items.length === 0) {
         return (
             <div className="mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center">
                 <ShoppingBag className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h1 className="font-playfair text-3xl font-bold">Your cart is empty</h1>
-                <p className="mt-2 text-sm text-muted-foreground">Browse our tiles and add what you like.</p>
+                <h1 className="font-playfair text-3xl font-bold">Your order is empty</h1>
+                <p className="mt-2 text-sm text-muted-foreground">Browse our tiles and choose what you need.</p>
                 <Button asChild className="mt-6"><Link href="/products">Browse tiles</Link></Button>
             </div>
         );
@@ -63,9 +65,12 @@ export default function CartPage() {
 
     return (
         <div className="mx-auto max-w-6xl px-2">
+            <div className="mb-8 pt-6">
+                <CheckoutProgress currentStep={1} />
+            </div>
             <div className="mb-8 flex items-end justify-between">
-                <h1 className="font-playfair text-4xl font-bold">Your cart</h1>
-                <Button onClick={clearCart} variant={"destructive"}>Clear cart</Button>
+                <h1 className="font-playfair text-4xl font-bold">My order</h1>
+                <Button onClick={clearCart} variant={"destructive"}>Clear order</Button>
             </div>
 
             <div className="grid contain-content gap-2 grid-cols-1 lg:grid-cols-[1fr_0.5fr]">
@@ -123,10 +128,10 @@ export default function CartPage() {
                         <div className="flex justify-between border-t border-border pt-3 text-base font-bold"><dt>Estimated total</dt><dd>{displayMoney(totals.total, baseCurrency)}</dd></div>
                     </dl>
                     <p className="text-xs text-muted-foreground">
-                        Delivery is added at checkout. Converted prices are estimates; payment is processed in {baseCurrency}.
+                        Delivery is added in the next step. Converted prices are estimates; payment is processed in {baseCurrency}.
                     </p>
-                    <Button asChild className="w-full" disabled={priced.length !== items.length}><Link href="/checkout">Checkout</Link></Button>
-                    <Button asChild variant="outline" className="w-full"><Link href="/products">Continue shopping</Link></Button>
+                    <Button asChild className="w-full" disabled={priced.length !== items.length}><Link href="/checkout">Finish ordering</Link></Button>
+                    <CartProductPickerDialog />
                 </aside>
             </div>
         </div>

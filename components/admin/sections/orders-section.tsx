@@ -7,8 +7,8 @@ import { useFormatters } from "@/contexts/format-context";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
-
-const STATUSES = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"];
+import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
+import { canTransitionOrderStatus, ORDER_STATUSES, type OrderStatus } from "@/lib/orders/status";
 
 export function OrdersSection({
   orders,
@@ -25,6 +25,7 @@ export function OrdersSection({
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [paidAtDialogOpen, setPaidAtDialogOpen] = useState(false);
 
   const visible = orders.filter(
     (o) =>
@@ -46,16 +47,26 @@ export function OrdersSection({
     }
   }
 
-  async function save() {
-    if (!selected) return;
+  async function save(paidAt?: string): Promise<boolean> {
+    if (!selected) return false;
+    if (status === "PAID" && selected.status !== "PAID" && !paidAt) {
+      setPaidAtDialogOpen(true);
+      return false;
+    }
     setSaving(true);
     try {
-      await api.updateOrder(selected.id, { status, internalNote: note || null });
+      await api.updateOrder(selected.id, {
+        status,
+        internalNote: note || null,
+        ...(paidAt ? { paidAt } : {}),
+      });
       setSelected(await api.getOrder(selected.id));
       toast.success("Order updated");
       await reload();
+      return true;
     } catch {
       toast.error("Order update failed");
+      return false;
     } finally {
       setSaving(false);
     }
@@ -171,7 +182,10 @@ export function OrdersSection({
               <div>
                 <Label>Order status</Label>
                 <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  {ORDER_STATUSES.filter((candidate) =>
+                    candidate === selected.status ||
+                    canTransitionOrderStatus(selected.status as OrderStatus, candidate)
+                  ).map((s) => <option key={s} value={s}>{s}</option>)}
                 </Select>
               </div>
               <div>
@@ -184,12 +198,26 @@ export function OrdersSection({
                 <p>Payment: {selected.paymentStatus}</p>
                 <p className="font-bold text-foreground">Total: {money(selected.grandTotal, selected.currency)}</p>
               </div>
-              <Button className="w-full" onClick={() => void save()} disabled={saving}>
+              <Button className="w-full" onClick={() => void save()} disabled={saving || status === selected.status}>
                 {saving ? "Saving…" : "Save order"}
               </Button>
             </div>
           </div>
         </section>
+      )}
+      {selected && (
+        <PaidAtAlertDialog
+          open={paidAtDialogOpen}
+          onOpenChange={(open) => {
+            setPaidAtDialogOpen(open);
+            if (!open && selected.status !== "PAID") setStatus(selected.status as OrderStatus);
+          }}
+          initialValue={selected.paidAt}
+          busy={saving}
+          onConfirm={async (paidAt) => {
+            if (await save(paidAt)) setPaidAtDialogOpen(false);
+          }}
+        />
       )}
     </div>
   );

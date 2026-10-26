@@ -20,6 +20,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { DataPagination } from "@/components/admin/data-pagination";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
+import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
 
 const STATUSES = ["PENDING", "AUTHORIZED", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"];
 const METHODS = ["MTN_MOMO", "AIRTEL_MONEY", "CARD", "BANK_TRANSFER", "CASH_ON_DELIVERY"];
@@ -36,6 +37,7 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
   const [proof, setProof] = useState(row.proofUrl ?? "");
   const [reason, setReason] = useState(row.failureReason ?? "");
   const [busy, setBusy] = useState(false);
+  const [paidAtDialogOpen, setPaidAtDialogOpen] = useState(false);
 
   const refundable = Math.round((row.amount - row.refundedAmount) * 100) / 100;
   const canRefund = (row.status === "PAID" || row.status === "PARTIALLY_REFUNDED") && refundable > 0;
@@ -50,18 +52,19 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
 
   const run = async (fn: () => Promise<unknown>, ok: string) => {
     setBusy(true);
-    try { await fn(); toast.success(ok); await reload(); }
-    catch (e) { toast.error(apiErrorMessage(e, "Something went wrong")); }
+    try { await fn(); toast.success(ok); await reload(); return true; }
+    catch (e) { toast.error(apiErrorMessage(e, "Something went wrong")); return false; }
     finally { setBusy(false); }
   };
 
-  const save = (override: Partial<{ status: string }> = {}) => {
+  const save = (override: Partial<{ status: string; paidAt: string }> = {}) => {
     const next = override.status ?? status;
     return run(
       () => api.updatePayment(row.id, {
         ...(locked ? {} : { status: next }),
         providerRef: ref, payerPhone: phone, note, proofUrl: proof,
         failureReason: next === "FAILED" ? reason : null,
+        ...(override.paidAt ? { paidAt: override.paidAt } : {}),
       }),
       "Payment updated",
     );
@@ -98,7 +101,7 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
           <p className="text-sm text-muted-foreground">Check the MoMo message or bank statement against the reference below, then confirm.</p>
           <div className="flex flex-wrap gap-2">
               <PermissionGate required={PERM.PAYMENTS_RECORD}>
-                <Button className="rounded-none" disabled={busy} onClick={() => save({ status: "PAID" })}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Mark as paid</Button>
+                <Button className="rounded-none" disabled={busy} onClick={() => setPaidAtDialogOpen(true)}>{busy ? <Loader2 className="animate-spin" /> : <Check />} Mark as paid</Button>
                 <Button variant="outline" className="rounded-none" disabled={busy} onClick={() => setStatus("FAILED")}>Mark as failed…</Button>
               </PermissionGate>
           </div>
@@ -108,10 +111,13 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
       {/* Edit */}
       <section className="space-y-4 border p-4">
         <h3 className="text-sm font-semibold">Details</h3>
-        {!locked && (
+        {!locked && row.status !== "PAID" && (
           <div className="space-y-1.5">
             <Label>Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(next) => {
+              if (next === "PAID" && row.status !== "PAID") setPaidAtDialogOpen(true);
+              else setStatus(next);
+            }}>
               <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
               <SelectContent className="rounded-none">
                 {["PENDING", "AUTHORIZED", "PAID", "FAILED"].map((s) => <SelectItem key={s} value={s} className="rounded-none">{pretty(s)}</SelectItem>)}
@@ -127,6 +133,7 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
         <div className="space-y-1.5"><Label>Note</Label><Textarea className="min-h-20 rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
         <div className="space-y-1.5"><Label>Proof of payment</Label><ImageField value={proof} onChange={setProof} /></div>
         {locked && <p className="text-xs text-muted-foreground">This payment has refunds, so its status is locked. You can still edit the details above.</p>}
+        {row.status === "PAID" && <p className="text-xs text-muted-foreground">This payment has been received. Use the refund action to record money returned; payment status cannot be moved backward.</p>}
         <PermissionGate required={PERM.PAYMENTS_RECORD}>
           <Button className="rounded-none" disabled={busy} onClick={() => save()}>{busy && <Loader2 className="animate-spin" />}Save changes</Button>
         </PermissionGate>
@@ -154,6 +161,18 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
         </section>
         </PermissionGate>
       )}
+      <PaidAtAlertDialog
+        open={paidAtDialogOpen}
+        onOpenChange={setPaidAtDialogOpen}
+        initialValue={row.paidAt}
+        busy={busy}
+        onConfirm={async (paidAt) => {
+          if (await save({ status: "PAID", paidAt })) {
+            setStatus("PAID");
+            setPaidAtDialogOpen(false);
+          }
+        }}
+      />
     </div>
   );
 }
@@ -208,6 +227,49 @@ function OrderPicker({ value, onChange }: { value: string; onChange: (id: string
   );
 }
 
+function NewPaymentStatusField({
+  value,
+  onChange,
+  setField,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  setField: (name: string, value: unknown) => void;
+}) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  return (
+    <>
+      <Select
+        value={value}
+        onValueChange={(next) => {
+          if (next === "PAID") {
+            setDialogOpen(true);
+          } else {
+            onChange(next);
+            setField("paidAt", null);
+          }
+        }}
+      >
+        <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
+        <SelectContent className="rounded-none">
+          <SelectItem value="PAID" className="rounded-none">Received</SelectItem>
+          <SelectItem value="PENDING" className="rounded-none">Waiting for confirmation</SelectItem>
+        </SelectContent>
+      </Select>
+      <PaidAtAlertDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onConfirm={(paidAt) => {
+          onChange("PAID");
+          setField("paidAt", paidAt);
+          setDialogOpen(false);
+        }}
+      />
+    </>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminPaymentsPage() {
@@ -240,19 +302,20 @@ export default function AdminPaymentsPage() {
       fields={[
         { name: "orderId", label: "Order", type: "custom", required: true, render: (v, set) => <OrderPicker value={v ?? ""} onChange={set} /> },
         { name: "method", label: "Method", type: "select", required: true, options: options(METHODS) },
-        { name: "status", label: "Payment is", type: "select", required: true, options: [{ value: "PAID", label: "Received" }, { value: "PENDING", label: "Waiting for confirmation" }] },
+        { name: "status", label: "Payment is", type: "custom", required: true, render: (value, set, setField) => <NewPaymentStatusField value={value ?? "PENDING"} onChange={set} setField={setField} /> },
         { name: "amount", label: "Amount (base currency)", type: "number", required: true },
         { name: "providerRef", label: "Transaction reference", type: "text", hint: "MoMo transaction ID, bank slip number…" },
         { name: "payerPhone", label: "Payer phone", type: "text" },
         { name: "note", label: "Note", type: "text", wide: true, placeholder: "Paid in cash at the showroom" },
         { name: "proofUrl", label: "Proof of payment", type: "image" },
       ]}
-      emptyForm={{ orderId: "", method: "CASH_ON_DELIVERY", status: "PAID", amount: "", providerRef: "", payerPhone: "", note: "", proofUrl: "" }}
+      emptyForm={{ orderId: "", method: "CASH_ON_DELIVERY", status: "PENDING", paidAt: null, amount: "", providerRef: "", payerPhone: "", note: "", proofUrl: "" }}
       validate={(v: Values): Record<string, string> => (v.amount !== "" && !(Number(v.amount) > 0) ? { amount: "Enter an amount above 0" } : {})}
       create={(v) =>
         api.recordPayment(Number(v.orderId), {
           method: v.method, status: v.status, amount: Number(v.amount),
           providerRef: v.providerRef, payerPhone: v.payerPhone, note: v.note, proofUrl: v.proofUrl,
+          ...(v.paidAt ? { paidAt: v.paidAt } : {}),
         })
       }
     />

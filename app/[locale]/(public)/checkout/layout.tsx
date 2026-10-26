@@ -12,7 +12,7 @@ export async function generateMetadata({
     return createPageMetadata({
       locale,
       path: "/checkout",
-      title: `Secure Checkout | ${siteConfig.siteName}`,
+      title: `Finish Your Order | ${siteConfig.siteName}`,
       description: "Complete your tile order with Mountain Ceramics Company.",
       noIndex: true,
     });
@@ -22,8 +22,8 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
     return <>
         <Breadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Cart", href: "/cart" },
-            { label: "Checkout", href: "/checkout" },
+            { label: "My order", href: "/cart" },
+            { label: "Finish ordering", href: "/checkout" },
 
         ]} />
         {children}

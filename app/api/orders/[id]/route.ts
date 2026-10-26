@@ -4,6 +4,7 @@ import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
 import { invoicePath, issueInvoiceSafely } from "@/lib/invoices/invoice";
 import { sendOrderStatusEmail } from "@/lib/email";
+import { canTransitionOrderStatus, type OrderStatus } from "@/lib/orders/status";
 
 const ORDER_STATUSES = [
   "PENDING",
@@ -111,6 +112,8 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
     const data = body as Record<string, unknown>;
     const hasStatus = Object.hasOwn(data, "status");
     const hasNote = Object.hasOwn(data, "internalNote");
+    const paidAt =
+      typeof data.paidAt === "string" ? data.paidAt : undefined;
     if (!hasStatus && !hasNote)
       return NextResponse.json(
         { error: "No editable fields provided" },
@@ -138,6 +141,16 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         { status: 400 },
       );
     }
+    if (
+      Object.hasOwn(data, "paidAt") &&
+      (typeof data.paidAt !== "string" ||
+        Number.isNaN(new Date(data.paidAt).getTime()))
+    ) {
+      return NextResponse.json(
+        { error: "Invalid payment received date" },
+        { status: 400 },
+      );
+    }
 
     const existing = await prisma.order.findUnique({
       where: { id },
@@ -155,24 +168,56 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
     const status = hasStatus
       ? (data.status as (typeof ORDER_STATUSES)[number])
       : undefined;
+    if (
+      status &&
+      !canTransitionOrderStatus(
+        existing.status as OrderStatus,
+        status as OrderStatus,
+      )
+    ) {
+      return NextResponse.json(
+        { error: `Order status cannot move from ${existing.status} back to ${status}` },
+        { status: 409 },
+      );
+    }
+    if (status === "PAID" && existing.status !== "PAID" && !paidAt) {
+      return NextResponse.json(
+        { error: "Enter when payment was received before marking the order paid" },
+        { status: 400 },
+      );
+    }
     const now = new Date();
     const updateData = {
       ...(status ? { status } : {}),
       ...(hasNote ? { internalNote: data.internalNote as string | null } : {}),
       ...(status === "PAID"
-        ? { paymentStatus: "PAID" as const, paidAt: now }
+        ? { paymentStatus: "PAID" as const, paidAt: paidAt ? new Date(paidAt) : existing.status === "PAID" ? undefined : null }
         : {}),
       ...(status === "SHIPPED" ? { shippedAt: now } : {}),
       ...(status === "DELIVERED" ? { deliveredAt: now } : {}),
       ...(status === "CANCELLED" ? { cancelledAt: now } : {}),
     };
 
-    await prisma.$transaction(async (tx) => {
+    const updateResult = await prisma.$transaction(async (tx) => {
+      const current = await tx.order.findUnique({
+        where: { id },
+        select: { status: true },
+      });
+      if (!current) return "missing";
+      if (
+        status &&
+        !canTransitionOrderStatus(current.status as OrderStatus, status as OrderStatus)
+      )
+        return "invalid-transition";
+      if (status === "PAID" && current.status !== "PAID" && !paidAt)
+        return "missing-paid-at";
+
       await tx.order.update({ where: { id }, data: updateData });
       if (status === "PAID") {
+        const receivedAt = paidAt ? new Date(paidAt) : new Date();
         await tx.payment.updateMany({
           where: { orderId: id, status: "PENDING" },
-          data: { status: "PAID", paidAt: now, recordedById: context.user.id },
+          data: { status: "PAID", paidAt: receivedAt, recordedById: context.user.id },
         });
       }
       if (status && status !== existing.status) {
@@ -185,7 +230,20 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
           },
         });
       }
+      return "updated";
     });
+    if (updateResult === "invalid-transition")
+      return NextResponse.json(
+        { error: "The order status changed while saving. Reload and try again." },
+        { status: 409 },
+      );
+    if (updateResult === "missing-paid-at")
+      return NextResponse.json(
+        { error: "Enter when payment was received before marking the order paid" },
+        { status: 400 },
+      );
+    if (updateResult === "missing")
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     const updated = await prisma.order.findUnique({
       where: { id },
