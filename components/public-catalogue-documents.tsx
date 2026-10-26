@@ -1,10 +1,8 @@
-"use client";
-
 import Image from "next/image";
 import { FileText } from "lucide-react";
 
 import type { CatalogueDoc } from "@/lib/api";
-import { useMediaPreview } from "@/components/media-preview-provider";
+import { CataloguePreviewButton } from "@/components/catalogue-preview-button";
 import { ShareWidget } from "@/components/share-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,8 +12,6 @@ export function PublicCatalogueDocuments({
 }: {
   catalogues: CatalogueDoc[];
 }) {
-  const { openPreview } = useMediaPreview();
-
   if (catalogues.length === 0) return null;
 
   return (
@@ -50,23 +46,13 @@ export function PublicCatalogueDocuments({
               id={`catalogue-${catalogue.id}`}
               className="overflow-hidden border bg-card"
             >
-              <button
-                type="button"
+              <CataloguePreviewButton
+                file={{
+                  url: coverImage || catalogue.fileUrl,
+                  name: coverImage ? `${catalogue.title} cover` : catalogue.title,
+                  mimeType: coverImage ? "image/*" : mimeType,
+                }}
                 className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-muted"
-                onClick={() =>
-                  coverImage
-                    ? openPreview({
-                        url: coverImage,
-                        name: `${catalogue.title} cover`,
-                        mimeType: "image/*",
-                      })
-                    : openPreview({
-                        url: catalogue.fileUrl,
-                        name: catalogue.title,
-                        mimeType,
-                      })
-                }
-                aria-label={`Preview ${catalogue.title}`}
               >
                 {coverImage ? (
                   <Image
@@ -89,7 +75,7 @@ export function PublicCatalogueDocuments({
                     Featured
                   </Badge>
                 )}
-              </button>
+              </CataloguePreviewButton>
               <div className="space-y-3 p-4">
                 <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
                   <span className="uppercase tracking-wider">{catalogue.category}</span>
@@ -104,20 +90,12 @@ export function PublicCatalogueDocuments({
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="rounded-none"
-                    onClick={() =>
-                      openPreview({
-                        url: catalogue.fileUrl,
-                        name: catalogue.title,
-                        mimeType,
-                      })
-                    }
+                  <CataloguePreviewButton
+                    file={{ url: catalogue.fileUrl, name: catalogue.title, mimeType }}
+                    className="inline-flex h-8 items-center justify-center border border-transparent bg-secondary px-2.5 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
                   >
                     View document
-                  </Button>
+                  </CataloguePreviewButton>
                   <ShareWidget
                     title={catalogue.title}
                     text={catalogue.description}

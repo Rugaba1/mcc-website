@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { PaginationControls } from "@/components/pagination-controls";
 import { CatalogueControls } from "@/components/catalogue-controls";
 import { PublicCatalogueDocuments } from "@/components/public-catalogue-documents";
+import { headers } from "next/headers";
+import { siteConfig } from "@/config/site.config";
+import { localizedUrl } from "@/lib/alternates";
 
 const BADGE_FILTERS = ["All", "Bestseller", "New", "Premium"] as const;
 
@@ -20,9 +23,13 @@ function badgeStyle(badge: Product["badge"]) {
 }
 
 const PAGE_SIZE = 12
+export const dynamic = "force-dynamic";
+
 export default async function CataloguePage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     search?: string;
     category?: string;
@@ -32,6 +39,7 @@ export default async function CataloguePage({
     badgeFilter?: string;
   }>;
 }) {
+  const { locale } = await params;
   let totalPages = 1;
   let downloadableCatalogues: CatalogueDoc[] = [];
   const {
@@ -200,6 +208,29 @@ export default async function CataloguePage({
             ...(search ? { search } : {}),
             ...(sort !== "newest" ? { sort } : {}),
             ...(viewMode !== "grid" ? { viewMode } : {}),
+          }}
+        />
+
+        <script
+          type="application/ld+json"
+          nonce={(await headers()).get("x-nonce") ?? undefined}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              name: "Mountain Ceramics Company tile catalogue",
+              numberOfItems: total,
+              itemListElement: products.map((product, index) => ({
+                "@type": "ListItem",
+                position: (page - 1) * PAGE_SIZE + index + 1,
+                name: product.name,
+                url: new URL(
+                  localizedUrl(locale, `/products/${product.slug ?? product.id}`),
+                  siteConfig.siteUrl,
+                ).toString(),
+                image: product.image || undefined,
+              })),
+            }).replace(/</g, "\\u003c"),
           }}
         />
 
