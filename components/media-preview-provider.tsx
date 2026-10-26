@@ -8,11 +8,9 @@ import {
   useState,
   type   ReactNode,
 } from "react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Download, FileText, Loader2, ZoomIn, ZoomOut } from "lucide-react";
-import { api, apiErrorMessage } from "@/lib/api";
-import { Button } from "@/components/ui/button";
+import { FileText, Loader2 } from "lucide-react";
+import { MediaPdfViewer } from "@/components/media-pdf-viewer";
 
 import {
   Dialog,
@@ -21,22 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const InvoicePdfPages = dynamic(
-  () => import("@/components/invoices/invoice-pdf-pages"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex justify-center py-24 text-muted-foreground">
-        <Loader2 className="size-6 animate-spin" />
-      </div>
-    ),
-  },
-);
-
-const MIN_SCALE = 0.6;
-const MAX_SCALE = 2;
-const SCALE_STEP = 0.2;
 
 export interface MediaPreviewFile {
   url: string;
@@ -83,9 +65,6 @@ function MediaPreviewDialog({
   const [docxHtml, setDocxHtml] = useState("");
   const [docxError, setDocxError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
-  const [pdfError, setPdfError] = useState<string | null>(null);
-  const [pdfScale, setPdfScale] = useState(1);
   const extension = file?.url.split(".").pop()?.split(/[?#]/)[0]?.toLowerCase();
   const isDocx =
     file?.mimeType ===
@@ -94,34 +73,6 @@ function MediaPreviewDialog({
   const isPdf = file?.mimeType === "application/pdf" || extension === "pdf";
   const isImage = Boolean(file?.mimeType?.startsWith("image/")) ||
     Boolean(extension && ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(extension));
-
-  useEffect(() => {
-    if (!file || !isPdf) {
-      setPdfBlob(null);
-      setPdfError(null);
-      setPdfScale(1);
-      return;
-    }
-
-    let cancelled = false;
-    setPdfBlob(null);
-    setPdfError(null);
-    setPdfScale(1);
-    api
-      .getMediaPdf(file.url)
-      .then((blob) => {
-        if (!cancelled) setPdfBlob(blob);
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          setPdfError(apiErrorMessage(error, "Could not load PDF preview"));
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [file?.url, isPdf]);
 
   useEffect(() => {
     if (!file || !isDocx) {
@@ -161,20 +112,6 @@ function MediaPreviewDialog({
     return () => controller.abort();
   }, [file, isDocx]);
 
-  function downloadPdf() {
-    if (!pdfBlob || !file) return;
-    const href = URL.createObjectURL(pdfBlob);
-    const anchor = document.createElement("a");
-    anchor.href = href;
-    anchor.download = file.name.toLowerCase().endsWith(".pdf")
-      ? file.name
-      : `${file.name}.pdf`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(href), 10_000);
-  }
-
   return (
     <Dialog open={Boolean(file)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex h-[92dvh] w-[96vw] max-w-7xl flex-col gap-0 overflow-hidden rounded-none p-0">
@@ -187,47 +124,6 @@ function MediaPreviewDialog({
             Preview of the selected image or document.
           </DialogDescription>
           </div>
-          {file && isPdf && (
-            <div className="flex shrink-0 items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label="Zoom out"
-                disabled={!pdfBlob || pdfScale <= MIN_SCALE}
-                onClick={() =>
-                  setPdfScale((scale) => Math.max(MIN_SCALE, +(scale - SCALE_STEP).toFixed(1)))
-                }
-              >
-                <ZoomOut className="size-4" />
-              </Button>
-              <span className="w-10 text-center text-xs tabular-nums text-muted-foreground">
-                {Math.round(pdfScale * 100)}%
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label="Zoom in"
-                disabled={!pdfBlob || pdfScale >= MAX_SCALE}
-                onClick={() =>
-                  setPdfScale((scale) => Math.min(MAX_SCALE, +(scale + SCALE_STEP).toFixed(1)))
-                }
-              >
-                <ZoomIn className="size-4" />
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                className="ml-1"
-                disabled={!pdfBlob}
-                onClick={downloadPdf}
-              >
-                <Download className="size-4" />
-                <span className="hidden sm:inline">Download</span>
-              </Button>
-            </div>
-          )}
         </DialogHeader>
         <div className="min-h-0 flex-1 overflow-auto border bg-muted/20">
           {file && isImage ? (
@@ -241,19 +137,7 @@ function MediaPreviewDialog({
               />
             </div>
           ) : file && isPdf ? (
-            <div className="min-h-full bg-muted p-2 sm:p-4">
-              {pdfError ? (
-                <p role="alert" className="py-24 text-center text-sm text-destructive">
-                  {pdfError}
-                </p>
-              ) : pdfBlob ? (
-                <InvoicePdfPages file={pdfBlob} scale={pdfScale} />
-              ) : (
-                <div className="flex justify-center py-24 text-muted-foreground">
-                  <Loader2 className="size-6 animate-spin" />
-                </div>
-              )}
-            </div>
+            <MediaPdfViewer url={file.url} name={file.name} />
           ) : file && isDocx ? (
             <div className="mx-auto min-h-[50vh] max-w-4xl bg-background p-6 sm:p-10">
               {loading ? (

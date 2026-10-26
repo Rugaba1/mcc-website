@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import { cache } from "react";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PublicationContent } from "@/components/publications-surface";
 import { siteConfig } from "@/config/site.config";
+import { localizedUrl } from "@/lib/alternates";
 import { prisma } from "@/lib/prisma";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 const getPublication = cache(async (slug: string) => {
   const now = new Date();
@@ -50,12 +54,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PublicationDetailPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const publication = await getPublication(slug);
   if (!publication) notFound();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const canonicalUrl = localizedUrl(locale, `/publications/${publication.slug}`);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: publication.title,
+    description: publication.summary || publication.title,
+    image: publication.coverImage || undefined,
+    datePublished: publication.createdAt.toISOString(),
+    dateModified: publication.updatedAt.toISOString(),
+    mainEntityOfPage: canonicalUrl,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.siteName,
+      url: siteConfig.siteUrl,
+    },
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        nonce={nonce}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -72,6 +100,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
             createdAt: publication.createdAt.toISOString(),
             updatedAt: publication.updatedAt.toISOString(),
           }}
+          showPdfInline
         />
       </main>
     </>

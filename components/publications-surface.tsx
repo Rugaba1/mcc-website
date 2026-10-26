@@ -9,6 +9,7 @@ import { Link, usePathname } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type PublicationDoc } from "@/lib/api";
 import { mdxComponents, mdxRehypePlugins, mdxRemarkPlugins } from "@/components/blog/mdx-renderers";
 import { MediaPreviewImage } from "@/components/media-preview-image";
+import { MediaPdfViewer } from "@/components/media-pdf-viewer";
 import { useMediaPreview } from "@/components/media-preview-provider";
 import { ShareWidget } from "@/components/share-widget";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +22,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export function PublicationContent({ publication }: { publication: PublicationDoc }) {
+type PublicationContentDoc = Omit<PublicationDoc, "placement"> & {
+  placement: string;
+};
+
+export function PublicationContent({
+  publication,
+  showPdfInline = false,
+}: {
+  publication: PublicationContentDoc;
+  showPdfInline?: boolean;
+}) {
   const { openPreview } = useMediaPreview();
   const pdf = publication.fileUrl?.split(/[?#]/)[0]?.toLowerCase().endsWith(".pdf");
 
@@ -60,28 +71,41 @@ export function PublicationContent({ publication }: { publication: PublicationDo
             </ReactMarkdown>
           </div>
         )}
+        {showPdfInline && pdf && publication.fileUrl && (
+          <div className="overflow-hidden border" aria-label={`${publication.title} PDF`}>
+            <MediaPdfViewer
+              url={publication.fileUrl}
+              name={publication.title}
+              toolbar
+            />
+          </div>
+        )}
         <div className="flex flex-wrap gap-2 border-t pt-4">
           {publication.fileUrl && (
             <>
-              <Button
-                type="button"
-                variant="secondary"
-                className="rounded-none"
-                onClick={() =>
-                  openPreview({
-                    url: publication.fileUrl!,
-                    name: publication.title,
-                    mimeType: pdf ? "application/pdf" : undefined,
-                  })
-                }
-              >
-                Preview attachment
-              </Button>
-              <Button asChild variant="outline" className="rounded-none">
-                <a href={publication.fileUrl} target="_blank" rel="noreferrer" download>
-                  Download attachment
-                </a>
-              </Button>
+              {!(showPdfInline && pdf) && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="rounded-none"
+                  onClick={() =>
+                    openPreview({
+                      url: publication.fileUrl!,
+                      name: publication.title,
+                      mimeType: pdf ? "application/pdf" : undefined,
+                    })
+                  }
+                >
+                  Preview attachment
+                </Button>
+              )}
+              {!pdf && (
+                <Button asChild variant="outline" className="rounded-none">
+                  <a href={publication.fileUrl} download>
+                    Download attachment
+                  </a>
+                </Button>
+              )}
             </>
           )}
           <ShareWidget
