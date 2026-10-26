@@ -157,6 +157,7 @@ export default async function CataloguePage({
           badgeFilter={badgeFilter}
           sort={sort}
           viewMode={viewMode}
+          search={search}
         />
 
         {/* Result count */}

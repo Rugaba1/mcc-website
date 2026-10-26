@@ -5,7 +5,6 @@ import type { CatalogueDoc } from "@/lib/api";
 import { CataloguePreviewButton } from "@/components/catalogue-preview-button";
 import { ShareWidget } from "@/components/share-widget";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export function PublicCatalogueDocuments({
   catalogues,
