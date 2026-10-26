@@ -110,7 +110,8 @@ export default function AdminOrderPage() {
               {order.items.map((i) => (
                 <div key={i.id} className="flex gap-4 p-4 text-sm">
                   <div className="size-14 shrink-0 overflow-hidden border bg-muted">
-                    {i.image && (                      <MediaImage src={i.image} alt="" className="size-full object-cover" />
+                    {i.image && (
+                      <MediaImage src={i.image} alt="" className="size-full object-cover" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
