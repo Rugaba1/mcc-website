@@ -1,3 +1,4 @@
+import { MediaImage } from "@/components/media-image";
 import { useEffect, useRef, useState, useCallback, useMemo, useCallback as _cb } from 'react'
 import { Canvas, useThree, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
@@ -717,7 +718,7 @@ function TilePanel() {
               <div>
                 Width: <strong>{width} cm</strong>
               </div>
-              <img src={texture} width={width} height={height} />
+              <MediaImage src={texture} width={width} height={height} />
             </div>
 
 

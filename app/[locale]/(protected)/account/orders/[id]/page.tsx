@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { useParams } from "next/navigation";
 import { FileText } from "lucide-react";
@@ -94,7 +96,7 @@ export default function OrderDetailPage() {
             const unit = Number(i.unitPrice);
             return (
               <div key={i.id} className="flex gap-4 p-4 text-sm">
-                {i.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={i.image} alt="" className="h-16 w-16 object-cover" />}
+                {i.image && <MediaImage src={i.image} alt="" className="h-16 w-16 object-cover" />}
                 <div className="flex-1">
                   <p className="font-semibold">{i.productName}</p>
                   <p className="text-xs text-muted-foreground">{[i.size, i.finish].filter(Boolean).join(" · ")} · {i.sku}</p>

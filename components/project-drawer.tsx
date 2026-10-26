@@ -37,10 +37,10 @@ export default function ProjectDrawer({
                             fill
                             className="object-cover"
                             sizes="580px"
-                            unoptimized
+
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-overlay/80 via-overlay/20 to-transparent" />
-                        
+
                         <div className="absolute bottom-0 left-0 right-0 p-6">
                             <span className={`inline-block ${typeColor(project.type)} text-[10px] font-bold px-3 py-1 uppercase tracking-widest mb-2`}>
                                 {project.type}
@@ -149,7 +149,7 @@ function TileRow({ tile, surface }: { tile: Product; surface: "wall" | "floor" }
                     fill
                     className="object-cover"
                     sizes="48px"
-                    unoptimized
+
                 />
             </div>
             <div className="flex-1 min-w-0">

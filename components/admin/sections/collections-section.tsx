@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useState } from "react";
 import { ImageIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -125,9 +127,7 @@ export function CollectionsSection({
           return (
             <div key={col.id} className="group overflow-hidden rounded-2xl border border-border bg-background">
               <div className="relative h-44 overflow-hidden bg-muted">
-                {col.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={col.image} alt={col.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                {col.image ? (                  <MediaImage src={col.image} alt={col.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
                   <div className="flex h-full items-center justify-center">
                     <ImageIcon className="h-10 w-10 text-muted-foreground" />

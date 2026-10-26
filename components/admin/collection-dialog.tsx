@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import { toast } from "sonner";
@@ -143,8 +145,7 @@ export function CollectionDialog({
                                 <ImageField value={image ?? ""} kind="image" onChange={(value) => setImage( value)} />;
                                 {image.trim() && (
                                     <div className="mt-2 aspect-video w-full max-w-60 overflow-hidden border bg-muted">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={image} alt="Preview" className="size-full object-cover" />
+                                        <MediaImage src={image} alt="Preview" className="size-full object-cover" />
                                     </div>
                                 )}
                             </div>
@@ -191,9 +192,7 @@ export function CollectionDialog({
                                                 <label className="flex cursor-pointer items-center gap-3 p-2.5 hover:bg-accent">
                                                     <Checkbox className="rounded-none" checked={isPicked(p.id)} onCheckedChange={() => toggle(p)} />
                                                     <div className="size-9 shrink-0 overflow-hidden bg-muted">
-                                                        {p.image && (
-                                                            // eslint-disable-next-line @next/next/no-img-element
-                                                            <img src={p.image} alt="" className="size-full object-cover" />
+                                                        {p.image && (                                                            <MediaImage src={p.image} alt="" className="size-full object-cover" />
                                                         )}
                                                     </div>
                                                     <span className="min-w-0 flex-1">

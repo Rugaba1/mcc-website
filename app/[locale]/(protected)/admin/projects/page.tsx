@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { Star } from "lucide-react";
 import { api, type Project } from "@/lib/api";
 import { ResourcePage, type Values } from "@/components/admin/resource-page";
@@ -37,8 +39,7 @@ export default function AdminProjectsPage() {
           cell: (p) => (
             <div className="flex items-center gap-3">
               <div className="h-11 w-16 shrink-0 overflow-hidden border bg-muted">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                {p.image && <img src={p.image} alt={p.title} className="size-full object-cover" />}
+                {p.image && <MediaImage src={p.image} alt={p.title} className="size-full object-cover" />}
               </div>
               <div><p className="font-medium">{p.title}</p><p className="text-xs text-muted-foreground">{p.location || "No location"}</p></div>
             </div>

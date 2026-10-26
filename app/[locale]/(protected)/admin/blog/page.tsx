@@ -16,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
 import { useFormatters } from "@/contexts/format-context";
+import { ShareWidget } from "@/components/share-widget";
 
 const PAGE_SIZE = 15;
 type Filter = "all" | BlogStatus;
@@ -139,9 +140,17 @@ export default function AdminBlogPage() {
                                             </Button>
                                         </PermissionGate>
                                         {p.status === "PUBLISHED" && (
+                                            <>
+                                            <ShareWidget
+                                                title={p.title}
+                                                text={p.excerpt ?? undefined}
+                                                path={`/${p.locale}/blog/${p.slug}`}
+                                                iconOnly
+                                            />
                                             <Button asChild variant="ghost" size="icon" className="size-8 rounded-none" aria-label="View live">
                                                 <a href={`/${p.locale}/blog/${p.slug}`} target="_blank" rel="noopener noreferrer"><ExternalLink /></a>
                                             </Button>
+                                            </>
                                         )}
                                         <PermissionGate required={PERM.BLOG_DELETE}>
                                             <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive"

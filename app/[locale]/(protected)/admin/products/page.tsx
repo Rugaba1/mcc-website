@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState } from "react";
 import { Boxes, Package, Pencil, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +11,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { DataPagination } from "@/components/admin/data-pagination";
 import { ProductSheet } from "@/components/admin/product-sheet";
+import { ShareWidget } from "@/components/share-widget";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -221,9 +224,7 @@ export default function AdminProductsPage() {
           <TableRow key={p.id} className={loading ? "opacity-50" : ""}>
             <TableCell>
               <div className="size-11 overflow-hidden border bg-muted">
-                {p.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.image} alt={p.name} className="size-full object-cover" />
+                {p.image && (                  <MediaImage src={p.image} alt={p.name} className="size-full object-cover" />
                 )}
               </div>
             </TableCell>
@@ -279,6 +280,14 @@ export default function AdminProductsPage() {
 
             <TableCell>
               <div className="flex justify-end gap-1">
+                {p.status === "ACTIVE" && (
+                  <ShareWidget
+                    title={p.name}
+                    text={p.description}
+                    path={`/products/${p.slug || p.id}`}
+                    iconOnly
+                  />
+                )}
                 <PermissionGate required={PERM.PRODUCTS_UPDATE}>
                   <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(p)} aria-label={`Edit ${p.name}`}>
                     <Pencil />

@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState } from "react";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "@/app/i18n/routing";
@@ -73,8 +75,7 @@ export default function CartPage() {
                         const min = i.saleType === "SQM" ? MIN_SQM : 1;
                         return (
                             <li key={`${i.variantId}-${i.saleType}`} className="flex gap-2 p-2 flex-wrap">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={i.image} alt="" className="h-24 w-24 shrink-0 bg-muted object-cover" />
+                                <MediaImage src={i.image} alt="" className="h-24 w-24 shrink-0 bg-muted object-cover" />
                                 <div className="flex min-w-0 flex-1 flex-col justify-between">
                                     <div>
                                         <p className="truncate font-semibold">{i.name}</p>

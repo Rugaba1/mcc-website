@@ -143,7 +143,7 @@ export default async function ProjectsPage({
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        unoptimized
+
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-overlay/70 via-transparent to-transparent" />
                       {/* Type badge */}
@@ -155,7 +155,7 @@ export default async function ProjectsPage({
                         <div className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           {tiles.slice(0, 3).map((t) => (
                             <div key={t.id} className="w-8 h-8 overflow-hidden rounded-sm border border-border/60">
-                              <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" unoptimized />
+                              <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" />
                             </div>
                           ))}
                         </div>

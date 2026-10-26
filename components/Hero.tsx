@@ -84,7 +84,7 @@ export default function Hero() {
             priority={i === 0}
             className={`object-cover ${i === current ? "animate-hero-zoom" : ""}`}
             sizes="100vw"
-            unoptimized
+
           />
           {/* Overlay: darker overall + extra darkening on the left behind the text */}
           <div className="absolute inset-0 bg-gradient-to-t from-overlay/70 via-overlay/50 to-overlay/60" />
@@ -143,7 +143,7 @@ export default function Hero() {
             </svg>
           </a>
           <a
-            href="#contact"
+            href="/contact"
             className="border border-overlay-foreground/50 hover:border-primary bg-card/5 hover:bg-primary/10 text-overlay-foreground font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase backdrop-blur-sm"
           >
             Get a Quote
@@ -175,8 +175,8 @@ export default function Hero() {
             onClick={() => goTo(i)}
             aria-label={`Slide ${i + 1}`}
             className={`p-0 rounded-none transition-all duration-500 ${i === current
-                ? "w-10 h-1 bg-primary hover:bg-primary"
-                : "w-4 h-1 bg-card/40 hover:bg-card/70"
+              ? "w-10 h-1 bg-primary hover:bg-primary"
+              : "w-4 h-1 bg-card/40 hover:bg-card/70"
               }`}
           />
         ))}

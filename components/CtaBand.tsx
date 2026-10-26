@@ -11,7 +11,7 @@ export default function CtaBand() {
         fill
         className="object-cover"
         sizes="100vw"
-        unoptimized />
+      />
       {/* Dark + gold overlay */}
       <div className="absolute inset-0 bg-inverse/80" />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent" />
@@ -48,7 +48,7 @@ export default function CtaBand() {
 
           <div className="flex flex-wrap gap-4 justify-center">
             <a
-              href="#contact"
+              href="/contact"
               className="group bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-10 py-4 transition-all duration-300 shadow-xl shadow-primary/20 flex items-center gap-3 text-sm tracking-widest uppercase"
             >
               Get Free Quote

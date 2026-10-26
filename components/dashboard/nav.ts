@@ -3,6 +3,7 @@ import {
   CreditCard,
   CircleDollarSign,
   FileText,
+  Files,
   Heart,
   LayoutDashboard,
   Mail,
@@ -51,6 +52,8 @@ export const adminNav: NavItem[] = [
   { name: "Reports", href: "/admin/reports", icon: ChartNoAxesCombined, permission: PERM.REPORTS_VIEW },
   { name: "Products", href: "/admin/products", icon: Package, permission: PERM.PRODUCTS_VIEW },
   { name: "Collections", href: "/admin/collections", icon: Layers, permission: PERM.COLLECTIONS_MANAGE },
+  { name: "Catalogues", href: "/admin/catalogues", icon: Files, permission: PERM.CATALOGUES_MANAGE },
+  { name: "Publications", href: "/admin/publications", icon: Newspaper, permission: PERM.PUBLICATIONS_MANAGE },
   { name: "Projects", href: "/admin/projects", icon: FolderKanban, permission: PERM.PROJECTS_MANAGE },
   {
     name: "Testimonials",

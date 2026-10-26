@@ -1,0 +1,134 @@
+"use client";
+
+import Image from "next/image";
+import { FileText } from "lucide-react";
+
+import type { CatalogueDoc } from "@/lib/api";
+import { useMediaPreview } from "@/components/media-preview-provider";
+import { ShareWidget } from "@/components/share-widget";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+export function PublicCatalogueDocuments({
+  catalogues,
+}: {
+  catalogues: CatalogueDoc[];
+}) {
+  const { openPreview } = useMediaPreview();
+
+  if (catalogues.length === 0) return null;
+
+  return (
+    <section aria-labelledby="downloadable-catalogues" className="mt-16 border-t pt-12">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            Downloadable resources
+          </p>
+          <h2 id="downloadable-catalogues" className="mt-2 text-2xl font-bold">
+            Product catalogues
+          </h2>
+        </div>
+        <p className="max-w-xl text-sm text-muted-foreground">
+          Browse product catalogues and announcements from Mountain Ceramics Company.
+        </p>
+      </div>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {catalogues.map((catalogue) => {
+          const fileIsImage =
+            /\.(?:avif|gif|jpe?g|png|webp)(?:[?#].*)?$/i.test(catalogue.fileUrl);
+          const coverImage = catalogue.coverImage || (fileIsImage ? catalogue.fileUrl : "");
+          const mimeType = fileIsImage
+            ? "image/*"
+            : /\.pdf(?:[?#].*)?$/i.test(catalogue.fileUrl)
+              ? "application/pdf"
+              : undefined;
+
+          return (
+            <article
+              key={catalogue.id}
+              id={`catalogue-${catalogue.id}`}
+              className="overflow-hidden border bg-card"
+            >
+              <button
+                type="button"
+                className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-muted"
+                onClick={() =>
+                  coverImage
+                    ? openPreview({
+                        url: coverImage,
+                        name: `${catalogue.title} cover`,
+                        mimeType: "image/*",
+                      })
+                    : openPreview({
+                        url: catalogue.fileUrl,
+                        name: catalogue.title,
+                        mimeType,
+                      })
+                }
+                aria-label={`Preview ${catalogue.title}`}
+              >
+                {coverImage ? (
+                  <Image
+                    src={coverImage}
+                    alt={catalogue.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <FileText className="size-12" />
+                    <span className="text-xs uppercase">
+                      {mimeType === "application/pdf" ? "PDF document" : "Document"}
+                    </span>
+                  </div>
+                )}
+                {catalogue.featured && (
+                  <Badge className="absolute left-3 top-3 rounded-none">
+                    Featured
+                  </Badge>
+                )}
+              </button>
+              <div className="space-y-3 p-4">
+                <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                  <span className="uppercase tracking-wider">{catalogue.category}</span>
+                  {catalogue.year && <span>{catalogue.year}</span>}
+                </div>
+                <div>
+                  <h3 className="font-semibold">{catalogue.title}</h3>
+                  {catalogue.description && (
+                    <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
+                      {catalogue.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="rounded-none"
+                    onClick={() =>
+                      openPreview({
+                        url: catalogue.fileUrl,
+                        name: catalogue.title,
+                        mimeType,
+                      })
+                    }
+                  >
+                    View document
+                  </Button>
+                  <ShareWidget
+                    title={catalogue.title}
+                    text={catalogue.description}
+                    path={`/catalogue#catalogue-${catalogue.id}`}
+                  />
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

@@ -30,7 +30,7 @@ export function OtpInput({
   return (
     <div
       className={cn(
-        "relative grid w-full max-w-sm grid-cols-6 gap-2 rounded-md outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+        "relative grid w-full max-w-sm grid-cols-6 gap-2 rounded-md outline-none  ",
         disabled && "opacity-50",
       )}
     >

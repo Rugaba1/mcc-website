@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {
@@ -739,9 +741,7 @@ function LowStockCard({ rows }: { rows: AdminAnalytics["tables"]["lowStock"] }) 
             {rows.map((r) => (
               <li key={r.variantId} className="flex items-center gap-3 py-3">
                 <div className="size-10 shrink-0 overflow-hidden  bg-muted">
-                  {r.image && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={r.image} alt={r.product} className="size-full object-cover" />
+                  {r.image && (                    <MediaImage src={r.image} alt={r.product} className="size-full object-cover" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">

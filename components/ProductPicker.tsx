@@ -403,7 +403,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         className="object-cover group-hover:scale-105 transition-transform duration-200"
                         loading={idx < 4 ? "eager" : "lazy"}
                         priority={idx < 2}
-                        unoptimized
+
                       />
                       {isSelected && (
                         <div className="absolute top-1 right-1 w-5 h-5  bg-primary text-primary-foreground flex items-center justify-center shadow">
@@ -524,7 +524,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         sizes="100px"
                         className="object-cover"
                         loading={idx < 4 ? "eager" : "lazy"}
-                        unoptimized
+
                       />
                       {isSelected && (
                         <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">
@@ -567,7 +567,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         sizes="120px"
                         className="object-cover"
                         loading={idx < 4 ? "eager" : "lazy"}
-                        unoptimized
+
                       />
                       {isSelected && (
                         <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground flex items-center justify-center">
@@ -610,7 +610,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         sizes="100px"
                         className="object-cover"
                         loading={idx < 4 ? "eager" : "lazy"}
-                        unoptimized
+
                       />
                       {isSelected && (
                         <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">

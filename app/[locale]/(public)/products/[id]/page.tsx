@@ -103,23 +103,23 @@ export default async function TileDetailPage({
     brand: { "@type": "Brand", name: siteConfig.siteName },
     ...(primaryVariant
       ? {
-          offers: {
-            "@type": "Offer",
-            url: new URL(productPath, siteConfig.siteUrl).toString(),
-            priceCurrency: primaryVariant.currency,
-            price: String(primaryVariant.pricePerSqm),
-            sku: primaryVariant.sku,
-            ...(primaryVariant.inventory
-              ? {
-                  availability:
-                    primaryVariant.inventory.onHandSqm >
-                    primaryVariant.inventory.reservedSqm
-                      ? "https://schema.org/InStock"
-                      : "https://schema.org/OutOfStock",
-                }
-              : {}),
-          },
-        }
+        offers: {
+          "@type": "Offer",
+          url: new URL(productPath, siteConfig.siteUrl).toString(),
+          priceCurrency: primaryVariant.currency,
+          price: String(primaryVariant.pricePerSqm),
+          sku: primaryVariant.sku,
+          ...(primaryVariant.inventory
+            ? {
+              availability:
+                primaryVariant.inventory.onHandSqm >
+                  primaryVariant.inventory.reservedSqm
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+            }
+            : {}),
+        },
+      }
       : {}),
     ...(reviews?.total && reviews.averageRating !== null
       ? {
@@ -177,7 +177,7 @@ export default async function TileDetailPage({
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority
-                    unoptimized
+
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
@@ -275,7 +275,7 @@ export default async function TileDetailPage({
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                             sizes="64px"
-                            unoptimized
+
                           />
                         ) : (
                           <div className="w-full h-full  flex items-center justify-center">
@@ -321,7 +321,7 @@ export default async function TileDetailPage({
                                   fill
                                   className="object-cover"
                                   sizes="48px"
-                                  unoptimized
+
                                 />
                               ) : (
                                 <div className="w-full h-full " />
@@ -356,7 +356,7 @@ export default async function TileDetailPage({
                   </svg>
                   Visualize in Room
                 </Link>
-                <Link href="/#contact" className="flex-1">
+                <Link href="/contact" className="flex-1">
                   <Button variant="outline" className="h-full w-full px-6 py-4 text-sm font-bold uppercase tracking-widest">
                     Get a Quote
                   </Button>
@@ -395,7 +395,7 @@ export default async function TileDetailPage({
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                             sizes="(max-width: 640px) 50vw, 25vw"
-                            unoptimized
+
                           />
                         ) : (
                           <div className="absolute inset-0  flex items-center justify-center">

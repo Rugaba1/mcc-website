@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Archive, Loader2, Send } from "lucide-react";
+import { Archive, Loader2, RotateCw, Send } from "lucide-react";
 import { toast } from "sonner";
 
-import { api, apiErrorMessage, type ContactMessage } from "@/lib/api";
+import {
+  api,
+  apiErrorMessage,
+  type ContactEmailDelivery,
+  type ContactMessage,
+} from "@/lib/api";
 import { Link } from "@/app/i18n/routing";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
@@ -23,6 +28,7 @@ function MessageView({ row, reload }: { row: ContactMessage; reload: () => Promi
   const { user } = useAuth();
   const [reply, setReply] = useState("");
   const [busy, setBusy] = useState(false);
+  const [retryingDeliveryId, setRetryingDeliveryId] = useState<number | null>(null);
   const orderRequest = /^\[ORDER_REQUEST:(CANCEL|REFUND):(\d+)\]\r?\nOrder: ([^\r\n]+)\r?\n\r?\nCustomer request:\r?\n([\s\S]*)$/.exec(row.message);
 
   // Opening a new message marks it as read
@@ -40,6 +46,23 @@ function MessageView({ row, reload }: { row: ContactMessage; reload: () => Promi
     try { await fn(); toast.success(ok); await reload(); }
     catch (e) { toast.error(apiErrorMessage(e, "Something went wrong")); }
     finally { setBusy(false); }
+  };
+
+  const retryEmail = async (delivery: ContactEmailDelivery) => {
+    setRetryingDeliveryId(delivery.id);
+    try {
+      const result = await api.retryContactEmail(row.id, delivery.type);
+      toast.success(
+        result.status === "SENT"
+          ? "Email delivered"
+          : "Email retry scheduled",
+      );
+      await reload();
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Could not retry email delivery"));
+    } finally {
+      setRetryingDeliveryId(null);
+    }
   };
 
   return (
@@ -63,6 +86,55 @@ function MessageView({ row, reload }: { row: ContactMessage; reload: () => Promi
       <p className="whitespace-pre-wrap border bg-muted/40 p-4 text-sm">
         {orderRequest ? orderRequest[4] : row.message}
       </p>
+
+      {row.emailDeliveries.length > 0 && (
+        <div className="space-y-3 border-t pt-4">
+          <h3 className="text-sm font-semibold">Email delivery</h3>
+          {row.emailDeliveries.map((delivery) => (
+            <div
+              key={delivery.id}
+              className="flex flex-wrap items-center justify-between gap-3 border bg-muted/30 p-3"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm">
+                  {delivery.type === "ACKNOWLEDGEMENT"
+                    ? "Customer confirmation"
+                    : "Team notification"}
+                </span>
+                <StatusBadge status={delivery.status} />
+                <span className="text-xs text-muted-foreground">
+                  {delivery.status === "SENT"
+                    ? `Delivered ${dateTime(delivery.deliveredAt)}`
+                    : `${delivery.attempts} attempt${delivery.attempts === 1 ? "" : "s"}`}
+                </span>
+                {delivery.lastError && (
+                  <span className="text-xs text-destructive">
+                    {delivery.lastError}
+                  </span>
+                )}
+              </div>
+              {delivery.status === "FAILED" && (
+                <PermissionGate required={PERM.MESSAGES_MANAGE}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-none"
+                    disabled={retryingDeliveryId !== null}
+                    onClick={() => retryEmail(delivery)}
+                  >
+                    {retryingDeliveryId === delivery.id ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <RotateCw />
+                    )}
+                    Retry
+                  </Button>
+                </PermissionGate>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {row.replyText && (
         <div className="space-y-1.5">

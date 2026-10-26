@@ -220,7 +220,7 @@ function RegisterForm() {
             </form>
                 <>
                     Already have an account?{" "}
-                    <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline">
+                    <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline px-2.5 font-serif">
                         Sign in
                     </Link>
                 </>

@@ -4,36 +4,36 @@ import Image from "next/image";
 import { serverApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
-export default  async function Projects() {
-   
-    let projects = null
-    try {
-  
-      projects = await serverApi.getProjects({   });
-  
-  
-  
-  
-    } catch (error) {
-  
-    }
-  
-    if (!projects) {
-      return (
-        <div className="min-h-screen  flex items-center justify-center">
-          <div className="text-center">
-            <p className=" font-semibold text-lg">Projects not found</p>
-             
-          </div>
+export default async function Projects() {
+
+  let projects = null
+  try {
+
+    projects = await serverApi.getProjects({});
+
+
+
+
+  } catch (error) {
+
+  }
+
+  if (!projects) {
+    return (
+      <div className="min-h-screen  flex items-center justify-center">
+        <div className="text-center">
+          <p className=" font-semibold text-lg">Projects not found</p>
+
         </div>
-      );
-    }
-  
-  
-  
-  
-    const types = ["All", ...Array.from(new Set(projects.map((p) => p.type)))];
-    const filtered = projects
+      </div>
+    );
+  }
+
+
+
+
+  const types = ["All", ...Array.from(new Set(projects.map((p) => p.type)))];
+  const filtered = projects
 
   return (
     <section id="projects" className="py-24 ">
@@ -67,7 +67,7 @@ export default  async function Projects() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   sizes="(max-width: 768px) 100vw, 58vw"
-                  unoptimized
+
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-overlay/85 via-overlay/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -90,7 +90,7 @@ export default  async function Projects() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       sizes="(max-width: 768px) 100vw, 42vw"
-                      unoptimized
+
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-overlay/80 via-overlay/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-5">
@@ -112,7 +112,7 @@ export default  async function Projects() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  unoptimized
+
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-overlay/80 via-overlay/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">

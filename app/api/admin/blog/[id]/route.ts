@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
-import { postData, uniquePostSlug } from "@/lib/blog/payload";
+import { parseBlogPostPayload, postData, uniquePostSlug } from "@/lib/blog/payload";
 import { checkMdx } from "@/lib/blog/validate";
 import { toSummary } from "@/lib/blog/summary";
 
@@ -40,8 +40,23 @@ export const PUT = withPermission([PERM.BLOG_WRITE, PERM.BLOG_EDIT_ANY])(
     if (!existing)
       return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const body = await req.json();
-    const data = postData(body);
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON request body" },
+        { status: 400 },
+      );
+    }
+    const payload = parseBlogPostPayload(body);
+    if (!payload) {
+      return NextResponse.json(
+        { error: "Blog post body must be a JSON object" },
+        { status: 400 },
+      );
+    }
+    const data = postData(payload);
     if (!data.title || !data.content)
       return NextResponse.json(
         { error: "Title and content are required" },
@@ -62,7 +77,10 @@ export const PUT = withPermission([PERM.BLOG_WRITE, PERM.BLOG_EDIT_ANY])(
       data: {
         ...data,
         publishedAt,
-        slug: await uniquePostSlug(body.slug || data.title, id),
+        slug: await uniquePostSlug(
+          payload.slug ?? data.title,
+          id,
+        ),
       },
       include: { author: { select: { firstName: true, lastName: true } } },
     });

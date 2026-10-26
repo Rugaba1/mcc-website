@@ -9,6 +9,7 @@ const saveSchema = z.object({
   sceneId: z.number().int().positive().nullable().optional(),
   name: z.string().trim().min(1).max(150),
   sessionId: z.string().trim().max(100).optional(),
+  previewImage: z.string().max(60_000).nullable().optional(),
   items: z
     .array(
       z.object({
@@ -75,7 +76,7 @@ export const POST = withOptionalAuth(async (req, { user }) => {
         { status: 400 },
       );
     }
-    const { sceneId, name, items, sessionId } = parsed.data;
+    const { sceneId, name, items, sessionId, previewImage } = parsed.data;
 
     const shareToken = crypto.randomBytes(16).toString("hex");
 
@@ -86,6 +87,7 @@ export const POST = withOptionalAuth(async (req, { user }) => {
         sceneId: sceneId ?? null,
         name,
         shareToken,
+        previewImage: previewImage ?? null,
         items: {
           create: items.map((item) => ({
             variantId: item.variantId,
@@ -104,7 +106,7 @@ export const POST = withOptionalAuth(async (req, { user }) => {
         success: true,
         shareToken: design.shareToken,
         designId: design.id,
-        shareUrl: `/visualizer?design=${design.shareToken}`,
+        shareUrl: `/visualizer/design/${design.shareToken}`,
       },
       { status: 201 },
     );
@@ -131,7 +133,7 @@ export const PUT = withOptionalAuth(async (req, { user }) => {
       );
     }
 
-    const { shareToken, sceneId, name, items, sessionId } = parsed.data;
+    const { shareToken, sceneId, name, items, sessionId, previewImage } = parsed.data;
     const existing = await prisma.visualizerDesign.findUnique({
       where: { shareToken },
       select: { id: true, userId: true, sessionId: true },
@@ -156,6 +158,7 @@ export const PUT = withOptionalAuth(async (req, { user }) => {
       data: {
         sceneId: sceneId ?? null,
         name,
+        previewImage: previewImage ?? null,
         items: {
           deleteMany: {},
           create: items.map((item) => ({
@@ -174,7 +177,7 @@ export const PUT = withOptionalAuth(async (req, { user }) => {
       success: true,
       designId: updated.id,
       shareToken: updated.shareToken,
-      shareUrl: `/visualizer?design=${updated.shareToken}`,
+      shareUrl: `/visualizer/design/${updated.shareToken}`,
     });
   } catch (err) {
     console.error("PUT /api/visualizer/designs error:", err);

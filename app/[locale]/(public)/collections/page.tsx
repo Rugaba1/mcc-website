@@ -115,17 +115,7 @@ export default async function CollectionsPage({
         )}
       </div>
 
-      {/* Footer strip */}
-      <div className="bg-inverse py-8 mt-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className=" text-sm">© {new Date().getFullYear()} Mountain Ceramics Company</p>
-          <div className="flex gap-6">
-            <Link href="/" className="text-muted-foreground hover:text-primary text-sm transition-colors">Home</Link>
-            <Link href="/projects" className="text-muted-foreground hover:text-primary text-sm transition-colors">Projects</Link>
-            <Link href="/visualizer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Visualizer</Link>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }
@@ -153,7 +143,7 @@ function CollectionCard({
     : `/visualizer?collection=${encodeURIComponent(collection.name)}`;
 
   return (
-    <div className={` group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col ${large ? "md:flex-row" : ""}`}>
+    <div id={`collection-${collection.id}`} className={` group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col ${large ? "md:flex-row" : ""}`}>
 
       {/* Image */}
       <div className={`relative overflow-hidden ${large ? "md:w-1/2 min-h-70" : "min-h-55"}`}>
@@ -163,7 +153,7 @@ function CollectionCard({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
           sizes={large ? "(max-width: 768px) 100vw, 50vw" : "33vw"}
-          unoptimized
+
         />
         <div className="absolute inset-0 bg-linear-to-t from-overlay/60 via-transparent to-transparent" />
         {collection.featured && (
@@ -224,7 +214,7 @@ function CollectionCard({
                     fill
                     className="object-cover"
                     sizes="40px"
-                    unoptimized
+
                   />
                 </div>
               ))}

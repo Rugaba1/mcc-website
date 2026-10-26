@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useCallback, useEffect, useState } from "react";
 import { Loader2, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
@@ -141,9 +143,7 @@ export function RegularUsersPage() {
                                 <td className="p-3">
                                     <div className="flex items-center gap-3">
                                         <span className="flex size-10 items-center justify-center overflow-hidden rounded-full border bg-muted">
-                                            {user.profilePicture ? (
-                                                // eslint-disable-next-line @next/next/no-img-element
-                                                <img src={user.profilePicture} alt="" className="size-full object-cover" />
+                                            {user.profilePicture ? (                                                <MediaImage src={user.profilePicture} alt="" className="size-full object-cover" />
                                             ) : <UserRound className="size-5 text-muted-foreground" />}
                                         </span>
                                         <div><p className="font-medium">{user.name}</p><p className="text-xs text-muted-foreground">{user.email}{user.phoneNumber ? ` · ${user.phoneNumber}` : ""}</p></div>

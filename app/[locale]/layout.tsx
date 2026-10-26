@@ -15,6 +15,7 @@ import { siteConfig } from "@/config/site.config";
 import { FormatProvider } from "@/contexts/format-context";
 import { LuxuryLoading } from "@/components/luxury-loading";
 import BackToTop from "@/components/BackToTop";
+import { MediaPreviewProvider } from "@/components/media-preview-provider";
 
 const centuryGothic = localFont({
     src: [
@@ -140,9 +141,11 @@ export default async function LocaleLayout({
                                 secureCookie={siteConfig.isProduction}
                             >
                                 <AuthProvider>
-                                    <CartProvider>
-                                        {children}
-                                    </CartProvider>
+                                    <MediaPreviewProvider>
+                                        <CartProvider>
+                                            {children}
+                                        </CartProvider>
+                                    </MediaPreviewProvider>
                                 </AuthProvider>
                             </FormatProvider>
                             <Toaster position="top-right" richColors closeButton theme="system" />

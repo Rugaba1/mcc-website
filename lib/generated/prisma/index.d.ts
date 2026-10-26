@@ -59,6 +59,11 @@ export type NewsletterCampaign = $Result.DefaultSelection<Prisma.$NewsletterCamp
  */
 export type NewsletterCampaignRecipient = $Result.DefaultSelection<Prisma.$NewsletterCampaignRecipientPayload>
 /**
+ * Model Publication
+ * 
+ */
+export type Publication = $Result.DefaultSelection<Prisma.$PublicationPayload>
+/**
  * Model CheckoutReservation
  * 
  */
@@ -254,6 +259,11 @@ export type Role = $Result.DefaultSelection<Prisma.$RolePayload>
  */
 export type ContactMessage = $Result.DefaultSelection<Prisma.$ContactMessagePayload>
 /**
+ * Model ContactEmailDelivery
+ * 
+ */
+export type ContactEmailDelivery = $Result.DefaultSelection<Prisma.$ContactEmailDeliveryPayload>
+/**
  * Model MediaFile
  * 
  */
@@ -379,6 +389,24 @@ export const ContactStatus: {
 
 export type ContactStatus = (typeof ContactStatus)[keyof typeof ContactStatus]
 
+
+export const ContactEmailDeliveryType: {
+  ACKNOWLEDGEMENT: 'ACKNOWLEDGEMENT',
+  STAFF_ALERT: 'STAFF_ALERT'
+};
+
+export type ContactEmailDeliveryType = (typeof ContactEmailDeliveryType)[keyof typeof ContactEmailDeliveryType]
+
+
+export const ContactEmailDeliveryStatus: {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+};
+
+export type ContactEmailDeliveryStatus = (typeof ContactEmailDeliveryStatus)[keyof typeof ContactEmailDeliveryStatus]
+
 }
 
 export type OrderStatus = $Enums.OrderStatus
@@ -428,6 +456,14 @@ export const InvoiceKind: typeof $Enums.InvoiceKind
 export type ContactStatus = $Enums.ContactStatus
 
 export const ContactStatus: typeof $Enums.ContactStatus
+
+export type ContactEmailDeliveryType = $Enums.ContactEmailDeliveryType
+
+export const ContactEmailDeliveryType: typeof $Enums.ContactEmailDeliveryType
+
+export type ContactEmailDeliveryStatus = $Enums.ContactEmailDeliveryStatus
+
+export const ContactEmailDeliveryStatus: typeof $Enums.ContactEmailDeliveryStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -639,6 +675,16 @@ export class PrismaClient<
     * ```
     */
   get newsletterCampaignRecipient(): Prisma.NewsletterCampaignRecipientDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.publication`: Exposes CRUD operations for the **Publication** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Publications
+    * const publications = await prisma.publication.findMany()
+    * ```
+    */
+  get publication(): Prisma.PublicationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.checkoutReservation`: Exposes CRUD operations for the **CheckoutReservation** model.
@@ -1029,6 +1075,16 @@ export class PrismaClient<
     * ```
     */
   get contactMessage(): Prisma.ContactMessageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.contactEmailDelivery`: Exposes CRUD operations for the **ContactEmailDelivery** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactEmailDeliveries
+    * const contactEmailDeliveries = await prisma.contactEmailDelivery.findMany()
+    * ```
+    */
+  get contactEmailDelivery(): Prisma.ContactEmailDeliveryDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.mediaFile`: Exposes CRUD operations for the **MediaFile** model.
@@ -1495,6 +1551,7 @@ export namespace Prisma {
     NewsletterSubscription: 'NewsletterSubscription',
     NewsletterCampaign: 'NewsletterCampaign',
     NewsletterCampaignRecipient: 'NewsletterCampaignRecipient',
+    Publication: 'Publication',
     CheckoutReservation: 'CheckoutReservation',
     CheckoutReservationItem: 'CheckoutReservationItem',
     AdminNotification: 'AdminNotification',
@@ -1534,6 +1591,7 @@ export namespace Prisma {
     Catalogue: 'Catalogue',
     Role: 'Role',
     ContactMessage: 'ContactMessage',
+    ContactEmailDelivery: 'ContactEmailDelivery',
     MediaFile: 'MediaFile'
   };
 
@@ -1550,7 +1608,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "currency" | "user" | "blogPost" | "refreshToken" | "emailBlocklist" | "emailBlocklistEvent" | "newsletterSubscription" | "newsletterCampaign" | "newsletterCampaignRecipient" | "checkoutReservation" | "checkoutReservationItem" | "adminNotification" | "adminNotificationRead" | "legalDocumentVersion" | "legalAcceptance" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "orderItem" | "invoice" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "mediaFile"
+      modelProps: "currency" | "user" | "blogPost" | "refreshToken" | "emailBlocklist" | "emailBlocklistEvent" | "newsletterSubscription" | "newsletterCampaign" | "newsletterCampaignRecipient" | "publication" | "checkoutReservation" | "checkoutReservationItem" | "adminNotification" | "adminNotificationRead" | "legalDocumentVersion" | "legalAcceptance" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "orderItem" | "invoice" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "contactEmailDelivery" | "mediaFile"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2145,6 +2203,72 @@ export namespace Prisma {
           count: {
             args: Prisma.NewsletterCampaignRecipientCountArgs<ExtArgs>
             result: $Utils.Optional<NewsletterCampaignRecipientCountAggregateOutputType> | number
+          }
+        }
+      }
+      Publication: {
+        payload: Prisma.$PublicationPayload<ExtArgs>
+        fields: Prisma.PublicationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublicationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublicationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          findFirst: {
+            args: Prisma.PublicationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublicationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          findMany: {
+            args: Prisma.PublicationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>[]
+          }
+          create: {
+            args: Prisma.PublicationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          createMany: {
+            args: Prisma.PublicationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PublicationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          update: {
+            args: Prisma.PublicationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          deleteMany: {
+            args: Prisma.PublicationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublicationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PublicationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationPayload>
+          }
+          aggregate: {
+            args: Prisma.PublicationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublication>
+          }
+          groupBy: {
+            args: Prisma.PublicationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublicationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublicationCountArgs<ExtArgs>
+            result: $Utils.Optional<PublicationCountAggregateOutputType> | number
           }
         }
       }
@@ -4722,6 +4846,72 @@ export namespace Prisma {
           }
         }
       }
+      ContactEmailDelivery: {
+        payload: Prisma.$ContactEmailDeliveryPayload<ExtArgs>
+        fields: Prisma.ContactEmailDeliveryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactEmailDeliveryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactEmailDeliveryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          findFirst: {
+            args: Prisma.ContactEmailDeliveryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactEmailDeliveryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          findMany: {
+            args: Prisma.ContactEmailDeliveryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>[]
+          }
+          create: {
+            args: Prisma.ContactEmailDeliveryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          createMany: {
+            args: Prisma.ContactEmailDeliveryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ContactEmailDeliveryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          update: {
+            args: Prisma.ContactEmailDeliveryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactEmailDeliveryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactEmailDeliveryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ContactEmailDeliveryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactEmailDeliveryPayload>
+          }
+          aggregate: {
+            args: Prisma.ContactEmailDeliveryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactEmailDelivery>
+          }
+          groupBy: {
+            args: Prisma.ContactEmailDeliveryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactEmailDeliveryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactEmailDeliveryCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactEmailDeliveryCountAggregateOutputType> | number
+          }
+        }
+      }
       MediaFile: {
         payload: Prisma.$MediaFilePayload<ExtArgs>
         fields: Prisma.MediaFileFieldRefs
@@ -4920,6 +5110,7 @@ export namespace Prisma {
     newsletterSubscription?: NewsletterSubscriptionOmit
     newsletterCampaign?: NewsletterCampaignOmit
     newsletterCampaignRecipient?: NewsletterCampaignRecipientOmit
+    publication?: PublicationOmit
     checkoutReservation?: CheckoutReservationOmit
     checkoutReservationItem?: CheckoutReservationItemOmit
     adminNotification?: AdminNotificationOmit
@@ -4959,6 +5150,7 @@ export namespace Prisma {
     catalogue?: CatalogueOmit
     role?: RoleOmit
     contactMessage?: ContactMessageOmit
+    contactEmailDelivery?: ContactEmailDeliveryOmit
     mediaFile?: MediaFileOmit
   }
 
@@ -5936,6 +6128,37 @@ export namespace Prisma {
    */
   export type RoleCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
+  }
+
+
+  /**
+   * Count Type ContactMessageCountOutputType
+   */
+
+  export type ContactMessageCountOutputType = {
+    emailDeliveries: number
+  }
+
+  export type ContactMessageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    emailDeliveries?: boolean | ContactMessageCountOutputTypeCountEmailDeliveriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ContactMessageCountOutputType without action
+   */
+  export type ContactMessageCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessageCountOutputType
+     */
+    select?: ContactMessageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ContactMessageCountOutputType without action
+   */
+  export type ContactMessageCountOutputTypeCountEmailDeliveriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactEmailDeliveryWhereInput
   }
 
 
@@ -16021,6 +16244,1015 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: NewsletterCampaignRecipientInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Publication
+   */
+
+  export type AggregatePublication = {
+    _count: PublicationCountAggregateOutputType | null
+    _avg: PublicationAvgAggregateOutputType | null
+    _sum: PublicationSumAggregateOutputType | null
+    _min: PublicationMinAggregateOutputType | null
+    _max: PublicationMaxAggregateOutputType | null
+  }
+
+  export type PublicationAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type PublicationSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type PublicationMinAggregateOutputType = {
+    id: number | null
+    slug: string | null
+    title: string | null
+    summary: string | null
+    contentMarkdown: string | null
+    coverImage: string | null
+    fileUrl: string | null
+    placement: string | null
+    active: boolean | null
+    startsAt: Date | null
+    endsAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicationMaxAggregateOutputType = {
+    id: number | null
+    slug: string | null
+    title: string | null
+    summary: string | null
+    contentMarkdown: string | null
+    coverImage: string | null
+    fileUrl: string | null
+    placement: string | null
+    active: boolean | null
+    startsAt: Date | null
+    endsAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicationCountAggregateOutputType = {
+    id: number
+    slug: number
+    title: number
+    summary: number
+    contentMarkdown: number
+    coverImage: number
+    fileUrl: number
+    placement: number
+    active: number
+    startsAt: number
+    endsAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PublicationAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type PublicationSumAggregateInputType = {
+    id?: true
+  }
+
+  export type PublicationMinAggregateInputType = {
+    id?: true
+    slug?: true
+    title?: true
+    summary?: true
+    contentMarkdown?: true
+    coverImage?: true
+    fileUrl?: true
+    placement?: true
+    active?: true
+    startsAt?: true
+    endsAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicationMaxAggregateInputType = {
+    id?: true
+    slug?: true
+    title?: true
+    summary?: true
+    contentMarkdown?: true
+    coverImage?: true
+    fileUrl?: true
+    placement?: true
+    active?: true
+    startsAt?: true
+    endsAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicationCountAggregateInputType = {
+    id?: true
+    slug?: true
+    title?: true
+    summary?: true
+    contentMarkdown?: true
+    coverImage?: true
+    fileUrl?: true
+    placement?: true
+    active?: true
+    startsAt?: true
+    endsAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PublicationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Publication to aggregate.
+     */
+    where?: PublicationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Publications to fetch.
+     */
+    orderBy?: PublicationOrderByWithRelationInput | PublicationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublicationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Publications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Publications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Publications
+    **/
+    _count?: true | PublicationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PublicationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PublicationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublicationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublicationMaxAggregateInputType
+  }
+
+  export type GetPublicationAggregateType<T extends PublicationAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublication]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublication[P]>
+      : GetScalarType<T[P], AggregatePublication[P]>
+  }
+
+
+
+
+  export type PublicationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicationWhereInput
+    orderBy?: PublicationOrderByWithAggregationInput | PublicationOrderByWithAggregationInput[]
+    by: PublicationScalarFieldEnum[] | PublicationScalarFieldEnum
+    having?: PublicationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublicationCountAggregateInputType | true
+    _avg?: PublicationAvgAggregateInputType
+    _sum?: PublicationSumAggregateInputType
+    _min?: PublicationMinAggregateInputType
+    _max?: PublicationMaxAggregateInputType
+  }
+
+  export type PublicationGroupByOutputType = {
+    id: number
+    slug: string
+    title: string
+    summary: string
+    contentMarkdown: string
+    coverImage: string | null
+    fileUrl: string | null
+    placement: string
+    active: boolean
+    startsAt: Date | null
+    endsAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PublicationCountAggregateOutputType | null
+    _avg: PublicationAvgAggregateOutputType | null
+    _sum: PublicationSumAggregateOutputType | null
+    _min: PublicationMinAggregateOutputType | null
+    _max: PublicationMaxAggregateOutputType | null
+  }
+
+  type GetPublicationGroupByPayload<T extends PublicationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublicationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublicationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublicationGroupByOutputType[P]>
+            : GetScalarType<T[P], PublicationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublicationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    slug?: boolean
+    title?: boolean
+    summary?: boolean
+    contentMarkdown?: boolean
+    coverImage?: boolean
+    fileUrl?: boolean
+    placement?: boolean
+    active?: boolean
+    startsAt?: boolean
+    endsAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["publication"]>
+
+
+
+  export type PublicationSelectScalar = {
+    id?: boolean
+    slug?: boolean
+    title?: boolean
+    summary?: boolean
+    contentMarkdown?: boolean
+    coverImage?: boolean
+    fileUrl?: boolean
+    placement?: boolean
+    active?: boolean
+    startsAt?: boolean
+    endsAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PublicationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "title" | "summary" | "contentMarkdown" | "coverImage" | "fileUrl" | "placement" | "active" | "startsAt" | "endsAt" | "createdAt" | "updatedAt", ExtArgs["result"]["publication"]>
+
+  export type $PublicationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Publication"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      slug: string
+      title: string
+      summary: string
+      contentMarkdown: string
+      coverImage: string | null
+      fileUrl: string | null
+      placement: string
+      active: boolean
+      startsAt: Date | null
+      endsAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["publication"]>
+    composites: {}
+  }
+
+  type PublicationGetPayload<S extends boolean | null | undefined | PublicationDefaultArgs> = $Result.GetResult<Prisma.$PublicationPayload, S>
+
+  type PublicationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublicationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublicationCountAggregateInputType | true
+    }
+
+  export interface PublicationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Publication'], meta: { name: 'Publication' } }
+    /**
+     * Find zero or one Publication that matches the filter.
+     * @param {PublicationFindUniqueArgs} args - Arguments to find a Publication
+     * @example
+     * // Get one Publication
+     * const publication = await prisma.publication.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublicationFindUniqueArgs>(args: SelectSubset<T, PublicationFindUniqueArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Publication that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublicationFindUniqueOrThrowArgs} args - Arguments to find a Publication
+     * @example
+     * // Get one Publication
+     * const publication = await prisma.publication.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublicationFindUniqueOrThrowArgs>(args: SelectSubset<T, PublicationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Publication that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationFindFirstArgs} args - Arguments to find a Publication
+     * @example
+     * // Get one Publication
+     * const publication = await prisma.publication.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublicationFindFirstArgs>(args?: SelectSubset<T, PublicationFindFirstArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Publication that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationFindFirstOrThrowArgs} args - Arguments to find a Publication
+     * @example
+     * // Get one Publication
+     * const publication = await prisma.publication.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublicationFindFirstOrThrowArgs>(args?: SelectSubset<T, PublicationFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Publications that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Publications
+     * const publications = await prisma.publication.findMany()
+     * 
+     * // Get first 10 Publications
+     * const publications = await prisma.publication.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const publicationWithIdOnly = await prisma.publication.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PublicationFindManyArgs>(args?: SelectSubset<T, PublicationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Publication.
+     * @param {PublicationCreateArgs} args - Arguments to create a Publication.
+     * @example
+     * // Create one Publication
+     * const Publication = await prisma.publication.create({
+     *   data: {
+     *     // ... data to create a Publication
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublicationCreateArgs>(args: SelectSubset<T, PublicationCreateArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Publications.
+     * @param {PublicationCreateManyArgs} args - Arguments to create many Publications.
+     * @example
+     * // Create many Publications
+     * const publication = await prisma.publication.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublicationCreateManyArgs>(args?: SelectSubset<T, PublicationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Publication.
+     * @param {PublicationDeleteArgs} args - Arguments to delete one Publication.
+     * @example
+     * // Delete one Publication
+     * const Publication = await prisma.publication.delete({
+     *   where: {
+     *     // ... filter to delete one Publication
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublicationDeleteArgs>(args: SelectSubset<T, PublicationDeleteArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Publication.
+     * @param {PublicationUpdateArgs} args - Arguments to update one Publication.
+     * @example
+     * // Update one Publication
+     * const publication = await prisma.publication.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublicationUpdateArgs>(args: SelectSubset<T, PublicationUpdateArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Publications.
+     * @param {PublicationDeleteManyArgs} args - Arguments to filter Publications to delete.
+     * @example
+     * // Delete a few Publications
+     * const { count } = await prisma.publication.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublicationDeleteManyArgs>(args?: SelectSubset<T, PublicationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Publications.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Publications
+     * const publication = await prisma.publication.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublicationUpdateManyArgs>(args: SelectSubset<T, PublicationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Publication.
+     * @param {PublicationUpsertArgs} args - Arguments to update or create a Publication.
+     * @example
+     * // Update or create a Publication
+     * const publication = await prisma.publication.upsert({
+     *   create: {
+     *     // ... data to create a Publication
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Publication we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublicationUpsertArgs>(args: SelectSubset<T, PublicationUpsertArgs<ExtArgs>>): Prisma__PublicationClient<$Result.GetResult<Prisma.$PublicationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Publications.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationCountArgs} args - Arguments to filter Publications to count.
+     * @example
+     * // Count the number of Publications
+     * const count = await prisma.publication.count({
+     *   where: {
+     *     // ... the filter for the Publications we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublicationCountArgs>(
+      args?: Subset<T, PublicationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublicationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Publication.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublicationAggregateArgs>(args: Subset<T, PublicationAggregateArgs>): Prisma.PrismaPromise<GetPublicationAggregateType<T>>
+
+    /**
+     * Group by Publication.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublicationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublicationGroupByArgs['orderBy'] }
+        : { orderBy?: PublicationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublicationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublicationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Publication model
+   */
+  readonly fields: PublicationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Publication.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublicationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Publication model
+   */
+  interface PublicationFieldRefs {
+    readonly id: FieldRef<"Publication", 'Int'>
+    readonly slug: FieldRef<"Publication", 'String'>
+    readonly title: FieldRef<"Publication", 'String'>
+    readonly summary: FieldRef<"Publication", 'String'>
+    readonly contentMarkdown: FieldRef<"Publication", 'String'>
+    readonly coverImage: FieldRef<"Publication", 'String'>
+    readonly fileUrl: FieldRef<"Publication", 'String'>
+    readonly placement: FieldRef<"Publication", 'String'>
+    readonly active: FieldRef<"Publication", 'Boolean'>
+    readonly startsAt: FieldRef<"Publication", 'DateTime'>
+    readonly endsAt: FieldRef<"Publication", 'DateTime'>
+    readonly createdAt: FieldRef<"Publication", 'DateTime'>
+    readonly updatedAt: FieldRef<"Publication", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Publication findUnique
+   */
+  export type PublicationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter, which Publication to fetch.
+     */
+    where: PublicationWhereUniqueInput
+  }
+
+  /**
+   * Publication findUniqueOrThrow
+   */
+  export type PublicationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter, which Publication to fetch.
+     */
+    where: PublicationWhereUniqueInput
+  }
+
+  /**
+   * Publication findFirst
+   */
+  export type PublicationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter, which Publication to fetch.
+     */
+    where?: PublicationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Publications to fetch.
+     */
+    orderBy?: PublicationOrderByWithRelationInput | PublicationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Publications.
+     */
+    cursor?: PublicationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Publications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Publications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Publications.
+     */
+    distinct?: PublicationScalarFieldEnum | PublicationScalarFieldEnum[]
+  }
+
+  /**
+   * Publication findFirstOrThrow
+   */
+  export type PublicationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter, which Publication to fetch.
+     */
+    where?: PublicationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Publications to fetch.
+     */
+    orderBy?: PublicationOrderByWithRelationInput | PublicationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Publications.
+     */
+    cursor?: PublicationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Publications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Publications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Publications.
+     */
+    distinct?: PublicationScalarFieldEnum | PublicationScalarFieldEnum[]
+  }
+
+  /**
+   * Publication findMany
+   */
+  export type PublicationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter, which Publications to fetch.
+     */
+    where?: PublicationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Publications to fetch.
+     */
+    orderBy?: PublicationOrderByWithRelationInput | PublicationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Publications.
+     */
+    cursor?: PublicationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Publications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Publications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Publications.
+     */
+    distinct?: PublicationScalarFieldEnum | PublicationScalarFieldEnum[]
+  }
+
+  /**
+   * Publication create
+   */
+  export type PublicationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Publication.
+     */
+    data: XOR<PublicationCreateInput, PublicationUncheckedCreateInput>
+  }
+
+  /**
+   * Publication createMany
+   */
+  export type PublicationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Publications.
+     */
+    data: PublicationCreateManyInput | PublicationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Publication update
+   */
+  export type PublicationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Publication.
+     */
+    data: XOR<PublicationUpdateInput, PublicationUncheckedUpdateInput>
+    /**
+     * Choose, which Publication to update.
+     */
+    where: PublicationWhereUniqueInput
+  }
+
+  /**
+   * Publication updateMany
+   */
+  export type PublicationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Publications.
+     */
+    data: XOR<PublicationUpdateManyMutationInput, PublicationUncheckedUpdateManyInput>
+    /**
+     * Filter which Publications to update
+     */
+    where?: PublicationWhereInput
+    /**
+     * Limit how many Publications to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Publication upsert
+   */
+  export type PublicationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Publication to update in case it exists.
+     */
+    where: PublicationWhereUniqueInput
+    /**
+     * In case the Publication found by the `where` argument doesn't exist, create a new Publication with this data.
+     */
+    create: XOR<PublicationCreateInput, PublicationUncheckedCreateInput>
+    /**
+     * In case the Publication was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublicationUpdateInput, PublicationUncheckedUpdateInput>
+  }
+
+  /**
+   * Publication delete
+   */
+  export type PublicationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
+    /**
+     * Filter which Publication to delete.
+     */
+    where: PublicationWhereUniqueInput
+  }
+
+  /**
+   * Publication deleteMany
+   */
+  export type PublicationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Publications to delete
+     */
+    where?: PublicationWhereInput
+    /**
+     * Limit how many Publications to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Publication without action
+   */
+  export type PublicationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Publication
+     */
+    select?: PublicationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Publication
+     */
+    omit?: PublicationOmit<ExtArgs> | null
   }
 
 
@@ -56342,6 +57574,8 @@ export namespace Prisma {
     repliedById?: boolean
     ipHash?: boolean
     createdAt?: boolean
+    emailDeliveries?: boolean | ContactMessage$emailDeliveriesArgs<ExtArgs>
+    _count?: boolean | ContactMessageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["contactMessage"]>
 
 
@@ -56364,10 +57598,16 @@ export namespace Prisma {
   }
 
   export type ContactMessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "phone" | "projectType" | "message" | "status" | "ackSentAt" | "replyText" | "repliedAt" | "repliedById" | "ipHash" | "createdAt", ExtArgs["result"]["contactMessage"]>
+  export type ContactMessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    emailDeliveries?: boolean | ContactMessage$emailDeliveriesArgs<ExtArgs>
+    _count?: boolean | ContactMessageCountOutputTypeDefaultArgs<ExtArgs>
+  }
 
   export type $ContactMessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ContactMessage"
-    objects: {}
+    objects: {
+      emailDeliveries: Prisma.$ContactEmailDeliveryPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       firstName: string
@@ -56723,6 +57963,7 @@ export namespace Prisma {
    */
   export interface Prisma__ContactMessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    emailDeliveries<T extends ContactMessage$emailDeliveriesArgs<ExtArgs> = {}>(args?: Subset<T, ContactMessage$emailDeliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -56783,6 +58024,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * Filter, which ContactMessage to fetch.
      */
     where: ContactMessageWhereUniqueInput
@@ -56801,6 +58046,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * Filter, which ContactMessage to fetch.
      */
     where: ContactMessageWhereUniqueInput
@@ -56818,6 +58067,10 @@ export namespace Prisma {
      * Omit specific fields from the ContactMessage
      */
     omit?: ContactMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
     /**
      * Filter, which ContactMessage to fetch.
      */
@@ -56867,6 +58120,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * Filter, which ContactMessage to fetch.
      */
     where?: ContactMessageWhereInput
@@ -56914,6 +58171,10 @@ export namespace Prisma {
      * Omit specific fields from the ContactMessage
      */
     omit?: ContactMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
     /**
      * Filter, which ContactMessages to fetch.
      */
@@ -56963,6 +58224,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * The data needed to create a ContactMessage.
      */
     data: XOR<ContactMessageCreateInput, ContactMessageUncheckedCreateInput>
@@ -56991,6 +58256,10 @@ export namespace Prisma {
      * Omit specific fields from the ContactMessage
      */
     omit?: ContactMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
     /**
      * The data needed to update a ContactMessage.
      */
@@ -57032,6 +58301,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * The filter to search for the ContactMessage to update in case it exists.
      */
     where: ContactMessageWhereUniqueInput
@@ -57058,6 +58331,10 @@ export namespace Prisma {
      */
     omit?: ContactMessageOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
      * Filter which ContactMessage to delete.
      */
     where: ContactMessageWhereUniqueInput
@@ -57078,6 +58355,30 @@ export namespace Prisma {
   }
 
   /**
+   * ContactMessage.emailDeliveries
+   */
+  export type ContactMessage$emailDeliveriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    where?: ContactEmailDeliveryWhereInput
+    orderBy?: ContactEmailDeliveryOrderByWithRelationInput | ContactEmailDeliveryOrderByWithRelationInput[]
+    cursor?: ContactEmailDeliveryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactEmailDeliveryScalarFieldEnum | ContactEmailDeliveryScalarFieldEnum[]
+  }
+
+  /**
    * ContactMessage without action
    */
   export type ContactMessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -57089,6 +58390,1063 @@ export namespace Prisma {
      * Omit specific fields from the ContactMessage
      */
     omit?: ContactMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ContactEmailDelivery
+   */
+
+  export type AggregateContactEmailDelivery = {
+    _count: ContactEmailDeliveryCountAggregateOutputType | null
+    _avg: ContactEmailDeliveryAvgAggregateOutputType | null
+    _sum: ContactEmailDeliverySumAggregateOutputType | null
+    _min: ContactEmailDeliveryMinAggregateOutputType | null
+    _max: ContactEmailDeliveryMaxAggregateOutputType | null
+  }
+
+  export type ContactEmailDeliveryAvgAggregateOutputType = {
+    id: number | null
+    contactMessageId: number | null
+    attempts: number | null
+  }
+
+  export type ContactEmailDeliverySumAggregateOutputType = {
+    id: number | null
+    contactMessageId: number | null
+    attempts: number | null
+  }
+
+  export type ContactEmailDeliveryMinAggregateOutputType = {
+    id: number | null
+    contactMessageId: number | null
+    type: $Enums.ContactEmailDeliveryType | null
+    status: $Enums.ContactEmailDeliveryStatus | null
+    attempts: number | null
+    availableAt: Date | null
+    lockedUntil: Date | null
+    lastAttemptAt: Date | null
+    deliveredAt: Date | null
+    lastError: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactEmailDeliveryMaxAggregateOutputType = {
+    id: number | null
+    contactMessageId: number | null
+    type: $Enums.ContactEmailDeliveryType | null
+    status: $Enums.ContactEmailDeliveryStatus | null
+    attempts: number | null
+    availableAt: Date | null
+    lockedUntil: Date | null
+    lastAttemptAt: Date | null
+    deliveredAt: Date | null
+    lastError: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactEmailDeliveryCountAggregateOutputType = {
+    id: number
+    contactMessageId: number
+    type: number
+    status: number
+    attempts: number
+    availableAt: number
+    lockedUntil: number
+    lastAttemptAt: number
+    deliveredAt: number
+    lastError: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ContactEmailDeliveryAvgAggregateInputType = {
+    id?: true
+    contactMessageId?: true
+    attempts?: true
+  }
+
+  export type ContactEmailDeliverySumAggregateInputType = {
+    id?: true
+    contactMessageId?: true
+    attempts?: true
+  }
+
+  export type ContactEmailDeliveryMinAggregateInputType = {
+    id?: true
+    contactMessageId?: true
+    type?: true
+    status?: true
+    attempts?: true
+    availableAt?: true
+    lockedUntil?: true
+    lastAttemptAt?: true
+    deliveredAt?: true
+    lastError?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactEmailDeliveryMaxAggregateInputType = {
+    id?: true
+    contactMessageId?: true
+    type?: true
+    status?: true
+    attempts?: true
+    availableAt?: true
+    lockedUntil?: true
+    lastAttemptAt?: true
+    deliveredAt?: true
+    lastError?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactEmailDeliveryCountAggregateInputType = {
+    id?: true
+    contactMessageId?: true
+    type?: true
+    status?: true
+    attempts?: true
+    availableAt?: true
+    lockedUntil?: true
+    lastAttemptAt?: true
+    deliveredAt?: true
+    lastError?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ContactEmailDeliveryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactEmailDelivery to aggregate.
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactEmailDeliveries to fetch.
+     */
+    orderBy?: ContactEmailDeliveryOrderByWithRelationInput | ContactEmailDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactEmailDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactEmailDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactEmailDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactEmailDeliveries
+    **/
+    _count?: true | ContactEmailDeliveryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ContactEmailDeliveryAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContactEmailDeliverySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactEmailDeliveryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactEmailDeliveryMaxAggregateInputType
+  }
+
+  export type GetContactEmailDeliveryAggregateType<T extends ContactEmailDeliveryAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactEmailDelivery]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactEmailDelivery[P]>
+      : GetScalarType<T[P], AggregateContactEmailDelivery[P]>
+  }
+
+
+
+
+  export type ContactEmailDeliveryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactEmailDeliveryWhereInput
+    orderBy?: ContactEmailDeliveryOrderByWithAggregationInput | ContactEmailDeliveryOrderByWithAggregationInput[]
+    by: ContactEmailDeliveryScalarFieldEnum[] | ContactEmailDeliveryScalarFieldEnum
+    having?: ContactEmailDeliveryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactEmailDeliveryCountAggregateInputType | true
+    _avg?: ContactEmailDeliveryAvgAggregateInputType
+    _sum?: ContactEmailDeliverySumAggregateInputType
+    _min?: ContactEmailDeliveryMinAggregateInputType
+    _max?: ContactEmailDeliveryMaxAggregateInputType
+  }
+
+  export type ContactEmailDeliveryGroupByOutputType = {
+    id: number
+    contactMessageId: number
+    type: $Enums.ContactEmailDeliveryType
+    status: $Enums.ContactEmailDeliveryStatus
+    attempts: number
+    availableAt: Date
+    lockedUntil: Date | null
+    lastAttemptAt: Date | null
+    deliveredAt: Date | null
+    lastError: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ContactEmailDeliveryCountAggregateOutputType | null
+    _avg: ContactEmailDeliveryAvgAggregateOutputType | null
+    _sum: ContactEmailDeliverySumAggregateOutputType | null
+    _min: ContactEmailDeliveryMinAggregateOutputType | null
+    _max: ContactEmailDeliveryMaxAggregateOutputType | null
+  }
+
+  type GetContactEmailDeliveryGroupByPayload<T extends ContactEmailDeliveryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactEmailDeliveryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactEmailDeliveryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactEmailDeliveryGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactEmailDeliveryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactEmailDeliverySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactMessageId?: boolean
+    type?: boolean
+    status?: boolean
+    attempts?: boolean
+    availableAt?: boolean
+    lockedUntil?: boolean
+    lastAttemptAt?: boolean
+    deliveredAt?: boolean
+    lastError?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    contactMessage?: boolean | ContactMessageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactEmailDelivery"]>
+
+
+
+  export type ContactEmailDeliverySelectScalar = {
+    id?: boolean
+    contactMessageId?: boolean
+    type?: boolean
+    status?: boolean
+    attempts?: boolean
+    availableAt?: boolean
+    lockedUntil?: boolean
+    lastAttemptAt?: boolean
+    deliveredAt?: boolean
+    lastError?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ContactEmailDeliveryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "contactMessageId" | "type" | "status" | "attempts" | "availableAt" | "lockedUntil" | "lastAttemptAt" | "deliveredAt" | "lastError" | "createdAt" | "updatedAt", ExtArgs["result"]["contactEmailDelivery"]>
+  export type ContactEmailDeliveryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contactMessage?: boolean | ContactMessageDefaultArgs<ExtArgs>
+  }
+
+  export type $ContactEmailDeliveryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactEmailDelivery"
+    objects: {
+      contactMessage: Prisma.$ContactMessagePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      contactMessageId: number
+      type: $Enums.ContactEmailDeliveryType
+      status: $Enums.ContactEmailDeliveryStatus
+      attempts: number
+      availableAt: Date
+      lockedUntil: Date | null
+      lastAttemptAt: Date | null
+      deliveredAt: Date | null
+      lastError: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["contactEmailDelivery"]>
+    composites: {}
+  }
+
+  type ContactEmailDeliveryGetPayload<S extends boolean | null | undefined | ContactEmailDeliveryDefaultArgs> = $Result.GetResult<Prisma.$ContactEmailDeliveryPayload, S>
+
+  type ContactEmailDeliveryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ContactEmailDeliveryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ContactEmailDeliveryCountAggregateInputType | true
+    }
+
+  export interface ContactEmailDeliveryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactEmailDelivery'], meta: { name: 'ContactEmailDelivery' } }
+    /**
+     * Find zero or one ContactEmailDelivery that matches the filter.
+     * @param {ContactEmailDeliveryFindUniqueArgs} args - Arguments to find a ContactEmailDelivery
+     * @example
+     * // Get one ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactEmailDeliveryFindUniqueArgs>(args: SelectSubset<T, ContactEmailDeliveryFindUniqueArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ContactEmailDelivery that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ContactEmailDeliveryFindUniqueOrThrowArgs} args - Arguments to find a ContactEmailDelivery
+     * @example
+     * // Get one ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactEmailDeliveryFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactEmailDeliveryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactEmailDelivery that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryFindFirstArgs} args - Arguments to find a ContactEmailDelivery
+     * @example
+     * // Get one ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactEmailDeliveryFindFirstArgs>(args?: SelectSubset<T, ContactEmailDeliveryFindFirstArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactEmailDelivery that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryFindFirstOrThrowArgs} args - Arguments to find a ContactEmailDelivery
+     * @example
+     * // Get one ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactEmailDeliveryFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactEmailDeliveryFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ContactEmailDeliveries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactEmailDeliveries
+     * const contactEmailDeliveries = await prisma.contactEmailDelivery.findMany()
+     * 
+     * // Get first 10 ContactEmailDeliveries
+     * const contactEmailDeliveries = await prisma.contactEmailDelivery.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactEmailDeliveryWithIdOnly = await prisma.contactEmailDelivery.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactEmailDeliveryFindManyArgs>(args?: SelectSubset<T, ContactEmailDeliveryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ContactEmailDelivery.
+     * @param {ContactEmailDeliveryCreateArgs} args - Arguments to create a ContactEmailDelivery.
+     * @example
+     * // Create one ContactEmailDelivery
+     * const ContactEmailDelivery = await prisma.contactEmailDelivery.create({
+     *   data: {
+     *     // ... data to create a ContactEmailDelivery
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactEmailDeliveryCreateArgs>(args: SelectSubset<T, ContactEmailDeliveryCreateArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ContactEmailDeliveries.
+     * @param {ContactEmailDeliveryCreateManyArgs} args - Arguments to create many ContactEmailDeliveries.
+     * @example
+     * // Create many ContactEmailDeliveries
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactEmailDeliveryCreateManyArgs>(args?: SelectSubset<T, ContactEmailDeliveryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ContactEmailDelivery.
+     * @param {ContactEmailDeliveryDeleteArgs} args - Arguments to delete one ContactEmailDelivery.
+     * @example
+     * // Delete one ContactEmailDelivery
+     * const ContactEmailDelivery = await prisma.contactEmailDelivery.delete({
+     *   where: {
+     *     // ... filter to delete one ContactEmailDelivery
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactEmailDeliveryDeleteArgs>(args: SelectSubset<T, ContactEmailDeliveryDeleteArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ContactEmailDelivery.
+     * @param {ContactEmailDeliveryUpdateArgs} args - Arguments to update one ContactEmailDelivery.
+     * @example
+     * // Update one ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactEmailDeliveryUpdateArgs>(args: SelectSubset<T, ContactEmailDeliveryUpdateArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ContactEmailDeliveries.
+     * @param {ContactEmailDeliveryDeleteManyArgs} args - Arguments to filter ContactEmailDeliveries to delete.
+     * @example
+     * // Delete a few ContactEmailDeliveries
+     * const { count } = await prisma.contactEmailDelivery.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactEmailDeliveryDeleteManyArgs>(args?: SelectSubset<T, ContactEmailDeliveryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactEmailDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactEmailDeliveries
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactEmailDeliveryUpdateManyArgs>(args: SelectSubset<T, ContactEmailDeliveryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ContactEmailDelivery.
+     * @param {ContactEmailDeliveryUpsertArgs} args - Arguments to update or create a ContactEmailDelivery.
+     * @example
+     * // Update or create a ContactEmailDelivery
+     * const contactEmailDelivery = await prisma.contactEmailDelivery.upsert({
+     *   create: {
+     *     // ... data to create a ContactEmailDelivery
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactEmailDelivery we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactEmailDeliveryUpsertArgs>(args: SelectSubset<T, ContactEmailDeliveryUpsertArgs<ExtArgs>>): Prisma__ContactEmailDeliveryClient<$Result.GetResult<Prisma.$ContactEmailDeliveryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ContactEmailDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryCountArgs} args - Arguments to filter ContactEmailDeliveries to count.
+     * @example
+     * // Count the number of ContactEmailDeliveries
+     * const count = await prisma.contactEmailDelivery.count({
+     *   where: {
+     *     // ... the filter for the ContactEmailDeliveries we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactEmailDeliveryCountArgs>(
+      args?: Subset<T, ContactEmailDeliveryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactEmailDeliveryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactEmailDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactEmailDeliveryAggregateArgs>(args: Subset<T, ContactEmailDeliveryAggregateArgs>): Prisma.PrismaPromise<GetContactEmailDeliveryAggregateType<T>>
+
+    /**
+     * Group by ContactEmailDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactEmailDeliveryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactEmailDeliveryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactEmailDeliveryGroupByArgs['orderBy'] }
+        : { orderBy?: ContactEmailDeliveryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactEmailDeliveryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactEmailDeliveryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactEmailDelivery model
+   */
+  readonly fields: ContactEmailDeliveryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactEmailDelivery.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactEmailDeliveryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    contactMessage<T extends ContactMessageDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactMessageDefaultArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactEmailDelivery model
+   */
+  interface ContactEmailDeliveryFieldRefs {
+    readonly id: FieldRef<"ContactEmailDelivery", 'Int'>
+    readonly contactMessageId: FieldRef<"ContactEmailDelivery", 'Int'>
+    readonly type: FieldRef<"ContactEmailDelivery", 'ContactEmailDeliveryType'>
+    readonly status: FieldRef<"ContactEmailDelivery", 'ContactEmailDeliveryStatus'>
+    readonly attempts: FieldRef<"ContactEmailDelivery", 'Int'>
+    readonly availableAt: FieldRef<"ContactEmailDelivery", 'DateTime'>
+    readonly lockedUntil: FieldRef<"ContactEmailDelivery", 'DateTime'>
+    readonly lastAttemptAt: FieldRef<"ContactEmailDelivery", 'DateTime'>
+    readonly deliveredAt: FieldRef<"ContactEmailDelivery", 'DateTime'>
+    readonly lastError: FieldRef<"ContactEmailDelivery", 'String'>
+    readonly createdAt: FieldRef<"ContactEmailDelivery", 'DateTime'>
+    readonly updatedAt: FieldRef<"ContactEmailDelivery", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactEmailDelivery findUnique
+   */
+  export type ContactEmailDeliveryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactEmailDelivery to fetch.
+     */
+    where: ContactEmailDeliveryWhereUniqueInput
+  }
+
+  /**
+   * ContactEmailDelivery findUniqueOrThrow
+   */
+  export type ContactEmailDeliveryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactEmailDelivery to fetch.
+     */
+    where: ContactEmailDeliveryWhereUniqueInput
+  }
+
+  /**
+   * ContactEmailDelivery findFirst
+   */
+  export type ContactEmailDeliveryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactEmailDelivery to fetch.
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactEmailDeliveries to fetch.
+     */
+    orderBy?: ContactEmailDeliveryOrderByWithRelationInput | ContactEmailDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactEmailDeliveries.
+     */
+    cursor?: ContactEmailDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactEmailDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactEmailDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactEmailDeliveries.
+     */
+    distinct?: ContactEmailDeliveryScalarFieldEnum | ContactEmailDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * ContactEmailDelivery findFirstOrThrow
+   */
+  export type ContactEmailDeliveryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactEmailDelivery to fetch.
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactEmailDeliveries to fetch.
+     */
+    orderBy?: ContactEmailDeliveryOrderByWithRelationInput | ContactEmailDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactEmailDeliveries.
+     */
+    cursor?: ContactEmailDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactEmailDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactEmailDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactEmailDeliveries.
+     */
+    distinct?: ContactEmailDeliveryScalarFieldEnum | ContactEmailDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * ContactEmailDelivery findMany
+   */
+  export type ContactEmailDeliveryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactEmailDeliveries to fetch.
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactEmailDeliveries to fetch.
+     */
+    orderBy?: ContactEmailDeliveryOrderByWithRelationInput | ContactEmailDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactEmailDeliveries.
+     */
+    cursor?: ContactEmailDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactEmailDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactEmailDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactEmailDeliveries.
+     */
+    distinct?: ContactEmailDeliveryScalarFieldEnum | ContactEmailDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * ContactEmailDelivery create
+   */
+  export type ContactEmailDeliveryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ContactEmailDelivery.
+     */
+    data: XOR<ContactEmailDeliveryCreateInput, ContactEmailDeliveryUncheckedCreateInput>
+  }
+
+  /**
+   * ContactEmailDelivery createMany
+   */
+  export type ContactEmailDeliveryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactEmailDeliveries.
+     */
+    data: ContactEmailDeliveryCreateManyInput | ContactEmailDeliveryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactEmailDelivery update
+   */
+  export type ContactEmailDeliveryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ContactEmailDelivery.
+     */
+    data: XOR<ContactEmailDeliveryUpdateInput, ContactEmailDeliveryUncheckedUpdateInput>
+    /**
+     * Choose, which ContactEmailDelivery to update.
+     */
+    where: ContactEmailDeliveryWhereUniqueInput
+  }
+
+  /**
+   * ContactEmailDelivery updateMany
+   */
+  export type ContactEmailDeliveryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactEmailDeliveries.
+     */
+    data: XOR<ContactEmailDeliveryUpdateManyMutationInput, ContactEmailDeliveryUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactEmailDeliveries to update
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * Limit how many ContactEmailDeliveries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactEmailDelivery upsert
+   */
+  export type ContactEmailDeliveryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ContactEmailDelivery to update in case it exists.
+     */
+    where: ContactEmailDeliveryWhereUniqueInput
+    /**
+     * In case the ContactEmailDelivery found by the `where` argument doesn't exist, create a new ContactEmailDelivery with this data.
+     */
+    create: XOR<ContactEmailDeliveryCreateInput, ContactEmailDeliveryUncheckedCreateInput>
+    /**
+     * In case the ContactEmailDelivery was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactEmailDeliveryUpdateInput, ContactEmailDeliveryUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactEmailDelivery delete
+   */
+  export type ContactEmailDeliveryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter which ContactEmailDelivery to delete.
+     */
+    where: ContactEmailDeliveryWhereUniqueInput
+  }
+
+  /**
+   * ContactEmailDelivery deleteMany
+   */
+  export type ContactEmailDeliveryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactEmailDeliveries to delete
+     */
+    where?: ContactEmailDeliveryWhereInput
+    /**
+     * Limit how many ContactEmailDeliveries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactEmailDelivery without action
+   */
+  export type ContactEmailDeliveryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactEmailDelivery
+     */
+    select?: ContactEmailDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactEmailDelivery
+     */
+    omit?: ContactEmailDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactEmailDeliveryInclude<ExtArgs> | null
   }
 
 
@@ -58241,6 +60599,25 @@ export namespace Prisma {
   export type NewsletterCampaignRecipientScalarFieldEnum = (typeof NewsletterCampaignRecipientScalarFieldEnum)[keyof typeof NewsletterCampaignRecipientScalarFieldEnum]
 
 
+  export const PublicationScalarFieldEnum: {
+    id: 'id',
+    slug: 'slug',
+    title: 'title',
+    summary: 'summary',
+    contentMarkdown: 'contentMarkdown',
+    coverImage: 'coverImage',
+    fileUrl: 'fileUrl',
+    placement: 'placement',
+    active: 'active',
+    startsAt: 'startsAt',
+    endsAt: 'endsAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PublicationScalarFieldEnum = (typeof PublicationScalarFieldEnum)[keyof typeof PublicationScalarFieldEnum]
+
+
   export const CheckoutReservationScalarFieldEnum: {
     id: 'id',
     tokenHash: 'tokenHash',
@@ -58841,6 +61218,24 @@ export namespace Prisma {
   export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
+  export const ContactEmailDeliveryScalarFieldEnum: {
+    id: 'id',
+    contactMessageId: 'contactMessageId',
+    type: 'type',
+    status: 'status',
+    attempts: 'attempts',
+    availableAt: 'availableAt',
+    lockedUntil: 'lockedUntil',
+    lastAttemptAt: 'lastAttemptAt',
+    deliveredAt: 'deliveredAt',
+    lastError: 'lastError',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ContactEmailDeliveryScalarFieldEnum = (typeof ContactEmailDeliveryScalarFieldEnum)[keyof typeof ContactEmailDeliveryScalarFieldEnum]
+
+
   export const MediaFileScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -58981,6 +61376,19 @@ export namespace Prisma {
   };
 
   export type NewsletterCampaignRecipientOrderByRelevanceFieldEnum = (typeof NewsletterCampaignRecipientOrderByRelevanceFieldEnum)[keyof typeof NewsletterCampaignRecipientOrderByRelevanceFieldEnum]
+
+
+  export const PublicationOrderByRelevanceFieldEnum: {
+    slug: 'slug',
+    title: 'title',
+    summary: 'summary',
+    contentMarkdown: 'contentMarkdown',
+    coverImage: 'coverImage',
+    fileUrl: 'fileUrl',
+    placement: 'placement'
+  };
+
+  export type PublicationOrderByRelevanceFieldEnum = (typeof PublicationOrderByRelevanceFieldEnum)[keyof typeof PublicationOrderByRelevanceFieldEnum]
 
 
   export const CheckoutReservationOrderByRelevanceFieldEnum: {
@@ -59332,6 +61740,13 @@ export namespace Prisma {
   export type ContactMessageOrderByRelevanceFieldEnum = (typeof ContactMessageOrderByRelevanceFieldEnum)[keyof typeof ContactMessageOrderByRelevanceFieldEnum]
 
 
+  export const ContactEmailDeliveryOrderByRelevanceFieldEnum: {
+    lastError: 'lastError'
+  };
+
+  export type ContactEmailDeliveryOrderByRelevanceFieldEnum = (typeof ContactEmailDeliveryOrderByRelevanceFieldEnum)[keyof typeof ContactEmailDeliveryOrderByRelevanceFieldEnum]
+
+
   export const MediaFileOrderByRelevanceFieldEnum: {
     name: 'name',
     originalName: 'originalName',
@@ -59479,6 +61894,20 @@ export namespace Prisma {
    * Reference to a field of type 'ContactStatus'
    */
   export type EnumContactStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ContactEmailDeliveryType'
+   */
+  export type EnumContactEmailDeliveryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactEmailDeliveryType'>
+    
+
+
+  /**
+   * Reference to a field of type 'ContactEmailDeliveryStatus'
+   */
+  export type EnumContactEmailDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactEmailDeliveryStatus'>
     
 
 
@@ -60345,6 +62774,101 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"NewsletterCampaignRecipient"> | string
     sentAt?: DateTimeNullableWithAggregatesFilter<"NewsletterCampaignRecipient"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"NewsletterCampaignRecipient"> | Date | string
+  }
+
+  export type PublicationWhereInput = {
+    AND?: PublicationWhereInput | PublicationWhereInput[]
+    OR?: PublicationWhereInput[]
+    NOT?: PublicationWhereInput | PublicationWhereInput[]
+    id?: IntFilter<"Publication"> | number
+    slug?: StringFilter<"Publication"> | string
+    title?: StringFilter<"Publication"> | string
+    summary?: StringFilter<"Publication"> | string
+    contentMarkdown?: StringFilter<"Publication"> | string
+    coverImage?: StringNullableFilter<"Publication"> | string | null
+    fileUrl?: StringNullableFilter<"Publication"> | string | null
+    placement?: StringFilter<"Publication"> | string
+    active?: BoolFilter<"Publication"> | boolean
+    startsAt?: DateTimeNullableFilter<"Publication"> | Date | string | null
+    endsAt?: DateTimeNullableFilter<"Publication"> | Date | string | null
+    createdAt?: DateTimeFilter<"Publication"> | Date | string
+    updatedAt?: DateTimeFilter<"Publication"> | Date | string
+  }
+
+  export type PublicationOrderByWithRelationInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    contentMarkdown?: SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    placement?: SortOrder
+    active?: SortOrder
+    startsAt?: SortOrderInput | SortOrder
+    endsAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: PublicationOrderByRelevanceInput
+  }
+
+  export type PublicationWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    slug?: string
+    AND?: PublicationWhereInput | PublicationWhereInput[]
+    OR?: PublicationWhereInput[]
+    NOT?: PublicationWhereInput | PublicationWhereInput[]
+    title?: StringFilter<"Publication"> | string
+    summary?: StringFilter<"Publication"> | string
+    contentMarkdown?: StringFilter<"Publication"> | string
+    coverImage?: StringNullableFilter<"Publication"> | string | null
+    fileUrl?: StringNullableFilter<"Publication"> | string | null
+    placement?: StringFilter<"Publication"> | string
+    active?: BoolFilter<"Publication"> | boolean
+    startsAt?: DateTimeNullableFilter<"Publication"> | Date | string | null
+    endsAt?: DateTimeNullableFilter<"Publication"> | Date | string | null
+    createdAt?: DateTimeFilter<"Publication"> | Date | string
+    updatedAt?: DateTimeFilter<"Publication"> | Date | string
+  }, "id" | "slug">
+
+  export type PublicationOrderByWithAggregationInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    contentMarkdown?: SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    placement?: SortOrder
+    active?: SortOrder
+    startsAt?: SortOrderInput | SortOrder
+    endsAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PublicationCountOrderByAggregateInput
+    _avg?: PublicationAvgOrderByAggregateInput
+    _max?: PublicationMaxOrderByAggregateInput
+    _min?: PublicationMinOrderByAggregateInput
+    _sum?: PublicationSumOrderByAggregateInput
+  }
+
+  export type PublicationScalarWhereWithAggregatesInput = {
+    AND?: PublicationScalarWhereWithAggregatesInput | PublicationScalarWhereWithAggregatesInput[]
+    OR?: PublicationScalarWhereWithAggregatesInput[]
+    NOT?: PublicationScalarWhereWithAggregatesInput | PublicationScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Publication"> | number
+    slug?: StringWithAggregatesFilter<"Publication"> | string
+    title?: StringWithAggregatesFilter<"Publication"> | string
+    summary?: StringWithAggregatesFilter<"Publication"> | string
+    contentMarkdown?: StringWithAggregatesFilter<"Publication"> | string
+    coverImage?: StringNullableWithAggregatesFilter<"Publication"> | string | null
+    fileUrl?: StringNullableWithAggregatesFilter<"Publication"> | string | null
+    placement?: StringWithAggregatesFilter<"Publication"> | string
+    active?: BoolWithAggregatesFilter<"Publication"> | boolean
+    startsAt?: DateTimeNullableWithAggregatesFilter<"Publication"> | Date | string | null
+    endsAt?: DateTimeNullableWithAggregatesFilter<"Publication"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Publication"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Publication"> | Date | string
   }
 
   export type CheckoutReservationWhereInput = {
@@ -63500,6 +66024,7 @@ export namespace Prisma {
     repliedById?: IntNullableFilter<"ContactMessage"> | number | null
     ipHash?: StringNullableFilter<"ContactMessage"> | string | null
     createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    emailDeliveries?: ContactEmailDeliveryListRelationFilter
   }
 
   export type ContactMessageOrderByWithRelationInput = {
@@ -63517,6 +66042,7 @@ export namespace Prisma {
     repliedById?: SortOrderInput | SortOrder
     ipHash?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    emailDeliveries?: ContactEmailDeliveryOrderByRelationAggregateInput
     _relevance?: ContactMessageOrderByRelevanceInput
   }
 
@@ -63538,6 +66064,7 @@ export namespace Prisma {
     repliedById?: IntNullableFilter<"ContactMessage"> | number | null
     ipHash?: StringNullableFilter<"ContactMessage"> | string | null
     createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    emailDeliveries?: ContactEmailDeliveryListRelationFilter
   }, "id">
 
   export type ContactMessageOrderByWithAggregationInput = {
@@ -63580,6 +66107,100 @@ export namespace Prisma {
     repliedById?: IntNullableWithAggregatesFilter<"ContactMessage"> | number | null
     ipHash?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
+  }
+
+  export type ContactEmailDeliveryWhereInput = {
+    AND?: ContactEmailDeliveryWhereInput | ContactEmailDeliveryWhereInput[]
+    OR?: ContactEmailDeliveryWhereInput[]
+    NOT?: ContactEmailDeliveryWhereInput | ContactEmailDeliveryWhereInput[]
+    id?: IntFilter<"ContactEmailDelivery"> | number
+    contactMessageId?: IntFilter<"ContactEmailDelivery"> | number
+    type?: EnumContactEmailDeliveryTypeFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFilter<"ContactEmailDelivery"> | number
+    availableAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    lockedUntil?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    deliveredAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastError?: StringNullableFilter<"ContactEmailDelivery"> | string | null
+    createdAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    contactMessage?: XOR<ContactMessageScalarRelationFilter, ContactMessageWhereInput>
+  }
+
+  export type ContactEmailDeliveryOrderByWithRelationInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    availableAt?: SortOrder
+    lockedUntil?: SortOrderInput | SortOrder
+    lastAttemptAt?: SortOrderInput | SortOrder
+    deliveredAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    contactMessage?: ContactMessageOrderByWithRelationInput
+    _relevance?: ContactEmailDeliveryOrderByRelevanceInput
+  }
+
+  export type ContactEmailDeliveryWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    contactMessageId_type?: ContactEmailDeliveryContactMessageIdTypeCompoundUniqueInput
+    AND?: ContactEmailDeliveryWhereInput | ContactEmailDeliveryWhereInput[]
+    OR?: ContactEmailDeliveryWhereInput[]
+    NOT?: ContactEmailDeliveryWhereInput | ContactEmailDeliveryWhereInput[]
+    contactMessageId?: IntFilter<"ContactEmailDelivery"> | number
+    type?: EnumContactEmailDeliveryTypeFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFilter<"ContactEmailDelivery"> | number
+    availableAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    lockedUntil?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    deliveredAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastError?: StringNullableFilter<"ContactEmailDelivery"> | string | null
+    createdAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    contactMessage?: XOR<ContactMessageScalarRelationFilter, ContactMessageWhereInput>
+  }, "id" | "contactMessageId_type">
+
+  export type ContactEmailDeliveryOrderByWithAggregationInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    availableAt?: SortOrder
+    lockedUntil?: SortOrderInput | SortOrder
+    lastAttemptAt?: SortOrderInput | SortOrder
+    deliveredAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ContactEmailDeliveryCountOrderByAggregateInput
+    _avg?: ContactEmailDeliveryAvgOrderByAggregateInput
+    _max?: ContactEmailDeliveryMaxOrderByAggregateInput
+    _min?: ContactEmailDeliveryMinOrderByAggregateInput
+    _sum?: ContactEmailDeliverySumOrderByAggregateInput
+  }
+
+  export type ContactEmailDeliveryScalarWhereWithAggregatesInput = {
+    AND?: ContactEmailDeliveryScalarWhereWithAggregatesInput | ContactEmailDeliveryScalarWhereWithAggregatesInput[]
+    OR?: ContactEmailDeliveryScalarWhereWithAggregatesInput[]
+    NOT?: ContactEmailDeliveryScalarWhereWithAggregatesInput | ContactEmailDeliveryScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ContactEmailDelivery"> | number
+    contactMessageId?: IntWithAggregatesFilter<"ContactEmailDelivery"> | number
+    type?: EnumContactEmailDeliveryTypeWithAggregatesFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusWithAggregatesFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntWithAggregatesFilter<"ContactEmailDelivery"> | number
+    availableAt?: DateTimeWithAggregatesFilter<"ContactEmailDelivery"> | Date | string
+    lockedUntil?: DateTimeNullableWithAggregatesFilter<"ContactEmailDelivery"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableWithAggregatesFilter<"ContactEmailDelivery"> | Date | string | null
+    deliveredAt?: DateTimeNullableWithAggregatesFilter<"ContactEmailDelivery"> | Date | string | null
+    lastError?: StringNullableWithAggregatesFilter<"ContactEmailDelivery"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ContactEmailDelivery"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ContactEmailDelivery"> | Date | string
   }
 
   export type MediaFileWhereInput = {
@@ -64595,6 +67216,115 @@ export namespace Prisma {
     unsubscribeTokenHash?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicationCreateInput = {
+    slug: string
+    title: string
+    summary?: string
+    contentMarkdown?: string
+    coverImage?: string | null
+    fileUrl?: string | null
+    placement?: string
+    active?: boolean
+    startsAt?: Date | string | null
+    endsAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicationUncheckedCreateInput = {
+    id?: number
+    slug: string
+    title: string
+    summary?: string
+    contentMarkdown?: string
+    coverImage?: string | null
+    fileUrl?: string | null
+    placement?: string
+    active?: boolean
+    startsAt?: Date | string | null
+    endsAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicationUpdateInput = {
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    contentMarkdown?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    placement?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicationUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    contentMarkdown?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    placement?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicationCreateManyInput = {
+    id?: number
+    slug: string
+    title: string
+    summary?: string
+    contentMarkdown?: string
+    coverImage?: string | null
+    fileUrl?: string | null
+    placement?: string
+    active?: boolean
+    startsAt?: Date | string | null
+    endsAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicationUpdateManyMutationInput = {
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    contentMarkdown?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    placement?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicationUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    contentMarkdown?: StringFieldUpdateOperationsInput | string
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    placement?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -67849,6 +70579,7 @@ export namespace Prisma {
     repliedById?: number | null
     ipHash?: string | null
     createdAt?: Date | string
+    emailDeliveries?: ContactEmailDeliveryCreateNestedManyWithoutContactMessageInput
   }
 
   export type ContactMessageUncheckedCreateInput = {
@@ -67866,6 +70597,7 @@ export namespace Prisma {
     repliedById?: number | null
     ipHash?: string | null
     createdAt?: Date | string
+    emailDeliveries?: ContactEmailDeliveryUncheckedCreateNestedManyWithoutContactMessageInput
   }
 
   export type ContactMessageUpdateInput = {
@@ -67882,6 +70614,7 @@ export namespace Prisma {
     repliedById?: NullableIntFieldUpdateOperationsInput | number | null
     ipHash?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailDeliveries?: ContactEmailDeliveryUpdateManyWithoutContactMessageNestedInput
   }
 
   export type ContactMessageUncheckedUpdateInput = {
@@ -67899,6 +70632,7 @@ export namespace Prisma {
     repliedById?: NullableIntFieldUpdateOperationsInput | number | null
     ipHash?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailDeliveries?: ContactEmailDeliveryUncheckedUpdateManyWithoutContactMessageNestedInput
   }
 
   export type ContactMessageCreateManyInput = {
@@ -67949,6 +70683,107 @@ export namespace Prisma {
     repliedById?: NullableIntFieldUpdateOperationsInput | number | null
     ipHash?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactEmailDeliveryCreateInput = {
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contactMessage: ContactMessageCreateNestedOneWithoutEmailDeliveriesInput
+  }
+
+  export type ContactEmailDeliveryUncheckedCreateInput = {
+    id?: number
+    contactMessageId: number
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactEmailDeliveryUpdateInput = {
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contactMessage?: ContactMessageUpdateOneRequiredWithoutEmailDeliveriesNestedInput
+  }
+
+  export type ContactEmailDeliveryUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    contactMessageId?: IntFieldUpdateOperationsInput | number
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactEmailDeliveryCreateManyInput = {
+    id?: number
+    contactMessageId: number
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactEmailDeliveryUpdateManyMutationInput = {
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactEmailDeliveryUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    contactMessageId?: IntFieldUpdateOperationsInput | number
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MediaFileCreateInput = {
@@ -69048,6 +71883,68 @@ export namespace Prisma {
     id?: SortOrder
     campaignId?: SortOrder
     subscriptionId?: SortOrder
+  }
+
+  export type PublicationOrderByRelevanceInput = {
+    fields: PublicationOrderByRelevanceFieldEnum | PublicationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type PublicationCountOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    contentMarkdown?: SortOrder
+    coverImage?: SortOrder
+    fileUrl?: SortOrder
+    placement?: SortOrder
+    active?: SortOrder
+    startsAt?: SortOrder
+    endsAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicationAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type PublicationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    contentMarkdown?: SortOrder
+    coverImage?: SortOrder
+    fileUrl?: SortOrder
+    placement?: SortOrder
+    active?: SortOrder
+    startsAt?: SortOrder
+    endsAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicationMinOrderByAggregateInput = {
+    id?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    contentMarkdown?: SortOrder
+    coverImage?: SortOrder
+    fileUrl?: SortOrder
+    placement?: SortOrder
+    active?: SortOrder
+    startsAt?: SortOrder
+    endsAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicationSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type CheckoutReservationItemListRelationFilter = {
@@ -71669,6 +74566,16 @@ export namespace Prisma {
     not?: NestedEnumContactStatusFilter<$PrismaModel> | $Enums.ContactStatus
   }
 
+  export type ContactEmailDeliveryListRelationFilter = {
+    every?: ContactEmailDeliveryWhereInput
+    some?: ContactEmailDeliveryWhereInput
+    none?: ContactEmailDeliveryWhereInput
+  }
+
+  export type ContactEmailDeliveryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ContactMessageOrderByRelevanceInput = {
     fields: ContactMessageOrderByRelevanceFieldEnum | ContactMessageOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -71744,6 +74651,113 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumContactStatusFilter<$PrismaModel>
     _max?: NestedEnumContactStatusFilter<$PrismaModel>
+  }
+
+  export type EnumContactEmailDeliveryTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryType | EnumContactEmailDeliveryTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryType[]
+    notIn?: $Enums.ContactEmailDeliveryType[]
+    not?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel> | $Enums.ContactEmailDeliveryType
+  }
+
+  export type EnumContactEmailDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryStatus | EnumContactEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryStatus[]
+    notIn?: $Enums.ContactEmailDeliveryStatus[]
+    not?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel> | $Enums.ContactEmailDeliveryStatus
+  }
+
+  export type ContactMessageScalarRelationFilter = {
+    is?: ContactMessageWhereInput
+    isNot?: ContactMessageWhereInput
+  }
+
+  export type ContactEmailDeliveryOrderByRelevanceInput = {
+    fields: ContactEmailDeliveryOrderByRelevanceFieldEnum | ContactEmailDeliveryOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ContactEmailDeliveryContactMessageIdTypeCompoundUniqueInput = {
+    contactMessageId: number
+    type: $Enums.ContactEmailDeliveryType
+  }
+
+  export type ContactEmailDeliveryCountOrderByAggregateInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    availableAt?: SortOrder
+    lockedUntil?: SortOrder
+    lastAttemptAt?: SortOrder
+    deliveredAt?: SortOrder
+    lastError?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactEmailDeliveryAvgOrderByAggregateInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    attempts?: SortOrder
+  }
+
+  export type ContactEmailDeliveryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    availableAt?: SortOrder
+    lockedUntil?: SortOrder
+    lastAttemptAt?: SortOrder
+    deliveredAt?: SortOrder
+    lastError?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactEmailDeliveryMinOrderByAggregateInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    availableAt?: SortOrder
+    lockedUntil?: SortOrder
+    lastAttemptAt?: SortOrder
+    deliveredAt?: SortOrder
+    lastError?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactEmailDeliverySumOrderByAggregateInput = {
+    id?: SortOrder
+    contactMessageId?: SortOrder
+    attempts?: SortOrder
+  }
+
+  export type EnumContactEmailDeliveryTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryType | EnumContactEmailDeliveryTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryType[]
+    notIn?: $Enums.ContactEmailDeliveryType[]
+    not?: NestedEnumContactEmailDeliveryTypeWithAggregatesFilter<$PrismaModel> | $Enums.ContactEmailDeliveryType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel>
+    _max?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel>
+  }
+
+  export type EnumContactEmailDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryStatus | EnumContactEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryStatus[]
+    notIn?: $Enums.ContactEmailDeliveryStatus[]
+    not?: NestedEnumContactEmailDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.ContactEmailDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel>
   }
 
   export type MediaFileOrderByRelevanceInput = {
@@ -75019,8 +78033,72 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type ContactEmailDeliveryCreateNestedManyWithoutContactMessageInput = {
+    create?: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput> | ContactEmailDeliveryCreateWithoutContactMessageInput[] | ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput[]
+    connectOrCreate?: ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput | ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput[]
+    createMany?: ContactEmailDeliveryCreateManyContactMessageInputEnvelope
+    connect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+  }
+
+  export type ContactEmailDeliveryUncheckedCreateNestedManyWithoutContactMessageInput = {
+    create?: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput> | ContactEmailDeliveryCreateWithoutContactMessageInput[] | ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput[]
+    connectOrCreate?: ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput | ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput[]
+    createMany?: ContactEmailDeliveryCreateManyContactMessageInputEnvelope
+    connect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+  }
+
   export type EnumContactStatusFieldUpdateOperationsInput = {
     set?: $Enums.ContactStatus
+  }
+
+  export type ContactEmailDeliveryUpdateManyWithoutContactMessageNestedInput = {
+    create?: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput> | ContactEmailDeliveryCreateWithoutContactMessageInput[] | ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput[]
+    connectOrCreate?: ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput | ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput[]
+    upsert?: ContactEmailDeliveryUpsertWithWhereUniqueWithoutContactMessageInput | ContactEmailDeliveryUpsertWithWhereUniqueWithoutContactMessageInput[]
+    createMany?: ContactEmailDeliveryCreateManyContactMessageInputEnvelope
+    set?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    disconnect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    delete?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    connect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    update?: ContactEmailDeliveryUpdateWithWhereUniqueWithoutContactMessageInput | ContactEmailDeliveryUpdateWithWhereUniqueWithoutContactMessageInput[]
+    updateMany?: ContactEmailDeliveryUpdateManyWithWhereWithoutContactMessageInput | ContactEmailDeliveryUpdateManyWithWhereWithoutContactMessageInput[]
+    deleteMany?: ContactEmailDeliveryScalarWhereInput | ContactEmailDeliveryScalarWhereInput[]
+  }
+
+  export type ContactEmailDeliveryUncheckedUpdateManyWithoutContactMessageNestedInput = {
+    create?: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput> | ContactEmailDeliveryCreateWithoutContactMessageInput[] | ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput[]
+    connectOrCreate?: ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput | ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput[]
+    upsert?: ContactEmailDeliveryUpsertWithWhereUniqueWithoutContactMessageInput | ContactEmailDeliveryUpsertWithWhereUniqueWithoutContactMessageInput[]
+    createMany?: ContactEmailDeliveryCreateManyContactMessageInputEnvelope
+    set?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    disconnect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    delete?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    connect?: ContactEmailDeliveryWhereUniqueInput | ContactEmailDeliveryWhereUniqueInput[]
+    update?: ContactEmailDeliveryUpdateWithWhereUniqueWithoutContactMessageInput | ContactEmailDeliveryUpdateWithWhereUniqueWithoutContactMessageInput[]
+    updateMany?: ContactEmailDeliveryUpdateManyWithWhereWithoutContactMessageInput | ContactEmailDeliveryUpdateManyWithWhereWithoutContactMessageInput[]
+    deleteMany?: ContactEmailDeliveryScalarWhereInput | ContactEmailDeliveryScalarWhereInput[]
+  }
+
+  export type ContactMessageCreateNestedOneWithoutEmailDeliveriesInput = {
+    create?: XOR<ContactMessageCreateWithoutEmailDeliveriesInput, ContactMessageUncheckedCreateWithoutEmailDeliveriesInput>
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutEmailDeliveriesInput
+    connect?: ContactMessageWhereUniqueInput
+  }
+
+  export type EnumContactEmailDeliveryTypeFieldUpdateOperationsInput = {
+    set?: $Enums.ContactEmailDeliveryType
+  }
+
+  export type EnumContactEmailDeliveryStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ContactEmailDeliveryStatus
+  }
+
+  export type ContactMessageUpdateOneRequiredWithoutEmailDeliveriesNestedInput = {
+    create?: XOR<ContactMessageCreateWithoutEmailDeliveriesInput, ContactMessageUncheckedCreateWithoutEmailDeliveriesInput>
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutEmailDeliveriesInput
+    upsert?: ContactMessageUpsertWithoutEmailDeliveriesInput
+    connect?: ContactMessageWhereUniqueInput
+    update?: XOR<XOR<ContactMessageUpdateToOneWithWhereWithoutEmailDeliveriesInput, ContactMessageUpdateWithoutEmailDeliveriesInput>, ContactMessageUncheckedUpdateWithoutEmailDeliveriesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -75530,6 +78608,40 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumContactStatusFilter<$PrismaModel>
     _max?: NestedEnumContactStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryType | EnumContactEmailDeliveryTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryType[]
+    notIn?: $Enums.ContactEmailDeliveryType[]
+    not?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel> | $Enums.ContactEmailDeliveryType
+  }
+
+  export type NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryStatus | EnumContactEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryStatus[]
+    notIn?: $Enums.ContactEmailDeliveryStatus[]
+    not?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel> | $Enums.ContactEmailDeliveryStatus
+  }
+
+  export type NestedEnumContactEmailDeliveryTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryType | EnumContactEmailDeliveryTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryType[]
+    notIn?: $Enums.ContactEmailDeliveryType[]
+    not?: NestedEnumContactEmailDeliveryTypeWithAggregatesFilter<$PrismaModel> | $Enums.ContactEmailDeliveryType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel>
+    _max?: NestedEnumContactEmailDeliveryTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumContactEmailDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ContactEmailDeliveryStatus | EnumContactEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ContactEmailDeliveryStatus[]
+    notIn?: $Enums.ContactEmailDeliveryStatus[]
+    not?: NestedEnumContactEmailDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.ContactEmailDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel>
   }
 
   export type UserPermissionCreateWithoutUserInput = {
@@ -86524,6 +89636,159 @@ export namespace Prisma {
     displayOrder?: IntFilter<"User"> | number
   }
 
+  export type ContactEmailDeliveryCreateWithoutContactMessageInput = {
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput = {
+    id?: number
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactEmailDeliveryCreateOrConnectWithoutContactMessageInput = {
+    where: ContactEmailDeliveryWhereUniqueInput
+    create: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput>
+  }
+
+  export type ContactEmailDeliveryCreateManyContactMessageInputEnvelope = {
+    data: ContactEmailDeliveryCreateManyContactMessageInput | ContactEmailDeliveryCreateManyContactMessageInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactEmailDeliveryUpsertWithWhereUniqueWithoutContactMessageInput = {
+    where: ContactEmailDeliveryWhereUniqueInput
+    update: XOR<ContactEmailDeliveryUpdateWithoutContactMessageInput, ContactEmailDeliveryUncheckedUpdateWithoutContactMessageInput>
+    create: XOR<ContactEmailDeliveryCreateWithoutContactMessageInput, ContactEmailDeliveryUncheckedCreateWithoutContactMessageInput>
+  }
+
+  export type ContactEmailDeliveryUpdateWithWhereUniqueWithoutContactMessageInput = {
+    where: ContactEmailDeliveryWhereUniqueInput
+    data: XOR<ContactEmailDeliveryUpdateWithoutContactMessageInput, ContactEmailDeliveryUncheckedUpdateWithoutContactMessageInput>
+  }
+
+  export type ContactEmailDeliveryUpdateManyWithWhereWithoutContactMessageInput = {
+    where: ContactEmailDeliveryScalarWhereInput
+    data: XOR<ContactEmailDeliveryUpdateManyMutationInput, ContactEmailDeliveryUncheckedUpdateManyWithoutContactMessageInput>
+  }
+
+  export type ContactEmailDeliveryScalarWhereInput = {
+    AND?: ContactEmailDeliveryScalarWhereInput | ContactEmailDeliveryScalarWhereInput[]
+    OR?: ContactEmailDeliveryScalarWhereInput[]
+    NOT?: ContactEmailDeliveryScalarWhereInput | ContactEmailDeliveryScalarWhereInput[]
+    id?: IntFilter<"ContactEmailDelivery"> | number
+    contactMessageId?: IntFilter<"ContactEmailDelivery"> | number
+    type?: EnumContactEmailDeliveryTypeFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFilter<"ContactEmailDelivery"> | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFilter<"ContactEmailDelivery"> | number
+    availableAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    lockedUntil?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    deliveredAt?: DateTimeNullableFilter<"ContactEmailDelivery"> | Date | string | null
+    lastError?: StringNullableFilter<"ContactEmailDelivery"> | string | null
+    createdAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactEmailDelivery"> | Date | string
+  }
+
+  export type ContactMessageCreateWithoutEmailDeliveriesInput = {
+    firstName: string
+    lastName: string
+    email: string
+    phone?: string | null
+    projectType?: string | null
+    message: string
+    status?: $Enums.ContactStatus
+    ackSentAt?: Date | string | null
+    replyText?: string | null
+    repliedAt?: Date | string | null
+    repliedById?: number | null
+    ipHash?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ContactMessageUncheckedCreateWithoutEmailDeliveriesInput = {
+    id?: number
+    firstName: string
+    lastName: string
+    email: string
+    phone?: string | null
+    projectType?: string | null
+    message: string
+    status?: $Enums.ContactStatus
+    ackSentAt?: Date | string | null
+    replyText?: string | null
+    repliedAt?: Date | string | null
+    repliedById?: number | null
+    ipHash?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ContactMessageCreateOrConnectWithoutEmailDeliveriesInput = {
+    where: ContactMessageWhereUniqueInput
+    create: XOR<ContactMessageCreateWithoutEmailDeliveriesInput, ContactMessageUncheckedCreateWithoutEmailDeliveriesInput>
+  }
+
+  export type ContactMessageUpsertWithoutEmailDeliveriesInput = {
+    update: XOR<ContactMessageUpdateWithoutEmailDeliveriesInput, ContactMessageUncheckedUpdateWithoutEmailDeliveriesInput>
+    create: XOR<ContactMessageCreateWithoutEmailDeliveriesInput, ContactMessageUncheckedCreateWithoutEmailDeliveriesInput>
+    where?: ContactMessageWhereInput
+  }
+
+  export type ContactMessageUpdateToOneWithWhereWithoutEmailDeliveriesInput = {
+    where?: ContactMessageWhereInput
+    data: XOR<ContactMessageUpdateWithoutEmailDeliveriesInput, ContactMessageUncheckedUpdateWithoutEmailDeliveriesInput>
+  }
+
+  export type ContactMessageUpdateWithoutEmailDeliveriesInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumContactStatusFieldUpdateOperationsInput | $Enums.ContactStatus
+    ackSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    replyText?: NullableStringFieldUpdateOperationsInput | string | null
+    repliedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    repliedById?: NullableIntFieldUpdateOperationsInput | number | null
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateWithoutEmailDeliveriesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumContactStatusFieldUpdateOperationsInput | $Enums.ContactStatus
+    ackSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    replyText?: NullableStringFieldUpdateOperationsInput | string | null
+    repliedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    repliedById?: NullableIntFieldUpdateOperationsInput | number | null
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserPermissionCreateManyUserInput = {
     permissionId: number
     grantedById?: number | null
@@ -89104,6 +92369,61 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     showOnHomepage?: BoolFieldUpdateOperationsInput | boolean
     displayOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ContactEmailDeliveryCreateManyContactMessageInput = {
+    id?: number
+    type: $Enums.ContactEmailDeliveryType
+    status?: $Enums.ContactEmailDeliveryStatus
+    attempts?: number
+    availableAt?: Date | string
+    lockedUntil?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    lastError?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactEmailDeliveryUpdateWithoutContactMessageInput = {
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactEmailDeliveryUncheckedUpdateWithoutContactMessageInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactEmailDeliveryUncheckedUpdateManyWithoutContactMessageInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    type?: EnumContactEmailDeliveryTypeFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryType
+    status?: EnumContactEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.ContactEmailDeliveryStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    availableAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

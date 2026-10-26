@@ -43,6 +43,20 @@ export const GET = withPermission(PERM.MESSAGES_VIEW)(
     const rows = await prisma.contactMessage.findMany({
       where,
       orderBy: { createdAt: "desc" },
+      include: {
+        emailDeliveries: {
+          orderBy: { type: "asc" },
+          select: {
+            id: true,
+            type: true,
+            status: true,
+            attempts: true,
+            lastAttemptAt: true,
+            deliveredAt: true,
+            lastError: true,
+          },
+        },
+      },
       ...(pagination.requested
         ? { skip: (page - 1) * pagination.pageSize, take: pagination.pageSize }
         : {}),
@@ -53,6 +67,11 @@ export const GET = withPermission(PERM.MESSAGES_VIEW)(
       ackSentAt: r.ackSentAt?.toISOString() ?? null,
       repliedAt: r.repliedAt?.toISOString() ?? null,
       createdAt: r.createdAt.toISOString(),
+      emailDeliveries: r.emailDeliveries.map((delivery) => ({
+        ...delivery,
+        lastAttemptAt: delivery.lastAttemptAt?.toISOString() ?? null,
+        deliveredAt: delivery.deliveredAt?.toISOString() ?? null,
+      })),
     }));
     return NextResponse.json(
       pagination.requested

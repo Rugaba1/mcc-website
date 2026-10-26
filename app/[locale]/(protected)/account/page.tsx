@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "@/app/i18n/routing";
 import {
@@ -242,8 +244,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
                 {tables.wishlist.map((w) => (
                   <Link key={w.id} href={`/products/${w.slug ?? w.productId}`} className="group space-y-1.5">
                     <div className="aspect-square overflow-hidden  bg-muted">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={w.image} alt={w.name} className="size-full object-cover transition-transform group-hover:scale-105" />
+                      <MediaImage src={w.image} alt={w.name} className="size-full object-cover transition-transform group-hover:scale-105" />
                     </div>
                     <p className="truncate text-sm font-medium">{w.name}</p>
                     <p className="truncate text-xs text-muted-foreground">{w.category}</p>
@@ -272,9 +273,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
                 {tables.designs.map((d) => (
                   <Link key={d.id} href={d.shareToken ? `/visualizer?design=${encodeURIComponent(d.shareToken)}` : "/visualizer"} className="group space-y-1.5">
                     <div className="aspect-[4/3] overflow-hidden bg-muted">
-                      {d.previewImage && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={d.previewImage} alt={d.name} className="size-full object-cover transition-transform group-hover:scale-105" />
+                      {d.previewImage && d.shareToken && (                        <MediaImage src={`/api/visualizer/designs/${d.shareToken}/preview`} alt={d.name} className="size-full object-cover transition-transform group-hover:scale-105" />
                       )}
                     </div>
                     <p className="truncate text-sm font-medium">{d.name}</p>
@@ -451,9 +450,7 @@ function CartCard({ currency }: { currency: string }) {
                 return (
                   <li key={`${i.variantId}:${i.saleType}`} className="flex items-center gap-3 py-3">
                     <div className="size-12 shrink-0 overflow-hidden  bg-muted">
-                      {i.image && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={i.image} alt={i.name} className="size-full object-cover" />
+                      {i.image && (                        <MediaImage src={i.image} alt={i.name} className="size-full object-cover" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">

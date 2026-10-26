@@ -18,7 +18,7 @@ const CATEGORY_META = [
   { key: "floor2", title: "Large Format", sub: "600×1200mm+", href: "/catalogue", rowSpan: false },
 ];
 
- 
+
 
 const PAGE_SIZE = 12;
 
@@ -26,7 +26,7 @@ export default async function Products() {
 
   const page = 1
   let totalPages = 1;
-  let products:Product[] = []
+  let products: Product[] = []
   try {
     const data = (await serverApi.getProducts({ skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, category: encodeURIComponent("") }))
     products = data.products
@@ -94,7 +94,7 @@ export default async function Products() {
                   fill
                   className="object-cover category-img"
                   sizes="(max-width: 768px) 50vw, 33vw"
-                  unoptimized
+
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-linear-to-t from-inverse/85 via-inverse/20 to-transparent group-hover:from-inverse/90 transition-all duration-300" />

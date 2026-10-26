@@ -71,7 +71,7 @@ export default function About() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 1024px) 100vw, 50vw"
-                        unoptimized />
+                    />
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-linear-to-r from-overlay/20 to-overlay/5 lg:bg-linear-to-br lg:from-overlay/30 lg:via-transparent lg:to-transparent" />
 
@@ -144,7 +144,7 @@ export default function About() {
                     </div>
 
                     <a
-                        href="#contact"
+                        href="/contact"
                         className="self-start group bg-accent hover:bg-primary  font-bold px-9 py-4 transition-all duration-300 shadow-lg flex items-center gap-3 text-sm tracking-widest uppercase"
                     >
                         Work With Us

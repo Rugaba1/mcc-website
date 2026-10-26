@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileText, ImageIcon, X } from "lucide-react";
+import Image from "next/image";
 
 import type { MediaFile } from "@/lib/api";
 import { FileManager } from "@/components/admin/file-manager";
@@ -10,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
+import { useMediaPreview } from "@/components/media-preview-provider";
 
 /** Modal that lets the admin upload or pick a file from the library. */
 export function FilePicker({
@@ -58,13 +60,13 @@ export function ImageField({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { openPreview } = useMediaPreview();
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-3">
-        <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden border bg-muted">
+        <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden border bg-muted">
           {value && kind === "image" ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={value} alt="" className="size-full object-cover" />
+            <Image src={value} alt="" fill sizes="5rem" className="object-cover" />
           ) : value ? (
             <FileText className="size-6 text-muted-foreground" />
           ) : (
@@ -72,6 +74,22 @@ export function ImageField({
           )}
         </div>
         <div className="flex flex-wrap gap-2">
+          {value && (
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-none"
+              onClick={() =>
+                openPreview({
+                  url: value,
+                  name: value.split("/").pop() || "Selected media",
+                  mimeType: kind === "image" ? "image/*" : undefined,
+                })
+              }
+            >
+              Preview
+            </Button>
+          )}
           <PermissionGate required={PERM.MEDIA_VIEW}>
             <Button type="button" variant="outline" className="rounded-none" onClick={() => setOpen(true)}>
               {value ? "Replace" : "Choose from library"}

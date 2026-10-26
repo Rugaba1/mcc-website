@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
+import { legalDraftUpdateSchema } from "@/lib/legal/draft";
 
 type Context = { params: Promise<{ id: string }> };
-
-const draftSchema = z.object({
-  title: z.string().trim().max(255),
-  titleFr: z.string().trim().max(255),
-  titleRw: z.string().trim().max(255),
-  contentMarkdown: z.string().max(100_000),
-  contentMarkdownFr: z.string().max(100_000),
-  contentMarkdownRw: z.string().max(100_000),
-}).strict();
 
 export const PUT = withPermission(PERM.CONTENT_MANAGE)(
   async (request: NextRequest, context) => {
@@ -27,9 +18,18 @@ export const PUT = withPermission(PERM.CONTENT_MANAGE)(
     } catch {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const parsed = draftSchema.safeParse(body);
+    const parsed = legalDraftUpdateSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid legal document draft" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Invalid legal document draft",
+          issues: parsed.error.issues.map((issue) => ({
+            path: issue.path.map(String),
+            message: issue.message,
+          })),
+        },
+        { status: 400 },
+      );
     }
 
     const result = await prisma.legalDocumentVersion.updateMany({

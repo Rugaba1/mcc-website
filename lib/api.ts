@@ -1,4 +1,8 @@
 import { isAxiosError } from "axios";
+import {
+  toLegalDraftContent,
+  type LegalDraftContent,
+} from "@/lib/legal/draft-payload";
 import apiClient, { refreshAccessToken } from "./api-client";
 import { apiServer } from "./api-server";
 
@@ -233,6 +237,22 @@ export interface CatalogueDoc {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface PublicationDoc {
+  id: number;
+  slug: string;
+  title: string;
+  summary: string;
+  contentMarkdown: string;
+  coverImage: string | null;
+  fileUrl: string | null;
+  placement: "NAVBAR" | "HOME_DIALOG" | "PUBLIC_PAGE" | "NAVBAR_AND_PAGE" | "DIALOG_AND_PAGE";
+  active: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 export type InvoiceKind = "PROFORMA" | "INVOICE" | "CREDIT_NOTE";
 
 export interface InvoiceRef {
@@ -375,6 +395,22 @@ export interface CustomerDetail extends CustomerSummary {
 }
 
 export type ContactStatus = "NEW" | "READ" | "REPLIED" | "ARCHIVED";
+export type ContactEmailDeliveryType = "ACKNOWLEDGEMENT" | "STAFF_ALERT";
+export type ContactEmailDeliveryStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "SENT"
+  | "FAILED";
+
+export interface ContactEmailDelivery {
+  id: number;
+  type: ContactEmailDeliveryType;
+  status: ContactEmailDeliveryStatus;
+  attempts: number;
+  lastAttemptAt: string | null;
+  deliveredAt: string | null;
+  lastError: string | null;
+}
 
 export interface ContactMessage {
   id: number;
@@ -389,6 +425,7 @@ export interface ContactMessage {
   replyText: string | null;
   repliedAt: string | null;
   createdAt: string;
+  emailDeliveries: ContactEmailDelivery[];
 }
 
 export interface ContactInput {
@@ -1097,6 +1134,15 @@ export const api = {
         recipientCount: number;
       }[];
     }>("/api/admin/newsletter"),
+  getPublications: () => get<PublicationDoc[]>("/api/publications"),
+  getAdminPublications: () => get<PublicationDoc[]>("/api/admin/publications"),
+  createPublication: (data: Omit<PublicationDoc, "id" | "slug" | "createdAt" | "updatedAt">) =>
+    post<PublicationDoc>("/api/admin/publications", data),
+  updatePublication: (
+    id: number,
+    data: Omit<PublicationDoc, "id" | "slug" | "createdAt" | "updatedAt">,
+  ) => put<PublicationDoc>(`/api/admin/publications/${id}`, data),
+  deletePublication: (id: number) => del(`/api/admin/publications/${id}`),
   createAdminNewsletterCampaign: (data: { subject: string; bodyMarkdown: string }) =>
     post<{ campaign: { id: number; subject: string; status: string }; recipientCount: number }>(
       "/api/admin/newsletter",
@@ -1151,17 +1197,8 @@ export const api = {
   ) => post<{ version: LegalVersion }>("/api/admin/legal", draft),
   updateLegalDraft: (
     id: number,
-    draft: Pick<
-      LegalVersion,
-      | "documentType"
-      | "title"
-      | "titleFr"
-      | "titleRw"
-      | "contentMarkdown"
-      | "contentMarkdownFr"
-      | "contentMarkdownRw"
-    >,
-  ) => put<LegalVersion>(`/api/admin/legal/${id}`, draft),
+    draft: LegalDraftContent & { documentType?: unknown },
+  ) => put<LegalVersion>(`/api/admin/legal/${id}`, toLegalDraftContent(draft)),
   publishLegalVersion: (id: number) =>
     post<{ version: LegalVersion }>(`/api/admin/legal/${id}/publish`),
   register: (data: {
@@ -1294,6 +1331,10 @@ export const api = {
     get<{ posts: BlogPostSummary[]; total: number; totalPages: number }>(
       `/api/admin/blog${qs(p)}`,
     ),
+  getPublicBlogPosts: (p: { locale?: string; limit?: number; search?: string } = {}) =>
+    get<{ posts: BlogPostSummary[]; total: number; totalPages: number }>(
+      `/api/blog${qs(p)}`,
+    ),
   getAdminBlogPost: (id: number) =>
     get<BlogPostDetail>(`/api/admin/blog/${id}`),
   createBlogPost: (d: BlogPostInput) =>
@@ -1391,6 +1432,7 @@ export const api = {
     sceneId: number | null;
     name: string;
     sessionId?: string;
+    previewImage?: string | null;
     items: {
       variantId: number;
       surfaceKey: string;
@@ -1410,6 +1452,7 @@ export const api = {
     sceneId: number | null;
     name: string;
     sessionId?: string;
+    previewImage?: string | null;
     items: {
       variantId: number;
       surfaceKey: string;
@@ -1556,6 +1599,10 @@ export const api = {
 
   // Catalogues
   getCatalogues: () => get<CatalogueDoc[]>("/api/catalogues"),
+  getAdminCataloguesPage: (query: AdminPageQuery) =>
+    get<PaginatedResult<CatalogueDoc>>(
+      `/api/admin/catalogues${adminPageQuery(query)}`,
+    ),
   createCatalogue: (d: Omit<CatalogueDoc, "id" | "createdAt" | "updatedAt">) =>
     post<CatalogueDoc>("/api/catalogues", d),
   updateCatalogue: (
@@ -1641,6 +1688,8 @@ export const api = {
   getContactMessages: () => get<ContactMessage[]>("/api/contact-messages"),
   getContactMessagesPage: (query: AdminPageQuery) =>
     get<PaginatedResult<ContactMessage>>(`/api/contact-messages${adminPageQuery(query)}`),
+  retryContactEmail: (id: number, type: ContactEmailDeliveryType) =>
+    post<ContactEmailDelivery>(`/api/contact-messages/${id}/email-retry`, { type }),
   updateContactStatus: (id: number, status: ContactStatus) =>
     put<{ id: number; status: ContactStatus }>(`/api/contact-messages/${id}`, {
       status,

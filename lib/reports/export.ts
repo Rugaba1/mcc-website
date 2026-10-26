@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { TDocumentDefinitions, TFontDictionary } from "pdfmake/interfaces";
 import type { ReportFormat, ReportTable } from "./report-data";
 import { FONT_FILES } from "@/lib/invoices/config";
+import { siteConfig } from "@/config/site.config";
 
 interface PdfDoc {
   on(event: "data", cb: (chunk: Buffer) => void): void;
@@ -75,10 +76,34 @@ export async function renderReport(
     info: { title: report.title, subject: report.description },
     pageSize: "A4",
     pageOrientation: "landscape",
-    pageMargins: [28, 32, 28, 32],
+    pageMargins: [32, 86, 32, 56],
     defaultStyle: { font: "CenturyGothic", fontSize: 7 },
+    header: () => ({
+      margin: [32, 18, 32, 0],
+      stack: [
+        { text: siteConfig.companyName, font: "Glovar", fontSize: 13, bold: true, color: "#004f46" },
+        {
+          text: [
+            siteConfig.companyAddress,
+            siteConfig.companyTin && `TIN: ${siteConfig.companyTin}`,
+            siteConfig.companyRegistrationNumber && `Registration no.: ${siteConfig.companyRegistrationNumber}`,
+          ].filter(Boolean).join("  |  "),
+          fontSize: 7,
+          color: "#5f6b63",
+          margin: [0, 3, 0, 0],
+        },
+        { canvas: [{ type: "line", x1: 0, y1: 7, x2: 778, y2: 7, lineWidth: 1.5, lineColor: "#d6b43e" }] },
+      ],
+    }),
+    footer: (currentPage: number, pageCount: number) => ({
+      margin: [32, 0, 32, 18],
+      columns: [
+        { text: `${siteConfig.companyName} · ${siteConfig.companyWebsite}`, fontSize: 7, color: "#5f6b63" },
+        { text: `Page ${currentPage} of ${pageCount}`, alignment: "right", fontSize: 7, color: "#5f6b63" },
+      ],
+    }),
     content: [
-      { text: report.title, fontSize: 16, bold: true, margin: [0, 0, 0, 6] },
+      { text: report.title, font: "Glovar", fontSize: 16, bold: true, color: "#004f46", margin: [0, 0, 0, 6] },
       { text: report.description, fontSize: 8, margin: [0, 0, 0, 4] },
       { text: `Generated at ${report.generatedAt}`, fontSize: 7, margin: [0, 0, 0, 12] },
       {

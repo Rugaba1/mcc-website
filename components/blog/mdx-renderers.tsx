@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { PluggableList } from "unified";
+import { MediaPreviewImage } from "@/components/media-preview-image";
 
 const linkClass =
   "text-primary underline decoration-primary decoration-2 underline-offset-4 hover:bg-secondary";
@@ -47,8 +48,7 @@ export const mdxComponents = {
       />
     ),
   img: ({ src, alt }: ComponentProps<"img">) => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt ?? ""} loading="lazy" className="my-8 w-full border" />
+      typeof src === "string" ? <MediaPreviewImage src={src} alt={alt ?? ""} /> : null
   ),
   table: (props: ComponentProps<"table">) => (
     <div className="my-8 overflow-x-auto border">

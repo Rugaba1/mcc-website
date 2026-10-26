@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useCallback, useEffect, useState } from "react";
 import { Layers, Pencil, Plus, Search, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
+import { ShareWidget } from "@/components/share-widget";
 
 const PAGE_SIZE = 10;
 
@@ -159,9 +162,7 @@ export default function AdminCollectionsPage() {
                 <TableRow key={c.id}>
                   <TableCell>
                     <div className="h-11 w-16 overflow-hidden border bg-muted">
-                      {c.image && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={c.image} alt={c.name} className="size-full object-cover" />
+                      {c.image && (                        <MediaImage src={c.image} alt={c.name} className="size-full object-cover" />
                       )}
                     </div>
                   </TableCell>
@@ -179,6 +180,12 @@ export default function AdminCollectionsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
+                      <ShareWidget
+                        title={c.name}
+                        text={c.description}
+                        path={`/collections#collection-${c.id}`}
+                        iconOnly
+                      />
                       <PermissionGate required={PERM.COLLECTIONS_MANAGE}>
                         <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => openEdit(c)} aria-label={`Edit ${c.name}`}>
                           <Pencil />

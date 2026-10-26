@@ -178,14 +178,7 @@ function LoginForm() {
                         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {submitting ? "Please wait…" : challenge ? "Verify and sign in" : "Sign in"}
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground">
-                        View our{" "}
-                        <Link href="/legal/terms-and-conditions" className="underline underline-offset-4">Terms and Conditions</Link>
-                        {", "}
-                        <Link href="/legal/terms-of-service" className="underline underline-offset-4">Terms of Service</Link>
-                        {", and "}
-                        <Link href="/legal/privacy-policy" className="underline underline-offset-4">Privacy Policy</Link>.
-                    </p>
+
                     {challenge && method === "email" && (
                         <Button type="button" variant="outline" className="w-full" disabled={submitting} onClick={resendCode}>
                             Send another code
@@ -194,7 +187,7 @@ function LoginForm() {
                 </form>
                 <div className="py-6 flex items-center justify-center">
                     New here?{" "}
-                    <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline">
+                    <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline font-serif px-2.5">
                         Create an account
                     </Link>
                 </div>
@@ -208,6 +201,15 @@ function LoginForm() {
                         Back to password sign in
                     </Button>
                 )}
+
+                <p className="text-center text-xs text-muted-foreground">
+                    View our{" "}
+                    <Link href="/legal/terms-and-conditions" className="underline underline-offset-4">Terms and Conditions</Link>
+                    {", "}
+                    <Link href="/legal/terms-of-service" className="underline underline-offset-4">Terms of Service</Link>
+                    {", and "}
+                    <Link href="/legal/privacy-policy" className="underline underline-offset-4">Privacy Policy</Link>.
+                </p>
             </div>
 
         </div>

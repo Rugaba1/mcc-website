@@ -10,6 +10,7 @@ export const GET = withRateLimit({
 })(async (_req: NextRequest) => {
   try {
     const rows = await prisma.catalogue.findMany({
+      where: { published: true },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(rows);
@@ -37,7 +38,7 @@ export const POST = withPermission(PERM.CATALOGUES_MANAGE)(
         fileUrl: body.fileUrl ?? "",
         category: body.category ?? "general",
         year: body.year ?? "",
-        published: body.published ?? true,
+        published: body.published ?? false,
         featured: body.featured ?? false,
       },
     });

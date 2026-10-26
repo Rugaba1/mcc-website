@@ -8,11 +8,13 @@ import { Link } from "@/app/i18n/routing";
 import { api, apiErrorMessage, type SavedVisualizerDesign } from "@/lib/api";
 import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
+import { ShareWidget } from "@/components/share-widget";
 import { Input } from "@/components/ui/input";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { DataPagination } from "@/components/admin/data-pagination";
+import { MediaImage } from "@/components/media-image";
 
 const PAGE_SIZE = 18;
 export default function AdminSavedDesignsPage() {
@@ -82,9 +84,8 @@ export default function AdminSavedDesignsPage() {
                     {visible.map((design) => (
                         <article key={design.id} className="overflow-hidden border bg-background">
                             <div className="relative aspect-4/3 bg-muted">
-                                {design.previewImage ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={design.previewImage} alt="" className="size-full object-cover" />
+                                {design.previewImage && design.shareToken ? (
+                                    <MediaImage src={`/api/visualizer/designs/${design.shareToken}/preview`} alt={`${design.name || "Saved design"} preview`} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
                                 ) : (
                                     <div className="flex size-full items-center justify-center"><Palette className="size-8 text-muted-foreground" /></div>
                                 )}
@@ -99,7 +100,8 @@ export default function AdminSavedDesignsPage() {
                                     <p className="text-xs text-muted-foreground">Updated {dateTime(design.updatedAt)}</p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {design.shareToken && <Button asChild size="sm"><Link href={`/visualizer?design=${design.shareToken}`}><ExternalLink /> Open</Link></Button>}
+                                    {design.shareToken && <Button asChild size="sm"><Link href={`/visualizer/design/${design.shareToken}`}><ExternalLink /> Open</Link></Button>}
+                                    {design.shareToken && <ShareWidget title={design.name || "Saved room design"} text={`View this ${design.scene?.name ?? "room"} design on Mountain Ceramics Company.`} path={`/visualizer/design/${design.shareToken}`} />}
                                     <PermissionGate required={PERM.CONTENT_MANAGE}>
                                         <Button type="button" size="icon" variant="ghost" aria-label={`Delete ${design.name || "design"}`} onClick={() => void remove(design)}><Trash2 /></Button>
                                     </PermissionGate>

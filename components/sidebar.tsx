@@ -66,7 +66,7 @@ export function SidebarContent({
                             alt="Mountain Ceramics Company"
                             height={60}
                             width={60}
-                            unoptimized />
+                        />
                     </span>
                     {!collapsed && (
                         <span className="font-serif text-lg tracking-tight">

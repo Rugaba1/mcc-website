@@ -1,3 +1,4 @@
+import { MediaImage } from "@/components/media-image";
 import { UserRound } from "lucide-react";
 import { serverApi } from "@/lib/api";
 
@@ -12,9 +13,7 @@ export async function TeamSection() {
                 {team.map((m) => (
                     <article key={m.id} className="text-center">
                         <div className="mx-auto flex aspect-square w-full max-w-60 items-center justify-center overflow-hidden bg-muted">
-                            {m.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={m.image} alt={m.name} className="size-full object-cover" />
+                            {m.image ? (                                <MediaImage src={m.image} alt={m.name} className="size-full object-cover" />
                             ) : (
                                 <UserRound className="size-12 text-muted-foreground" />
                             )}

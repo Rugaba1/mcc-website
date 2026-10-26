@@ -1,10 +1,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type Product, serverApi } from "@/lib/api";
+import { type CatalogueDoc, type Product, serverApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { PaginationControls } from "@/components/pagination-controls";
 import { CatalogueControls } from "@/components/catalogue-controls";
+import { PublicCatalogueDocuments } from "@/components/public-catalogue-documents";
 
 const BADGE_FILTERS = ["All", "Bestseller", "New", "Premium"] as const;
 
@@ -32,6 +33,7 @@ export default async function CataloguePage({
   }>;
 }) {
   let totalPages = 1;
+  let downloadableCatalogues: CatalogueDoc[] = [];
   const {
     search,
     badgeFilter: requestedBadgeFilter,
@@ -68,6 +70,11 @@ export default async function CataloguePage({
     totalPages = data.totalPages;
   } catch (error) {
     console.error("Could not load catalogue products:", error);
+  }
+  try {
+    downloadableCatalogues = await serverApi.getCatalogues();
+  } catch (error) {
+    console.error("Could not load downloadable catalogues:", error);
   }
 
   if (!products) {
@@ -203,7 +210,7 @@ export default async function CataloguePage({
             <p className=" text-sm mb-6">Contact our team for pricing, samples, and custom orders.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/#contact"
+                href="/contact"
                 className="bg-primary hover:bg-primary  font-bold px-8 py-3.5 uppercase tracking-widest text-sm transition-colors"
               >
                 Request a Quote
@@ -217,6 +224,7 @@ export default async function CataloguePage({
             </div>
           </div>
         )}
+        <PublicCatalogueDocuments catalogues={downloadableCatalogues} />
       </div>
     </div>
   );
@@ -236,7 +244,7 @@ function FeaturedCard({ product: p }: { product: Product }) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width:640px) 50vw, 25vw"
-            unoptimized
+
           />
         )}
         {/* Hover overlay with dual actions */}
@@ -298,7 +306,7 @@ function GridCard({ product: p }: { product: Product }) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
-            unoptimized
+
           />
         ) : (
           <div className="absolute inset-0 bg-linear-to-br from-muted to-muted flex items-center justify-center">
@@ -378,7 +386,7 @@ function ListCard({ product: p }: { product: Product }) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="96px"
-            unoptimized
+
           />
         ) : (
           <div className="w-full h-full bg-linear-to-br from-muted to-muted" />

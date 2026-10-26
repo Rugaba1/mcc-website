@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { api, apiErrorMessage } from "@/lib/api";
 import type { CurrencyOption } from "@/lib/currency";
+import { currencyFlag } from "@/lib/currency";
 import { CURRENCY_CONFIG_UPDATED_EVENT } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,7 +156,7 @@ export default function AdminCurrenciesPage() {
             {currencies.map((currency) => (
               <tr key={currency.code} className="border-t">
                 <td className="p-3">
-                  <strong>{currency.code}</strong>
+                  <strong>{currencyFlag(currency.code)} {currency.code}</strong>
                   <span className="ml-2 text-muted-foreground">{currency.name}</span>
                   {currency.isBase && <span className="ml-2 text-xs text-primary">Base</span>}
                 </td>

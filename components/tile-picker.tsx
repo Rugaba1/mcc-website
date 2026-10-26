@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import type { Product } from "@/lib/api";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -33,9 +35,7 @@ export function TilePicker({
                 onChange={() => onToggle(p.id)}
                 className="h-4 w-4 shrink-0 accent-primary"
               />
-              {p.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.image} alt="" className="h-8 w-8 shrink-0 rounded object-cover" />
+              {p.image && (                <MediaImage src={p.image} alt="" className="h-8 w-8 shrink-0 rounded object-cover" />
               )}
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold">{p.name}</p>

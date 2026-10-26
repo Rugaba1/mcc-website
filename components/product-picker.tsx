@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
 
@@ -59,8 +61,7 @@ export function ProductPicker({ value, onChange }: { value: Picked[]; onChange: 
                 <label className="flex cursor-pointer items-center gap-3 p-2.5 hover:bg-accent">
                   <Checkbox className="rounded-none" checked={has(p.id)} onCheckedChange={() => toggle(p)} />
                   <div className="size-9 shrink-0 overflow-hidden bg-muted">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {p.image && <img src={p.image} alt="" className="size-full object-cover" />}
+                    {p.image && <MediaImage src={p.image} alt="" className="size-full object-cover" />}
                   </div>
                   <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{p.name}</span><span className="block truncate text-xs text-muted-foreground">{p.categoryLabel}</span></span>
                 </label>

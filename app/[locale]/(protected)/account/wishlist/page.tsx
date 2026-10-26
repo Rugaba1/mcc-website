@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { Heart, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/app/i18n/routing";
@@ -55,8 +57,7 @@ export default function WishlistPage() {
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {data.map((w) => (
           <div key={w.productId} className="overflow-hidden  border border-border bg-background">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={w.image} alt={w.name} className="h-44 w-full object-cover" />
+            <MediaImage src={w.image} alt={w.name} className="h-44 w-full object-cover" />
             <div className="space-y-2 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{w.categoryLabel}</p>
               <p className="font-semibold">{w.name}</p>

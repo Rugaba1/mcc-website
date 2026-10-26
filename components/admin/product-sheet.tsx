@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -303,8 +305,7 @@ export function ProductSheet({
               <ImageField value={form.image} kind="image" onChange={(value) => set("image", value)} />
               {form.image.trim() && (
                 <div className="mt-2 size-24 overflow-hidden border bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={form.image} alt="Preview" className="size-full object-cover" />
+                  <MediaImage src={form.image} alt="Preview" className="size-full object-cover" />
                 </div>
               )}
             </Field>

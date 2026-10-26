@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { api, apiErrorMessage, type Product, type ProductVariant } from "@/lib/api";
@@ -75,9 +77,7 @@ export function VisualizerSection({
         {visible.map((v) => (
           <div key={v.id} className="overflow-hidden  border border-border bg-background">
             <div className="flex h-32 items-center justify-center bg-muted">
-              {v.textureUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={v.textureUrl} alt="" className="h-full w-full object-cover" />
+              {v.textureUrl ? (                <MediaImage src={v.textureUrl} alt="" className="h-full w-full object-cover" />
               ) : (
                 <Badge variant="outline">No texture</Badge>
               )}

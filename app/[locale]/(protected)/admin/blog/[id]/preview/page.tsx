@@ -1,3 +1,4 @@
+import { MediaImage } from "@/components/media-image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -13,9 +14,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
         <article className="container mx-auto max-w-3xl px-4 py-16">
             <Badge className="mb-4 rounded-none">Preview · {post.status.toLowerCase()}</Badge>
             <h1 className="text-4xl">{post.title}</h1>
-            {post.coverImage && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={post.coverImage} alt={post.coverAlt ?? post.title} className="my-8 aspect-video w-full border object-cover" />
+            {post.coverImage && (                <MediaImage src={post.coverImage} alt={post.coverAlt ?? post.title} className="my-8 aspect-video w-full border object-cover" />
             )}
             <MdxContent source={post.content} />
         </article>

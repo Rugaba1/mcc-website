@@ -18,6 +18,7 @@ import {
 import { TILES_CATALOG, TileProduct } from "../data/catalog";
 import { useFormatters } from "@/contexts/format-context";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import {
@@ -82,13 +83,25 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
 
   const tileList = dbTiles && dbTiles.length > 0 ? dbTiles : TILES_CATALOG;
 
-  const handleCopyShare = async () => {
+  const handleShare = async () => {
+    const url = shareUrl || window.location.href;
     try {
-      await navigator.clipboard.writeText(shareUrl || window.location.href);
+      if (typeof navigator.share === "function") {
+        await navigator.share({
+          title: `My ${sceneName} room design`,
+          text: `View my ${sceneName} tile design from Mountain Ceramics Company.`,
+          url,
+        });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
+      toast.success("Share link copied");
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      console.error("Could not share visualizer design:", error);
+      toast.error("Could not share or copy the design link.");
     }
   };
 
@@ -194,7 +207,7 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
 
         {/* Share & Save Design Actions */}
         <Button
-          onClick={handleCopyShare}
+          onClick={() => void handleShare()}
           variant={"outline"}
           title="Copy shareable link"
         >
@@ -265,7 +278,7 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="relative w-10 h-10  overflow-hidden bg-inverse shrink-0">
-                        <Image src={t.swatchUrl} alt={t.name} fill className="object-cover" unoptimized />
+                        <Image src={t.swatchUrl} alt={t.name} fill className="object-cover" />
                       </div>
                       <div>
                         <div className="text-xs font-semibold text-foreground">{t.name}</div>

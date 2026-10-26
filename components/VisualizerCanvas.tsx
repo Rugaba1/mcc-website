@@ -12,6 +12,7 @@ interface VisualizerCanvasProps {
   onSelectSurface: (sortOrder: number) => void;
   isZoomMode: boolean;
   className?: string;
+  onCanvasElement?: (canvas: HTMLCanvasElement | null) => void;
 }
 
 export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
@@ -21,9 +22,17 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
   onSelectSurface,
   isZoomMode,
   className,
+  onCanvasElement,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const setCanvasRef = useCallback(
+    (canvas: HTMLCanvasElement | null) => {
+      canvasRef.current = canvas;
+      onCanvasElement?.(canvas);
+    },
+    [onCanvasElement],
+  );
 
   // Loaded image references
   const baseImageRef = useRef<HTMLImageElement | null>(null);
@@ -428,7 +437,7 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
       )}
 
       <canvas
-        ref={canvasRef}
+        ref={setCanvasRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}

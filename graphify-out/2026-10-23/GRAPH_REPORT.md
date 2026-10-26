@@ -1,16 +1,16 @@
 # Graph Report - mcc  (2026-10-23)
 
 ## Corpus Check
-- 572 files · ~7,600,524 words
+- 579 files · ~7,600,638 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10852 nodes · 15345 edges · 435 communities (298 shown, 137 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 502 edges (avg confidence: 0.72)
+- 10905 nodes · 15457 edges · 424 communities (293 shown, 131 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 512 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6b23401b`
+- Built from commit: `d3cf33b8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -41,7 +41,6 @@
 - PrismaClient
 - variants-sheet.tsx
 - template.ts
-- prisma.ts
 - Floor.tsx
 - constants.ts
 - write
@@ -286,7 +285,6 @@
 - schema-contract-mapping
 - Prisma MongoDB Upgrade Path
 - endpoints
-- [locale]/layout.tsx
 - prisma migrate status
 - Prisma Compute Config
 - create-prisma Compute Flow
@@ -316,7 +314,6 @@
 - prisma mcp
 - client-api-mapping
 - Service Tokens
-- Prisma__VisualizerDesignClient
 - ./runtime/client
 - #wasm-compiler-loader
 - Engine
@@ -367,14 +364,12 @@
 - Prisma__PermissionLogClient
 - Prisma__ProductImageClient
 - Prisma__ProjectClient
-- Prisma__RefreshTokenClient
 - Prisma__RoleClient
 - Prisma__VisualizerDesignItemClient
 - Prisma__VisualizerSceneClient
 - ./edge
 - ./extension
 - ./index-browser
-- ./runtime/index-browser
 - TraceState
 - AI safety checkpoint for destructive commands
 - (public)/layout.tsx
@@ -382,28 +377,22 @@
 - AI safety checkpoint for destructive commands
 - Hero.tsx
 - Process.tsx
-- invoice-pdf-pages.tsx
-- Prisma__TestimonialClient
 - Context
 - DataLoader
 - TypedSql
 - README.md
 - AI safety checkpoint for destructive commands
 - prisma complete
-- [...nextauth]/route.ts
 - [id]/layout.tsx
 - prisma complete
 - PrismaClientBaseOptions
 - Skip
 - prisma complete
-- bcryptjs
 - class-variance-authority
 - colord
 - emoji-picker-react
-- fabric
 - @hugeicons/react
-- jose
-- jsonwebtoken
+- writeInto
 - AnyNull
 - DbNull
 - JsonNull
@@ -413,61 +402,61 @@
 - ExtendedSpanOptions
 - JsonConvertible
 - mariadb
-- mysql2
 - next
 - next-auth
 - next-intl
-- next-mdx-remote
+- Prisma__RoleClient
 - next-themes
 - prisma
 - @prisma/client
-- radix-ui
-- react-colorful
+- axios
 - react-pdf
+- jsonwebtoken
+- @mdx-js/mdx
+- @react-three/fiber
+- pdfmake
+- recharts
+- radix-ui
 - react-phone-number-input
 - @react-three/drei
-- @react-three/fiber
 - reading-time
-- recharts
-- remark-gfm
-- shadcn
-- sonner
-- three
 - tw-animate-css
 - @types/bcryptjs
 - @types/three
 - postcss.config.mjs
 - prisma-plugin.d.ts
 - BATHROOM_5_SCENE
+- shadcn
+- sonner
 
 ## God Nodes (most connected - your core abstractions)
 1. `r()` - 99 edges
 2. `n()` - 80 edges
 3. `Button()` - 78 edges
 4. `apiErrorMessage()` - 73 edges
-5. `requireStaff()` - 62 edges
-6. `s()` - 60 edges
-7. `api` - 47 edges
-8. `PrismaClient` - 47 edges
-9. `e()` - 45 edges
+5. `s()` - 60 edges
+6. `api` - 47 edges
+7. `PrismaClient` - 47 edges
+8. `e()` - 45 edges
+9. `withPermission()` - 45 edges
 10. `a()` - 40 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `MessagesSection()` --indirect_call--> `m()`  [INFERRED]
-  components/admin/sections/messages-section.tsx → lib/generated/prisma/query_compiler_fast_bg.js
 - `InvoicePdfPages()` --indirect_call--> `el()`  [INFERRED]
   components/invoices/invoice-pdf-pages.tsx → lib/generated/prisma/runtime/wasm-compiler-edge.js
 - `CustomerDashboardPage()` --calls--> `apiErrorMessage()`  [EXTRACTED]
   app/[locale]/(protected)/account/page.tsx → lib/api.ts
 - `CustomerPaymentsPage()` --indirect_call--> `m()`  [INFERRED]
   app/[locale]/(protected)/account/payments/page.tsx → lib/generated/prisma/query_compiler_fast_bg.js
+- `CustomerPaymentsPage()` --indirect_call--> `p()`  [INFERRED]
+  app/[locale]/(protected)/account/payments/page.tsx → lib/permissions/catalog.ts
 - `WishlistPage()` --indirect_call--> `w()`  [INFERRED]
   app/[locale]/(protected)/account/wishlist/page.tsx → lib/generated/prisma/query_compiler_fast_bg.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (435 total, 137 thin omitted)
+## Communities (424 total, 131 thin omitted)
 
 ### Community 0 - "index.d.ts"
 Cohesion: 0.00
@@ -475,7 +464,7 @@ Nodes (3598): Address, AddressAggregateArgs, AddressAvgAggregateInputType, Addre
 
 ### Community 1 - "runtime/client.js"
 Cohesion: 0.01
-Nodes (200): ad(), addMarginSymbol(), ae(), afterNextNewline(), Am(), au(), Ba(), bp() (+192 more)
+Nodes (292): k(), P(), V(), _a(), ad(), addItem(), ae(), al() (+284 more)
 
 ### Community 2 - "runtime/client.d.ts"
 Cohesion: 0.01
@@ -483,112 +472,83 @@ Nodes (307): AccelerateExtensionFetch, AccelerateExtensionFetchDecorator, Action
 
 ### Community 3 - "wasm-compiler-edge.js"
 Cohesion: 0.01
-Nodes (250): config, Prisma, PrismaClient, {
-  PrismaClientKnownRequestError,
-  PrismaClientUnknownRequestError,
-  PrismaClientRustPanicError,
-  PrismaClientInitializationError,
-  PrismaClientValidationError,
-  getPrismaClient,
-  sqltag,
-  empty,
-  join,
-  raw,
-  skip,
-  Decimal,
-  Debug,
-  DbNull,
-  JsonNull,
-  AnyNull,
-  NullTypes,
-  makeStrictEnum,
-  Extensions,
-  warnOnce,
-  defineDmmfProperty,
-  Public,
-  getRuntime,
-  createParam,
-}, Gm(), Uu(), Yu(), Zt() (+242 more)
+Nodes (309): a(), Fn, Gm(), Uu(), Yu(), Zt(), _a(), aa() (+301 more)
 
 ### Community 4 - "account/page.tsx"
-Cohesion: 0.04
-Nodes (87): ActiveOrders(), CartCard(), compact, CustomerDashboardPage(), Dashboard(), fmtDate(), HistoryTable(), KpiCard() (+79 more)
+Cohesion: 0.05
+Nodes (87): PAY_INFO, TODO: replace these placeholders with your real payment details, AdminBlogPage(), Filter, variant, AdminCollectionsPage(), AdminInventoryPage(), State (+79 more)
 
 ### Community 5 - "apiErrorMessage"
-Cohesion: 0.05
-Nodes (75): AccountDesignsPage(), KIND_LABEL, OrderDetailPage(), fetchOrders(), KIND_LABEL, OrdersPage(), CustomerPaymentsPage(), FixDialog() (+67 more)
+Cohesion: 0.08
+Nodes (21): EMPTY, Form, StaffManagementPage(), toForm(), BlogForm(), empty, Form, ImagePickerDialog() (+13 more)
 
 ### Community 6 - "api.ts"
-Cohesion: 0.03
-Nodes (68): AdminCollectionsPage(), AdminTestimonialsPage(), initialsOf(), toPayload(), BADGE_FILTERS, badgeStyle(), CATEGORY_FILTERS, FeaturedCard() (+60 more)
+Cohesion: 0.40
+Nodes (5): ./runtime/index-browser, default, import, require, types
 
 ### Community 7 - "a"
-Cohesion: 0.04
-Nodes (94): a(), m(), N(), q(), R(), B(), Fn, td() (+86 more)
+Cohesion: 0.12
+Nodes (16): Ctx, DELETE, detail(), GET, PUT, GET, POST, GET (+8 more)
 
 ### Community 8 - "addErrorMessage"
-Cohesion: 0.07
-Nodes (80): ac(), addErrorMessage(), addField(), addItem(), addSuggestion(), asObject(), bc(), _c() (+72 more)
+Cohesion: 0.08
+Nodes (71): ac(), addErrorMessage(), addField(), addSuggestion(), asObject(), bc(), bl(), _c() (+63 more)
 
 ### Community 9 - "absolutizeUrl"
 Cohesion: 0.08
-Nodes (42): buildLlmsText(), GET(), badges, features, generateMetadata(), generateMetadata(), Props, generateMetadata() (+34 more)
+Nodes (39): buildLlmsText(), GET(), badges, features, generateMetadata(), BlogPage(), generateMetadata(), Props (+31 more)
 
 ### Community 10 - "query_compiler_fast_bg.js"
 Cohesion: 0.05
-Nodes (39): C(), ee(), F, g, ge(), I(), J(), k() (+31 more)
+Nodes (51): Products(), MessagesSection(), Products(), C(), ee(), F, g, ge() (+43 more)
 
 ### Community 11 - "checkout/route.ts"
 Cohesion: 0.06
-Nodes (50): n(), CheckoutError, POST(), r2(), schema, PieCard(), fetchWishlist(), WishlistPage() (+42 more)
+Nodes (48): CheckoutError, POST, schema, fetchWishlist(), WishlistPage(), CartPage(), nf, QtyInput() (+40 more)
 
 ### Community 12 - "api/orders/[id]/payments/route.ts"
-Cohesion: 0.07
-Nodes (46): Ctx, POST(), schema, Ctx, DELETE(), findEditable(), idOf(), PATCH() (+38 more)
+Cohesion: 0.05
+Nodes (41): Ctx, POST, schema, Ctx, DELETE, PATCH, schema, GET (+33 more)
 
 ### Community 13 - "requireStaff"
-Cohesion: 0.06
-Nodes (41): Ctx, GET(), idOf(), OrderError, PATCH(), statusSchema, StockState, DELETE() (+33 more)
+Cohesion: 0.03
+Nodes (68): DELETE, GET, moderateSchema, PATCH, GET, DELETE, GET, loginSchema (+60 more)
 
 ### Community 14 - "ProductPicker.tsx"
-Cohesion: 0.10
-Nodes (41): VisualizerPage(), AppliedSummaryProps, CompareSlider(), CompareSliderProps, HeaderMenu(), HeaderMenuProps, ProductPicker(), ProductPickerProps (+33 more)
+Cohesion: 0.08
+Nodes (52): VisualizerPage(), AppliedSummaryProps, CompareSlider(), CompareSliderProps, HeaderMenu(), HeaderMenuProps, ProductPicker(), ProductPickerProps (+44 more)
 
 ### Community 15 - "users/page.tsx"
-Cohesion: 0.09
-Nodes (27): EMPTY, Form, StaffManagementPage(), toForm(), Picked, FileManager(), Kind, size() (+19 more)
+Cohesion: 0.05
+Nodes (67): AccountDesignsPage(), KIND_LABEL, OrderDetailPage(), fetchOrders(), KIND_LABEL, OrdersPage(), CustomerPaymentsPage(), FixDialog() (+59 more)
 
 ### Community 16 - "multi-select.tsx"
 Cohesion: 0.06
-Nodes (37): ChartConfig, ChartContainer(), ChartContext, ChartContextProps, ChartLegendContent(), ChartTooltipContent(), getPayloadConfigFromPayload(), INITIAL_DIMENSION (+29 more)
+Nodes (39): contactDetails, icons, socials, ColorField(), colorName(), ColorsField(), isHex(), Panel() (+31 more)
 
 ### Community 17 - "admin/analytics/route.ts"
-Cohesion: 0.07
-Nodes (40): GET, TODO: add permission check (e.g. reports.view) before shipping — right now ANY l, REVENUE_ORDER, GET, REVENUE_ORDER, buildSeries(), card(), CardFormat (+32 more)
+Cohesion: 0.09
+Nodes (31): GET, REVENUE_ORDER, GET, REVENUE_ORDER, buildSeries(), card(), CardFormat, dayKey() (+23 more)
 
 ### Community 18 - "getApiUser"
-Cohesion: 0.05
-Nodes (34): Ctx, GET(), RouteContext, GET(), AUTH_COOKIES, DELETE(), GET(), canManage() (+26 more)
+Cohesion: 0.10
+Nodes (26): DELETE, Ctx, DELETE, PUT, GET, POST, revokeUserRefreshSessions(), adminRoutes (+18 more)
 
 ### Community 19 - "button.tsx"
-Cohesion: 0.09
-Nodes (32): centuryGothic, glovar, contactDetails, icons, socials, Input(), Label(), Select() (+24 more)
+Cohesion: 0.03
+Nodes (96): centuryGothic, glovar, AdminProjectsPage(), toPayload(), BADGE_FILTERS, badgeStyle(), CATEGORY_FILTERS, FeaturedCard() (+88 more)
 
 ### Community 20 - "s"
-Cohesion: 0.12
-Nodes (50): s(), addErrorMessage(), addField(), addSuggestion(), an(), asObject(), bc(), br() (+42 more)
+Cohesion: 0.10
+Nodes (57): s(), addErrorMessage(), addField(), addSuggestion(), an(), asObject(), bc(), br() (+49 more)
 
 ### Community 21 - "invoice.ts"
-Cohesion: 0.08
-Nodes (40): GET(), notFound(), GET(), GET(), DELETE(), GET(), GET(), ORDER_STATUSES (+32 more)
+Cohesion: 0.12
+Nodes (26): GET, GET, GET, ORDER_STATUSES, PUT, RouteContext, InvoiceResult, issueInvoiceSafely() (+18 more)
 
 ### Community 22 - "checkout/page.tsx"
-Cohesion: 0.09
-Nodes (24): { Link, redirect, usePathname, useRouter, getPathname }, Step, LoginForm(), AuthCard(), FormError(), PasswordInput(), emptyData, Review (+16 more)
-
-### Community 24 - "variants-sheet.tsx"
-Cohesion: 0.09
-Nodes (28): ColorField(), colorName(), ColorsField(), isHex(), Panel(), PRESETS, Swatch(), ProjectDrawer() (+20 more)
+Cohesion: 0.08
+Nodes (26): changePasswordSchema, POST, GET, DELETE, GET, Context, GET, POST (+18 more)
 
 ### Community 25 - "template.ts"
 Cohesion: 0.08
@@ -599,32 +559,32 @@ Cohesion: 0.08
 Nodes (25): App(), EXTERIOR_WALL_IDS, floorSlab(), groundFloorData(), House(), House3D(), matConcrete, matDoor (+17 more)
 
 ### Community 28 - "constants.ts"
-Cohesion: 0.09
-Nodes (26): changePasswordSchema, POST(), GET(), PUT(), verifyToken, adminRoutes, COMPANY, CONNECT_HOSTS (+18 more)
+Cohesion: 0.14
+Nodes (19): getApiUser(), getTokenFromHeader(), getUserFromToken(), AccessClaims, accessKey(), encoder, generateAccessToken(), parseUserId() (+11 more)
 
 ### Community 29 - "write"
-Cohesion: 0.11
-Nodes (33): addMarginSymbol(), afterNextNewline(), copy(), de(), Fp(), ge(), getCurrentLineLength(), getPrintWidth() (+25 more)
+Cohesion: 0.10
+Nodes (35): getAllBatchQueryCallbacks(), _s(), addMarginSymbol(), afterNextNewline(), bt(), compare(), de(), Fp() (+27 more)
 
 ### Community 30 - "email.ts"
-Cohesion: 0.14
-Nodes (27): conflict(), POST(), registerSchema, bodySchema, POST(), OK, POST(), PROJECT_TYPES (+19 more)
+Cohesion: 0.12
+Nodes (35): Ctx, GET, OrderError, PATCH, statusSchema, StockState, OK, POST (+27 more)
 
 ### Community 31 - "blog/[id]/route.ts"
-Cohesion: 0.15
-Nodes (18): Ctx, DELETE(), detail(), GET(), PUT(), refresh(), GET(), POST() (+10 more)
+Cohesion: 0.28
+Nodes (9): as(), destroy(), digestInto(), finish(), keccak(), subarray(), writeInto(), xof() (+1 more)
 
 ### Community 32 - "dependencies"
-Cohesion: 0.07
-Nodes (29): cmdk, cn, @hugeicons/core-free-icons, libphonenumber-js, lucide-react, @mdx-js/mdx, nodemailer, dependencies (+21 more)
+Cohesion: 0.06
+Nodes (31): emoji-picker-react, fabric, jose, mariadb, next-intl, next-mdx-remote, next-themes, dependencies (+23 more)
 
 ### Community 33 - "Icons.tsx"
-Cohesion: 0.10
-Nodes (14): contactDetails, icons, socials, footerLinks, socials, ClockIcon(), EnvelopeIcon(), FacebookIcon() (+6 more)
+Cohesion: 0.13
+Nodes (4): ClockIcon(), IconProps, MapPinIcon(), PhoneIcon()
 
 ### Community 34 - "devDependencies"
-Cohesion: 0.07
-Nodes (29): dotenv, eslint, eslint-config-next, devDependencies, dotenv, eslint, eslint-config-next, tailwindcss (+21 more)
+Cohesion: 0.06
+Nodes (31): dotenv, eslint, eslint-config-next, devDependencies, dotenv, eslint, eslint-config-next, tailwindcss (+23 more)
 
 ### Community 35 - "Model Queries"
 Cohesion: 0.07
@@ -653,10 +613,6 @@ Nodes (27): aggregate, Aggregation Operations, Atomic operations, count, create,
 ### Community 41 - "Driver Adapters"
 Cohesion: 0.07
 Nodes (27): Accept self-signed certificates, After (v7), Available Adapters, Before (v6), Configuration, Connection Pool Configuration, Driver Adapters, Installation (+19 more)
-
-### Community 42 - "jwt.ts"
-Cohesion: 0.16
-Nodes (22): getDummyHash(), invalid(), loginSchema, POST(), POST(), POST(), unauthorized(), getTokenFromHeader() (+14 more)
 
 ### Community 43 - "Upgrade to Prisma ORM 7"
 Cohesion: 0.08
@@ -755,8 +711,8 @@ Cohesion: 0.10
 Nodes (20): cursor, distinct, Filtered include, include, Include relation count, Multiple distinct fields, Negative take (reverse), Nested include (+12 more)
 
 ### Community 67 - "store.ts"
-Cohesion: 0.11
-Nodes (15): products, projects, testimonials, Badge, BADGE_OPTIONS, Category, CATEGORY_OPTIONS, Collection (+7 more)
+Cohesion: 0.12
+Nodes (12): Badge, BADGE_OPTIONS, Category, CATEGORY_OPTIONS, Collection, defaultCollections, defaultProjectsExtended, KEYS (+4 more)
 
 ### Community 68 - "Client Methods"
 Cohesion: 0.10
@@ -795,8 +751,8 @@ Cohesion: 0.10
 Nodes (19): After (v7) - prisma.config.ts, Basic Configuration, Before (v6) - schema.prisma, Configuration Options, Custom Config Path, datasource.directUrl, datasource.shadowDatabaseUrl, datasource.url (+11 more)
 
 ### Community 77 - "locations.ts"
-Cohesion: 0.15
-Nodes (16): CACHE, GET(), CACHE, GET(), CACHE, GET(), byName(), getDistricts() (+8 more)
+Cohesion: 0.06
+Nodes (43): POST, DELETE, GET, PUT, authOptions, handler, rateLimitedHandler, POST (+35 more)
 
 ### Community 78 - "prisma db push"
 Cohesion: 0.10
@@ -875,8 +831,8 @@ Cohesion: 0.11
 Nodes (17): 1. Install dotenv, 2. Import in prisma.config.ts, Application Code, Bun Users, CI/CD Considerations, Entry point, Environment Variables, Multiple .env Files (+9 more)
 
 ### Community 98 - "forgot-password/route.ts"
-Cohesion: 0.20
-Nodes (13): forgotPasswordSchema, GENERIC_OK, POST(), POST(), resetPasswordSchema, POST(), verifyOtpSchema, generateResetCode() (+5 more)
+Cohesion: 0.09
+Nodes (29): forgotPasswordSchema, GENERIC_OK, POST, POST, registerSchema, POST, verifyOtpSchema, checkEmailEligibility() (+21 more)
 
 ### Community 99 - "prisma db seed"
 Cohesion: 0.11
@@ -887,16 +843,12 @@ Cohesion: 0.11
 Nodes (17): 1. Install dotenv, 2. Import in prisma.config.ts, Application Code, Bun Users, CI/CD Considerations, Entry point, Environment Variables, Multiple .env Files (+9 more)
 
 ### Community 101 - "sidebar.tsx"
-Cohesion: 0.15
-Nodes (7): Area, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuLabel(), DropdownMenuSeparator(), DropdownMenuTrigger()
+Cohesion: 0.03
+Nodes (61): { Link, redirect, usePathname, useRouter, getPathname }, metadata, StaffOnly(), AdminDashboardPage(), generateMetadata(), load, PostPage(), Props (+53 more)
 
 ### Community 102 - "PrismaPromise"
 Cohesion: 0.11
 Nodes (5): Prisma__AddressClient, Prisma__CatalogueClient, Prisma__ContactMessageClient, Prisma__MediaFileClient, PrismaPromise
-
-### Community 103 - "write"
-Cohesion: 0.04
-Nodes (108): P(), _a(), al(), an(), ap(), bd(), Be(), Br() (+100 more)
 
 ### Community 104 - "prisma db seed"
 Cohesion: 0.11
@@ -933,10 +885,6 @@ Nodes (16): 1. Keep your Accelerate URL, 2. Install Accelerate extension, 3. Con
 ### Community 112 - "ESM and CommonJS Support"
 Cohesion: 0.12
 Nodes (16): Browser-Safe Types, Bun, "Cannot use import statement outside a module", CommonJS Projects, "ERR_REQUIRE_ESM", ESM and CommonJS Support, ESM Projects, File Extensions (+8 more)
-
-### Community 113 - "HeaderMenu.tsx"
-Cohesion: 0.32
-Nodes (10): AlertDialog(), AlertDialogAction(), AlertDialogCancel(), AlertDialogContent(), AlertDialogDescription(), AlertDialogFooter(), AlertDialogHeader(), AlertDialogTitle() (+2 more)
 
 ### Community 114 - "panorama/page.tsx"
 Cohesion: 0.14
@@ -1003,16 +951,12 @@ Cohesion: 0.12
 Nodes (15): 1. Provider name, 2. Output is required, 3. engineType changed, 4. moduleFormat is explicit when needed, After Schema Changes, Datasource Block, Example Output Paths, Generated Entrypoints (+7 more)
 
 ### Community 130 - "blog-form.tsx"
-Cohesion: 0.17
-Nodes (9): BlogForm(), empty, Form, ImagePickerDialog(), MdxEditor(), safeAlt(), safeUrl(), BlogPostInput (+1 more)
+Cohesion: 0.04
+Nodes (57): n(), ActiveOrders(), CartCard(), compact, CustomerDashboardPage(), Dashboard(), fmtDate(), HistoryTable() (+49 more)
 
 ### Community 131 - "Schema Changes"
 Cohesion: 0.12
 Nodes (15): 1. Provider name, 2. Output is required, 3. engineType changed, 4. moduleFormat is explicit when needed, After Schema Changes, Datasource Block, Example Output Paths, Generated Entrypoints (+7 more)
-
-### Community 132 - "auth-context.tsx"
-Cohesion: 0.18
-Nodes (10): AuthContext, AuthContextType, AuthProvider(), currentLocale(), refreshAccessToken(), AuthUser, Listener, listeners (+2 more)
 
 ### Community 170 - "Schema Changes"
 Cohesion: 0.12
@@ -1027,8 +971,8 @@ Cohesion: 0.13
 Nodes (14): Error Handling, Prerequisites, Prisma Postgres Setup, Reference Files, Step 1: Authenticate, Step 2: List available regions, Step 3: Create a project with a database, Step 4: Create a named connection (optional) (+6 more)
 
 ### Community 173 - "products/route.ts"
-Cohesion: 0.26
-Nodes (10): PUT(), clean(), GET(), parseColors(), POST(), toInt(), productData(), slugify() (+2 more)
+Cohesion: 0.18
+Nodes (9): DELETE, GET, PUT, GET, POST, productData(), slugify(), STATUSES (+1 more)
 
 ### Community 174 - "(public)/page.tsx"
 Cohesion: 0.16
@@ -1069,10 +1013,6 @@ Nodes (13): Commit and rollback, Contract snapshot, Error mapping, Factory, owne
 ### Community 183 - "Core Workflows"
 Cohesion: 0.14
 Nodes (13): 1. Console-first workflow, 2. Quick provisioning with create-db, 2b. Persistent databases with the Platform CLI, 3. Link an existing local project, 4. Programmatic provisioning with Management API, 5. Type-safe integration with Management API SDK, Core Workflows, How to Use (+5 more)
-
-### Community 184 - "useAuth"
-Cohesion: 0.24
-Nodes (9): StaffOnly(), RegisterPage(), DashboardShell(), Navbar(), ProtectedRoute(), isActive(), SidebarContent(), useAuth() (+1 more)
 
 ### Community 185 - "Prisma Compute Framework Readiness"
 Cohesion: 0.14
@@ -1398,10 +1338,6 @@ Nodes (8): Decision table, Hand-off rule, If staying on v6: hygiene (a deliberat
 Cohesion: 0.22
 Nodes (8): Create connection, Create project (with database), Delete database, Delete project, endpoints, Get database, List projects, List regions
 
-### Community 271 - "[locale]/layout.tsx"
-Cohesion: 0.25
-Nodes (5): centuryGothic, glovar, metadata, OG_LOCALES, ThemeProvider()
-
 ### Community 272 - "prisma migrate status"
 Cohesion: 0.22
 Nodes (8): Check status, Command, Examples, Exit Codes, Options, prisma migrate status, What It Does, When to Use
@@ -1441,10 +1377,6 @@ Nodes (8): Decision table, Hand-off rule, If staying on v6: hygiene (a deliberat
 ### Community 281 - "endpoints"
 Cohesion: 0.22
 Nodes (8): Create connection, Create project (with database), Delete database, Delete project, endpoints, Get database, List projects, List regions
-
-### Community 282 - "Navbar.tsx"
-Cohesion: 0.28
-Nodes (4): links, Avatar(), AvatarFallback(), AvatarImage()
 
 ### Community 284 - "prisma migrate status"
 Cohesion: 0.22
@@ -1498,10 +1430,6 @@ Nodes (7): Bad, client-api-mapping, Good, Priority, References, The mapping, Why
 Cohesion: 0.25
 Nodes (7): auth, Creating a service token, OAuth 2.0 (for user-scoped access), Security practices, Service Tokens, Token scope, Using a service token
 
-### Community 297 - "dashboard-shell.tsx"
-Cohesion: 0.32
-Nodes (4): adminNav, customerNav, NavItem, MobileSidebar()
-
 ### Community 298 - "prisma mcp"
 Cohesion: 0.25
 Nodes (7): Command, Notes, prisma mcp, References, Typical Use Cases, Usage, What It Does
@@ -1554,10 +1482,6 @@ Nodes (6): Checklist, Ground rules, Priority, References, verify-cutover-checkli
 Cohesion: 0.29
 Nodes (6): Basic instantiation, Common mistakes, Key rules, Prisma 7 Client Instantiation, Required packages, Usage in application code
 
-### Community 313 - "types/request.ts"
-Cohesion: 0.33
-Nodes (5): routing, AdminRequest, AdminRequestDTO, RequestType, SupportedLocales
-
 ### Community 314 - "prisma debug"
 Cohesion: 0.29
 Nodes (6): Command, Example Output, Options, prisma debug, What It Does, When to Use
@@ -1589,6 +1513,10 @@ Nodes (6): Checklist, Ground rules, Priority, References, verify-cutover-checkli
 ### Community 324 - "Prisma 7 Client Instantiation"
 Cohesion: 0.29
 Nodes (6): Basic instantiation, Common mistakes, Key rules, Prisma 7 Client Instantiation, Required packages, Usage in application code
+
+### Community 326 - "WhyUs.tsx"
+Cohesion: 0.19
+Nodes (7): slides, WhyUsIcon(), products, projects, stats, testimonials, whyUs
 
 ### Community 340 - "next.config.js"
 Cohesion: 0.33
@@ -1628,10 +1556,6 @@ Nodes (5): ./extension, default, import, require, types
 Cohesion: 0.40
 Nodes (5): ./index-browser, default, import, require, types
 
-### Community 363 - "./runtime/index-browser"
-Cohesion: 0.40
-Nodes (5): ./runtime/index-browser, default, import, require, types
-
 ### Community 365 - "AI safety checkpoint for destructive commands"
 Cohesion: 0.50
 Nodes (3): AI safety checkpoint for destructive commands, Reference, Required workflow
@@ -1639,6 +1563,10 @@ Nodes (3): AI safety checkpoint for destructive commands, Reference, Required wo
 ### Community 368 - "AI safety checkpoint for destructive commands"
 Cohesion: 0.50
 Nodes (3): AI safety checkpoint for destructive commands, Reference, Required workflow
+
+### Community 369 - "Hero.tsx"
+Cohesion: 0.07
+Nodes (24): routing, centuryGothic, glovar, metadata, OG_LOCALES, ThemeProvider(), CONNECT_HOSTS, FRAME_HOSTS (+16 more)
 
 ### Community 376 - "README.md"
 Cohesion: 0.50
@@ -1652,25 +1580,66 @@ Nodes (3): AI safety checkpoint for destructive commands, Reference, Required wo
 Cohesion: 0.67
 Nodes (3): PrismaClientBaseOptions, PrismaClientOptionsWithAccelerateUrl, PrismaClientOptionsWithAdapter
 
+### Community 390 - "emoji-picker-react"
+Cohesion: 0.20
+Nodes (18): addMarginSymbol(), afterNextNewline(), Or, getCurrentLineLength(), getPrintWidth(), gs(), indent(), newLine() (+10 more)
+
+### Community 393 - "writeInto"
+Cohesion: 0.27
+Nodes (11): digest(), digestInto(), finish(), keccak(), li(), ma(), pa(), Qp() (+3 more)
+
+### Community 405 - "mariadb"
+Cohesion: 0.25
+Nodes (4): BackToTop(), footerLinks, socials, XIcon()
+
+### Community 409 - "next-intl"
+Cohesion: 0.33
+Nodes (5): config, Prisma, PrismaClient, {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientInitializationError,
+  PrismaClientValidationError,
+  getPrismaClient,
+  sqltag,
+  empty,
+  join,
+  raw,
+  skip,
+  Decimal,
+  Debug,
+  DbNull,
+  JsonNull,
+  AnyNull,
+  NullTypes,
+  makeStrictEnum,
+  Extensions,
+  warnOnce,
+  defineDmmfProperty,
+  Public,
+  getRuntime,
+  createParam,
+}, empty()
+
 ## Knowledge Gaps
-- **6704 isolated node(s):** `KIND_LABEL`, `KIND_LABEL`, `sqm`, `compact`, `plain` (+6699 more)
+- **6824 isolated node(s):** `KIND_LABEL`, `KIND_LABEL`, `sqm`, `compact`, `plain` (+6819 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **137 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **131 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `gs()` connect `runtime/client.js` to `write`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Why does `Or` connect `runtime/client.js` to `runtime/client.d.ts`?**
+- **Why does `gs()` connect `emoji-picker-react` to `runtime/client.js`?**
   _High betweenness centrality (0.044) - this node is a cross-community bridge._
-- **Why does `s()` connect `s` to `runtime/client.js`, `blog-form.tsx`, `wasm-compiler-edge.js`, `apiErrorMessage`, `write`, `addErrorMessage`, `a`, `query_compiler_fast_bg.js`, `panorama/page.tsx`, `variants-sheet.tsx`, `write`?**
+- **Why does `Or` connect `emoji-picker-react` to `runtime/client.d.ts`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `r()` connect `runtime/client.js` to `wasm-compiler-edge.js`, `emoji-picker-react`, `addErrorMessage`, `query_compiler_fast_bg.js`, `users/page.tsx`, `panorama/page.tsx`, `s`, `invoice.ts`, `write`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Are the 85 inferred relationships involving `r()` (e.g. with `PanoramaInner()` and `ResourcePage()`) actually correct?**
   _`r()` has 85 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 77 inferred relationships involving `n()` (e.g. with `k()` and `V()`) actually correct?**
   _`n()` has 77 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 58 inferred relationships involving `s()` (e.g. with `OrderView()` and `PaymentView()`) actually correct?**
+  _`s()` has 58 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `KIND_LABEL`, `KIND_LABEL`, `sqm` to the rest of the system?**
-  _6704 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `index.d.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.0005557099194220616 - nodes in this community are weakly interconnected._
+  _6824 weakly-connected nodes found - possible documentation gaps or missing edges._

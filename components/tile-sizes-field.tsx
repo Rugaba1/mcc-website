@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SizeInput } from "@/components/ui/size-input";
 
 const COMMON_SIZES = [
   "300×300mm",
@@ -74,32 +74,8 @@ export function TileSizesField({
         )}
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_6rem_auto]">
-        <div className="space-y-1">
-          <Label htmlFor="tile-size-width">Width</Label>
-          <Input
-            id="tile-size-width"
-            type="number"
-            min="1"
-            step="any"
-            inputMode="decimal"
-            placeholder="600"
-            value={width}
-            onChange={(event) => setWidth(event.target.value)}
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="tile-size-height">Height</Label>
-          <Input
-            id="tile-size-height"
-            type="number"
-            min="1"
-            step="any"
-            inputMode="decimal"
-            placeholder="600"
-            value={height}
-            onChange={(event) => setHeight(event.target.value)}
-          />
-        </div>
+        <SizeInput id="tile-size-width" label="Width" value={width} unit={unit} placeholder="600" onValueChange={setWidth} />
+        <SizeInput id="tile-size-height" label="Height" value={height} unit={unit} placeholder="600" onValueChange={setHeight} />
         <div className="col-span-2 space-y-1 sm:col-span-1">
           <Label htmlFor="tile-size-unit">Unit</Label>
           <Select value={unit} onValueChange={setUnit}>

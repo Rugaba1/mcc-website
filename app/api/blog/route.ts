@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPublishedPosts } from "@/lib/blog/queries";
-import { postData, uniquePostSlug } from "@/lib/blog/payload";
+import { parseBlogPostPayload, postData, uniquePostSlug } from "@/lib/blog/payload";
 import { withRateLimit } from "@/lib/middleware/withRateLimit";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
@@ -42,9 +42,24 @@ export const GET = withRateLimit({
 
 export const POST = withPermission(PERM.BLOG_WRITE)(async (req, { user }) => {
   try {
-    const body = await req.json();
-    const data = postData(body);
-    if (!data.title || !data.content) {
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON request body" },
+        { status: 400 },
+      );
+    }
+    const payload = parseBlogPostPayload(body);
+    if (!payload) {
+      return NextResponse.json(
+        { error: "Blog post body must be a JSON object with valid fields" },
+        { status: 400 },
+      );
+    }
+    const data = postData(payload);
+    if (!data.title || !data.content.trim()) {
       return NextResponse.json(
         { error: "title and content are required" },
         { status: 400 },
@@ -53,7 +68,7 @@ export const POST = withPermission(PERM.BLOG_WRITE)(async (req, { user }) => {
     const post = await prisma.blogPost.create({
       data: {
         ...data,
-        slug: await uniquePostSlug(body.slug || data.title),
+        slug: await uniquePostSlug(payload.slug || data.title),
         authorId: user.id,
       },
     });

@@ -1,3 +1,4 @@
+import { MediaImage } from "@/components/media-image";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -5,33 +6,33 @@ import { serverApi, type Product } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
 export default async function FeaturedCollections() {
-  
+
 
   let collections = null
-    let products: Product[] = []
-    try {
-  
-      collections = (await serverApi.getCollections())
-  
-      const ps = collections.map((p) => p.items?.flatMap((p => p.product)))
-  
-      ps.forEach((p) => {
-        if (p) products = [...products, ...p]
-      })
-  
-    } catch (error) {
-  
-    }
-    if (!collections) {
-      return (
-        <div className="min-h-screen  flex items-center justify-center">
-          <div className="text-center">
-            <p className=" font-semibold text-lg">collections not found</p>
-            
-          </div>
+  let products: Product[] = []
+  try {
+
+    collections = (await serverApi.getCollections())
+
+    const ps = collections.map((p) => p.items?.flatMap((p => p.product)))
+
+    ps.forEach((p) => {
+      if (p) products = [...products, ...p]
+    })
+
+  } catch (error) {
+
+  }
+  if (!collections) {
+    return (
+      <div className="min-h-screen  flex items-center justify-center">
+        <div className="text-center">
+          <p className=" font-semibold text-lg">collections not found</p>
+
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
   // Show featured first, then rest — limit to 6
   const sorted = [
@@ -94,7 +95,7 @@ export default async function FeaturedCollections() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      unoptimized
+
                     />
                   ) : (
                     <div className="absolute inset-0 bg-linear-to-br from-muted to-muted flex items-center justify-center">
@@ -139,7 +140,7 @@ export default async function FeaturedCollections() {
                       {tiles.slice(0, 5).map((t) => (
                         <div key={t.id} className="w-9 h-9 overflow-hidden rounded  /10 shrink-0">
                           {t.image ? (
-                            <img
+                            <MediaImage
                               src={t.image}
                               alt={t.name}
                               className="w-full h-full object-cover"

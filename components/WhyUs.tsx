@@ -15,7 +15,7 @@ export default function WhyUs() {
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
-            unoptimized />
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-inverse/20 to-inverse/60 lg:bg-gradient-to-l lg:from-inverse/70 lg:to-transparent" />
 
           {/* Award card */}

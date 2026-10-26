@@ -4,7 +4,9 @@ import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
+import { visit } from "unist-util-visit";
 import { unified } from "unified";
+import type { Root } from "mdast";
 import { deliverMail } from "@/lib/mailer";
 import { siteConfig } from "@/config/site.config";
 import { serverConfig } from "@/config/server.config";
@@ -57,6 +59,20 @@ const footerDetails = [
     .join(" | "),
   siteConfig.companyWebsite,
 ].filter(Boolean);
+
+function absoluteMarkdownUrls() {
+  return (tree: Root) => {
+    visit(tree, ["link", "image"], (node) => {
+      if (!("url" in node) || typeof node.url !== "string") return;
+      if (
+        node.url.startsWith("/") &&
+        !node.url.startsWith("//")
+      ) {
+        node.url = new URL(node.url, siteConfig.siteUrl).toString();
+      }
+    });
+  };
+}
 
 const shell = (
   title: string,
@@ -139,6 +155,7 @@ export async function sendNewsletterCampaignEmail(p: {
     await unified()
       .use(remarkParse)
       .use(remarkGfm)
+      .use(absoluteMarkdownUrls)
       .use(remarkRehype)
       .use(rehypeSanitize)
       .use(rehypeStringify)

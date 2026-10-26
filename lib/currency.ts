@@ -8,6 +8,36 @@ export type CurrencyOption = {
   rateToBase: number;
 };
 
+const currencyCountries: Record<string, string> = {
+  AED: "AE",
+  AUD: "AU",
+  BIF: "BI",
+  CAD: "CA",
+  CHF: "CH",
+  CNY: "CN",
+  CDF: "CD",
+  EUR: "EU",
+  GBP: "GB",
+  INR: "IN",
+  JPY: "JP",
+  KES: "KE",
+  NGN: "NG",
+  RWF: "RW",
+  SAR: "SA",
+  TZS: "TZ",
+  UGX: "UG",
+  USD: "US",
+  ZAR: "ZA",
+};
+
+export function currencyFlag(code: string): string {
+  const country = currencyCountries[code.toUpperCase()];
+  if (!country) return String.fromCodePoint(0x1f310);
+  return String.fromCodePoint(
+    ...Array.from(country, (letter) => 0x1f1e6 + letter.charCodeAt(0) - 65),
+  );
+}
+
 export function serializeCurrency(currency: {
   code: string;
   name: string;

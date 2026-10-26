@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useRef, useState, type ChangeEvent } from "react";
 import { ImageIcon, Loader2 } from "lucide-react";
 import { Input, Label } from "./fields";
@@ -53,9 +55,7 @@ export function ImageUploader({
           >
             {uploading ? (
               <Loader2 className="h-6 w-6 animate-spin" />
-            ) : value ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={value} alt="" className="h-full w-full object-cover" />
+            ) : value ? (              <MediaImage src={value} alt="" className="h-full w-full object-cover" />
             ) : (
               <ImageIcon className="h-7 w-7 text-muted-foreground" />
             )}

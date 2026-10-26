@@ -2,13 +2,10 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import {
-  sendContactAcknowledgement,
-  sendContactStaffAlert,
-} from "@/lib/email";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { withRateLimit } from "@/lib/middleware/withRateLimit";
 import { PERM } from "@/lib/permissions/catalog";
+import { processContactEmailDelivery } from "@/lib/contact-email-queue";
 
 export const runtime = "nodejs";
 
@@ -92,7 +89,14 @@ export const POST = withRateLimit({
           projectType: data.projectType || null,
           message: data.message,
           ipHash,
+          emailDeliveries: {
+            create: [
+              { type: "ACKNOWLEDGEMENT" },
+              { type: "STAFF_ALERT" },
+            ],
+          },
         },
+        include: { emailDeliveries: { select: { id: true, type: true } } },
       });
       await tx.adminNotification.create({
         data: {
@@ -107,36 +111,27 @@ export const POST = withRateLimit({
       return message;
     });
 
-    // The message is already stored, so a mail failure must not fail the request
-    const [ackSent, staffAlertSent] = await Promise.all([
-      sendContactAcknowledgement({
-        to: data.email,
-        firstName: data.firstName,
-        message: data.message,
+    const deliveryResults = await Promise.all(
+      saved.emailDeliveries.map(async (delivery) => {
+        try {
+          return [delivery.type, await processContactEmailDelivery(delivery.id)] as const;
+        } catch (error) {
+          console.error("Initial contact email delivery attempt failed.", {
+            contactMessageId: saved.id,
+            deliveryId: delivery.id,
+            type: delivery.type,
+            error,
+          });
+          return [delivery.type, "pending"] as const;
+        }
       }),
-      sendContactStaffAlert({
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        phone: data.phone,
-        projectType: data.projectType,
-        message: data.message,
-      }),
-    ]);
-
-    if (ackSent) {
-      await prisma.contactMessage.update({
-        where: { id: saved.id },
-        data: { ackSentAt: new Date() },
-      });
-    } else {
-      console.error("Contact confirmation email was not delivered.", {
-        contactMessageId: saved.id,
-      });
-    }
-    if (!staffAlertSent)
-      console.error("Contact staff notification email was not delivered.", {
-        contactMessageId: saved.id,
-      });
+    );
+    const ackSent = deliveryResults.some(
+      ([type, result]) => type === "ACKNOWLEDGEMENT" && result === "sent",
+    );
+    const staffAlertSent = deliveryResults.some(
+      ([type, result]) => type === "STAFF_ALERT" && result === "sent",
+    );
 
     return NextResponse.json(
       { ...OK, confirmationSent: ackSent, staffAlertSent },

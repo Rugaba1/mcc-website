@@ -26,6 +26,7 @@ import {
   Table2,
   Minus,
   Pencil,
+  Paperclip,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +41,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ImagePickerDialog } from "@/components/admin/image-picker-dialog";
+import { ContentLinkPicker } from "@/components/admin/content-link-picker";
 import type { MediaFile } from "@/lib/api";
 import { cn } from "cn";
 import {
@@ -88,6 +90,7 @@ export function MarkdownEditor({
   disabled = false,
   maxLength,
   enableImages = true,
+  enableContentLinks = true,
   id,
 }: {
   value: string;
@@ -95,12 +98,14 @@ export function MarkdownEditor({
   disabled?: boolean;
   maxLength?: number;
   enableImages?: boolean;
+  enableContentLinks?: boolean;
   id?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { resolvedTheme } = useTheme();
   const [mode, setMode] = useState<EditorMode>("write");
   const [pickingImage, setPickingImage] = useState(false);
+  const [pickingContent, setPickingContent] = useState(false);
   const [pickingEmoji, setPickingEmoji] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkLabel, setLinkLabel] = useState("");
@@ -219,6 +224,10 @@ export function MarkdownEditor({
     );
   }
 
+  function insertContentCard(markdown: string) {
+    edit(() => `\n\n${markdown}\n\n`);
+  }
+
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
     const key = event.key.toLowerCase();
@@ -275,6 +284,9 @@ export function MarkdownEditor({
         <Button type="button" variant="ghost" size="icon" className={toolbarButton} title="Insert emoji" aria-label="Insert emoji" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setPickingEmoji(true)}><Smile /></Button>
         {enableImages && (
           <Button type="button" variant="ghost" size="icon" className={toolbarButton} title="Insert image" aria-label="Insert image" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setPickingImage(true)}><ImageIcon /></Button>
+        )}
+        {enableContentLinks && (
+          <Button type="button" variant="ghost" size="icon" className={toolbarButton} title="Attach a product, collection, catalogue, publication, or blog" aria-label="Attach existing content" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setPickingContent(true)}><Paperclip /></Button>
         )}
         <Button type="button" variant="ghost" size="icon" className={toolbarButton} title="Insert table" aria-label="Insert table" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => edit(() => "\n\n| Column 1 | Column 2 |\n| --- | --- |\n| Cell 1 | Cell 2 |\n\n")}><Table2 /></Button>
         <Button type="button" variant="ghost" size="icon" className={toolbarButton} title="Horizontal rule" aria-label="Horizontal rule" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => edit(() => "\n\n---\n\n")}><Minus /></Button>
@@ -383,6 +395,13 @@ export function MarkdownEditor({
           open={pickingImage}
           onOpenChange={setPickingImage}
           onSelect={insertImage}
+        />
+      )}
+      {enableContentLinks && (
+        <ContentLinkPicker
+          open={pickingContent}
+          onOpenChange={setPickingContent}
+          onSelect={insertContentCard}
         />
       )}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>

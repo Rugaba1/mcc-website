@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
-import { postData, uniquePostSlug } from "@/lib/blog/payload";
+import { parseBlogPostPayload, postData, uniquePostSlug } from "@/lib/blog/payload";
 import { checkMdx } from "@/lib/blog/validate";
 import { toSummary } from "@/lib/blog/summary";
 
@@ -59,8 +59,23 @@ export const GET = withPermission(PERM.BLOG_VIEW)(async (req: NextRequest) => {
 export const POST = withPermission(PERM.BLOG_WRITE)(
   async (req: NextRequest, { user }) => {
   try {
-    const body = await req.json();
-    const data = postData(body);
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON request body" },
+        { status: 400 },
+      );
+    }
+    const payload = parseBlogPostPayload(body);
+    if (!payload) {
+      return NextResponse.json(
+        { error: "Blog post body must be a JSON object" },
+        { status: 400 },
+      );
+    }
+    const data = postData(payload);
     if (!data.title || !data.content)
       return NextResponse.json(
         { error: "Title and content are required" },
@@ -73,7 +88,9 @@ export const POST = withPermission(PERM.BLOG_WRITE)(
     const post = await prisma.blogPost.create({
       data: {
         ...data,
-        slug: await uniquePostSlug(body.slug || data.title),
+        slug: await uniquePostSlug(
+          payload.slug ?? data.title,
+        ),
         authorId: user.id,
       },
     });

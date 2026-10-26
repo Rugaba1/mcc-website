@@ -74,7 +74,7 @@ function ForgotPasswordContent() {
     };
 
     const back = (
-        <Link href="/login" className="font-semibold text-primary hover:underline">
+        <Link href="/login" className="font-semibold text-primary font-serif hover:underline">
             Back to sign in
         </Link>
     );

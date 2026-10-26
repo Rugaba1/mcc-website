@@ -74,7 +74,7 @@ export default function Process() {
         {/* Bottom CTA */}
         <div className="mt-20 text-center">
           <a
-            href="#contact"
+            href="/contact"
             className="group inline-flex items-center gap-3 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-10 py-4 transition-all duration-300 text-sm tracking-widest uppercase shadow-lg shadow-primary/20"
           >
             Start Your Project Today

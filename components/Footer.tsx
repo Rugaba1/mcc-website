@@ -2,6 +2,8 @@ import Image from "next/image";
 import { Link } from "@/app/i18n/routing";
 import { COMPANY } from "@/lib/company";
 import { NewsletterSignup } from "@/components/newsletter-signup";
+import { siteConfig } from "@/config/site.config";
+import CookieConsent from "./cookie-consent";
 
 const footerLinks = [
   {
@@ -45,10 +47,10 @@ export default function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-12 mb-14">
 
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 gap-2">
             <div className="flex flex-wrap items-start ">
-              <div className="flex flex-col gap-3 group">
-                <Link href="/" className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-col  group">
+                <div className="flex flex-row items-center gap-2 flex-wrap">
                   <div className="relative h-10 w-10 shrink-0">
                     <Image
                       src="/logo.png"
@@ -56,14 +58,29 @@ export default function Footer() {
                       fill
                       className="object-contain"
                       sizes="40px"
-                      unoptimized />
+                    />
                   </div>
-                  <div className="flex flex-col leading-none">
-                    <span className="font-bold text-[15px] tracking-wide">Mountain Ceramics</span>
-                    <span className="text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
+                  <div className="flex gap-2 flex-wrap">
+                    <div className="flex flex-col leading-none">
+                      <span className="font-bold text-[15px] tracking-wide">Mountain Ceramics</span>
+                      <span className="text-[10px] tracking-[0.25em] uppercase">Company · Rwanda</span>
+                    </div>
+
+
+                    {/* <Link
+                        href="/contact"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold px-8 py-3 tracking-widest uppercase transition-all duration-300"
+                      >
+                        Get Free Quote
+                      </Link> */}
+
                   </div>
-                </Link>
-                <a href={`tel:${COMPANY.phone}`} className="text-[10px] tracking-[0.25em] uppercase">{COMPANY.phone}</a>
+
+                </div>
+                <div className="flex flex-wrap gap-1 items-center">
+                  <a href={`tel:${COMPANY.phone}`} className="text-[10px] tracking-[0.25em] uppercase">{COMPANY.phone}</a> | <a className="text-[10px] tracking-[0.25em] uppercase" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+                </div>
+
 
 
 
@@ -72,23 +89,12 @@ export default function Footer() {
                 </p>
                 <NewsletterSignup />
               </div>
-              <div className=" flex flex-col md:flex-row items-center  gap-1">
 
-                <Link
-                  href="/contact"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold px-8 py-3 tracking-widest uppercase transition-all duration-300"
-                >
-                  Get Free Quote
-                </Link>
-              </div>
             </div>
 
 
 
-            <div className="mb-8 flex flex-col items-start gap-2 text-sm text-inverse-foreground/80">
-              <a className="transition-colors hover:text-inverse-foreground" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
-              <Link className="transition-colors hover:text-inverse-foreground" href="/contact">Contact our team</Link>
-            </div>
+
 
             {/* Certs */}
             <div className="flex flex-wrap gap-2">
@@ -131,9 +137,15 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-center text-xs text-inverse-foreground/70 sm:text-left">
-            © {year} Mountain Ceramics Company (MCC). All rights reserved. · {COMPANY.address}
-          </p>
+          <div>
+            <p className="text-center text-xs text-inverse-foreground/70 sm:text-left">
+              © {year} Mountain Ceramics Company (MCC). All rights reserved. · {COMPANY.address}
+            </p>
+            <CookieConsent
+              analyticsId={siteConfig.googleAnalyticsId}
+
+            /></div>
+
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <Link href="/legal/terms-and-conditions" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
               Terms and Conditions

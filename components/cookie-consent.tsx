@@ -9,6 +9,7 @@ import { Link } from "@/app/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+ 
 
 const CONSENT_COOKIE = "mcc_cookie_consent";
 const CONSENT_VERSION = 1;
@@ -132,13 +133,14 @@ function GoogleAnalytics({
   );
 }
 
-export default function CookieConsent({
+export default  function CookieConsent({
   analyticsId,
-  nonce,
+ 
 }: {
   analyticsId: string;
-  nonce?: string;
-}) {
+  }) {
+    // const requestHeaders = await headers();
+    //   const nonce = requestHeaders.get("x-nonce") ?? undefined;
   const t = useTranslations("cookieConsent");
   const [ready, setReady] = useState(false);
   const [consent, setConsent] = useState<CookieConsentValue | null>(null);
@@ -189,7 +191,7 @@ export default function CookieConsent({
   return (
     <>
       {consent?.analytics && analyticsId ? (
-        <GoogleAnalytics measurementId={analyticsId} nonce={nonce} />
+        <GoogleAnalytics measurementId={analyticsId} nonce={undefined} />
       ) : null}
 
       {consent === null || settingsOpen ? (
@@ -288,7 +290,7 @@ export default function CookieConsent({
           type="button"
           variant="outline"
           size="sm"
-          className="fixed bottom-3 left-3 z-100 gap-2 bg-background shadow-md sm:bottom-6 sm:left-6"
+          className="bg-background shadow-md  my-2"
           aria-pressed={settingsOpen}
           onClick={openSettings}
         >

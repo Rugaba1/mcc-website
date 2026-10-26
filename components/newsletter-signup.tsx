@@ -33,8 +33,8 @@ export function NewsletterSignup() {
   }
 
   return (
-    <form onSubmit={subscribe} className="mt-6 max-w-sm space-y-3">
-      <label htmlFor="newsletter-email" className="text-xs font-semibold uppercase tracking-wider">
+    <form onSubmit={subscribe} className=" max-w-sm space-y-2">
+      <label htmlFor="newsletter-email" className="text-xs font-serif font-semibold uppercase tracking-wider">
         News and updates
       </label>
       <div className="flex min-w-0 gap-2">
@@ -76,7 +76,7 @@ export function NewsletterSignup() {
         tabIndex={-1}
         autoComplete="off"
         aria-hidden="true"
-        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        className="absolute left-[-9999px] h-0 w-0 opacity-0"
       />
     </form>
   );

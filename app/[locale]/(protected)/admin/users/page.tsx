@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "@/app/i18n/routing";
 import { toast } from "sonner";
@@ -58,9 +60,7 @@ const toForm = (u: AdminUser): Form => ({
 function Avatar({ src, name }: { src: string | null; name: string }) {
   return (
     <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted">
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={name} className="size-full object-cover" />
+      {src ? (        <MediaImage src={src} alt={name} className="size-full object-cover" />
       ) : (
         <UserRound className="size-5 text-muted-foreground" />
       )}

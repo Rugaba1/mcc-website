@@ -1,5 +1,7 @@
 "use client";
 
+import { MediaImage } from "@/components/media-image";
+
 import { useEffect, useState } from "react";
 import { ExternalLink, ImageIcon, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -194,8 +196,7 @@ export function BlogForm({ postId }: { postId?: number }) {
                         <CardContent className="space-y-3">
                             {form.coverImage ? (
                                 <div className="relative border">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={form.coverImage} alt={form.coverAlt || ""} className="aspect-video w-full object-cover" />
+                                    <MediaImage src={form.coverImage} alt={form.coverAlt || ""} className="aspect-video w-full object-cover" />
                                     <Button type="button" size="icon" variant="secondary" className="absolute right-1.5 top-1.5 size-7 rounded-none"
                                         onClick={() => { set("coverImage", ""); set("coverAlt", ""); }} aria-label="Remove cover"><X /></Button>
                                 </div>

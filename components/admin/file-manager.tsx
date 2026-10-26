@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Copy, FileText, Loader2, Pencil, Search, Trash2, Upload } from "lucide-react";
+import { Check, Copy, Eye, FileText, Loader2, Pencil, Search, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { api, apiErrorMessage, type MediaFile } from "@/lib/api";
@@ -18,6 +18,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Image from "next/image";
+import { useMediaPreview } from "@/components/media-preview-provider";
 
 const PAGE_SIZE = 24;
 const size = (b: number) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
@@ -34,6 +36,7 @@ export function FileManager({
   onSelect?: (file: MediaFile) => void;
 }) {
   const { user } = useAuth();
+  const { openPreview } = useMediaPreview();
   const canUpload = Boolean(user && hasPermissions(user.permissions, PERM.MEDIA_UPLOAD));
   const [kind, setKind] = useState<Kind>(fixedKind ?? "all");
   const [search, setSearch] = useState("");
@@ -184,8 +187,7 @@ export function FileManager({
                     onDoubleClick={() => mode === "pick" && onSelect?.(f)}
                   >
                     {f.kind === "image" ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={f.url} alt={f.alt ?? f.name} loading="lazy" className="size-full object-cover" />
+                      <Image src={f.url} alt={f.alt ?? f.name} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover" />
                     ) : (
                       <span className="flex size-full flex-col items-center justify-center gap-1 text-muted-foreground">
                         <FileText className="size-8" />
@@ -202,6 +204,7 @@ export function FileManager({
                     <p className="truncate text-sm font-medium" title={f.name}>{f.name}</p>
                     <p className="text-xs text-muted-foreground">{size(f.size)}</p>
                     <div className="flex gap-0.5">
+                      <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => openPreview(f)} aria-label={`Preview ${f.name}`}><Eye /></Button>
                       <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => copy(f)} aria-label="Copy link"><Copy /></Button>
                       <PermissionGate required={PERM.MEDIA_MANAGE}>
                         <Button type="button" variant="ghost" size="icon" className="size-7 rounded-none" onClick={() => setRenaming(f)} aria-label="Rename"><Pencil /></Button>

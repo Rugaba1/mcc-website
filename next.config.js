@@ -19,8 +19,6 @@ const imagePatterns = imageSources.map((source) => {
     ...(url.port ? { port: url.port } : {}),
   };
 });
-const imageDomains = imagePatterns.map(({ hostname }) => hostname);
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
@@ -46,10 +44,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
-  },
-
   compiler: {
     removeConsole:
       process.env.NODE_ENV === "production"
@@ -57,8 +51,8 @@ const nextConfig = {
         : false,
   },
   images: {
-    domains: imageDomains,
     remotePatterns: imagePatterns,
+    formats: ["image/avif", "image/webp"],
   },
   async headers() {
     return [
