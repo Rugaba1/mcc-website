@@ -117,6 +117,9 @@ export const POST = withOptionalAuth(async (req, { user }) => {
       { status: 500 },
     );
   }
+}, {
+  interval: 60_000,
+  uniqueTokenPerInterval: 30,
 });
 
 // ── PUT /api/visualizer/designs — update an owned saved design ───────────────
@@ -186,4 +189,7 @@ export const PUT = withOptionalAuth(async (req, { user }) => {
       { status: 500 },
     );
   }
+}, {
+  interval: 60_000,
+  uniqueTokenPerInterval: 30,
 });

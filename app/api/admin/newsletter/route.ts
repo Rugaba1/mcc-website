@@ -38,12 +38,29 @@ export const GET = withPermission(PERM.NEWSLETTER_MANAGE)(
           },
         }),
       ]);
+      const recipientCounts = campaigns.length
+        ? await prisma.newsletterCampaignRecipient.groupBy({
+            by: ["campaignId", "status"],
+            where: { campaignId: { in: campaigns.map((campaign) => campaign.id) } },
+            _count: { _all: true },
+          })
+        : [];
+      const recipientsByCampaign = new Map<
+        number,
+        Record<string, number>
+      >();
+      for (const row of recipientCounts) {
+        const statusCounts = recipientsByCampaign.get(row.campaignId) ?? {};
+        statusCounts[row.status] = row._count._all;
+        recipientsByCampaign.set(row.campaignId, statusCounts);
+      }
       return NextResponse.json({
         counts: Object.fromEntries(counts.map((row) => [row.status, row._count._all])),
         subscribers,
         campaigns: campaigns.map(({ _count, ...campaign }) => ({
           ...campaign,
           recipientCount: _count.recipients,
+          recipientStatusCounts: recipientsByCampaign.get(campaign.id) ?? {},
         })),
       });
     } catch (error) {

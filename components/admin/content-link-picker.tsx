@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
@@ -58,6 +58,23 @@ export function ContentLinkPicker({
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<ContentKind | "all">("all");
   const [loadError, setLoadError] = useState("");
+  const [productOffset, setProductOffset] = useState(0);
+  const [productTotal, setProductTotal] = useState(0);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingMoreProducts, setLoadingMoreProducts] = useState(false);
+
+  const productItems = useCallback(
+    (products: Product[]): ContentItem[] =>
+      products.map((product) => ({
+        kind: "product",
+        id: product.id,
+        title: product.name,
+        href: `/products/${product.slug || product.id}`,
+        image: product.image,
+        description: product.description,
+      })),
+    [],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -65,23 +82,14 @@ export function ContentLinkPicker({
     setLoading(true);
     setLoadError("");
     Promise.all([
-      api.getProducts({ status: "ACTIVE", limit: 60 }),
       api.getCollections(),
       api.getCatalogues(),
       api.getPublications(),
       api.getPublicBlogPosts({ locale, limit: 60 }),
     ])
-      .then(([products, collections, catalogues, publications, blog]) => {
+      .then(([collections, catalogues, publications, blog]) => {
         if (cancelled) return;
         setItems([
-          ...products.products.map((product: Product) => ({
-            kind: "product" as const,
-            id: product.id,
-            title: product.name,
-            href: `/products/${product.slug || product.id}`,
-            image: product.image,
-            description: product.description,
-          })),
           ...collections.map((collection: Collection) => ({
             kind: "collection" as const,
             id: collection.id,
@@ -102,7 +110,7 @@ export function ContentLinkPicker({
             kind: "publication" as const,
             id: publication.id,
             title: publication.title,
-            href: `/publications#publication-${publication.id}`,
+            href: `/publications/${publication.slug}`,
             image: publication.coverImage,
             description: publication.summary,
           })),
@@ -129,6 +137,60 @@ export function ContentLinkPicker({
     };
   }, [locale, open]);
 
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoadingProducts(true);
+    const timer = window.setTimeout(async () => {
+      setLoadError("");
+      try {
+        const result = await api.getProducts({
+          status: "ACTIVE",
+          limit: 60,
+          search: query.trim() || undefined,
+        });
+        if (cancelled) return;
+        setItems((current) => [
+          ...current.filter((item) => item.kind !== "product"),
+          ...productItems(result.products),
+        ]);
+        setProductOffset(result.products.length);
+        setProductTotal(result.total);
+      } catch (error) {
+        if (cancelled) return;
+        setLoadError(apiErrorMessage(error, "Could not load products"));
+        toast.error(apiErrorMessage(error, "Could not load products"));
+      } finally {
+        if (!cancelled) setLoadingProducts(false);
+      }
+    }, query.trim() ? 250 : 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [open, productItems, query]);
+
+  async function loadMoreProducts() {
+    if (loadingProducts || loadingMoreProducts || productOffset >= productTotal) return;
+    setLoadingMoreProducts(true);
+    setLoadError("");
+    try {
+      const result = await api.getProducts({
+        status: "ACTIVE",
+        limit: 60,
+        skip: productOffset,
+        search: query.trim() || undefined,
+      });
+      setItems((current) => [...current, ...productItems(result.products)]);
+      setProductOffset((offset) => offset + result.products.length);
+    } catch (error) {
+      setLoadError(apiErrorMessage(error, "Could not load more products"));
+      toast.error(apiErrorMessage(error, "Could not load more products"));
+    } finally {
+    setLoadingMoreProducts(false);
+    }
+  }
+
   const visibleItems = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
     return items.filter(
@@ -153,9 +215,10 @@ export function ContentLinkPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85vh] flex-col rounded-none sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Attach existing content</DialogTitle>
+          <DialogTitle>Feature products, collections, and more</DialogTitle>
           <DialogDescription>
-            Insert a linked content card that works in the website preview and in email.
+            Add a linked image card with a title and description. Product search covers
+            the full active catalogue, not just the first page.
           </DialogDescription>
         </DialogHeader>
         <div className="relative">
@@ -177,7 +240,7 @@ export function ContentLinkPicker({
           </TabsList>
         </Tabs>
         <div className="min-h-0 flex-1 overflow-y-auto border">
-          {loading ? (
+          {loading || loadingProducts ? (
             <p className="flex items-center justify-center gap-2 p-10 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
               Loading shareable content…
@@ -212,6 +275,20 @@ export function ContentLinkPicker({
                 </li>
               ))}
             </ul>
+          )}
+          {!loading && !loadingProducts && !loadError && productOffset < productTotal && (
+            <div className="border-t p-3 text-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-none"
+                onClick={() => void loadMoreProducts()}
+                disabled={loadingMoreProducts}
+              >
+                {loadingMoreProducts && <Loader2 className="animate-spin" />}
+                {loadingMoreProducts ? "Loading products…" : "Load more products"}
+              </Button>
+            </div>
           )}
         </div>
       </DialogContent>

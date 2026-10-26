@@ -13,7 +13,7 @@ import { currencyFlag } from "@/lib/currency";
 export function CurrencySelector({ className = "" }: { className?: string }) {
   const { availableCurrencies, displayCurrency, setDisplayCurrency } =
     useFormatters();
-  if (availableCurrencies.length < 2) return null;
+  if (availableCurrencies.length === 0) return null;
 
   return (
     <Select value={displayCurrency} onValueChange={setDisplayCurrency} >

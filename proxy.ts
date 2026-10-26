@@ -56,7 +56,7 @@ function buildCsp(nonce: string): string {
     `media-src ${join("'self'", "blob:", API_ORIGIN, GCS, CDN)}`,
     "font-src 'self' data:",
     `connect-src ${join("'self'", API_ORIGIN, WS_ORIGIN, SIGNALING_ORIGIN, ...CONNECT_HOSTS)}`,
-    `frame-src ${join(...FRAME_HOSTS)}`,
+    `frame-src ${join("'self'", ...FRAME_HOSTS)}`,
     "worker-src 'self' blob:",
     "object-src 'none'",
     "frame-ancestors 'none'",

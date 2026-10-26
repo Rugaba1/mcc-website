@@ -1,4 +1,5 @@
 import { MediaImage } from "@/components/media-image";
+import { SizeInput } from "@/components/ui/size-input";
 import { useEffect, useRef, useState, useCallback, useMemo, useCallback as _cb } from 'react'
 import { Canvas, useThree, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
@@ -630,51 +631,31 @@ function TilePanel() {
         Tile Configurations
       </h3>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-        <label style={{
-
-          fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-        }}>
-          Width
-
-
-        </label>
-        <Input key={"Input-1"} type="number" min={0} style={{ border: "3px solid gray", padding: '8px 16px' }} value={String(width)} onChange={(e) => setWidth(Number(e.target.value) || 0)}
+      <div className="grid grid-cols-3 gap-3">
+        <SizeInput
+          id="visualizer-width"
+          label="Width"
+          value={String(width)}
+          unit="cm"
+          min={0}
+          onValueChange={(value) => setWidth(Number(value) || 0)}
         />
-
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-        <label style={{
-
-          fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-        }}>
-          Height
-
-
-        </label>
-        <Input key={"Input-2"} type="number" min={0} style={{ border: "3px solid gray", padding: '8px 16px' }} value={String(height)} onChange={(e) => {
-          setHeight(Number(e.target.value) || 0)
-        }}
+        <SizeInput
+          id="visualizer-height"
+          label="Height"
+          value={String(height)}
+          unit="cm"
+          min={0}
+          onValueChange={(value) => setHeight(Number(value) || 0)}
         />
-
-      </div>
-
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-        <label style={{
-
-          fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-        }}>
-          Depth
-
-
-        </label>
-        <Input key={"Input-3"} type="number" min={0} style={{ border: "3px solid gray", padding: '8px 16px' }} value={String(depth)} onChange={(e) => {
-          setDepth(Number(e.target.value))
-        }}
+        <SizeInput
+          id="visualizer-depth"
+          label="Depth"
+          value={String(depth)}
+          unit="cm"
+          min={0}
+          onValueChange={(value) => setDepth(Number(value) || 0)}
         />
-
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>

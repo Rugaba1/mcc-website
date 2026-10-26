@@ -8,6 +8,8 @@ type SizeInputProps = {
   value: string;
   unit?: string;
   placeholder?: string;
+  min?: number;
+  step?: number | "any";
   onValueChange: (value: string) => void;
 };
 
@@ -17,6 +19,8 @@ export function SizeInput({
   value,
   unit,
   placeholder,
+  min = 1,
+  step = "any",
   onValueChange,
 }: SizeInputProps) {
   return (
@@ -28,8 +32,8 @@ export function SizeInput({
         <Input
           id={id}
           type="number"
-          min="1"
-          step="any"
+          min={min}
+          step={step}
           inputMode="decimal"
           aria-label={label}
           placeholder={placeholder}

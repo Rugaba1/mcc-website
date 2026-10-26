@@ -74,6 +74,23 @@ function absoluteMarkdownUrls() {
   };
 }
 
+function styleNewsletterContent(html: string) {
+  return html
+    .replace(/<h1\b/g, '<h1 style="margin:24px 0 12px;color:#004f46;font-size:26px;line-height:1.25;"')
+    .replace(/<h2\b/g, '<h2 style="margin:22px 0 10px;color:#004f46;font-size:22px;line-height:1.3;"')
+    .replace(/<h3\b/g, '<h3 style="margin:18px 0 8px;color:#004f46;font-size:18px;line-height:1.35;"')
+    .replace(/<p\b/g, '<p style="margin:0 0 16px;line-height:1.7;"')
+    .replace(/<a\b/g, '<a style="color:#00574f;text-decoration:underline;"')
+    .replace(/<img\b/g, '<img style="display:block;max-width:100%;height:auto;margin:16px 0;border:0;"')
+    .replace(/<blockquote\b/g, '<blockquote style="margin:20px 0;padding:12px 16px;border-left:3px solid #d6b43e;background:#fffcf5;color:#40524c;"')
+    .replace(/<ul\b/g, '<ul style="margin:0 0 16px;padding-left:24px;"')
+    .replace(/<ol\b/g, '<ol style="margin:0 0 16px;padding-left:24px;"')
+    .replace(/<table\b/g, '<table style="width:100%;border-collapse:collapse;margin:16px 0;"')
+    .replace(/<th\b/g, '<th style="padding:8px;border:1px solid #d8ded9;background:#edf3f1;text-align:left;"')
+    .replace(/<td\b/g, '<td style="padding:8px;border:1px solid #d8ded9;text-align:left;"')
+    .replace(/<hr\b/g, '<hr style="height:1px;margin:24px 0;border:0;background:#d8ded9;"');
+}
+
 const shell = (
   title: string,
   body: string,
@@ -151,7 +168,7 @@ export async function sendNewsletterCampaignEmail(p: {
   markdown: string;
   unsubscribeLink: string;
 }) {
-  const content = String(
+  const content = styleNewsletterContent(String(
     await unified()
       .use(remarkParse)
       .use(remarkGfm)
@@ -160,7 +177,7 @@ export async function sendNewsletterCampaignEmail(p: {
       .use(rehypeSanitize)
       .use(rehypeStringify)
       .process(p.markdown),
-  );
+  ));
   return safeSendMail({
     from: sender(),
     to: p.to,

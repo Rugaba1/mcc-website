@@ -1132,6 +1132,7 @@ export const api = {
         createdAt: string;
         sentAt: string | null;
         recipientCount: number;
+        recipientStatusCounts: Record<string, number>;
       }[];
     }>("/api/admin/newsletter"),
   getPublications: () => get<PublicationDoc[]>("/api/publications"),
@@ -1396,6 +1397,7 @@ export const api = {
   ) => apiClient.patch<Ok>(`/api/me/payments/${id}`, d).then((r) => r.data),
   withdrawMyPayment: (id: number) => del(`/api/me/payments/${id}`),
   getInvoicePdf: (url: string) => getBlob(url),
+  getMediaPdf: (url: string) => getBlob(url),
   getUsers: () => get<RegularUser[]>("/api/users?type=regular"),
   createUser: (d: {
     name: string;

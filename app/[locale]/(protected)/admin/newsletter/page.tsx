@@ -1,16 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Loader2, RefreshCw, Send, Users } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Eye, EyeOff, Loader2, RefreshCw, Send, Users } from "lucide-react";
 import { toast } from "sonner";
 import { api, apiErrorMessage } from "@/lib/api";
 import { MarkdownEditor } from "@/components/admin/mdx-editor";
+import { MediaImage } from "@/components/media-image";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { siteConfig } from "@/config/site.config";
 import {
   Table,
   TableBody,
@@ -32,6 +36,7 @@ export default function AdminNewsletterPage() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -173,14 +178,95 @@ export default function AdminNewsletterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Message</Label>
-              <MarkdownEditor value={bodyMarkdown} onChange={setBodyMarkdown} enableImages={false} maxLength={50_000} />
+              <div>
+                <Label>Message</Label>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Use the image button to add campaign images, or the paperclip button
+                  to feature active products, collections, catalogues, publications,
+                  or blog posts. Featured content is inserted as a linked image,
+                  title, and description.
+                </p>
+              </div>
+              <MarkdownEditor
+                value={bodyMarkdown}
+                onChange={setBodyMarkdown}
+                enableImages
+                enableContentLinks
+                maxLength={50_000}
+              />
             </div>
-            <Button type="submit" className="rounded-none" disabled={creating || !bodyMarkdown.trim()}>
-              {creating ? <Loader2 className="animate-spin" /> : <Send />}
-              {creating ? "Creating campaign…" : "Create campaign & send first batch"}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-none"
+                onClick={() => setPreviewOpen((open) => !open)}
+                aria-expanded={previewOpen}
+              >
+                {previewOpen ? <EyeOff /> : <Eye />}
+                {previewOpen ? "Hide email preview" : "Preview email"}
+              </Button>
+              <Button type="submit" className="rounded-none" disabled={creating || !bodyMarkdown.trim()}>
+                {creating ? <Loader2 className="animate-spin" /> : <Send />}
+                {creating ? "Creating campaign…" : "Create campaign & send first batch"}
+              </Button>
+            </div>
           </form>
+          {previewOpen && (
+            <div className="mx-auto w-full max-w-2xl border bg-muted/30 p-3 sm:p-6">
+              <div className="overflow-hidden border bg-background shadow-sm">
+                <div className="border-b-4 border-secondary bg-primary px-6 py-5 text-primary-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em]">
+                    {siteConfig.companyName}
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold">
+                    {subject.trim() || "Your newsletter subject"}
+                  </h3>
+                </div>
+                <article className="prose prose-sm max-w-none p-6 dark:prose-invert">
+                  {bodyMarkdown.trim() ? (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        img: ({ src, alt }) =>
+                          typeof src === "string" ? (
+                            <MediaImage
+                              src={src}
+                              alt={alt ?? ""}
+                              width={1200}
+                              height={675}
+                              sizes="(max-width: 672px) 100vw, 600px"
+                              className="h-auto w-full"
+                            />
+                          ) : null,
+                        a: ({ href, children }) => (
+                          <a href={href} className="text-primary underline underline-offset-4">
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {bodyMarkdown}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-muted-foreground">Your newsletter content will appear here.</p>
+                  )}
+                </article>
+                <footer className="border-t bg-muted/30 px-6 py-4 text-xs leading-relaxed text-muted-foreground">
+                  <p className="font-medium text-foreground">{siteConfig.companyName}</p>
+                  <p>{siteConfig.companyAddress}</p>
+                  <p>
+                    You are receiving this because you confirmed a newsletter
+                    subscription. Every sent campaign includes a personal unsubscribe
+                    link.
+                  </p>
+                </footer>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Preview only. Email clients may render some formatting differently.
+              </p>
+            </div>
+          )}
         </section>
 
         <section className="space-y-4">
@@ -192,7 +278,7 @@ export default function AdminNewsletterPage() {
                 <TableRow>
                   <TableHead>Subject</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Recipients</TableHead>
+                  <TableHead>Delivery</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -204,7 +290,19 @@ export default function AdminNewsletterPage() {
                   <TableRow key={campaign.id}>
                     <TableCell className="max-w-xs truncate font-medium">{campaign.subject}</TableCell>
                     <TableCell><Badge variant={campaign.status === "SENT" ? "default" : campaign.status === "PARTIAL" ? "destructive" : "secondary"} className="rounded-none">{campaign.status.toLowerCase()}</Badge></TableCell>
-                    <TableCell>{campaign.recipientCount}</TableCell>
+                    <TableCell>
+                      <p>{campaign.recipientCount} recipients</p>
+                      <p className="text-xs text-muted-foreground">
+                        {campaign.recipientStatusCounts.SENT ?? 0} delivered
+                        {" · "}
+                        {campaign.recipientStatusCounts.FAILED ?? 0} failed
+                        {" · "}
+                        {(campaign.recipientStatusCounts.PENDING ?? 0) +
+                          (campaign.recipientStatusCounts.SENDING ?? 0)} pending
+                        {" · "}
+                        {campaign.recipientStatusCounts.SKIPPED ?? 0} skipped
+                      </p>
+                    </TableCell>
                     <TableCell>{date(campaign.createdAt)}</TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">

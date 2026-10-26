@@ -8,6 +8,7 @@ import { api, apiErrorMessage, type AdminVariant, type Product, type VariantInpu
 import { ColorField, Swatch, colorName } from "@/components/color-field";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { ImageField } from "@/components/file-picker";
+import { SizeInput } from "@/components/ui/size-input";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -285,9 +286,15 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                     <Input className="rounded-none" type="number" min={0} value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} />
                   </Field>
                 </PermissionGate>
-                <Field label="Thickness (mm)">
-                  <Input className="rounded-none" type="number" step="0.1" value={form.thicknessMm} onChange={(e) => set("thicknessMm", e.target.value)} />
-                </Field>
+                <SizeInput
+                  id="variant-thickness-mm"
+                  label="Thickness"
+                  value={form.thicknessMm}
+                  unit="mm"
+                  min={0}
+                  step={0.1}
+                  onValueChange={(value) => set("thicknessMm", value)}
+                />
               </div>
 
               <PermissionGate required={PERM.PRICING_MANAGE}>

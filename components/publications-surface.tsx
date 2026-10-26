@@ -21,63 +21,78 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-function PublicationContent({ publication }: { publication: PublicationDoc }) {
+export function PublicationContent({ publication }: { publication: PublicationDoc }) {
   const { openPreview } = useMediaPreview();
   const pdf = publication.fileUrl?.split(/[?#]/)[0]?.toLowerCase().endsWith(".pdf");
 
   return (
     <article
       id={`publication-${publication.id}`}
-      className="space-y-4 border bg-card p-5"
+      className="overflow-hidden border bg-card shadow-sm"
     >
       {publication.coverImage && (
-        <MediaPreviewImage src={publication.coverImage} alt={publication.title} />
-      )}
-      <div>
-        <Badge variant="secondary" className="rounded-none">{publication.placement.replaceAll("_", " ").toLowerCase()}</Badge>
-        <h2 className="mt-2 text-xl font-semibold">{publication.title}</h2>
-        {publication.summary && <p className="mt-2 text-sm text-muted-foreground">{publication.summary}</p>}
-      </div>
-      {publication.contentMarkdown && (
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          <ReactMarkdown
-            remarkPlugins={mdxRemarkPlugins}
-            rehypePlugins={mdxRehypePlugins}
-            components={mdxComponents}
-          >
-            {publication.contentMarkdown}
-          </ReactMarkdown>
-        </div>
-      )}
-      <div className="flex flex-wrap gap-2">
-        {publication.fileUrl && (
-          <>
-            <Button
-              type="button"
-              variant="secondary"
-              className="rounded-none"
-              onClick={() =>
-                openPreview({
-                  url: publication.fileUrl!,
-                  name: publication.title,
-                  mimeType: pdf ? "application/pdf" : undefined,
-                })
-              }
-            >
-              Preview attachment
-            </Button>
-            <Button asChild variant="outline" className="rounded-none">
-              <a href={publication.fileUrl} target="_blank" rel="noreferrer" download>
-                Download attachment
-              </a>
-            </Button>
-          </>
-        )}
-        <ShareWidget
-          title={publication.title}
-          text={publication.summary}
-          path={`/publications#publication-${publication.id}`}
+        <MediaPreviewImage
+          src={publication.coverImage}
+          alt={publication.title}
+          className="my-0"
         />
+      )}
+      <div className="space-y-4 p-5 sm:p-7">
+        <div>
+          <Badge variant="secondary" className="rounded-none">
+            {publication.placement.replaceAll("_", " ").toLowerCase()}
+          </Badge>
+          <h2 className="mt-3 text-xl font-semibold sm:text-2xl">{publication.title}</h2>
+          {publication.summary && (
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {publication.summary}
+            </p>
+          )}
+        </div>
+        {publication.contentMarkdown && (
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown
+              remarkPlugins={mdxRemarkPlugins}
+              rehypePlugins={mdxRehypePlugins}
+              components={mdxComponents}
+            >
+              {publication.contentMarkdown}
+            </ReactMarkdown>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2 border-t pt-4">
+          {publication.fileUrl && (
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-none"
+                onClick={() =>
+                  openPreview({
+                    url: publication.fileUrl!,
+                    name: publication.title,
+                    mimeType: pdf ? "application/pdf" : undefined,
+                  })
+                }
+              >
+                Preview attachment
+              </Button>
+              <Button asChild variant="outline" className="rounded-none">
+                <a href={publication.fileUrl} target="_blank" rel="noreferrer" download>
+                  Download attachment
+                </a>
+              </Button>
+            </>
+          )}
+          <ShareWidget
+            title={publication.title}
+            text={publication.summary}
+            path={`/publications/${publication.slug}`}
+          />
+          <Button asChild variant="outline" className="rounded-none">
+            <Link href={`/publications/${publication.slug}`}>View publication</Link>
+          </Button>
+        </div>
       </div>
     </article>
   );
@@ -110,23 +125,40 @@ export function PublicationsPageContent() {
   }, []);
 
   return (
-    <main className="mx-auto min-h-[60vh] max-w-6xl space-y-6 px-4 py-12 sm:px-6">
-      <header className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Company updates</p>
-        <h1 className="mt-2 text-3xl font-semibold">Publications & promotions</h1>
-        <p className="mt-2 text-muted-foreground">Announcements, product news, and downloadable promotions from Mountain Ceramics Company.</p>
-      </header>
-      {loading ? (
-        <p className="border p-8 text-center text-sm text-muted-foreground">Loading publications…</p>
-      ) : publications.length === 0 ? (
-        <p className="border p-8 text-center text-sm text-muted-foreground">There are no current publications.</p>
-      ) : (
-        <div className="space-y-5">
-          {publications.map((publication) => (
-            <PublicationContent key={publication.id} publication={publication} />
-          ))}
+    <main className="min-h-[60vh]">
+      <section className="bg-inverse px-4 py-16 text-center sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <span className="mb-4 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em]">
+            <span className="h-px w-8 bg-primary" />
+            Company updates
+            <span className="h-px w-8 bg-primary" />
+          </span>
+          <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+            Publications &amp; Promotions
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-inverse-foreground/80 sm:text-lg">
+            Announcements, product news, and downloadable promotions from Mountain Ceramics Company.
+          </p>
         </div>
-      )}
+      </section>
+
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
+        {loading ? (
+          <p className="border p-8 text-center text-sm text-muted-foreground">
+            Loading publications…
+          </p>
+        ) : publications.length === 0 ? (
+          <p className="border p-8 text-center text-sm text-muted-foreground">
+            There are no current publications.
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {publications.map((publication) => (
+              <PublicationContent key={publication.id} publication={publication} />
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   );
 }
@@ -173,7 +205,7 @@ export function PublicationsSurface() {
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary px-4 py-2 text-center text-sm text-primary-foreground">
           <span className="font-semibold">{banner.title}</span>
           {banner.summary && <span>{banner.summary}</span>}
-          <Link className="underline underline-offset-2" href={`/publications#publication-${banner.id}`}>Learn more</Link>
+          <Link className="underline underline-offset-2" href={`/publications/${banner.slug}`}>Learn more</Link>
         </div>
       )}
       <Dialog open={Boolean(dialogPublication)} onOpenChange={closeDialog}>

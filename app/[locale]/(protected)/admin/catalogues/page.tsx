@@ -4,9 +4,12 @@ import { FileText } from "lucide-react";
 import Image from "next/image";
 
 import { ImageField } from "@/components/file-picker";
+import { MediaPreviewImage } from "@/components/media-preview-image";
+import { useMediaPreview } from "@/components/media-preview-provider";
 import { ResourcePage, type Values } from "@/components/admin/resource-page";
 import { ShareWidget } from "@/components/share-widget";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { api, type CatalogueDoc } from "@/lib/api";
 import { PERM } from "@/lib/permissions/catalog";
 
@@ -26,6 +29,8 @@ function toPayload(values: Values): CatalogueInput {
 }
 
 export default function AdminCataloguesPage() {
+  const { openPreview } = useMediaPreview();
+
   return (
     <ResourcePage<CatalogueDoc>
       title="Catalogues"
@@ -140,8 +145,42 @@ export default function AdminCataloguesPage() {
         title: (catalogue) => catalogue.title,
         description: (catalogue) => catalogue.description,
         render: (catalogue) => (
-          <div className="space-y-4">
-            <p className="break-all text-sm text-muted-foreground">{catalogue.fileUrl}</p>
+          <div className="space-y-5">
+            {catalogue.coverImage ? (
+              <MediaPreviewImage
+                src={catalogue.coverImage}
+                alt={`${catalogue.title} cover`}
+                className="overflow-hidden border"
+              />
+            ) : (
+              <div className="flex aspect-[4/3] items-center justify-center border bg-muted text-muted-foreground">
+                <FileText className="size-12" />
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-none"
+                onClick={() =>
+                  openPreview({
+                    url: catalogue.fileUrl,
+                    name: catalogue.title,
+                    mimeType: /\.pdf(?:[?#].*)?$/i.test(catalogue.fileUrl)
+                      ? "application/pdf"
+                      : undefined,
+                  })
+                }
+              >
+                Preview catalogue
+              </Button>
+              <Button asChild variant="outline" className="rounded-none">
+                <a href={catalogue.fileUrl} target="_blank" rel="noreferrer">
+                  Open original file
+                </a>
+              </Button>
+            </div>
+            <p className="break-all text-xs text-muted-foreground">{catalogue.fileUrl}</p>
             <ShareWidget
               title={catalogue.title}
               text={catalogue.description}

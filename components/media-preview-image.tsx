@@ -7,9 +7,11 @@ import { useMediaPreview } from "@/components/media-preview-provider";
 export function MediaPreviewImage({
   src,
   alt = "",
+  className = "",
 }: {
   src?: string;
   alt?: string;
+  className?: string;
 }) {
   const { openPreview } = useMediaPreview();
   if (!src) return null;
@@ -17,7 +19,7 @@ export function MediaPreviewImage({
   return (
     <button
       type="button"
-      className="my-8 block w-full cursor-zoom-in text-left"
+      className={`block w-full cursor-zoom-in text-left ${className}`}
       aria-label={`Preview ${alt || "content image"}`}
       onClick={() =>
         openPreview({

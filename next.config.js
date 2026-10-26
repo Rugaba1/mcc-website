@@ -77,6 +77,10 @@ const nextConfig = {
         source: "/api/invoices/:path*",
         headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
       },
+      {
+        source: "/uploads/:path*",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
     ];
   },
 };

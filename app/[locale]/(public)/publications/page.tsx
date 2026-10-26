@@ -1,4 +1,5 @@
 import { PublicationsPageContent } from "@/components/publications-surface";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,5 +13,13 @@ export const metadata: Metadata = {
 };
 
 export default function PublicationsPage() {
-  return <PublicationsPageContent />;
+  return (
+    <>
+      <Breadcrumbs items={[
+        { label: "Home", href: "/" },
+        { label: "Publications" },
+      ]} />
+      <PublicationsPageContent />
+    </>
+  );
 }

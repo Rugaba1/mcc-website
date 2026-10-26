@@ -12,6 +12,7 @@ import { ShareWidget } from "@/components/share-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DateTimePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -197,11 +198,41 @@ export default function AdminPublicationsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="publication-start">Starts at</Label>
-              <Input id="publication-start" type="datetime-local" value={draft.startsAt ?? ""} onChange={(event) => setDraft({ ...draft, startsAt: event.target.value || null })} />
+              <DateTimePicker
+                id="publication-start"
+                value={draft.startsAt ?? ""}
+                placeholder="Choose start date and time"
+                onChange={(value) => setDraft({ ...draft, startsAt: value || null })}
+              />
+              {draft.startsAt && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDraft({ ...draft, startsAt: null })}
+                >
+                  Clear start schedule
+                </Button>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="publication-end">Ends at</Label>
-              <Input id="publication-end" type="datetime-local" value={draft.endsAt ?? ""} onChange={(event) => setDraft({ ...draft, endsAt: event.target.value || null })} />
+              <DateTimePicker
+                id="publication-end"
+                value={draft.endsAt ?? ""}
+                placeholder="Choose end date and time"
+                onChange={(value) => setDraft({ ...draft, endsAt: value || null })}
+              />
+              {draft.endsAt && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDraft({ ...draft, endsAt: null })}
+                >
+                  Clear end schedule
+                </Button>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="publication-active" checked={draft.active} onCheckedChange={(checked) => setDraft({ ...draft, active: checked === true })} />
@@ -253,7 +284,7 @@ export default function AdminPublicationsPage() {
                     <TableCell><Badge variant={publication.active ? "default" : "secondary"}>{publication.active ? "Active" : "Inactive"}</Badge></TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {publication.active && <ShareWidget title={publication.title} text={publication.summary} path={`/publications#publication-${publication.id}`} iconOnly />}
+                        {publication.active && <ShareWidget title={publication.title} text={publication.summary} path={`/publications/${publication.slug}`} iconOnly />}
                         <Button type="button" size="icon" variant="outline" aria-label={`Edit ${publication.title}`} onClick={() => beginEdit(publication)}><Pencil /></Button>
                         <Button type="button" size="icon" variant="ghost" aria-label={`Delete ${publication.title}`} onClick={() => void remove(publication)}><Trash2 /></Button>
                       </div>
