@@ -14,6 +14,7 @@ import { siteConfig } from "@/config/site.config";
 import { FormatProvider } from "@/contexts/format-context";
 import BackToTop from "@/components/BackToTop";
 import { MediaPreviewProvider } from "@/components/media-preview-provider";
+import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 
 const centuryGothic = localFont({
     src: [
@@ -146,6 +147,7 @@ export default async function LocaleLayout({
                     }}
                 />
                 <NextIntlClientProvider locale={locale} messages={messages}>
+                    <ServiceWorkerRegistration />
                     <ThemeProvider
                         nonce={nonce}
                         attribute="class"
