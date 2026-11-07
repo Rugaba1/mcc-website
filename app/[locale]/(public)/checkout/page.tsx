@@ -18,7 +18,13 @@ import { useAuth } from "@/contexts/auth-context";
 import { lineOf, useCart } from "@/contexts/cart-context";
 import { api, apiErrorMessage, type CouponValidation } from "@/lib/api";
 import { useFormatters } from "@/contexts/format-context";
-import { getShipping, SHIPPING_OPTIONS, ShippingId } from "@/lib/shipping";
+import {
+    calculateDeliveryFee,
+    DELIVERY_FEE_PER_SQM,
+    getShipping,
+    SHIPPING_OPTIONS,
+    ShippingId,
+} from "@/lib/shipping";
 import { computeTotals } from "@/lib/pricing";
 import { PAYMENT_OPTIONS, type PaymentMethodId } from "@/lib/payments";
 import type { Opt } from "@/lib/locations"; // type-only, so the JSON isn't bundled
@@ -253,14 +259,19 @@ function CheckoutForm() {
 
     const ship = getShipping(shippingId);
     const delivery = ship.fulfillment === "DELIVERY";
+    const totalSqm = items.reduce(
+        (sum, item) => sum + (lineOf(item)?.sqm ?? 0),
+        0,
+    );
+    const shippingFee = delivery ? calculateDeliveryFee(totalSqm) : 0;
     const subtotal = useMemo(
         () => items.reduce((sum, item) => sum + (lineOf(item)?.total ?? 0), 0),
         [items],
     );
-    const totals = computeTotals([{ price: subtotal, qty: 1 }], ship.fee);
+    const totals = computeTotals([{ price: subtotal, qty: 1 }], shippingFee);
     const discountedTotals = computeTotals(
         [{ price: Math.max(0, totals.subtotal - (coupon?.discount ?? 0)), qty: 1 }],
-        ship.fee,
+        shippingFee,
     );
 
     useEffect(() => {
@@ -345,7 +356,11 @@ function CheckoutForm() {
                                 />
                                 <span>{o.label}</span>
                             </div>
-                            <span className="font-medium">{o.fee ? displayMoney(o.fee, baseCurrency) : "Free"}</span>
+                            <span className="text-right font-medium">
+                                {o.fulfillment === "DELIVERY"
+                                    ? `${displayMoney(shippingFee, baseCurrency)} · ${DELIVERY_FEE_PER_SQM}/m²`
+                                    : "Free"}
+                            </span>
                         </label>
                     ))}
                 </fieldset>
@@ -449,19 +464,19 @@ function CheckoutForm() {
                     {PAYMENT_OPTIONS.map((o) => (
                         <label
                             key={o.id}
+                            htmlFor={`payment-method-${o.id}`}
                             className={`flex w-full cursor-pointer items-center gap-3 border p-3 text-sm ${paymentMethod === o.id ? "border-primary bg-primary/5" : "border-border"}`}
                         >
                             <input
+                                id={`payment-method-${o.id}`}
                                 type="radio"
                                 name="paymentMethod"
                                 checked={paymentMethod === o.id}
                                 onChange={() => setPaymentMethod(o.id)}
                                 className="accent-primary"
                             />
-                            <div>
-                                <div className="font-medium">{o.label}</div>
-                                <div className="text-xs text-muted-foreground">{o.hint}</div>
-                            </div>
+                            <span className="block font-medium">{o.label}</span>
+                            <span className="block min-w-0 text-xs text-muted-foreground">{o.hint}</span>
                         </label>
                     ))}
                     <PaymentSummary method={paymentMethod} phone={f.phone} total={discountedTotals.total} />

@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description,
     type: "article",
     noIndex: !document,
+    image: "/images/mcc-factory.jpg"
   });
 }
 
@@ -51,7 +52,7 @@ export default async function LegalDocumentPage({ params }: PageProps) {
   const timeZone = (await headers()).get("x-timezone") ?? siteConfig.defaultTimeZone;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
+    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
       <Breadcrumbs items={[
         { label: "Home", href: "/" },
         { label: document.content.title },
@@ -70,6 +71,6 @@ export default async function LegalDocumentPage({ params }: PageProps) {
           {document.content.contentMarkdown}
         </ReactMarkdown>
       </article>
-    </main>
+    </div>
   );
 }

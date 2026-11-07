@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { api, apiErrorMessage } from "@/lib/api";
 import type { CurrencyOption } from "@/lib/currency";
-import { currencyFlag } from "@/lib/currency";
+import { CurrencyFlag } from "@/components/currency-flag";
 import { CURRENCY_CONFIG_UPDATED_EVENT } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,25 +116,25 @@ export default function AdminCurrenciesPage() {
       </header>
 
       <form onSubmit={createCurrency} className="grid gap-4 border p-4 sm:grid-cols-2 lg:grid-cols-6">
-        <label className="space-y-1 text-sm">
+        <label htmlFor="currency-code" className="space-y-1 text-sm">
           <span>ISO code</span>
-          <Input required maxLength={3} value={draft.code} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
+          <Input id="currency-code" required maxLength={3} value={draft.code} onChange={(e) => setDraft({ ...draft, code: e.target.value })} />
         </label>
-        <label className="space-y-1 text-sm">
+        <label htmlFor="currency-name" className="space-y-1 text-sm">
           <span>Name</span>
-          <Input required maxLength={80} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <Input id="currency-name" required maxLength={80} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         </label>
-        <label className="space-y-1 text-sm">
+        <label htmlFor="currency-symbol" className="space-y-1 text-sm">
           <span>Symbol</span>
-          <Input required maxLength={8} value={draft.symbol} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} />
+          <Input id="currency-symbol" required maxLength={8} value={draft.symbol} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} />
         </label>
-        <label className="space-y-1 text-sm">
+        <label htmlFor="currency-decimal-digits" className="space-y-1 text-sm">
           <span>Decimal digits</span>
-          <Input required type="number" min={0} max={4} value={draft.decimalDigits} onChange={(e) => setDraft({ ...draft, decimalDigits: e.target.value })} />
+          <Input id="currency-decimal-digits" required type="number" min={0} max={4} value={draft.decimalDigits} onChange={(e) => setDraft({ ...draft, decimalDigits: e.target.value })} />
         </label>
-        <label className="space-y-1 text-sm">
+        <label htmlFor="currency-rate-to-base" className="space-y-1 text-sm">
           <span>Rate to base</span>
-          <Input required type="number" min="0.0000000001" step="any" value={draft.rateToBase} onChange={(e) => setDraft({ ...draft, rateToBase: e.target.value })} />
+          <Input id="currency-rate-to-base" required type="number" min="0.0000000001" step="any" value={draft.rateToBase} onChange={(e) => setDraft({ ...draft, rateToBase: e.target.value })} />
         </label>
         <div className="flex items-end">
           <Button type="submit" disabled={busy}>Add currency</Button>
@@ -156,7 +156,10 @@ export default function AdminCurrenciesPage() {
             {currencies.map((currency) => (
               <tr key={currency.code} className="border-t">
                 <td className="p-3">
-                  <strong>{currencyFlag(currency.code)} {currency.code}</strong>
+                  <strong className="inline-flex items-center gap-1.5">
+                    <CurrencyFlag code={currency.code} />
+                    {currency.code}
+                  </strong>
                   <span className="ml-2 text-muted-foreground">{currency.name}</span>
                   {currency.isBase && <span className="ml-2 text-xs text-primary">Base</span>}
                 </td>

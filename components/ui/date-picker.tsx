@@ -34,6 +34,7 @@ export function DatePicker({
   placeholder = "Pick a date",
   disabled,
   disablePast = false,
+  minDate,
 }: {
   id?: string;
   value: string;
@@ -41,9 +42,11 @@ export function DatePicker({
   placeholder?: string;
   disabled?: boolean;
   disablePast?: boolean;
+  minDate?: string;
 }) {
   const [open, setOpen] = useState(false);
   const selected = parseDate(value);
+  const minimumDate = minDate ? parseDate(minDate) : undefined;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -72,11 +75,12 @@ export function DatePicker({
             setOpen(false);
           }}
           disabled={
-            disablePast
-              ? { before: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) }
-              : undefined
+            minimumDate
+              ? { before: minimumDate }
+              : disablePast
+                ? { before: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) }
+                : undefined
           }
-          autoFocus
         />
       </PopoverContent>
     </Popover>
@@ -89,12 +93,14 @@ export function DateTimePicker({
   onChange,
   placeholder,
   allowPast = false,
+  minDateTime,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   allowPast?: boolean;
+  minDateTime?: string;
 }) {
   const dateValue = value.slice(0, 10);
   const timeValue = value.slice(11, 16) || "00:00";
@@ -104,11 +110,18 @@ export function DateTimePicker({
   minimumTime.setSeconds(0, 0);
   minimumTime.setMinutes(minimumTime.getMinutes() + 1);
   const isToday = dateValue === today;
+  const configuredMinimum = minDateTime ? new Date(minDateTime) : null;
+  const isBeforeMinimum = (date: string, time: string) => {
+    const candidate = new Date(`${date}T${time}`);
+    return (
+      (configuredMinimum !== null && candidate < configuredMinimum) ||
+      (!allowPast && candidate <= minimumTime)
+    );
+  };
 
   function updateTime(nextHour: string, nextMinute: string) {
     if (!dateValue) return;
-    const candidate = new Date(`${dateValue}T${nextHour}:${nextMinute}`);
-    if (!allowPast && candidate <= minimumTime) return;
+    if (isBeforeMinimum(dateValue, `${nextHour}:${nextMinute}`)) return;
     onChange(`${dateValue}T${nextHour}:${nextMinute}`);
   }
 
@@ -118,18 +131,22 @@ export function DateTimePicker({
         id={id}
         value={dateValue}
         placeholder={placeholder}
-        disablePast={!allowPast}
+        disablePast={!allowPast && !minDateTime}
+        minDate={minDateTime?.slice(0, 10)}
         onChange={(date) => {
           if (!date) {
             onChange("");
             return;
           }
 
-          const candidate = new Date(`${date}T${timeValue}`);
-          const nextTime =
-            !allowPast && date === today && candidate <= minimumTime
-              ? format(minimumTime, "HH:mm")
-              : timeValue;
+          let nextTime = timeValue;
+          if (isBeforeMinimum(date, nextTime)) {
+            if (configuredMinimum && date === minDateTime?.slice(0, 10)) {
+              nextTime = format(configuredMinimum, "HH:mm");
+            } else if (!allowPast && date === today) {
+              nextTime = format(minimumTime, "HH:mm");
+            }
+          }
           onChange(`${date}T${nextTime}`);
         }}
       />
@@ -154,7 +171,12 @@ export function DateTimePicker({
                 <SelectItem
                   key={option}
                   value={option}
-                  disabled={!allowPast && isToday && Number(option) < minimumTime.getHours()}
+                  disabled={
+                    (configuredMinimum !== null &&
+                      dateValue === minDateTime?.slice(0, 10) &&
+                      Number(option) < configuredMinimum.getHours()) ||
+                    (!allowPast && isToday && Number(option) < minimumTime.getHours())
+                  }
                 >
                   {option}
                 </SelectItem>
@@ -179,10 +201,14 @@ export function DateTimePicker({
                   key={option}
                   value={option}
                   disabled={
-                    !allowPast &&
-                    isToday &&
-                    Number(hour) === minimumTime.getHours() &&
-                    Number(option) < minimumTime.getMinutes()
+                    (configuredMinimum !== null &&
+                      dateValue === minDateTime?.slice(0, 10) &&
+                      Number(hour) === configuredMinimum.getHours() &&
+                      Number(option) < configuredMinimum.getMinutes()) ||
+                    (!allowPast &&
+                      isToday &&
+                      Number(hour) === minimumTime.getHours() &&
+                      Number(option) < minimumTime.getMinutes())
                   }
                 >
                   {option}

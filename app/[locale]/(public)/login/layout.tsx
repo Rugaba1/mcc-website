@@ -18,6 +18,7 @@ export async function generateMetadata({
     title: `Sign In | ${siteConfig.siteName}`,
     description: "Sign in to manage your account and orders with Mountain Ceramics Company.",
     noIndex: true,
+    image:"/images/mcc-factory-right-angle.jpg"
   });
 }
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {

@@ -55,7 +55,7 @@ export function TileSizesField({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2" aria-label="Selected fallback sizes">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Selected fallback sizes">
         {sizes.map((size, index) => (
           <span key={`${size}-${index}`} className="inline-flex items-center gap-1 border bg-muted px-2 py-1 text-sm">
             {size}

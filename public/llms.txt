@@ -1,38 +1,59 @@
-# Mountain Ceramic
+# Mountain Ceramics Company
 
-> Mountain Ceramic is a tile manufacturer in Rwanda. This file describes public company pages and currently available public API endpoints for AI assistants and other automated clients.
+> Mountain Ceramics Company (MCC) is a tile manufacturer in Rwanda. This file describes public company pages and public API endpoints for AI assistants and other automated clients.
 
 ## Store
 
 - Public storefront pages are available in English, French, and Kinyarwanda.
 - Browse tile products, collections, catalogues, projects, and store information.
+- Read current company announcements and documents on the publications page.
 - Product and variant details, availability, and prices are provided by the store; use the latest product data rather than inferring stock or prices.
+- Product listings show starting prices per square metre when a priced active variant exists. For exact size, finish, price, currency, and availability, query the product API rather than relying on a page summary.
 - Guest checkout is available. Do not require an account to place an order.
 
 ## Public pages
 
-- Home: `/`
-- Products: `/products`
-- Collections: `/collections`
-- Catalogues: `/catalogue`
-- Projects: `/projects`
-- Blog: `/blog`
-- Contact: `/contact`
-- Tile visualizer: `/visualizer`
-- Legal documents: `/legal/terms-and-conditions`, `/legal/terms-of-service`, `/legal/privacy-policy`
+- Home: [Home](https://mountainceramic.com/)
+- Products: [Products](https://mountainceramic.com/products)
+- Collections: [Collections](https://mountainceramic.com/collections)
+- Catalogues: [Catalogues](https://mountainceramic.com/catalogue)
+- Projects: [Projects](https://mountainceramic.com/projects)
+- Blog: [Blog](https://mountainceramic.com/blog)
+- Publications and company announcements: [Publications](https://mountainceramic.com/publications)
+- Contact: [Contact](https://mountainceramic.com/contact)
+- Tile visualizer: [Visualizer](https://mountainceramic.com/visualizer)
+- Legal documents: [Terms and Conditions](https://mountainceramic.com/legal/terms-and-conditions), [Terms of Service](https://mountainceramic.com/legal/terms-of-service), [Privacy Policy](https://mountainceramic.com/legal/privacy-policy)
 
-English is the default locale and does not use a URL prefix. Add `/fr` or `/rw` before a page path to browse in French or Kinyarwanda. The store sitemap is available at `/sitemap.xml`.
+English is the default locale and does not use a URL prefix. Add `/fr` or `/rw` before a page path to browse in French or Kinyarwanda. The store sitemap is available at [XML sitemap](https://mountainceramic.com/sitemap.xml).
+
+## Discovery and app resources
+
+- XML sitemap: [Sitemap](https://mountainceramic.com/sitemap.xml) (includes public products, published blog posts, active publications, and legal pages).
+- Crawler rules: [robots.txt](https://mountainceramic.com/robots.txt).
+- Web app manifest: [manifest.webmanifest](https://mountainceramic.com/manifest.webmanifest).
+- API catalog: [RFC 9727 API catalog](https://mountainceramic.com/.well-known/api-catalog).
+- API schema: [OpenAPI document](https://mountainceramic.com/openapi.json).
+- Agent capabilities: [AI catalog](https://mountainceramic.com/.well-known/ai-catalog.json).
+- Markdown pages: request a public page with `Accept: text/markdown`; ordinary browser requests continue to receive HTML.
+- Agent browsing instructions: [Public store skill](https://mountainceramic.com/agent-skills/mcc-store/SKILL.md).
+- Browser tools: On WebMCP-capable browsers, agents can search products, read product details, browse collections/catalogues, manage the local cart, and navigate public store pages. Contact submission requires explicit confirmation; checkout remains customer-reviewed.
+- Authentication: [Agent authentication policy](https://mountainceramic.com/auth.md). Agent registration and OAuth/OIDC are not currently supported.
+- Browser and home-screen icons use the Mountain Ceramics Company logo.
 
 ## Public API
 
-- `GET /api/products` — list and filter products.
-- `GET /api/products/{slug}` — retrieve a product by its stable slug.
-- `GET /api/collections` — list public collections.
-- `GET /api/catalogues` — list public catalogues.
-- `GET /api/blog` — list public blog posts.
-- `GET /api/visualizer-products` — retrieve products available to the visualizer.
-- `GET /api/visualizer/scenes` — retrieve visualizer scenes.
-- `POST /api/checkout` — submit a guest or signed-in checkout; the server calculates order totals.
-- `POST /api/contact` — submit a store enquiry.
+- [`GET /api/products`](https://mountainceramic.com/api/products) — list and filter products.
+- [`GET /api/products/{slug}`](https://mountainceramic.com/api/products/{slug}) — retrieve a product by its stable slug.
+- [`GET /api/collections`](https://mountainceramic.com/api/collections) — list public collections.
+- [`GET /api/catalogues`](https://mountainceramic.com/api/catalogues) — list public catalogues.
+- [`GET /api/blog`](https://mountainceramic.com/api/blog) — list public blog posts.
+- [`GET /api/publications`](https://mountainceramic.com/api/publications) — list currently active public publications.
+- [`GET /api/visualizer-products`](https://mountainceramic.com/api/visualizer-products) — retrieve products available to the visualizer.
+- [`GET /api/visualizer/scenes`](https://mountainceramic.com/api/visualizer/scenes) — retrieve visualizer scenes.
+- [`GET /api/health`](https://mountainceramic.com/api/health) — check that the web service is responding.
+- [`POST /api/checkout`](https://mountainceramic.com/api/checkout) — submit a guest or signed-in checkout; the server calculates order totals.
+- [`POST /api/contact`](https://mountainceramic.com/api/contact) — submit a store enquiry.
 
-Use the API response as the source of truth for prices, availability, and product details. Do not submit client-calculated totals as authoritative.
+For floor tiles, call `GET /api/products?category=floor&status=ACTIVE&limit=60`. Each product includes active `variants`; each priced variant reports `size`, `finish`, `pricePerSqm`, and `currency`. `pricePerSqm` is the price per square metre. For a single product, call `GET /api/products/{slug}` for the current variant availability too. If a browser tool refuses a product page or catalogue page, use these public API endpoints instead.
+
+Use the API response as the source of truth for prices, availability, and product details. Do not infer missing prices or stock, and do not submit client-calculated totals as authoritative.

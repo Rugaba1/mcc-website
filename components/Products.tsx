@@ -1,10 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/app/i18n/routing";
 import { serverApi, type Product } from "@/lib/api";
+import { MediaImage } from "@/components/media-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
 import AddToCartButton from "./add-cart-button";
 import { WishlistButton } from "./wishlist-button";
+import { ProductStartingPrice } from "@/components/product-starting-price";
+import { getLocale } from "next-intl/server";
 
 
 const filters = [
@@ -18,6 +20,7 @@ const filters = [
 const PAGE_SIZE = 12;
 
 export default async function Products() {
+  const locale = await getLocale();
 
   let products: Product[] = [];
   let loadFailed = false;
@@ -107,7 +110,7 @@ export default async function Products() {
             >
               {/* Image */}
               <div className="relative h-56 overflow-hidden ">
-                <Image
+                <MediaImage
                   src={p.image}
                   alt={p.name}
                   fill
@@ -160,6 +163,7 @@ export default async function Products() {
                 <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-200">
                   {p.name}
                 </h3>
+                <ProductStartingPrice variants={p.variants} locale={locale} />
                 <p className=" text-sm leading-relaxed mb-5 line-clamp-2">{p.description}</p>
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <AddToCartButton product={p} sm /> <WishlistButton productId={p.id} />

@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
   }, [load]);
 
   return (
-    <main className="flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
+    <section className="flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -166,7 +166,7 @@ export default function AdminDashboardPage() {
       ) : (
         <Dashboard data={data} days={Number(days)} refreshing={loading} />
       )}
-    </main>
+    </section>
   );
 }
 

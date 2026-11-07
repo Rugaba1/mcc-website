@@ -117,7 +117,7 @@ export async function processContactEmailDelivery(
       status: failedPermanently ? "FAILED" : "PENDING",
       availableAt: new Date(now.getTime() + retryDelay(delivery.attempts)),
       lockedUntil: null,
-      lastError: "SMTP_DELIVERY_FAILED",
+      lastError: "EMAIL_DELIVERY_FAILED",
     },
   });
   console.error("Queued contact email was not delivered.", {

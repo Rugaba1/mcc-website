@@ -9,8 +9,21 @@ export function hasValidAuthRequestHeaders(request: NextRequest) {
 
   const allowedOrigins = [...siteConfig.allowedOrigins];
 
-  if (allowedOrigins.length === 0 && !siteConfig.isProduction) {
+  if (!siteConfig.isProduction) {
     allowedOrigins.push(request.nextUrl.origin);
+    if (origin) {
+      try {
+        const parsedOrigin = new URL(origin);
+        const isLocalOrigin =
+          parsedOrigin.origin === origin &&
+          ["localhost", "127.0.0.1", "::1", "[::1]"].includes(
+            parsedOrigin.hostname.toLowerCase(),
+          );
+        if (isLocalOrigin) allowedOrigins.push(parsedOrigin.origin);
+      } catch {
+        return false;
+      }
+    }
   }
 
   return allowedOrigins.includes(origin);

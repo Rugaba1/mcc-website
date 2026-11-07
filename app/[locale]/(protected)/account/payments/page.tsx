@@ -70,7 +70,7 @@ export default function CustomerPaymentsPage() {
     const s = data?.summary;
 
     return (
-        <main className="mx-auto w-full max-w-5xl space-y-6 p-4 md:p-6">
+        <section className="mx-auto w-full max-w-5xl space-y-6 p-4 md:p-6">
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">My payments</h1>
@@ -187,7 +187,7 @@ export default function CustomerPaymentsPage() {
             <FixDialog target={editing} onClose={() => setEditing(null)} onDone={load} />
             <ConfirmDelete open={!!withdrawing} onOpenChange={(o) => { if (!o) setWithdrawing(null); }} title="Withdraw this payment?"
                 description="Use this if you entered it by mistake. If you already sent the money, contact us instead so we can match it to your order." busy={busy} onConfirm={withdraw} />
-        </main>
+        </section>
     );
 }
 

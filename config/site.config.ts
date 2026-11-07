@@ -31,19 +31,19 @@ const allowedOrigins = [
 const companyStreetAddress =
   process.env.NEXT_PUBLIC_COMPANY_STREET_ADDRESS ||
   process.env.COMPANY_STREET_ADDRESS ||
-  "Kacyiru";
+  "Nyambuye";
 const companyLocality =
   process.env.NEXT_PUBLIC_COMPANY_LOCALITY ||
   process.env.COMPANY_LOCALITY ||
-  "Gasabo";
+  "Muhanga District";
 const companyRegion =
   process.env.NEXT_PUBLIC_COMPANY_REGION ||
   process.env.COMPANY_REGION ||
-  "Umujyi wa Kigali";
+  "";
 const companyCountry =
   process.env.NEXT_PUBLIC_COMPANY_COUNTRY ||
   process.env.COMPANY_COUNTRY ||
-  "RWANDA";
+  "Rwanda";
 const companyName =
   process.env.NEXT_PUBLIC_APP_NAME ||
   process.env.NEXT_PUBLIC_COMPANY_NAME ||
@@ -56,7 +56,7 @@ if (googleAnalyticsId && !/^G-[A-Z0-9]+$/i.test(googleAnalyticsId)) {
 }
 
 export const siteConfig = {
-  siteName: process.env.NEXT_PUBLIC_APP_NAME || "Mountain Ceramic Company LTD",
+  siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Mountain Ceramics Company",
   companyName,
   companyStreetAddress,
   companyLocality,
@@ -70,17 +70,19 @@ export const siteConfig = {
       companyLocality,
       companyRegion,
       companyCountry,
-    ].join(", "),
+    ]
+      .filter(Boolean)
+      .join(", "),
   companyTin: process.env.COMPANY_TIN || "108383570",
   companyRegistrationNumber: process.env.COMPANY_REGISTRATION_NUMBER || "",
   companyPhone:
     process.env.NEXT_PUBLIC_COMPANY_PHONE ||
     process.env.COMPANY_PHONE ||
-    "+250788304033",
+    "0798687945",
   companyPhoneAlternate:
     process.env.NEXT_PUBLIC_COMPANY_PHONE_ALTERNATE ||
     process.env.COMPANY_PHONE_ALTERNATE ||
-    "+250 780 765 548",
+    "0781028738",
   companyEmail:
     process.env.NEXT_PUBLIC_COMPANY_EMAIL ||
     process.env.COMPANY_EMAIL ||
@@ -115,8 +117,9 @@ export const siteConfig = {
   configuredSiteUrl,
   siteUrl: configuredSiteUrl || "http://localhost:3000",
   apiBaseUrl:
-    process.env.NEXT_PUBLIC_DOMAIN ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
     configuredSiteUrl ||
+    process.env.NEXT_PUBLIC_DOMAIN ||
     "http://localhost:3000",
   apiUrl: process.env.NEXT_API_URL,
   publicApiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,

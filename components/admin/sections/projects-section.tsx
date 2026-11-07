@@ -11,6 +11,7 @@ import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
 import { ImageUploader } from "../image-uploader";
 import { TilePicker } from "@/components/tile-picker";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 type Form = Omit<Project, "id">;
 
@@ -30,6 +31,7 @@ export function ProjectsSection({
   products: Product[];
   reload: () => Promise<void> | void;
 }) {
+  const { confirm, dialog } = useConfirmAction();
   const [editing, setEditing] = useState<Project | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<Form>(empty());
@@ -68,7 +70,7 @@ export function ProjectsSection({
   }
 
   async function remove(id: number) {
-    if (!confirm("Delete this project?")) return;
+    if (!(await confirm({ title: "Delete this project?", description: "This action cannot be undone." }))) return;
     try {
       await api.deleteProject(id);
       await reload();
@@ -94,21 +96,21 @@ export function ProjectsSection({
         <div className="rounded-2xl border border-border bg-background p-6">
           <h3 className="mb-5 font-bold">{editing ? `Editing: ${editing.title}` : "Add Project"}</h3>
           <div className="grid gap-5 sm:grid-cols-2">
-            <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setF("title", e.target.value)} placeholder="e.g. Kigali Convention Centre" /></div>
+            <div><Label htmlFor="project-title">Title *</Label><Input id="project-title" value={form.title} onChange={(e) => setF("title", e.target.value)} placeholder="e.g. Kigali Convention Centre" /></div>
             <div>
-              <Label>Type</Label>
-              <Select value={form.type} onChange={(e) => setF("type", e.target.value)}>
+              <Label htmlFor="project-type">Type</Label>
+              <Select id="project-type" value={form.type} onChange={(e) => setF("type", e.target.value)}>
                 {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </Select>
             </div>
-            <div><Label>Location</Label><Input value={form.location} onChange={(e) => setF("location", e.target.value)} /></div>
-            <div><Label>Area</Label><Input value={form.area} onChange={(e) => setF("area", e.target.value)} placeholder="e.g. 12,000 m²" /></div>
-            <div><Label>Year</Label><Input value={form.year} onChange={(e) => setF("year", e.target.value)} /></div>
-            <label className="flex items-center gap-3 pt-5 text-sm font-medium">
-              <Input type="checkbox" checked={form.large} onChange={(e) => setF("large", e.target.checked)} className="h-4 w-4 accent-primary" />
+            <div><Label htmlFor="project-location">Location</Label><Input id="project-location" value={form.location} onChange={(e) => setF("location", e.target.value)} /></div>
+            <div><Label htmlFor="project-area">Area</Label><Input id="project-area" value={form.area} onChange={(e) => setF("area", e.target.value)} placeholder="e.g. 12,000 m²" /></div>
+            <div><Label htmlFor="project-year">Year</Label><Input id="project-year" value={form.year} onChange={(e) => setF("year", e.target.value)} /></div>
+            <label htmlFor="project-large" className="flex min-h-11 items-center gap-3 pt-5 text-sm font-medium">
+              <Input id="project-large" type="checkbox" checked={form.large} onChange={(e) => setF("large", e.target.checked)} className="h-4 w-4 accent-primary" />
               Hero card
             </label>
-            <div className="sm:col-span-2"><Label>Description</Label><Textarea rows={3} value={form.description} onChange={(e) => setF("description", e.target.value)} /></div>
+            <div className="sm:col-span-2"><Label htmlFor="project-description">Description</Label><Textarea id="project-description" rows={3} value={form.description} onChange={(e) => setF("description", e.target.value)} /></div>
             <div className="sm:col-span-2"><ImageUploader label="Project Image" value={form.image} onChange={(u) => setF("image", u)} /></div>
             <div className="sm:col-span-2"><TilePicker label="Tiles used" products={products} selected={form.tileIds} onToggle={toggleTile} /></div>
           </div>
@@ -146,6 +148,7 @@ export function ProjectsSection({
           </div>
         ))}
       </div>
+      {dialog}
     </div>
   );
 }

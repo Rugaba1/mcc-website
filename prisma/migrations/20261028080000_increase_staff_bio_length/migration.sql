@@ -1,0 +1,1 @@
+ALTER TABLE `users` MODIFY `bio` VARCHAR(1500) NULL;

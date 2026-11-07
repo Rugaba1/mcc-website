@@ -66,7 +66,14 @@ export function DashboardShell({
     return (
       <AdminNotificationsProvider enabled={area === "admin"}>
         <div className="flex h-screen overflow-hidden">
+            <a
+                href="#dashboard-main-content"
+                className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:not-sr-only focus:bg-background focus:p-3 focus:text-foreground"
+            >
+                Skip to main content
+            </a>
             <aside
+                aria-label={area === "admin" ? "Administration sidebar" : "Account sidebar"}
                 className={`sticky  hidden h-screen shrink-0 border-r bg-sidebar transition-all duration-300 md:block ${collapsed ? "w-16" : "w-64"
                     }`}
             >
@@ -80,7 +87,11 @@ export function DashboardShell({
                 area={area}
             />
 
-            <main className="flex-1 overflow-y-scroll bg-background pb-20 md:pb-0">
+            <main
+                id="dashboard-main-content"
+                tabIndex={-1}
+                className="flex-1 overflow-y-scroll bg-background pb-20 md:pb-0"
+            >
                 <header className="sticky top-0 z-30 mx-auto flex h-14 items-center justify-between border-b bg-background/95 px-2.5 backdrop-blur-sm md:px-5">
                     <Button
                         variant="ghost"

@@ -110,7 +110,7 @@ export const POST = withPermission(PERM.VARIANTS_MANAGE)(
   } catch (e) {
     if (e instanceof z.ZodError)
       return NextResponse.json(
-        { error: "Invalid input", details: e.issues },
+        { error: e.issues[0]?.message ?? "Invalid input", details: e.issues },
         { status: 400 },
       );
     const code = (e as { code?: string })?.code;

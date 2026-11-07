@@ -4,9 +4,18 @@ import { cn } from "@/lib/utils";
 const field =
   "w-full  border border-input bg-background px-3 py-2.5 text-sm text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
 
-export function Label({ children }: { children: React.ReactNode }) {
+export function Label({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor?: string;
+}) {
   return (
-    <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-muted-foreground">
+    <label
+      htmlFor={htmlFor}
+      className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-muted-foreground"
+    >
       {children}
     </label>
   );

@@ -83,7 +83,7 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
     <div className="bg-inverse border-t border p-3 select-none">
       <div className="flex items-center flex-wrap justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-foreground">
+          <span className="text-xs font-semibold text-inverse-foreground">
             Applied Finishes ({appliedCount} / {scene.surfaces.length})
           </span>
           <Button
@@ -108,23 +108,25 @@ export const AppliedSummary: React.FC<AppliedSummaryProps> = ({
                 key={surf.sortOrder}
                 className="flex items-center flex-wrap gap-2 px-2.5 py-1.5  bg-background/70 border text-xs shrink-0"
               >
-                <div
-                  className="cursor-pointer"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-auto min-w-0 flex-col items-start whitespace-normal p-0 text-left"
                   onClick={() => onSelectSurface(surf.sortOrder)}
                 >
-                  <div className="font-medium   flex items-center gap-1">
+                  <span className="font-medium flex items-center gap-1">
                     <CheckCircle className="w-3 h-3 text-success" />
                     <span>{surf.name}</span>
-                  </div>
-                  <div className="text-[10px] text-primary font-normal">
+                  </span>
+                  <span className="text-[10px] text-primary font-normal">
                     {sel.product.name}
                     {pricePerBox ? ` • ${displayMoney(pricePerBox)}` : ""}
-                  </div>
-                </div>
+                  </span>
+                </Button>
                 <Button
                   onClick={() => onRemove(surf.sortOrder)}
                   variant={"destructive"}
-                  title="Remove"
+                  aria-label={`Remove ${surf.name}`}
                 >
                   <Trash2 className="w-3 h-3" />
                 </Button>

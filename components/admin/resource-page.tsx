@@ -42,6 +42,7 @@ export type FieldDef = {
         value: any,
         onChange: (v: any) => void,
         setField: (name: string, value: any) => void,
+        values: Values,
     ) => ReactNode; // type "custom"
 };
 
@@ -79,13 +80,15 @@ export interface ResourcePageProps<T extends { id: number }> {
     deletePermission?: PermCode;
     deleteWarning?: (row: T) => string;
     detail?: DetailDef<T>;
+    headerActions?: ReactNode;
 }
 
-function Control({ f, value, onChange, setField }: {
+function Control({ f, value, onChange, setField, values }: {
     f: FieldDef;
     value: any;
     onChange: (v: any) => void;
     setField: (name: string, value: any) => void;
+    values: Values;
 }) {
     switch (f.type) {
         case "textarea":
@@ -108,7 +111,7 @@ function Control({ f, value, onChange, setField }: {
         case "image":
             return <ImageField value={value ?? ""} onChange={onChange} />;
         case "custom":
-            return <>{f.render?.(value, onChange, setField)}</>;
+            return <>{f.render?.(value, onChange, setField, values)}</>;
         default:
             return <Input className="rounded-none" type={f.type} value={value ?? ""} placeholder={f.placeholder} onChange={(e) => onChange(e.target.value)} autoComplete="off" />;
     }
@@ -214,17 +217,20 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
     const formPermission = editing ? p.updatePermission : p.createPermission;
 
     return (
-        <main className="flex-1 space-y-5 p-4 md:p-6">
+        <section className="flex-1 space-y-5 p-4 md:p-6">
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">{p.title}</h1>
                     <p className="text-sm text-muted-foreground">{p.description}</p>
                 </div>
-                {p.create && p.fields && p.createPermission && (
-                    <PermissionGate required={p.createPermission}>
-                        <Button className="rounded-none" onClick={() => openForm(null)}><Plus /> Add {p.entityName}</Button>
-                    </PermissionGate>
-                )}
+                <div className="flex items-center gap-2">
+                    {p.headerActions}
+                    {p.create && p.fields && p.createPermission && (
+                        <PermissionGate required={p.createPermission}>
+                            <Button className="rounded-none" onClick={() => openForm(null)}><Plus /> Add {p.entityName}</Button>
+                        </PermissionGate>
+                    )}
+                </div>
             </header>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -306,6 +312,7 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                                             value={values[f.name]}
                                             onChange={(v) => { setValues((s) => ({ ...s, [f.name]: v })); setErrors((s) => ({ ...s, [f.name]: "" })); }}
                                             setField={(name, value) => setValues((s) => ({ ...s, [name]: value }))}
+                                            values={values}
                                         />
                                         {f.hint && !errors[f.name] && f.type !== "checkbox" && <p className="text-xs text-muted-foreground">{f.hint}</p>}
                                         {errors[f.name] && <p className="text-xs text-destructive">{errors[f.name]}</p>}
@@ -349,6 +356,6 @@ export function ResourcePage<T extends { id: number }>(p: ResourcePageProps<T>) 
                     />
                 </PermissionGate>
             )}
-        </main>
+        </section>
     );
 }

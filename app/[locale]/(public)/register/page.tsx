@@ -3,11 +3,13 @@
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { Link } from "@/app/i18n/routing";
+import { Link, useRouter } from "@/app/i18n/routing";
 import { api, apiErrorMessage } from "@/lib/api";
 import { safeNext } from "@/lib/auth/safe-next";
+import { useAuth } from "@/contexts/auth-context";
 import { LuxuryLoading } from "@/components/luxury-loading";
 import { FormError } from "@/components/auth/form-error";
+import { OtpInput } from "@/components/auth/otp-input";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,12 +19,20 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 
 function RegisterForm() {
     const params = useSearchParams();
+    const router = useRouter();
+    const { login } = useAuth();
     const next = safeNext(params.get("next"));
     const [form, setForm] = useState({
         firstName: "", lastName: "", email: "", phoneNumber: "", password: "", confirm: "",
     });
     const [error, setError] = useState("");
-    const [created, setCreated] = useState(false);
+    const [accountCreated, setAccountCreated] = useState(false);
+    const [challenge, setChallenge] = useState<{
+        challenge: string;
+        method: "email" | "authenticator";
+        message: string;
+    } | null>(null);
+    const [code, setCode] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [legalDocuments, setLegalDocuments] = useState<Array<{ id: number; slug: string; title: string; version: number }>>([]);
     const [selectedLegalIds, setSelectedLegalIds] = useState<number[]>([]);
@@ -48,9 +58,46 @@ function RegisterForm() {
     const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setForm((f) => ({ ...f, [k]: e.target.value }));
 
+    async function signInAfterRegistration(verification?: {
+        challenge: string;
+        code: string;
+    }) {
+        setError("");
+        setSubmitting(true);
+        try {
+            const result = await login(
+                form.email.trim(),
+                form.password,
+                next,
+                verification,
+            );
+            if ("twoFactorRequired" in result && result.twoFactorRequired) {
+                setChallenge({
+                    challenge: result.challenge,
+                    method: result.method,
+                    message: result.message,
+                });
+                setCode("");
+            } else if ("accountDisabled" in result || "emailVerificationRequired" in result) {
+                setError("Your account was created, but automatic sign-in could not be completed. Please sign in to continue.");
+            }
+        } catch (err) {
+            setError(
+                `Your account was created, but automatic sign-in failed. ${apiErrorMessage(err, "Please sign in to continue.")}`,
+            );
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
     async function onSubmit(e: FormEvent) {
         e.preventDefault();
         setError("");
+        if (challenge) {
+            if (code.length !== 6) return;
+            await signInAfterRegistration({ challenge: challenge.challenge, code });
+            return;
+        }
         if (form.password.length < 8) return setError("Password must be at least 8 characters.");
         if (form.password !== form.confirm) return setError("Passwords don't match.");
         if (form.phoneNumber && !isValidPhoneNumber(form.phoneNumber)) {
@@ -68,46 +115,71 @@ function RegisterForm() {
                 acceptedLegalVersionIds: selectedLegalIds,
                 next,
             });
-            setCreated(true);
+            setAccountCreated(true);
+            await signInAfterRegistration();
         } catch (err) {
             setError(apiErrorMessage(err, "Could not create your account."));
             setSubmitting(false);
         }
     }
 
-    async function resendVerification() {
-        setError("");
-        setSubmitting(true);
-        try {
-            await api.resendVerification({
-                email: form.email.trim(),
-                next,
-            });
-        } catch (err) {
-            setError(apiErrorMessage(err, "Could not send a verification link."));
-        } finally {
-            setSubmitting(false);
-        }
-    }
-
-    if (created) {
+    if (accountCreated) {
         return (
             <main className="mx-auto max-w-xl px-4 py-16 text-center">
-                <h1 className="text-3xl font-bold">Check your email</h1>
-                <p className="mt-4 text-muted-foreground" aria-live="polite">
-                    We sent a verification link to {form.email}. Verify your address before signing in.
-                    Your checkout or other destination will be kept for after sign-in.
-                </p>
-                <FormError message={error} />
-                <Button className="mt-6" variant="outline" disabled={submitting} onClick={resendVerification}>
-                    {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Resend verification link
-                </Button>
-                <p className="mt-6">
-                    <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline">
-                        Continue to sign in
-                    </Link>
-                </p>
+                <h1 className="text-3xl font-bold">
+                    {challenge ? "Verify it’s you" : "Signing you in"}
+                </h1>
+                {challenge ? (
+                    <form onSubmit={onSubmit} className="mx-auto mt-6 max-w-sm space-y-4">
+                        <p className="text-sm text-muted-foreground" aria-live="polite">
+                            {challenge.message}
+                        </p>
+                        <div className="space-y-2 text-left">
+                            <Label htmlFor="registration-two-factor-code">6-digit verification code</Label>
+                            <OtpInput
+                                id="registration-two-factor-code"
+                                value={code}
+                                onChange={setCode}
+                                autoFocus
+                            />
+                        </div>
+                        <FormError message={error} />
+                        <Button type="submit" className="w-full" disabled={submitting || code.length !== 6}>
+                            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Verify and sign in
+                        </Button>
+                        {challenge.method === "email" && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full"
+                                disabled={submitting}
+                                onClick={() => signInAfterRegistration()}
+                            >
+                                Send another code
+                            </Button>
+                        )}
+                    </form>
+                ) : error ? (
+                    <>
+                        <p className="mt-4 text-muted-foreground">
+                            Your account is ready, but automatic sign-in did not finish.
+                        </p>
+                        <FormError message={error} />
+                        <Button
+                            className="mt-6"
+                            onClick={() =>
+                                router.replace(`/login?next=${encodeURIComponent(next)}`)
+                            }
+                        >
+                            Continue to sign in
+                        </Button>
+                    </>
+                ) : (
+                    <p className="mt-4 text-muted-foreground" aria-live="polite">
+                        Your account is ready. Please wait while we sign you in.
+                    </p>
+                )}
             </main>
         );
     }

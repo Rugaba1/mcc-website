@@ -420,7 +420,6 @@ export function MarkdownEditor({
                 className="rounded-none"
                 value={linkLabel}
                 onChange={(event) => setLinkLabel(event.target.value)}
-                autoFocus
                 required
                 maxLength={500}
               />

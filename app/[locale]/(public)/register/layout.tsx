@@ -18,6 +18,7 @@ export async function generateMetadata({
     title: `Create an Account | ${siteConfig.siteName}`,
     description: "Create an account to manage orders and save your favorite tile products.",
     noIndex: true,
+    image:"/images/mcc-factory-right-angle.jpg"
   });
 }
 

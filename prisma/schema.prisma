@@ -119,14 +119,14 @@ model User {
   stockMovements         StockMovement[]
   orderHistory           OrderStatusHistory[]
   jobTitle               String?                 @map("job_title")         @db.VarChar(100)  
-  bio                    String?                                           @db.VarChar(500)
+  bio                    String?                                           @db.VarChar(1500)
   showOnHomepage         Boolean                 @map("show_on_homepage")  @default(false)
   displayOrder           Int                     @map("display_order")     @default(0)
 
   @@index([showOnHomepage, displayOrder])
   @@map("users")
   forgetPasswordRequests ForgetPasswordRequest[]
-  role                   Role[]
+  role                   Role[]                  @relation("roletouser")
   payments               Payment[]
   blogPosts BlogPost[]
   emailBlocksCreated     EmailBlocklist[]     @relation("EmailBlocklistCreator")
@@ -715,6 +715,7 @@ model Order {
   id             Int                      @id @default(autoincrement())
   orderNumber    String                   @unique @db.VarChar(30) // "MC-2026-000123"
   userId         Int?
+  savedCustomerId Int?
   guestEmail     String?                  @db.VarChar(255)
   guestPhone     String?                  @db.VarChar(20)
   tin            String?                  @db.VarChar(9)
@@ -750,6 +751,7 @@ model Order {
   cancelledAt    DateTime?
   updatedAt      DateTime                 @updatedAt
   user           User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  savedCustomer  SavedCustomer?           @relation(fields: [savedCustomerId], references: [id], onDelete: SetNull)
   coupon         Coupon?                 @relation(fields: [couponId], references: [id], onDelete: SetNull)
   deliveryZone   DeliveryZone?           @relation(fields: [deliveryZoneId], references: [id], onDelete: SetNull)
   items          OrderItem[]
@@ -757,9 +759,27 @@ model Order {
   history        OrderStatusHistory[]
 
   @@index([userId])
+  @@index([savedCustomerId])
   @@index([status, placedAt])
   @@map("order")
   invoices       Invoice[]
+}
+
+model SavedCustomer {
+  id          Int      @id @default(autoincrement())
+  firstName   String   @map("first_name") @db.VarChar(120)
+  lastName    String?  @map("last_name") @db.VarChar(120)
+  email       String?  @db.VarChar(255)
+  phoneNumber String   @map("phone_number") @db.VarChar(30)
+  tin         String?  @db.VarChar(9)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@map("saved_customer")
 }
 
 model OrderItem {
@@ -928,6 +948,7 @@ model ForgetPasswordRequest {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@map("forgetpasswordrequest")
 }
 // One row per surface in the design (floor = variant A, wall = variant B...)
 model VisualizerDesignItem {
@@ -1011,7 +1032,9 @@ model Catalogue {
 model Role {
   id       Int     @id // fixed IDs, kept in sync with ROLE_IDS in constants.ts
   roleName String  @unique
-  users    User[]
+  users    User[]  @relation("roletouser")
+
+  @@map("role")
 }
 
 enum ContactStatus {
@@ -1087,9 +1110,23 @@ model MediaFile {
   mimeType     String   @map("mime_type")      @db.VarChar(100)
   size         Int
   alt          String?                         @db.VarChar(255)
+  isPublic     Boolean  @default(true) @map("is_public")
+  folderId     Int?     @map("folder_id")
   uploadedById Int?     @map("uploaded_by_id")
   createdAt    DateTime @map("created_at")     @default(now())
+  folder       MediaFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
 
   @@index([kind, createdAt])
+  @@index([folderId, createdAt])
+  @@index([isPublic, createdAt])
   @@map("media_file")
+}
+
+model MediaFolder {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique @db.VarChar(255)
+  createdAt DateTime    @default(now()) @map("created_at")
+  files     MediaFile[]
+
+  @@map("media_folder")
 }

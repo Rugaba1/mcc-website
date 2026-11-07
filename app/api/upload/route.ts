@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
+import { saveUploadedFile } from "@/lib/uploads/storage";
 
 export const runtime = "nodejs";
 
@@ -37,6 +36,24 @@ export const POST = withPermission(PERM.MEDIA_UPLOAD)(async (
 ) => {
   try {
     const form = await req.formData();
+    const folderValue = form.get("folderId");
+    const visibilityValue = form.get("isPublic");
+    const folderId =
+      typeof folderValue === "string" && folderValue
+        ? Number(folderValue)
+        : null;
+    if (
+      folderId !== null &&
+      (!Number.isSafeInteger(folderId) ||
+        folderId < 1 ||
+        !(await prisma.mediaFolder.findUnique({ where: { id: folderId } })))
+    ) {
+      return NextResponse.json({ error: "Choose a valid folder" }, { status: 400 });
+    }
+    if (visibilityValue !== null && visibilityValue !== "true" && visibilityValue !== "false") {
+      return NextResponse.json({ error: "Choose public or private visibility" }, { status: 400 });
+    }
+    const isPublic = visibilityValue !== "false";
     const files = form
       .getAll("file")
       .filter((f): f is File => f instanceof File);
@@ -69,10 +86,9 @@ export const POST = withPermission(PERM.MEDIA_UPLOAD)(async (
       const ext = (kind === "image" ? IMAGE_TYPES : FILE_TYPES)[file.type];
       const folder = kind === "image" ? "images" : "files";
       const fileName = `${randomUUID()}${ext}`;
-      const dir = join(process.cwd(), "public", "uploads", folder);
-      await mkdir(dir, { recursive: true });
-      await writeFile(
-        join(dir, fileName),
+      await saveUploadedFile(
+        folder,
+        fileName,
         Buffer.from(await file.arrayBuffer()),
       );
 
@@ -86,6 +102,8 @@ export const POST = withPermission(PERM.MEDIA_UPLOAD)(async (
             mimeType: file.type,
             size: file.size,
             uploadedById: user.id,
+            folderId,
+            isPublic,
           },
         }),
       );

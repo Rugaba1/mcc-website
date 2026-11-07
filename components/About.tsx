@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { COMPANY } from "@/lib/company";
 import { FactoryIcon } from "./Icons";
 
 const features = [
@@ -19,7 +20,11 @@ const features = [
 
 const badges = ["ISO 9001", "RSB Certified", "Made in Rwanda", "10-Yr Warranty"];
 
-export default function About() {
+export default function About({
+  collectionCount,
+}: {
+  collectionCount: number | null;
+}) {
   return (
     <section id="about" className="py-0  overflow-hidden">
       <div className="grid lg:grid-cols-2 min-h-170">
@@ -27,8 +32,8 @@ export default function About() {
         {/* ── Left: Image panel ───────────────────────── */}
         <div className="relative min-h-[500px] lg:min-h-full">
           <Image
-            src="https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=1000&q=85"
-            alt="MCC ceramic tile manufacturing facility in Kigali"
+            src="/images/manufacturing-facility.jpg"
+            alt="MCC ceramic tile manufacturing facility in Muhanga"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -39,7 +44,7 @@ export default function About() {
           {/* Est. badge */}
           <div className="absolute top-8 right-8 bg-primary text-center px-6 py-4 shadow-2xl">
             <p className="text-primary-foreground/80 text-[10px] uppercase tracking-[0.25em] font-semibold">Est.</p>
-            <p className="text-primary-foreground text-5xl font-bold font-playfair leading-none">2009</p>
+            <p className="text-primary-foreground text-5xl font-bold font-playfair leading-none">{COMPANY.foundedYear}</p>
             <p className="text-primary-foreground/70 text-xs tracking-widest mt-1">Kigali, Rwanda</p>
           </div>
 
@@ -50,15 +55,16 @@ export default function About() {
             </div>
             <div>
               <p className="font-bold text-sm leading-tight">Production Facility</p>
-              <p className="text-muted-foreground text-xs mt-0.5">Kicukiro Industrial Zone</p>
+              <p className="text-muted-foreground text-xs mt-0.5">Nyambuye, Muhanga District, Rwanda</p>
             </div>
           </div>
 
-          {/* 50+ Collections badge */}
-          <div className="absolute bottom-8 right-8 bg-accent/90 backdrop-blur-sm text-center px-5 py-4 shadow-xl">
-            <p className=" text-3xl font-bold font-playfair">50+</p>
-            <p className=" text-xs tracking-wider uppercase mt-1">Collections</p>
-          </div>
+          {collectionCount !== null && (
+            <div className="absolute bottom-8 right-8 bg-accent/90 backdrop-blur-sm text-center px-5 py-4 shadow-xl">
+              <p className=" text-3xl font-bold font-playfair">{collectionCount}</p>
+              <p className=" text-xs tracking-wider uppercase mt-1">Collections</p>
+            </div>
+          )}
         </div>
 
         {/* ── Right: Content panel ────────────────────── */}
@@ -74,7 +80,7 @@ export default function About() {
           </h2>
 
           <p className=" text-lg leading-relaxed mb-4">
-            Founded in 2009 in Kigali, Mountain Ceramics Company has grown to become Rwanda&apos;s foremost ceramic tile producer, supplying high-quality tiles across East Africa.
+            Founded in {COMPANY.foundedYear} in Kigali, Mountain Ceramics Company has grown to become Rwanda&apos;s foremost ceramic tile producer, supplying high-quality tiles across East Africa.
           </p>
           <p className=" leading-relaxed mb-10">
             We combine modern European manufacturing technology with locally sourced raw materials to produce tiles that meet international standards while reflecting the rich aesthetic culture of the Great Lakes region.

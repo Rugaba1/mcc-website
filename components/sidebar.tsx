@@ -50,6 +50,7 @@ export function SidebarContent({
     const { user, logout } = useAuth();
     const { unreadMessageCount } = useAdminNotifications();
     const staff = isStaffUser(user);
+    const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
     const initials = `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`;
 
     return (
@@ -62,7 +63,7 @@ export function SidebarContent({
                 >
                     <span className="flex  items-center justify-center">
                         <Image
-                            src="/logo.png"
+                            src="/logo-trans.png"
                             alt="Mountain Ceramics Company"
                             height={60}
                             width={60}
@@ -76,7 +77,10 @@ export function SidebarContent({
                 </Link>
             </div>
 
-            <nav className="flex-1 space-y-1 overflow-y-auto p-2">
+            <nav
+                aria-label={area === "admin" ? "Administration navigation" : "Account navigation"}
+                className="flex-1 space-y-1 overflow-y-auto p-2"
+            >
                 {nav.map((item) => {
                     const active = isActive(pathname, item);
                     const Icon = item.icon;
@@ -86,6 +90,8 @@ export function SidebarContent({
                             href={item.href}
                             onClick={onLinkClick}
                             title={collapsed ? item.name : undefined}
+                            aria-label={collapsed ? item.name : undefined}
+                            aria-current={active ? "page" : undefined}
                             className={cn(
                                 "flex items-center  px-3 py-2 text-sm font-medium transition-colors",
                                 collapsed ? "relative justify-center" : "gap-3",
@@ -116,7 +122,11 @@ export function SidebarContent({
             <div className="border-t p-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-auto w-full justify-start gap-2 px-2 py-2">
+                        <Button
+                            variant="ghost"
+                            className="h-auto w-full justify-start gap-2 px-2 py-2"
+                            aria-label={`Account options${displayName ? ` for ${displayName}` : ""}`}
+                        >
                             <Avatar className="h-8 w-8">
                                 <AvatarFallback>{initials || "U"}</AvatarFallback>
                             </Avatar>

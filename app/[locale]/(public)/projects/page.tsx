@@ -1,6 +1,6 @@
 
-import Image from "next/image";
-import Link from "next/link";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
 import { serverApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "@/components/pagination-controls";
@@ -21,7 +21,7 @@ export default async function ProjectsPage({
   searchParams: Promise<{ category?: string, search?: string; page?: string; activeType: string; selectedProject: string }>;
 }) {
   const { category, page: pageParam, search, activeType, selectedProject } = await searchParams;
-  const page = Math.max(1, parseInt(pageParam ?? "1", PAGE_SIZE) || 1);
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   let totalPages = 1;
   let projects = null
   try {
@@ -32,16 +32,19 @@ export default async function ProjectsPage({
 
 
   } catch (error) {
-
+    console.error("Could not load projects for the public portfolio:", error);
   }
 
   if (!projects) {
     return (
       <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">Projects not found</p>
+        <div className="text-center" role="alert">
+          <h1 className="font-semibold text-lg">Projects are temporarily unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Please try again later or contact us for help.
+          </p>
           <Link href="/catalogue" className=" hover:underline text-sm mt-2 inline-block">
-            ← Back to home
+            Browse the catalogue
           </Link>
         </div>
       </div>
@@ -119,10 +122,9 @@ export default async function ProjectsPage({
         {/* ── Project grid ────────────────────────────────────── */}
         {filtered.length === 0 ? (
           <div className="text-center py-24 ">
-            <p className="text-lg mb-3">No projects yet.</p>
-            <Link href="/admin" className=" hover:underline text-sm font-semibold">
-              Add projects in the Admin Portal →
-            </Link>
+            <p className="text-lg mb-3">
+              Our project portfolio is being updated. Please check back later.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -137,7 +139,7 @@ export default async function ProjectsPage({
                   >
                     {/* Image */}
                     <div className="relative h-52 overflow-hidden">
-                      <Image
+                      <MediaImage
                         src={proj.image}
                         alt={proj.title}
                         fill
@@ -155,7 +157,7 @@ export default async function ProjectsPage({
                         <div className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           {tiles.slice(0, 3).map((t) => (
                             <div key={t.id} className="w-8 h-8 overflow-hidden rounded-sm border border-border/60">
-                              <Image src={t.image} alt={t.name} width={32} height={32} className="object-cover" />
+                              <MediaImage src={t.image} alt={t.name} width={32} height={32} className="object-cover" />
                             </div>
                           ))}
                         </div>

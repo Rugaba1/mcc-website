@@ -68,25 +68,32 @@ export default function CartPage() {
             <div className="mb-8 pt-6">
                 <CheckoutProgress currentStep={1} />
             </div>
-            <div className="mb-8 flex items-end justify-between">
-                <h1 className="font-playfair text-4xl font-bold">My order</h1>
-                <Button onClick={clearCart} variant={"destructive"}>Clear order</Button>
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 sm:mb-8">
+                <h1 className="font-playfair text-3xl font-bold sm:text-4xl">My order</h1>
+                <Button onClick={clearCart} variant={"destructive"} className="min-h-11">Clear order</Button>
             </div>
 
-            <div className="grid contain-content gap-2 grid-cols-1 lg:grid-cols-[1fr_0.5fr]">
-                <ul className="divide-y divide-border border border-border bg-background">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.5fr)]">
+                <ul className="min-w-0 divide-y divide-border border border-border bg-background">
                     {lines.map(({ item: i, line }) => {
                         const step = 1;
                         const min = i.saleType === "SQM" ? MIN_SQM : 1;
                         return (
-                            <li key={`${i.variantId}-${i.saleType}`} className="flex gap-2 p-2 flex-wrap">
-                                <MediaImage src={i.image} alt="" className="h-24 w-24 shrink-0 bg-muted object-cover" />
-                                <div className="flex min-w-0 flex-1 flex-col justify-between">
+                            <li
+                                key={`${i.variantId}-${i.saleType}`}
+                                className="grid min-w-0 grid-cols-[4rem_minmax(0,1fr)_2.75rem] gap-3 p-3 sm:grid-cols-[6rem_minmax(0,1fr)_2.75rem] sm:p-4"
+                            >
+                                <MediaImage
+                                    src={i.image}
+                                    alt=""
+                                    className="col-start-1 row-start-1 h-16 w-16 shrink-0 bg-muted object-cover sm:h-24 sm:w-24"
+                                />
+                                <div className="col-start-2 row-start-1 min-w-0">
                                     <div>
-                                        <p className="truncate font-semibold">{i.name}</p>
-                                        <p className="text-xs text-muted-foreground">{[i.size, i.finish].filter(Boolean).join(" · ")}</p>
+                                        <p className="break-words font-semibold leading-snug">{i.name}</p>
+                                        <p className="mt-1 break-words text-xs text-muted-foreground">{[i.size, i.finish].filter(Boolean).join(" · ")}</p>
                                         {line ? (
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="mt-1 break-words text-xs text-muted-foreground">
                                                 {i.saleType === "CONTAINER"
                                                     ? `${line.containers} container${line.containers === 1 ? "" : "s"} · ${number(line.sqm, { maximumFractionDigits: 2 })} m² × ${displayMoney(line.pricePerSqm, i.currency ?? baseCurrency)}`
                                                     : `${number(line.sqm, { maximumFractionDigits: 2 })} m² × ${displayMoney(line.pricePerSqm, i.currency ?? baseCurrency)}`}
@@ -94,10 +101,20 @@ export default function CartPage() {
                                         ) : (
                                             <p className="text-xs text-destructive">This item can’t be priced. Please remove it.</p>
                                         )}
-                                        {line && line.saved > 0 && <p className="text-xs font-medium text-success dark:text-success">Container price, you save {displayMoney(line.saved, i.currency ?? baseCurrency)}</p>}
+                                        {line && line.saved > 0 && <p className="mt-1 break-words text-xs font-medium text-success dark:text-success">Container price, you save {displayMoney(line.saved, i.currency ?? baseCurrency)}</p>}
                                     </div>
-                                    <div className="mt-2 flex items-center justify-between">
-                                        <div className="flex items-center border border-border">
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label={`Remove ${i.name}`}
+                                    onClick={() => removeFromCart(i.variantId, i.saleType)}
+                                    className="col-start-3 row-start-1 size-11 self-start"
+                                >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                                <div className="col-span-3 row-start-2 flex min-w-0 flex-wrap items-center justify-between gap-3 sm:col-start-2 sm:col-span-2">
+                                        <div className="flex max-w-full items-center border border-border">
                                             <Button variant="ghost" size="icon" aria-label="Less" disabled={i.qty <= min} onClick={() => setQty(i.variantId, i.saleType, i.qty - step)}>
                                                 <Minus className="h-4 w-4" />
                                             </Button>
@@ -107,18 +124,14 @@ export default function CartPage() {
                                             </Button>
                                             <span className="px-2 text-xs text-muted-foreground">{i.saleType === "CONTAINER" ? "containers" : "m²"}</span>
                                         </div>
-                                        <p className="font-semibold">{line ? displayMoney(line.total, i.currency ?? baseCurrency) : "—"}</p>
-                                    </div>
+                                        <p className="ml-auto break-words text-right font-semibold">{line ? displayMoney(line.total, i.currency ?? baseCurrency) : "—"}</p>
                                 </div>
-                                <Button variant="ghost" size="icon" aria-label={`Remove ${i.name}`} onClick={() => removeFromCart(i.variantId, i.saleType)}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
                             </li>
                         );
                     })}
                 </ul>
 
-                <aside className="sticky top-20 space-y-4 border border-border bg-background p-6">
+                <aside className="min-w-0 space-y-4 border border-border bg-background p-4 sm:p-6 lg:sticky lg:top-20">
                     <h2 className="font-playfair text-xl font-bold">Order summary</h2>
                     <dl className="space-y-2 text-sm">
                         <div className="flex justify-between"><dt className="text-muted-foreground">Items</dt><dd>{items.length}</dd></div>

@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /admin
+Disallow: /*/admin
+Disallow: /account
+Disallow: /*/account
+Disallow: /cart
+Disallow: /*/cart
+Disallow: /checkout
+Disallow: /*/checkout
+
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+Agentmap: https://mountainceramic.com/.well-known/ai-catalog.json
+Sitemap: https://mountainceramic.com/sitemap.xml

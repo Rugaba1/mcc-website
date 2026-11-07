@@ -191,13 +191,6 @@ export const whyUs = [
   },
 ];
 
-export const stats = [
-  { num: "15+", label: "Years of Excellence" },
-  { num: "500+", label: "Projects Completed" },
-  { num: "50+", label: "Tile Collections" },
-  { num: "1000+", label: "Happy Clients" },
-];
-
 export const processSteps = [
   { num: "01", icon: "clipboard", title: "Consultation", desc: "Share your project requirements and vision with our expert tile consultants." },
   { num: "02", icon: "palette", title: "Design Selection", desc: "Browse our collections and get personalised recommendations for your space." },

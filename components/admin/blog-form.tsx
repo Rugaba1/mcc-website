@@ -117,22 +117,22 @@ export function BlogForm({ postId }: { postId?: number }) {
                     <Card className="rounded-none shadow-none">
                         <CardContent className="space-y-4 pt-6">
                             <div className="space-y-1.5">
-                                <Label>Title</Label>
-                                <Input className="rounded-none" value={form.title}
+                                <Label htmlFor="blog-title">Title</Label>
+                                <Input id="blog-title" className="rounded-none" value={form.title}
                                     onChange={(e) => {
                                         set("title", e.target.value);
                                         if (!slugTouched) set("slug", slugify(e.target.value));
                                     }} />
                             </div>
                             <div className="space-y-1.5">
-                                <Label>Slug</Label>
-                                <Input className="rounded-none" value={form.slug}
+                                <Label htmlFor="blog-slug">Slug</Label>
+                                <Input id="blog-slug" className="rounded-none" value={form.slug}
                                     onChange={(e) => { setSlugTouched(true); set("slug", slugify(e.target.value)); }} />
                                 <p className="text-xs text-muted-foreground">Changing the slug of a published post breaks its existing links.</p>
                             </div>
                             <div className="space-y-1.5">
-                                <div className="flex justify-between"><Label>Excerpt</Label><Counter value={form.excerpt ?? ""} max={160} /></div>
-                                <Textarea className="rounded-none" rows={3} value={form.excerpt ?? ""} onChange={(e) => set("excerpt", e.target.value)} />
+                                <div className="flex justify-between"><Label htmlFor="blog-excerpt">Excerpt</Label><Counter value={form.excerpt ?? ""} max={160} /></div>
+                                <Textarea id="blog-excerpt" className="rounded-none" rows={3} value={form.excerpt ?? ""} onChange={(e) => set("excerpt", e.target.value)} />
                             </div>
                         </CardContent>
                     </Card>
@@ -159,10 +159,10 @@ export function BlogForm({ postId }: { postId?: number }) {
                         <CardHeader><CardTitle className="text-base">Publishing</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-1.5">
-                                <Label>Status</Label>
+                                <Label htmlFor="blog-status">Status</Label>
                                 <PermissionGate required={PERM.BLOG_PUBLISH}>
                                     <Select value={form.status} onValueChange={(v) => set("status", v as BlogStatus)}>
-                                        <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                                        <SelectTrigger id="blog-status" className="rounded-none"><SelectValue /></SelectTrigger>
                                         <SelectContent className="rounded-none">
                                             <SelectItem value="DRAFT">Draft</SelectItem>
                                             <SelectItem value="PUBLISHED">Published</SelectItem>
@@ -172,9 +172,9 @@ export function BlogForm({ postId }: { postId?: number }) {
                                 </PermissionGate>
                             </div>
                             <div className="space-y-1.5">
-                                <Label>Language</Label>
+                                <Label htmlFor="blog-language">Language</Label>
                                 <Select value={form.locale} onValueChange={(v) => set("locale", v)}>
-                                    <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger id="blog-language" className="rounded-none"><SelectValue /></SelectTrigger>
                                     <SelectContent className="rounded-none">
                                         <SelectItem value="en">English</SelectItem>
                                         <SelectItem value="fr">Français</SelectItem>
@@ -208,8 +208,8 @@ export function BlogForm({ postId }: { postId?: number }) {
                             </PermissionGate>
                             {form.coverImage && (
                                 <div className="space-y-1.5">
-                                    <Label>Alt text</Label>
-                                    <Input className="rounded-none" value={form.coverAlt ?? ""} onChange={(e) => set("coverAlt", e.target.value)} placeholder="Describe the image" />
+                                    <Label htmlFor="blog-cover-alt">Alt text</Label>
+                                    <Input id="blog-cover-alt" className="rounded-none" value={form.coverAlt ?? ""} onChange={(e) => set("coverAlt", e.target.value)} placeholder="Describe the image" />
                                 </div>
                             )}
                         </CardContent>
@@ -218,7 +218,7 @@ export function BlogForm({ postId }: { postId?: number }) {
                     <Card className="rounded-none shadow-none">
                         <CardHeader><CardTitle className="text-base">Tags</CardTitle></CardHeader>
                         <CardContent>
-                            <Input className="rounded-none" value={tagsText} onChange={(e) => setTagsText(e.target.value)} placeholder="flooring, kigali, porcelain" />
+                            <Input aria-label="Blog tags, comma separated" className="rounded-none" value={tagsText} onChange={(e) => setTagsText(e.target.value)} placeholder="flooring, kigali, porcelain" />
                             <p className="mt-1.5 text-xs text-muted-foreground">Separate with commas.</p>
                         </CardContent>
                     </Card>
@@ -227,12 +227,12 @@ export function BlogForm({ postId }: { postId?: number }) {
                         <CardHeader><CardTitle className="text-base">SEO</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-1.5">
-                                <div className="flex justify-between"><Label>SEO title</Label><Counter value={form.seoTitle ?? ""} max={60} /></div>
-                                <Input className="rounded-none" value={form.seoTitle ?? ""} placeholder={form.title} onChange={(e) => set("seoTitle", e.target.value)} />
+                                <div className="flex justify-between"><Label htmlFor="blog-seo-title">SEO title</Label><Counter value={form.seoTitle ?? ""} max={60} /></div>
+                                <Input id="blog-seo-title" className="rounded-none" value={form.seoTitle ?? ""} placeholder={form.title} onChange={(e) => set("seoTitle", e.target.value)} />
                             </div>
                             <div className="space-y-1.5">
-                                <div className="flex justify-between"><Label>Meta description</Label><Counter value={form.seoDescription ?? ""} max={160} /></div>
-                                <Textarea className="rounded-none" rows={3} value={form.seoDescription ?? ""} placeholder={form.excerpt ?? ""} onChange={(e) => set("seoDescription", e.target.value)} />
+                                <div className="flex justify-between"><Label htmlFor="blog-meta-description">Meta description</Label><Counter value={form.seoDescription ?? ""} max={160} /></div>
+                                <Textarea id="blog-meta-description" className="rounded-none" rows={3} value={form.seoDescription ?? ""} placeholder={form.excerpt ?? ""} onChange={(e) => set("seoDescription", e.target.value)} />
                             </div>
                             <p className="text-xs text-muted-foreground">Left blank, the title and excerpt are used.</p>
                         </CardContent>

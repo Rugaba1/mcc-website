@@ -173,14 +173,14 @@ export default function AdminCouponsPage() {
             />
           </div>
           <div className="min-w-0 space-y-2">
-            <Label>Discount type</Label>
+            <span id="coupon-discount-type-label" className="text-sm font-medium">Discount type</span>
             <Select
               value={draft.type}
               onValueChange={(type: Coupon["type"]) =>
                 setDraft({ ...draft, type })
               }
             >
-              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-labelledby="coupon-discount-type-label" className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="PERCENT">Percentage</SelectItem>
                 <SelectItem value="FIXED">Fixed amount</SelectItem>

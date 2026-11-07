@@ -20,8 +20,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useFormatters } from "@/contexts/format-context";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 function BlockedEmailsContent() {
+  const { confirm, dialog } = useConfirmAction();
   const { date } = useFormatters();
   const [entries, setEntries] = useState<BlockedEmail[]>([]);
   const [email, setEmail] = useState("");
@@ -96,13 +98,11 @@ function BlockedEmailsContent() {
   }
 
   async function removeBlock(entry: BlockedEmail) {
-    if (
-      !window.confirm(
-        `Remove the block for ${entry.email}? Disabled accounts will remain inactive until re-enabled separately.`,
-      )
-    ) {
-      return;
-    }
+    if (!(await confirm({
+      title: "Remove this email block?",
+      description: `Remove the block for ${entry.email}? Disabled accounts will remain inactive until re-enabled separately.`,
+      confirmLabel: "Remove block",
+    }))) return;
 
     setRemovingId(entry.id);
     try {
@@ -117,7 +117,7 @@ function BlockedEmailsContent() {
   }
 
   return (
-    <main className="space-y-6">
+    <section className="space-y-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Blocked email addresses</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
@@ -283,7 +283,8 @@ function BlockedEmailsContent() {
           </TableBody>
         </Table>
       </div>
-    </main>
+      {dialog}
+    </section>
   );
 }
 

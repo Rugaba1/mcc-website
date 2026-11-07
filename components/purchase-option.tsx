@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Minus, PackagePlus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export function PurchaseOptions({
   const moneyInDisplayCurrency = (value: number) =>
     displayMoney(value, currency ?? baseCurrency);
   const byContainer = canSellByContainer(variant);
+  const quantityId = useId();
   const [type, setType] = useState<SaleType>("SQM");
   const [sqm, setSqm] = useState("10");
   const [containers, setContainers] = useState(1);
@@ -46,6 +47,7 @@ export function PurchaseOptions({
       type="button"
       disabled={off}
       onClick={() => setType(t)}
+      aria-pressed={type === t}
       className={`flex-1 border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${type === t ? "border-primary bg-primary/5" : "hover:bg-accent"}`}
     >
       <span className="block text-sm font-semibold">{label}</span>
@@ -62,8 +64,8 @@ export function PurchaseOptions({
 
       {type === "SQM" ? (
         <div className="space-y-2">
-          <label className="text-sm font-medium">How many m² do you need?</label>
-          <Input className="rounded-none" type="number" min={MIN_SQM} step={0.1} value={sqm} onChange={(e) => setSqm(e.target.value)} />
+          <label htmlFor={`${quantityId}-sqm`} className="text-sm font-medium">How many m² do you need?</label>
+          <Input id={`${quantityId}-sqm`} className="rounded-none" type="number" min={MIN_SQM} step={0.1} value={sqm} onChange={(e) => setSqm(e.target.value)} />
           {byContainer && perSqmSaving > 0 && (
             <p className="border-l-2 border-primary bg-muted/50 p-2 text-xs">
               {bigOrder ? "That’s a container’s worth. " : ""}
@@ -73,10 +75,10 @@ export function PurchaseOptions({
         </div>
       ) : (
         <div className="space-y-2">
-          <label className="text-sm font-medium">How many containers?</label>
+          <label htmlFor={`${quantityId}-containers`} className="text-sm font-medium">How many containers?</label>
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" size="icon" className="rounded-none" onClick={() => setContainers((c) => Math.max(1, c - 1))} aria-label="Fewer"><Minus /></Button>
-            <Input className="w-20 rounded-none text-center" type="number" min={1} value={containers} onChange={(e) => setContainers(Math.max(1, Math.floor(Number(e.target.value) || 1)))} />
+            <Input id={`${quantityId}-containers`} className="w-20 rounded-none text-center" type="number" min={1} value={containers} onChange={(e) => setContainers(Math.max(1, Math.floor(Number(e.target.value) || 1)))} />
             <Button type="button" variant="outline" size="icon" className="rounded-none" onClick={() => setContainers((c) => c + 1)} aria-label="More"><Plus /></Button>
           </div>
           <p className="text-sm text-muted-foreground">1 container = {number(variant.sqmPerContainer!, { maximumFractionDigits: 2 })} m².</p>

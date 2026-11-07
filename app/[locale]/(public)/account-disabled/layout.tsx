@@ -14,6 +14,7 @@ export async function generateMetadata({
     title: `Account Access | ${siteConfig.siteName}`,
     description: "Get help with access to your Mountain Ceramics Company account.",
     noIndex: true,
+    image: "/images/mcc-factory.jpg"
   });
 }
 

@@ -58,8 +58,6 @@ const money = (n: number, cur: string, digits?: number) =>
 function badgeFor(d: InvoiceData) {
   if (d.kind === "CREDIT_NOTE")
     return { text: "REFUNDED", color: BRAND.danger };
-  if (d.kind === "PROFORMA")
-    return { text: "AWAITING PAYMENT", color: BRAND.ink, border: BRAND.gold };
   return d.balance <= 0
     ? { text: "PAID", color: BRAND.success }
     : { text: "PAYMENT DUE", color: BRAND.danger };
@@ -79,8 +77,39 @@ export function buildInvoiceDefinition(
   logo: Content | null,
 ): TDocumentDefinitions {
   const cur = d.currency;
-  const badge = badgeFor(d);
-  const borderColor = badge.border ?? badge.color;
+  const badge = d.kind === "PROFORMA" ? null : badgeFor(d);
+  const borderColor = badge?.color ?? BRAND.ink;
+  const badgeContent: Content[] = badge
+    ? [
+        {
+          table: {
+            body: [
+              [
+                {
+                  text: badge.text,
+                  bold: true,
+                  fontSize: 8.5,
+                  color: badge.color,
+                  alignment: "center",
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineColor: () => borderColor,
+            vLineColor: () => borderColor,
+            hLineWidth: () => 1.2,
+            vLineWidth: () => 1.2,
+            paddingTop: () => 4,
+            paddingBottom: () => 4,
+            paddingLeft: () => 12,
+            paddingRight: () => 12,
+          },
+          alignment: "right",
+          margin: [90, 0, 0, 0],
+        },
+      ]
+    : [];
 
   const companyLines = [
     COMPANY.address,
@@ -132,33 +161,7 @@ export function buildInvoiceDefinition(
             color: BRAND.green,
           },
           { text: d.number, fontSize: 10, bold: true, margin: [0, 4, 0, 10] },
-          {
-            table: {
-              body: [
-                [
-                  {
-                    text: badge.text,
-                    bold: true,
-                    fontSize: 8.5,
-                    color: badge.color,
-                    alignment: "center",
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineColor: () => borderColor,
-              vLineColor: () => borderColor,
-              hLineWidth: () => 1.2,
-              vLineWidth: () => 1.2,
-              paddingTop: () => 4,
-              paddingBottom: () => 4,
-              paddingLeft: () => 12,
-              paddingRight: () => 12,
-            },
-            alignment: "right",
-            margin: [90, 0, 0, 0],
-          },
+          ...badgeContent,
         ],
       },
     ],
@@ -353,7 +356,7 @@ export function buildInvoiceDefinition(
       alignment: "right",
     },
   ]);
-  if (d.kind !== "CREDIT_NOTE") {
+  if (d.kind === "INVOICE") {
     totals.push(tRow("Amount paid", money(d.amountPaid, cur, d.currencyDigits)));
     totals.push(
       tRow("Balance due", money(d.balance, cur, d.currencyDigits), {

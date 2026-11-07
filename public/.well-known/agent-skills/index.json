@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "mcc-public-store",
+      "type": "skill-md",
+      "description": "Safely discover and query Mountain Ceramics Company's public products, collections, and catalogues.",
+      "url": "https://mountainceramic.com/agent-skills/mcc-store/SKILL.md",
+      "digest": "sha256:77831f54d075d15333a8e8e4f5e36d81aad1639f8258a9856b5d5357a7e19d21"
+    }
+  ]
+}

@@ -141,7 +141,7 @@ export default function Contact() {
 
           {/* Form side */}
           <div className="border border-border bg-background p-8   md:p-10">
-            <h3 className="mb-2 font-playfair text-2xl font-bold">Send Us a Message</h3>
+            <h2 className="mb-2 font-playfair text-2xl font-bold">Send Us a Message</h2>
             <p className="mb-8 text-sm text-muted-foreground">
               Fill in the form below and we&apos;ll get back to you within 24 hours. 2036676
             </p>

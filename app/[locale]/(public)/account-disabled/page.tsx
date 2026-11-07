@@ -11,7 +11,7 @@ function AccountDisabledContent() {
   const next = safeNext(useSearchParams().get("next"));
 
   return (
-    <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-5 px-4 text-center">
+    <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-5 px-4 text-center">
       <h1 className="text-3xl font-bold">Account access unavailable</h1>
       <p className="text-muted-foreground" role="status">
         This account cannot sign in right now. If you think this is a mistake,
@@ -29,7 +29,7 @@ function AccountDisabledContent() {
           </Link>
         </Button>
       </div>
-    </main>
+    </div>
   );
 }
 

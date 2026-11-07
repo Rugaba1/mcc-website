@@ -48,13 +48,13 @@ export function CatalogueControls({
   const current = { category, badgeFilter, sort, viewMode, search };
   return (
     <div className="mb-8 flex flex-col items-start gap-4 border border-border bg-card p-4 shadow-sm">
-      <div className="flex w-full flex-wrap gap-1.5" aria-label="Filter by category">
+      <div className="flex w-full flex-wrap gap-1.5" role="group" aria-label="Filter by category">
         {categories.map(([value, label]) => (
           <Button
             asChild
             key={value}
             variant={category === value ? "secondary" : "outline"}
-            aria-pressed={category === value}
+            aria-current={category === value ? "page" : undefined}
             className="text-xs font-bold uppercase tracking-wider"
           >
             <Link href={updateQuery(current, "category", value, "all")}>{label}</Link>
@@ -62,14 +62,14 @@ export function CatalogueControls({
         ))}
       </div>
 
-      <div className="flex w-full flex-wrap items-center gap-1.5">
+      <div className="flex w-full flex-wrap items-center gap-1.5" role="group" aria-label="Filter by label">
         <span className="mr-1 text-xs font-semibold text-muted-foreground">Label:</span>
         {badges.map((value) => (
           <Button
             asChild
             key={value}
             variant={badgeFilter === value ? "secondary" : "outline"}
-            aria-pressed={badgeFilter === value}
+            aria-current={badgeFilter === value ? "page" : undefined}
             className="text-xs font-bold uppercase tracking-wider"
           >
             <Link href={updateQuery(current, "badgeFilter", value, "All")}>{value}</Link>
@@ -81,27 +81,35 @@ export function CatalogueControls({
         <span className="text-xs font-semibold text-muted-foreground">
           Sort products
         </span>
-        <div className="flex flex-wrap gap-1.5" aria-label="Sort products">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Sort products">
           {([
             ["newest", "Newest first"],
             ["name", "Name A–Z"],
             ["category", "Category"],
           ] as const).map(([value, label]) => (
-            <Button key={value} asChild variant={sort === value ? "secondary" : "outline"} size="sm">
+            <Button
+              key={value}
+              asChild
+              variant={sort === value ? "secondary" : "outline"}
+              size="sm"
+              aria-current={sort === value ? "page" : undefined}
+            >
               <Link href={updateQuery(current, "sort", value, "newest")}>{label}</Link>
             </Button>
           ))}
         </div>
 
-        <div className="ml-auto flex border border-border" aria-label="Product view">
+        <div className="ml-auto flex border border-border" role="group" aria-label="Product view">
           <Button
             asChild
-            type="button"
             variant={viewMode === "grid" ? "secondary" : "ghost"}
             aria-label="Grid view"
-            aria-pressed={viewMode === "grid"}
           >
-            <Link href={updateQuery(current, "viewMode", "grid", "grid")} aria-label="Grid view">
+            <Link
+              href={updateQuery(current, "viewMode", "grid", "grid")}
+              aria-label="Grid view"
+              aria-current={viewMode === "grid" ? "page" : undefined}
+            >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
@@ -112,12 +120,14 @@ export function CatalogueControls({
           </Button>
           <Button
             asChild
-            type="button"
             variant={viewMode === "list" ? "secondary" : "ghost"}
             aria-label="List view"
-            aria-pressed={viewMode === "list"}
           >
-            <Link href={updateQuery(current, "viewMode", "list")} aria-label="List view">
+            <Link
+              href={updateQuery(current, "viewMode", "list")}
+              aria-label="List view"
+              aria-current={viewMode === "list" ? "page" : undefined}
+            >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
               </svg>

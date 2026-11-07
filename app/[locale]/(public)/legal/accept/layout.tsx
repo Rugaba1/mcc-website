@@ -14,6 +14,7 @@ export async function generateMetadata({
     title: `Review Legal Documents | ${siteConfig.siteName}`,
     description: "Review the current legal documents for your account.",
     noIndex: true,
+    image: "/images/mcc-factory.jpg"
   });
 }
 

@@ -11,6 +11,7 @@ import { Button } from "../../ui/button";
 import { Input, Label, Textarea } from "../fields";
 import { ImageUploader } from "../image-uploader";
 import { TilePicker } from "@/components/tile-picker";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 type Form = Omit<Collection, "id">;
 const empty = (): Form => ({ name: "", description: "", image: "", tileIds: [], featured: false });
@@ -24,6 +25,7 @@ export function CollectionsSection({
   products: Product[];
   reload: () => Promise<void> | void;
 }) {
+  const { confirm, dialog } = useConfirmAction();
   const [editing, setEditing] = useState<Collection | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<Form>(empty());
@@ -58,7 +60,7 @@ export function CollectionsSection({
   }
 
   async function remove(id: number) {
-    if (!confirm("Delete this collection?")) return;
+    if (!(await confirm({ title: "Delete this collection?", description: "This action cannot be undone." }))) return;
     try {
       await api.deleteCollection(id);
       await reload();
@@ -87,16 +89,16 @@ export function CollectionsSection({
           <h3 className="mb-5 font-bold">{editing ? `Editing: ${editing.name}` : "Add Collection"}</h3>
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <Label>Name *</Label>
-              <Input value={form.name} onChange={(e) => setF("name", e.target.value)} placeholder="e.g. Terrain Series" />
+              <Label htmlFor="collection-name">Name *</Label>
+              <Input id="collection-name" value={form.name} onChange={(e) => setF("name", e.target.value)} placeholder="e.g. Terrain Series" />
             </div>
-            <label className="flex items-center gap-3 pt-5 text-sm font-medium">
-              <Input type="checkbox" checked={form.featured} onChange={(e) => setF("featured", e.target.checked)} className="h-4 w-4 accent-primary" />
+            <label htmlFor="collection-featured" className="flex min-h-11 items-center gap-3 pt-5 text-sm font-medium">
+              <Input id="collection-featured" type="checkbox" checked={form.featured} onChange={(e) => setF("featured", e.target.checked)} className="h-4 w-4 accent-primary" />
               Featured on site
             </label>
             <div className="sm:col-span-2">
-              <Label>Description</Label>
-              <Textarea rows={3} value={form.description} onChange={(e) => setF("description", e.target.value)} />
+              <Label htmlFor="collection-description">Description</Label>
+              <Textarea id="collection-description" rows={3} value={form.description} onChange={(e) => setF("description", e.target.value)} />
             </div>
             <div className="sm:col-span-2">
               <ImageUploader label="Cover Image" value={form.image} onChange={(u) => setF("image", u)} />
@@ -154,6 +156,7 @@ export function CollectionsSection({
           );
         })}
       </div>
+      {dialog}
     </div>
   );
 }

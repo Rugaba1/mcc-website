@@ -162,6 +162,7 @@ export const POST = withRateLimit({
       return createdUser;
     });
 
+    let verificationEmailSent = false;
     try {
       const token = createEmailVerificationToken(user.id, user.email);
       const origin = siteConfig.configuredSiteUrl
@@ -171,23 +172,19 @@ export const POST = withRateLimit({
       verifyUrl.searchParams.set("token", token);
       verifyUrl.searchParams.set("next", next);
       await sendEmailVerificationLink(user.email, firstName, verifyUrl.toString());
+      verificationEmailSent = true;
     } catch (error) {
-      console.error("Verification message delivery failed:", error);
-      await prisma.user.delete({ where: { id: user.id } });
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Could not send a verification email. Please try again.",
-        },
-        { status: 503 },
-      );
+      console.error("Optional verification message delivery failed:", error);
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Account created. Check your email for a verification link.",
+        message: verificationEmailSent
+          ? "Account created. You can sign in now; email verification is optional."
+          : "Account created. You can sign in now; email verification is optional. A verification link can be requested later.",
         email: user.email,
+        verificationEmailSent,
         next,
       },
       { status: 201 },

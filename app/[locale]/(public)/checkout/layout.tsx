@@ -10,11 +10,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
     return createPageMetadata({
-      locale,
-      path: "/checkout",
-      title: `Finish Your Order | ${siteConfig.siteName}`,
-      description: "Complete your tile order with Mountain Ceramics Company.",
-      noIndex: true,
+        locale,
+        path: "/checkout",
+        title: `Finish Your Order | ${siteConfig.siteName}`,
+        description: "Complete your tile order with Mountain Ceramics Company.",
+        noIndex: true,
+        image: "/images/mcc-products.jpg"
     });
 }
 

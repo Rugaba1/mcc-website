@@ -15,8 +15,17 @@ const PRODUCT_CARD = {
   image: true,
   category: true,
   categoryLabel: true,
+  status: true,
   badge: true,
   featured: true,
+  variants: {
+    where: { active: true },
+    select: {
+      active: true,
+      currency: true,
+      pricePerSqm: true,
+    },
+  },
 } satisfies Prisma.ProductSelect;
 
 // ── GET /api/collections ──────────────────────────────────────────────────────
@@ -69,7 +78,19 @@ export const GET = withRateLimit({
       image: c.image,
       featured: c.featured,
       tileIds: c.items.map((i) => i.productId),
-      items: c.items,
+      items: c.items.map((item) => ({
+        ...item,
+        product: {
+          ...item.product,
+          variants:
+            item.product.status === "ACTIVE"
+              ? item.product.variants.map((variant) => ({
+                  ...variant,
+                  pricePerSqm: Number(variant.pricePerSqm),
+                }))
+              : [],
+        },
+      })),
     }));
 
     return NextResponse.json(

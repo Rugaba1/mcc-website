@@ -9,6 +9,7 @@ import { Button } from "../../ui/button";
 import { Switch } from "../../ui/switch";
 import { Input, Label, Select } from "../fields";
 import { Modal } from "../modal";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 interface UserRecord {
   id: number;
@@ -40,6 +41,7 @@ const blank = (): Editing => ({
 });
 
 export function UsersSection() {
+  const { confirm, dialog } = useConfirmAction();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -82,7 +84,7 @@ export function UsersSection() {
   };
 
   const remove = async (id: number) => {
-    if (!confirm("Delete this user?")) return;
+    if (!(await confirm({ title: "Delete this user?", description: "This action cannot be undone." }))) return;
     try {
       await api.deleteManagedUser(id);
       toast.success("User deleted");
@@ -183,37 +185,38 @@ export function UsersSection() {
           saveDisabled={!editing.name || !editing.email || (!editing.id && !editing.password)}
         >
           <div className="grid grid-cols-2 gap-4">
-            <div><Label>Full Name</Label><Input value={editing.name} onChange={(e) => set("name", e.target.value)} /></div>
+            <div><Label htmlFor="staff-full-name">Full Name</Label><Input id="staff-full-name" value={editing.name} onChange={(e) => set("name", e.target.value)} /></div>
             <div>
-              <Label>Role</Label>
-              <Select value={editing.role} onChange={(e) => set("role", e.target.value)}>
+              <Label htmlFor="staff-role">Role</Label>
+              <Select id="staff-role" value={editing.role} onChange={(e) => set("role", e.target.value)}>
                 <option value="staff">Staff</option>
                 <option value="admin">Admin</option>
               </Select>
             </div>
           </div>
-          <div><Label>Email</Label><Input type="email" value={editing.email} onChange={(e) => set("email", e.target.value)} /></div>
+          <div><Label htmlFor="staff-email">Email</Label><Input id="staff-email" type="email" value={editing.email} onChange={(e) => set("email", e.target.value)} /></div>
           <div>
-            <Label>{editing.id ? "New password (leave blank to keep)" : "Password"}</Label>
-            <Input type="password" autoComplete="new-password" value={editing.password} onChange={(e) => set("password", e.target.value)} placeholder="Min 8 characters" />
+            <Label htmlFor="staff-password">{editing.id ? "New password (leave blank to keep)" : "Password"}</Label>
+            <Input id="staff-password" type="password" autoComplete="new-password" value={editing.password} onChange={(e) => set("password", e.target.value)} placeholder="Min 8 characters" />
           </div>
           <div className="flex items-center justify-between rounded-xl bg-muted p-3">
             <span className="text-sm">Account active (can log in)</span>
-            <Switch checked={editing.active} onCheckedChange={(v) => set("active", v)} />
+            <Switch aria-label="Account active (can log in)" checked={editing.active} onCheckedChange={(v) => set("active", v)} />
           </div>
           <div>
-            <Label>Permissions</Label>
+            <p className="mb-2 text-sm font-medium">Permissions</p>
             <div className="divide-y divide-border rounded-xl border border-border">
               {PERMS.map((p) => (
                 <div key={p.key} className="flex items-center justify-between px-4 py-3">
                   <span className="text-sm">{p.label}</span>
-                  <Switch checked={editing[p.key]} onCheckedChange={(v) => set(p.key, v)} />
+                  <Switch aria-label={p.label} checked={editing[p.key]} onCheckedChange={(v) => set(p.key, v)} />
                 </div>
               ))}
             </div>
           </div>
         </Modal>
       )}
+      {dialog}
     </div>
   );
 }

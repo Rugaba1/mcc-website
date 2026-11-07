@@ -10,7 +10,7 @@ export default function WhyUs() {
         {/* ── Left: Image with overlay stats ──────────── */}
         <div className="relative min-h-[400px] lg:min-h-full order-2 lg:order-1">
           <Image
-            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1000&q=85"
+            src="/images/mcc-machinely.jpg"
             alt="Premium tile showroom"
             fill
             className="object-cover"

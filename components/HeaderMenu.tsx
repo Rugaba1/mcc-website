@@ -136,17 +136,19 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
   const handleOpenRooms = onOpenRooms || onOpenRoomsModal;
 
   return (
-    <div className="h-14  border-b border px-4 flex items-center justify-between  select-none">
+    <div className="h-14 w-full min-w-0 overflow-x-auto border-b border px-4 select-none">
 
 
       {/* Primary Toolbar Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex min-w-max items-center gap-1.5 sm:gap-2">
         {/* Switch Room Scenes Button */}
         {handleOpenRooms && (
           <Button
             onClick={handleOpenRooms}
             variant={"outline"}
             title="Browse all 15 room scenes"
+            aria-label="Browse room scenes"
+            className="min-h-11"
           >
             <Layers className="w-3.5 h-3.5 text-primary" />
             <span>Rooms (15)</span>
@@ -159,6 +161,8 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
             onClick={() => setIsSkuModalOpen(true)}
             variant={"outline"}
             title="Apply real Mountain Ceramic tile by SKU or name"
+            aria-label="Find a tile by SKU or name"
+            className="min-h-11"
           >
             <Search className="w-3.5 h-3.5 text-primary" />
             <span className="hidden md:inline">Find Tile</span>
@@ -170,6 +174,9 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
           onClick={onToggleCompare}
           variant={isCompareMode ? "secondary" : "outline"}
           title="Compare Design A vs Design B"
+          aria-label="Compare designs"
+          aria-pressed={isCompareMode}
+          className="min-h-11"
         >
           <Columns className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Compare</span>
@@ -180,6 +187,9 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
           onClick={onToggleZoom}
           variant={isZoomMode ? "secondary" : "outline"}
           title="Zoom & Pan inspection mode"
+          aria-label="Toggle zoom and pan mode"
+          aria-pressed={isZoomMode}
+          className="min-h-11"
         >
           <ZoomIn className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Zoom</span>
@@ -192,6 +202,8 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
             disabled={!canUndo}
             variant={canUndo ? "secondary" : "outline"}
             title="Undo last customization"
+            aria-label="Undo last customization"
+            className="min-h-11"
           >
             <Undo2 className="w-3.5 h-3.5" />
           </Button>
@@ -200,6 +212,8 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
             disabled={!canRedo}
             variant={canRedo ? "secondary" : "outline"}
             title="Redo customization"
+            aria-label="Redo customization"
+            className="min-h-11"
           >
             <Redo2 className="w-3.5 h-3.5" />
           </Button>
@@ -210,6 +224,8 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
           onClick={() => void handleShare()}
           variant={"outline"}
           title="Copy shareable link"
+          aria-label={copied ? "Share link copied" : "Share design"}
+          className="min-h-11"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Share2 className="w-3.5 h-3.5" />}
           <span className="hidden xl:inline">{copied ? "Copied" : "Share"}</span>
@@ -220,6 +236,8 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
           disabled={isSavingDesign}
           variant={"outline"}
           title="Save Design"
+          aria-label={isExistingDesign ? "Update saved design" : "Save design"}
+          className="min-h-11"
         >
           {saveSuccess ? <Check className="w-3.5 h-3.5 text-success" /> : <Save className="w-3.5 h-3.5" />}
           <span className="hidden xl:inline">{saveSuccess ? (isExistingDesign ? "Updated!" : "Saved!") : isExistingDesign ? "Update" : "Save"}</span>
@@ -252,18 +270,18 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
 
               {/* SKU Search */}
               <div>
-                <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
+                <label htmlFor="sku-product-search" className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
                   Enter SKU or Product Name:
                 </label>
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
                   <Input
+                    id="sku-product-search"
                     type="text"
                     value={skuInput}
                     onChange={(e) => setSkuInput(e.target.value)}
                     placeholder="e.g. MCC-AGAPE, Calacatta, Sandstone..."
                     className="w-full    pl-9 pr-3 py-2 text-xs   placeholder-muted-foreground focus:outline-none focus:border-primary"
-                    autoFocus
                   />
                 </div>
               </div>
@@ -273,8 +291,17 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
                 {matchedTiles.map((t) => (
                   <div
                     key={t.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Apply ${t.name} tile`}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handleApplySku(t);
+                      }
+                    }}
                     onClick={() => handleApplySku(t)}
-                    className="flex items-center justify-between p-2 -lg bg-background/50 border  hover:border-primary hover:bg-background cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-2 -lg bg-background/50 border hover:border-primary hover:bg-background cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="relative w-10 h-10  overflow-hidden bg-inverse shrink-0">
@@ -315,7 +342,6 @@ export const HeaderMenu: React.FC<HeaderMenuProps> = ({
               value={designName}
               onChange={(event) => setDesignName(event.target.value)}
               maxLength={150}
-              autoFocus
               onKeyDown={(event) => {
                 if (event.key === "Enter" && designName.trim() && !isSavingDesign) {
                   event.preventDefault();

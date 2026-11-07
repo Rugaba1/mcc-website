@@ -103,7 +103,7 @@ function ForgotPasswordContent() {
                 <form onSubmit={resetPassword} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="password">New password</Label>
-                        <PasswordInput id="password" autoComplete="new-password" autoFocus required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <PasswordInput id="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="confirm">Confirm new password</Label>
@@ -139,7 +139,7 @@ function ForgotPasswordContent() {
                     <form onSubmit={requestResetLink} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" autoComplete="email" autoFocus required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <FormError message={error} />
                         <Button type="submit" className="w-full" disabled={busy || !email}>

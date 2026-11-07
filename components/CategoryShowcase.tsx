@@ -1,124 +1,121 @@
 
-import Image from "next/image";
-import { Product, serverApi } from "@/lib/api";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
+import { prisma } from "@/lib/prisma";
 
-// Static fallback images per category in case the DB has no products yet
-const FALLBACKS: Record<string, string> = {
-  floor: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&q=80",
-  wall: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
-  outdoor: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80",
-  special: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
-};
+export default async function CategoryShowcase() {
+  let categories: {
+    key: string;
+    title: string;
+    subtitle: string;
+    href: string;
+    image: string | null;
+  }[] = [];
 
-const CATEGORY_META = [
-  { key: "floor", title: "Floor Tiles", sub: "Natural & Polished", href: "/catalogue?category=floor", rowSpan: true },
-  { key: "wall", title: "Wall Tiles", sub: "Gloss & Matte", href: "/catalogue?category=wall", rowSpan: false },
-  { key: "outdoor", title: "Outdoor Tiles", sub: "UV & Slip Resistant", href: "/catalogue?category=outdoor", rowSpan: false },
-  { key: "special", title: "Special Finish", sub: "Metallic & Decorative", href: "/catalogue?category=special", rowSpan: false },
-  { key: "floor2", title: "Large Format", sub: "600×1200mm+", href: "/catalogue", rowSpan: false },
-];
-
-
-
-const PAGE_SIZE = 12;
-
-export default async function Products() {
-
-  const page = 1
-  let totalPages = 1;
-  let products: Product[] = []
   try {
-    const data = (await serverApi.getProducts({ skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, category: encodeURIComponent("") }))
-    products = data.products
+    const products = await prisma.product.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: [{ featured: "desc" }, { id: "asc" }],
+      select: {
+        category: true,
+        categoryLabel: true,
+        image: true,
+        useCase: true,
+      },
+    });
 
-    totalPages = data.totalPages
+    const grouped = new Map<string, typeof products>();
+    for (const product of products) {
+      const group = grouped.get(product.category) ?? [];
+      group.push(product);
+      grouped.set(product.category, group);
+    }
 
+    categories = Array.from(grouped, ([key, items]) => {
+      const representative = items.find((item) => item.image.trim()) ?? items[0];
+      return {
+        key,
+        title: representative.categoryLabel || key,
+        subtitle:
+          representative.useCase.trim() || `${items.length} products available`,
+        href: `/catalogue?category=${encodeURIComponent(key)}`,
+        image: items.find((item) => item.image.trim())?.image ?? null,
+      };
+    });
   } catch (error) {
-
+    console.error("Failed to load homepage product categories:", error);
   }
 
-  if (!products || products.length == 0) {
+  if (categories.length === 0) {
     return (
-      <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">Tiles not found</p>
-
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6 text-center">
+          <h2 className="font-playfair text-4xl font-bold md:text-5xl">
+            Browse by Category
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Product categories will appear here when active products are available.
+          </p>
         </div>
-      </div>
+      </section>
     );
   }
 
-
-  // Pick the first product with an image per category
-  function getBestImage(categoryKey: string): string {
-    const key = categoryKey === "floor2" ? "floor" : categoryKey;
-    // prefer featured, then any with an image
-    const pool = products.filter((p) => p.category === key && p.image);
-    const featured = pool.find((p) => p.featured);
-    const pick = featured ?? pool[0];
-    if (pick?.image) return pick.image;
-    return FALLBACKS[key] ?? FALLBACKS.floor;
-  }
-
   return (
-    <section className="py-24 ">
+    <section className="py-24">
       <div className="max-w-7xl mx-auto px-6">
-
-        {/* Header */}
         <div className="text-center mb-14">
           <span className="inline-flex items-center gap-3  text-xs font-bold tracking-[0.25em] uppercase mb-4">
             <span className="gold-divider" />
             Browse by Category
             <span className="gold-divider" />
           </span>
-          <h2 className="font-playfair text-4xl md:text-5xl font-bold ">
+          <h2 className="font-playfair text-4xl md:text-5xl font-bold">
             Find Your Perfect Tile
           </h2>
         </div>
 
-        {/* Mosaic grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-2 gap-3 h-[600px] md:h-135">
-          {CATEGORY_META.map((cat, i) => {
-            const imgSrc = getBestImage(cat.key);
-            const isLocal = imgSrc.startsWith("/uploads/") || imgSrc.startsWith("data:");
-            return (
-              <a
-                key={cat.key}
-                href={cat.href}
-                className={`relative overflow-hidden group category-card ${i === 0 ? "row-span-2" : ""
-                  }`}
-              >
-                <Image
-                  src={imgSrc}
-                  alt={cat.title}
+        <div className="grid auto-rows-[minmax(240px,1fr)] grid-cols-2 gap-3 md:grid-cols-3">
+          {categories.map((category, index) => (
+            <Link
+              key={category.key}
+              href={category.href}
+              className={`category-card group relative min-h-60 overflow-hidden ${
+                index === 0 ? "row-span-2" : ""
+              }`}
+            >
+              {category.image ? (
+                <MediaImage
+                  src={category.image}
+                  alt={category.title}
                   fill
-                  className="object-cover category-img"
+                  className="category-img object-cover"
                   sizes="(max-width: 768px) 50vw, 33vw"
-
                 />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-inverse/85 via-inverse/20 to-transparent group-hover:from-inverse/90 transition-all duration-300" />
-
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                  <p className=" text-[10px] font-bold tracking-[0.25em] uppercase mb-1">{cat.sub}</p>
-                  <h3 className=" font-bold text-lg md:text-xl leading-tight">{cat.title}</h3>
-                  <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                    <span className=" text-xs font-semibold tracking-wider uppercase">Browse</span>
-                    <svg className="w-3.5 h-3.5 " fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+              ) : (
+                <div className="absolute inset-0 bg-muted" />
+              )}
+              <div className="absolute inset-0 bg-linear-to-t from-inverse/85 via-inverse/20 to-transparent transition-all duration-300 group-hover:from-inverse/90" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em]">
+                  {category.subtitle}
+                </p>
+                <h3 className="text-lg font-bold leading-tight md:text-xl">
+                  {category.title}
+                </h3>
+                <div className="mt-2 flex translate-y-2 items-center gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <span className="text-xs font-semibold uppercase tracking-wider">Browse</span>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-
-                {/* Corner accent */}
-                <div className="absolute top-4 right-4 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="absolute top-0 right-0 w-full h-px bg-primary" />
-                  <span className="absolute top-0 right-0 w-px h-full bg-primary" />
-                </div>
-              </a>
-            );
-          })}
+              </div>
+              <div className="absolute right-4 top-4 h-8 w-8 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <span className="absolute right-0 top-0 h-px w-full bg-primary" />
+                <span className="absolute right-0 top-0 h-full w-px bg-primary" />
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

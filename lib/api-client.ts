@@ -20,7 +20,7 @@ const NO_REFRESH_URLS = [
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: typeof window === "undefined" ? API_BASE_URL : "",
   withCredentials: true,
   timeout: 30_000,
   headers: {
@@ -38,15 +38,23 @@ const currentLocale = (): string => {
 };
 
 // One shared in-flight refresh: every concurrent 401 awaits the same promise
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
-export function refreshAccessToken(): Promise<string> {
+export function refreshAccessToken(): Promise<string | null> {
   refreshPromise ??= api
     .post(REFRESH_URL, {}, { timeout: 15_000 })
-    .then(({ data }) => {
+    .then(({ data, status }) => {
+      if (status === 204) {
+        tokenStore.clear();
+        return null;
+      }
+
       const { accessToken, user } = data;
+      if (typeof accessToken !== "string" || !accessToken || !user) {
+        throw new Error("The refresh response was incomplete.");
+      }
       tokenStore.set({ accessToken, user });
-      return accessToken as string;
+      return accessToken;
     })
     .catch((err) => {
       tokenStore.clear();
@@ -107,6 +115,7 @@ api.interceptors.response.use(
 
     try {
       const token = await refreshAccessToken();
+      if (token === null) return Promise.reject(error);
       original.headers.Authorization = `Bearer ${token}`;
       return api(original);
     } catch {

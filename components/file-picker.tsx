@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { FileText, ImageIcon, X } from "lucide-react";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 
 import type { MediaFile } from "@/lib/api";
-import { FileManager } from "@/components/admin/file-manager";
+import { MediaLibraryPicker } from "@/components/admin/media-library-picker";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
@@ -26,24 +25,7 @@ export function FilePicker({
   kind?: "all" | "image" | "file";
 }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[85vh] flex-col gap-3 rounded-none sm:max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>Choose a file</DialogTitle>
-          <DialogDescription>Upload something new or pick from your library.</DialogDescription>
-        </DialogHeader>
-        {open && (
-          <FileManager
-            mode="pick"
-            kind={kind}
-            onSelect={(f) => {
-              onSelect(f);
-              onOpenChange(false);
-            }}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+    <MediaLibraryPicker open={open} onOpenChange={onOpenChange} onSelect={onSelect} kind={kind} />
   );
 }
 
@@ -53,11 +35,13 @@ export function ImageField({
   onChange,
   kind = "image",
   placeholder = "…or paste an https:// link",
+  ariaLabel = "Image or file URL",
 }: {
   value: string;
   onChange: (url: string) => void;
   kind?: "image" | "file";
   placeholder?: string;
+  ariaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const { openPreview } = useMediaPreview();
@@ -66,7 +50,7 @@ export function ImageField({
       <div className="flex items-center gap-3">
         <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden border bg-muted">
           {value && kind === "image" ? (
-            <Image src={value} alt="" fill sizes="5rem" className="object-cover" />
+            <MediaImage src={value} alt="" fill sizes="5rem" className="object-cover" />
           ) : value ? (
             <FileText className="size-6 text-muted-foreground" />
           ) : (
@@ -102,7 +86,7 @@ export function ImageField({
           )}
         </div>
       </div>
-      <Input className="rounded-none text-xs" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+      <Input aria-label={ariaLabel} className="rounded-none text-xs" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
       <PermissionGate required={PERM.MEDIA_VIEW}>
         <FilePicker open={open} onOpenChange={setOpen} kind={kind} onSelect={(f) => onChange(f.url)} />
       </PermissionGate>

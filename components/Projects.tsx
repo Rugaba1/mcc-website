@@ -1,39 +1,30 @@
-"use server";
-
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
 import { serverApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
 export default async function Projects() {
-
-  let projects = null
+  let projects: Awaited<ReturnType<typeof serverApi.getProjects>>;
   try {
-
     projects = await serverApi.getProjects({});
-
-
-
-
   } catch (error) {
-
-  }
-
-  if (!projects) {
+    console.error("Failed to load homepage projects:", error);
     return (
-      <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">Projects not found</p>
-
+      <section id="projects" className="py-24">
+        <div className="mx-auto max-w-7xl px-6 text-center">
+          <h2 className="font-playfair text-4xl font-bold md:text-5xl">
+            Featured Projects
+          </h2>
+          <p className="mt-4 text-muted-foreground" role="status">
+            Project information is temporarily unavailable. Please try again later.
+          </p>
+          <Link href="/projects" className="mt-5 inline-block underline">
+            View all projects
+          </Link>
         </div>
-      </div>
+      </section>
     );
   }
-
-
-
-
-  const types = ["All", ...Array.from(new Set(projects.map((p) => p.type)))];
-  const filtered = projects
 
   return (
     <section id="projects" className="py-24 ">
@@ -55,13 +46,13 @@ export default async function Projects() {
         </div>
 
         {projects.length === 0 ? (
-          <p className=" text-center py-20">No projects yet. Add some in the admin portal.</p>
+          <p className="py-20 text-center">New project stories are coming soon.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
 
             {projects[0] && (
               <div className="md:col-span-7 relative overflow-hidden group min-h-[420px] cursor-pointer">
-                <Image
+                <MediaImage
                   src={projects[0].image}
                   alt={projects[0].title}
                   fill
@@ -84,7 +75,7 @@ export default async function Projects() {
               <div className="md:col-span-5 grid grid-rows-2 gap-4">
                 {projects.slice(1, 3).map((proj) => (
                   <div key={proj.id} className="relative overflow-hidden group min-h-[200px] cursor-pointer">
-                    <Image
+                    <MediaImage
                       src={proj.image}
                       alt={proj.title}
                       fill
@@ -106,7 +97,7 @@ export default async function Projects() {
 
             {projects.slice(3).map((proj) => (
               <div key={proj.id} className="md:col-span-6 relative overflow-hidden group min-h-[240px] cursor-pointer">
-                <Image
+                <MediaImage
                   src={proj.image}
                   alt={proj.title}
                   fill
@@ -128,7 +119,7 @@ export default async function Projects() {
         )}
 
         <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
-          <a
+          <Link
             href="/projects"
             className="group inline-flex items-center gap-3 bg-accent hover:bg-primary  font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
           >
@@ -136,8 +127,8 @@ export default async function Projects() {
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/collections"
             className="group inline-flex items-center gap-3  -[#0f1117] hover:bg-accent   font-bold px-9 py-4 transition-all duration-300 text-sm tracking-widest uppercase"
           >
@@ -145,7 +136,7 @@ export default async function Projects() {
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

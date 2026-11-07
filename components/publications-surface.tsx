@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
-import { toast } from "sonner";
 
 import { Link, usePathname } from "@/app/i18n/routing";
-import { api, apiErrorMessage, type PublicationDoc } from "@/lib/api";
+import { api, type PublicationDoc } from "@/lib/api";
 import { mdxComponents, mdxRehypePlugins, mdxRemarkPlugins } from "@/components/blog/mdx-renderers";
 import { MediaPreviewImage } from "@/components/media-preview-image";
 import { MediaPdfViewer } from "@/components/media-pdf-viewer";
 import { useMediaPreview } from "@/components/media-preview-provider";
 import { ShareWidget } from "@/components/share-widget";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,9 +27,11 @@ type PublicationContentDoc = Omit<PublicationDoc, "placement"> & {
 export function PublicationContent({
   publication,
   showPdfInline = false,
+  showTitle = true,
 }: {
   publication: PublicationContentDoc;
   showPdfInline?: boolean;
+  showTitle?: boolean;
 }) {
   const { openPreview } = useMediaPreview();
   const pdf = publication.fileUrl?.split(/[?#]/)[0]?.toLowerCase().endsWith(".pdf");
@@ -49,17 +49,18 @@ export function PublicationContent({
         />
       )}
       <div className="space-y-4 p-5 sm:p-7">
-        <div>
-          <Badge variant="secondary" className="rounded-none">
-            {publication.placement.replaceAll("_", " ").toLowerCase()}
-          </Badge>
-          <h2 className="mt-3 text-xl font-semibold sm:text-2xl">{publication.title}</h2>
+        {showTitle && (
+          <div className="text-center">
+            <h1 className="font-playfair text-3xl font-normal tracking-tight sm:text-4xl">
+              {publication.title}
+            </h1>
           {publication.summary && (
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {publication.summary}
             </p>
           )}
-        </div>
+          </div>
+        )}
         {publication.contentMarkdown && (
           <div className="prose prose-sm max-w-none dark:prose-invert">
             <ReactMarkdown
@@ -72,7 +73,11 @@ export function PublicationContent({
           </div>
         )}
         {showPdfInline && pdf && publication.fileUrl && (
-          <div className="overflow-hidden border" aria-label={`${publication.title} PDF`}>
+          <div
+            className="overflow-hidden border"
+            role="group"
+            aria-label={`${publication.title} PDF`}
+          >
             <MediaPdfViewer
               url={publication.fileUrl}
               name={publication.title}
@@ -119,71 +124,6 @@ export function PublicationContent({
         </div>
       </div>
     </article>
-  );
-}
-
-export function PublicationsPageContent() {
-  const [publications, setPublications] = useState<PublicationDoc[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    api.getPublications()
-      .then((result) => {
-        if (!cancelled) {
-          setPublications(result.filter((item) =>
-            ["PUBLIC_PAGE", "NAVBAR_AND_PAGE", "DIALOG_AND_PAGE"].includes(item.placement),
-          ));
-        }
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          console.error("Could not load public publications:", error);
-          toast.error(apiErrorMessage(error, "Could not load publications."));
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  return (
-    <main className="min-h-[60vh]">
-      <section className="bg-inverse px-4 py-16 text-center sm:py-20">
-        <div className="mx-auto max-w-7xl">
-          <span className="mb-4 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em]">
-            <span className="h-px w-8 bg-primary" />
-            Company updates
-            <span className="h-px w-8 bg-primary" />
-          </span>
-          <h1 className="text-4xl font-bold leading-tight md:text-5xl">
-            Publications &amp; Promotions
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-inverse-foreground/80 sm:text-lg">
-            Announcements, product news, and downloadable promotions from Mountain Ceramics Company.
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
-        {loading ? (
-          <p className="border p-8 text-center text-sm text-muted-foreground">
-            Loading publications…
-          </p>
-        ) : publications.length === 0 ? (
-          <p className="border p-8 text-center text-sm text-muted-foreground">
-            There are no current publications.
-          </p>
-        ) : (
-          <div className="space-y-6">
-            {publications.map((publication) => (
-              <PublicationContent key={publication.id} publication={publication} />
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
   );
 }
 

@@ -1,3 +1,5 @@
+import type { Country } from "react-phone-number-input";
+
 export type CurrencyOption = {
   code: string;
   name: string;
@@ -8,7 +10,7 @@ export type CurrencyOption = {
   rateToBase: number;
 };
 
-const currencyCountries: Record<string, string> = {
+const currencyCountries: Record<string, Country | "EU"> = {
   AED: "AE",
   AUD: "AU",
   BIF: "BI",
@@ -30,8 +32,12 @@ const currencyCountries: Record<string, string> = {
   ZAR: "ZA",
 };
 
+export function currencyCountryCode(code: string): Country | "EU" | undefined {
+  return currencyCountries[code.toUpperCase()];
+}
+
 export function currencyFlag(code: string): string {
-  const country = currencyCountries[code.toUpperCase()];
+  const country = currencyCountryCode(code);
   if (!country) return String.fromCodePoint(0x1f310);
   return String.fromCodePoint(
     ...Array.from(country, (letter) => 0x1f1e6 + letter.charCodeAt(0) - 65),

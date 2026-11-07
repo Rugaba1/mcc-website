@@ -21,6 +21,10 @@ import { DataPagination } from "@/components/admin/data-pagination";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
 import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
+import {
+  canTransitionPaymentStatus,
+  EDITABLE_PAYMENT_STATUSES,
+} from "@/lib/payments/status";
 
 const STATUSES = ["PENDING", "AUTHORIZED", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"];
 const METHODS = ["MTN_MOMO", "AIRTEL_MONEY", "CARD", "BANK_TRANSFER", "CASH_ON_DELIVERY"];
@@ -111,29 +115,40 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
       {/* Edit */}
       <section className="space-y-4 border p-4">
         <h3 className="text-sm font-semibold">Details</h3>
-        {!locked && row.status !== "PAID" && (
+        {!locked && row.status !== "PAID" && row.status !== "FAILED" && (
           <div className="space-y-1.5">
-            <Label>Status</Label>
+            <span id="payment-status-label" className="text-sm font-medium">Status</span>
             <Select value={status} onValueChange={(next) => {
+              if (!canTransitionPaymentStatus(row.status, next)) return;
               if (next === "PAID" && row.status !== "PAID") setPaidAtDialogOpen(true);
               else setStatus(next);
             }}>
-              <SelectTrigger className="w-full rounded-none"><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-labelledby="payment-status-label" className="w-full rounded-none"><SelectValue /></SelectTrigger>
               <SelectContent className="rounded-none">
-                {["PENDING", "AUTHORIZED", "PAID", "FAILED"].map((s) => <SelectItem key={s} value={s} className="rounded-none">{pretty(s)}</SelectItem>)}
+                {EDITABLE_PAYMENT_STATUSES.map((s) => (
+                  <SelectItem
+                    key={s}
+                    value={s}
+                    disabled={!canTransitionPaymentStatus(row.status, s)}
+                    className="rounded-none"
+                  >
+                    {pretty(s)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         )}
-        {status === "FAILED" && !locked && <div className="space-y-1.5"><Label>Why did it fail?</Label><Input className="rounded-none" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reference not found on statement" /></div>}
+        {status === "FAILED" && !locked && <div className="space-y-1.5"><Label htmlFor="payment-failure-reason">Why did it fail?</Label><Input id="payment-failure-reason" className="rounded-none" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reference not found on statement" /></div>}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5"><Label>Transaction reference</Label><Input className="rounded-none" value={ref} onChange={(e) => setRef(e.target.value)} /></div>
-          <div className="space-y-1.5"><Label>Payer phone</Label><Input className="rounded-none" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label htmlFor="payment-transaction-reference">Transaction reference</Label><Input id="payment-transaction-reference" className="rounded-none" value={ref} onChange={(e) => setRef(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label htmlFor="payment-payer-phone">Payer phone</Label><Input id="payment-payer-phone" className="rounded-none" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
         </div>
-        <div className="space-y-1.5"><Label>Note</Label><Textarea className="min-h-20 rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
-        <div className="space-y-1.5"><Label>Proof of payment</Label><ImageField value={proof} onChange={setProof} /></div>
+        <div className="space-y-1.5"><Label htmlFor="payment-note">Note</Label><Textarea id="payment-note" className="min-h-20 rounded-none" value={note} onChange={(e) => setNote(e.target.value)} /></div>
+        <div className="space-y-1.5"><span className="text-sm font-medium">Proof of payment</span><ImageField ariaLabel="Proof of payment URL" value={proof} onChange={setProof} /></div>
         {locked && <p className="text-xs text-muted-foreground">This payment has refunds, so its status is locked. You can still edit the details above.</p>}
         {row.status === "PAID" && <p className="text-xs text-muted-foreground">This payment has been received. Use the refund action to record money returned; payment status cannot be moved backward.</p>}
+        {row.status === "FAILED" && <p className="text-xs text-muted-foreground">This payment attempt failed and cannot be reopened. Record a new payment for a retry.</p>}
         <PermissionGate required={PERM.PAYMENTS_RECORD}>
           <Button className="rounded-none" disabled={busy} onClick={() => save()}>{busy && <Loader2 className="animate-spin" />}Save changes</Button>
         </PermissionGate>
@@ -146,8 +161,8 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
           <h3 className="text-sm font-semibold">Refund</h3>
           <p className="text-sm text-muted-foreground">Send the money back to the customer first (MoMo, bank…), then record it here. You can refund up to {money(refundable, row.currency)}.</p>
           <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-            <div className="space-y-1.5"><Label>Amount</Label><Input className="rounded-none" type="number" min={0} value={refundAmt} onChange={(e) => { setRefundAmt(e.target.value); setConfirming(false); }} /></div>
-            <div className="space-y-1.5"><Label>Reason</Label><Input className="rounded-none" value={refundWhy} onChange={(e) => { setRefundWhy(e.target.value); setConfirming(false); }} placeholder="Item returned, order cancelled…" /></div>
+            <div className="space-y-1.5"><Label htmlFor="payment-refund-amount">Amount</Label><Input id="payment-refund-amount" className="rounded-none" type="number" min={0} value={refundAmt} onChange={(e) => { setRefundAmt(e.target.value); setConfirming(false); }} /></div>
+            <div className="space-y-1.5"><Label htmlFor="payment-refund-reason">Reason</Label><Input id="payment-refund-reason" className="rounded-none" value={refundWhy} onChange={(e) => { setRefundWhy(e.target.value); setConfirming(false); }} placeholder="Item returned, order cancelled…" /></div>
           </div>
           {!confirming ? (
             <Button variant="outline" className="rounded-none" disabled={refundInvalid || busy} onClick={() => setConfirming(true)}><Undo2 /> Record refund</Button>
@@ -165,6 +180,7 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
         open={paidAtDialogOpen}
         onOpenChange={setPaidAtDialogOpen}
         initialValue={row.paidAt}
+        minimumDateTime={row.orderPlacedAt}
         busy={busy}
         onConfirm={async (paidAt) => {
           if (await save({ status: "PAID", paidAt })) {
@@ -179,7 +195,13 @@ function PaymentView({ row, reload }: { row: PaymentSummary; reload: () => Promi
 
 // ─── Order picker for "Add payment" ───────────────────────────────────────────
 
-function OrderPicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
+function OrderPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (id: string, placedAt: string) => void;
+}) {
   const { money } = useFormatters();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -214,7 +236,7 @@ function OrderPicker({ value, onChange }: { value: string; onChange: (id: string
         {loading ? <p className="flex items-center gap-2 p-3 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Loading…</p>
           : orders.length === 0 ? <p className="p-3 text-sm text-muted-foreground">No unpaid orders found.</p>
             : orders.map((o) => (
-              <button key={o.id} type="button" onClick={() => onChange(String(o.id))}
+              <button key={o.id} type="button" onClick={() => onChange(String(o.id), o.placedAt)}
                 className={`flex w-full items-center justify-between gap-3 border-b p-2.5 text-left text-sm last:border-b-0 hover:bg-accent ${value === String(o.id) ? "bg-accent" : ""}`}>
                 <span className="min-w-0"><span className="block font-medium">{o.orderNumber}</span><span className="block truncate text-xs text-muted-foreground">{o.customerName}</span></span>
                 <span className="shrink-0 tabular-nums">{money(o.grandTotal)}</span>
@@ -231,10 +253,12 @@ function NewPaymentStatusField({
   value,
   onChange,
   setField,
+  minimumDateTime,
 }: {
   value: string;
   onChange: (value: string) => void;
   setField: (name: string, value: unknown) => void;
+  minimumDateTime?: string;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -260,6 +284,7 @@ function NewPaymentStatusField({
       <PaidAtAlertDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        minimumDateTime={minimumDateTime}
         onConfirm={(paidAt) => {
           onChange("PAID");
           setField("paidAt", paidAt);
@@ -300,9 +325,9 @@ export default function AdminPaymentsPage() {
         render: (p, { reload }) => <PaymentView row={p} reload={reload} />,
       }}
       fields={[
-        { name: "orderId", label: "Order", type: "custom", required: true, render: (v, set) => <OrderPicker value={v ?? ""} onChange={set} /> },
+        { name: "orderId", label: "Order", type: "custom", required: true, render: (v, set, setField) => <OrderPicker value={v ?? ""} onChange={(id, placedAt) => { set(id); setField("orderPlacedAt", placedAt); }} /> },
         { name: "method", label: "Method", type: "select", required: true, options: options(METHODS) },
-        { name: "status", label: "Payment is", type: "custom", required: true, render: (value, set, setField) => <NewPaymentStatusField value={value ?? "PENDING"} onChange={set} setField={setField} /> },
+        { name: "status", label: "Payment is", type: "custom", required: true, render: (value, set, setField, values) => <NewPaymentStatusField value={value ?? "PENDING"} onChange={set} setField={setField} minimumDateTime={values.orderPlacedAt} /> },
         { name: "amount", label: "Amount (base currency)", type: "number", required: true },
         { name: "providerRef", label: "Transaction reference", type: "text", hint: "MoMo transaction ID, bank slip number…" },
         { name: "payerPhone", label: "Payer phone", type: "text" },

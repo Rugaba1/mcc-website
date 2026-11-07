@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { Check, Copy, Share2 } from "lucide-react";
+import { Check, Copy, Mail, Share2 } from "lucide-react";
+import {
+  SiFacebook,
+  SiTelegram,
+  SiWhatsapp,
+  SiX,
+} from "react-icons/si";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -84,22 +90,32 @@ export function ShareWidget({
   const links = [
     {
       name: "WhatsApp",
+      Icon: SiWhatsapp,
+      iconClassName: "text-[#25D366]",
       href: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
     },
     {
       name: "Facebook",
+      Icon: SiFacebook,
+      iconClassName: "text-[#0866FF]",
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     },
     {
       name: "X",
+      Icon: SiX,
+      iconClassName: "text-foreground",
       href: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
     },
     {
       name: "Telegram",
+      Icon: SiTelegram,
+      iconClassName: "text-[#24A1DE]",
       href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
     },
     {
       name: "Email",
+      Icon: Mail,
+      iconClassName: "text-muted-foreground",
       href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodedText}%0A${encodedUrl}`,
     },
   ];
@@ -147,8 +163,12 @@ export function ShareWidget({
               href={link.href}
               target={link.name === "Email" ? undefined : "_blank"}
               rel={link.name === "Email" ? undefined : "noopener noreferrer"}
-              className="inline-flex min-h-9 items-center justify-center border px-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-9 items-center justify-center gap-2 border px-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
             >
+              <link.Icon
+                aria-hidden="true"
+                className={`size-4 shrink-0 ${link.iconClassName}`}
+              />
               {link.name}
             </a>
           ))}

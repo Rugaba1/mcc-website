@@ -2,9 +2,9 @@
 
 import { MediaImage } from "@/components/media-image";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams } from "next/navigation";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Mail, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Link } from "@/app/i18n/routing";
@@ -20,7 +20,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
 import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
-import { canTransitionOrderStatus, ORDER_STATUSES, type OrderStatus } from "@/lib/orders/status";
+import {
+  canTransitionOrderStatus,
+  ORDER_STATUSES,
+  orderStatusDateField,
+  orderStatusDateLabel,
+  type OrderStatus,
+} from "@/lib/orders/status";
 
 const KIND_LABEL: Record<InvoiceRef["kind"], string> = {
   PROFORMA: "Proforma invoice",
@@ -36,7 +42,19 @@ export default function AdminOrderPage() {
   const [status, setStatus] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
-  const [paidAtDialogOpen, setPaidAtDialogOpen] = useState(false);
+  const [statusDateDialogOpen, setStatusDateDialogOpen] = useState(false);
+  const [recordingPayment, setRecordingPayment] = useState(false);
+  const [paymentBusy, setPaymentBusy] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("CASH_ON_DELIVERY");
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentNote, setPaymentNote] = useState("");
+  const [paymentReceivedAt, setPaymentReceivedAt] = useState(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  });
+  const [emailInvoiceBusy, setEmailInvoiceBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -53,15 +71,15 @@ export default function AdminOrderPage() {
     load();
   }, [load]);
 
-  async function saveStatus(paidAt?: string): Promise<boolean> {
+  async function saveStatus(statusAt?: string): Promise<boolean> {
     if (!order || status === order.status) return false;
-    if (status === "PAID" && order.status !== "PAID" && !paidAt) {
-      setPaidAtDialogOpen(true);
+    if (!statusAt) {
+      setStatusDateDialogOpen(true);
       return false;
     }
     setSaving(true);
     try {
-      await api.updateOrderStatus(order.id, status, note.trim() || undefined, paidAt);
+      await api.updateOrderStatus(order.id, status, note.trim() || undefined, statusAt);
       toast.success("Order status updated");
       setNote("");
       await load();
@@ -71,6 +89,46 @@ export default function AdminOrderPage() {
       return false;
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function recordPayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!order) return;
+    setPaymentBusy(true);
+    try {
+      await api.recordPayment(order.id, {
+        method: paymentMethod,
+        status: "PAID",
+        amount: Number(paymentAmount),
+        providerRef: paymentReference.trim() || undefined,
+        note: paymentNote.trim() || undefined,
+        paidAt: new Date(paymentReceivedAt).toISOString(),
+      });
+      toast.success("Payment recorded");
+      setPaymentAmount("");
+      setPaymentReference("");
+      setPaymentNote("");
+      setRecordingPayment(false);
+      await load();
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Could not record payment"));
+    } finally {
+      setPaymentBusy(false);
+    }
+  }
+
+  async function emailInvoice() {
+    if (!order) return;
+    setEmailInvoiceBusy(true);
+    try {
+      await api.sendOrderInvoice(order.id);
+      toast.success(`Invoice sent to ${order.email}`);
+      await load();
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Could not send invoice email"));
+    } finally {
+      setEmailInvoiceBusy(false);
     }
   }
 
@@ -85,9 +143,17 @@ export default function AdminOrderPage() {
 
   const c = order.currency;
   const address = [order.shipStreet, order.shipSector, order.shipDistrict, order.shipProvince].filter(Boolean).join(", ");
+  const received = order.payments
+    .filter((payment) => ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(payment.status))
+    .reduce((sum, payment) => sum + payment.amount, 0);
+  const refunded = order.payments.reduce(
+    (sum, payment) => sum + (payment.refundedAmount ?? 0),
+    0,
+  );
+  const balanceDue = Math.max(0, order.grandTotal - received + refunded);
 
   return (
-    <main className="flex-1 space-y-5 p-4 md:p-6">
+    <section className="flex-1 space-y-5 p-4 md:p-6">
       <Link href="/admin/orders" className="text-sm text-muted-foreground hover:underline">← All orders</Link>
 
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -134,7 +200,24 @@ export default function AdminOrderPage() {
 
           {/* Payments */}
           <Card className="rounded-none">
-            <CardHeader><CardTitle>Payments</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between gap-3">
+              <div>
+                <CardTitle>Payments</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Balance due: {money(balanceDue, c)}
+                </p>
+              </div>
+              <PermissionGate required={PERM.PAYMENTS_RECORD}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setRecordingPayment((value) => !value)}
+                  disabled={balanceDue <= 0 || order.status === "CANCELLED" || order.status === "REFUNDED"}
+                >
+                  <Plus /> Record payment
+                </Button>
+              </PermissionGate>
+            </CardHeader>
             <CardContent className="divide-y p-0">
               {order.payments.length === 0 && <p className="p-4 text-sm text-muted-foreground">No payments recorded.</p>}
               {order.payments.map((p) => (
@@ -151,6 +234,52 @@ export default function AdminOrderPage() {
                   </div>
                 </div>
               ))}
+              {recordingPayment && (
+                <PermissionGate required={PERM.PAYMENTS_RECORD}>
+                  <form onSubmit={recordPayment} className="space-y-3 p-4">
+                    <p className="text-sm font-semibold">Record received payment</p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <label htmlFor="record-payment-amount" className="text-xs font-medium">Amount ({c})</label>
+                        <Input id="record-payment-amount" type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(event) => setPaymentAmount(event.target.value)} required />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label htmlFor="record-payment-method" className="text-xs font-medium">Method</label>
+                        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                          <SelectTrigger id="record-payment-method" className="w-full rounded-none"><SelectValue /></SelectTrigger>
+                          <SelectContent className="rounded-none">
+                            {[
+                              ["CASH_ON_DELIVERY", "Cash"],
+                              ["MTN_MOMO", "MTN MoMo"],
+                              ["AIRTEL_MONEY", "Airtel Money"],
+                              ["BANK_TRANSFER", "Bank transfer"],
+                              ["CARD", "Card"],
+                            ].map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label htmlFor="record-payment-reference" className="text-xs font-medium">Reference (optional)</label>
+                        <Input id="record-payment-reference" value={paymentReference} onChange={(event) => setPaymentReference(event.target.value)} maxLength={150} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label htmlFor="record-payment-date" className="text-xs font-medium">Received at</label>
+                        <Input id="record-payment-date" type="datetime-local" value={paymentReceivedAt} onChange={(event) => setPaymentReceivedAt(event.target.value)} required />
+                      </div>
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <label htmlFor="record-payment-note" className="text-xs font-medium">Note (optional)</label>
+                        <Input id="record-payment-note" value={paymentNote} onChange={(event) => setPaymentNote(event.target.value)} maxLength={255} />
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button type="submit" size="sm" disabled={paymentBusy}>
+                        {paymentBusy && <Loader2 className="animate-spin" />}
+                        Save payment
+                      </Button>
+                    </div>
+                  </form>
+                </PermissionGate>
+              )}
             </CardContent>
           </Card>
 
@@ -219,7 +348,7 @@ export default function AdminOrderPage() {
             <CardContent className="space-y-1 p-5 text-sm">
               <p className="font-semibold">Customer</p>
               <p>{order.customerName}</p>
-              {order.email && <p className="text-muted-foreground">{order.email}</p>}
+              {order.email && <p className="break-all text-muted-foreground">{order.email}</p>}
               {order.phone && <p className="text-muted-foreground">{order.phone}</p>}
               {order.tin && <p className="text-muted-foreground">Rwanda TIN: {order.tin}</p>}
             </CardContent>
@@ -239,10 +368,34 @@ export default function AdminOrderPage() {
           </Card>
 
           {/* Documents */}
-          {order.invoices?.length > 0 && (
-            <Card className="rounded-none">
+          <Card className="rounded-none">
               <CardContent className="space-y-2 p-5 text-sm">
-                <p className="font-semibold">Documents</p>
+                <div className="flex flex-col items-stretch gap-2">
+                  <p className="font-semibold">Documents</p>
+                  <PermissionGate required={PERM.INVOICES_ISSUE}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-auto w-full min-w-0 justify-start whitespace-normal rounded-none px-3 py-2 text-left"
+                      onClick={() => void emailInvoice()}
+                      disabled={emailInvoiceBusy || !order.email || order.status === "CANCELLED"}
+                    >
+                      {emailInvoiceBusy ? <Loader2 className="animate-spin" /> : <Mail />}
+                      <span className="min-w-0 break-words">
+                        {order.email ? (
+                          <>Email invoice to <span className="break-all">{order.email}</span></>
+                        ) : (
+                          "Customer email required"
+                        )}
+                      </span>
+                    </Button>
+                  </PermissionGate>
+                </div>
+                {!order.invoices.length && (
+                  <p className="text-xs text-muted-foreground">
+                    No invoice has been generated yet. Sending an email will generate the current document first.
+                  </p>
+                )}
                 {order.invoices.map((inv) => (
                   <PermissionGate key={inv.id} required={PERM.INVOICES_VIEW}>
                     <Button
@@ -261,25 +414,30 @@ export default function AdminOrderPage() {
                   </PermissionGate>
                 ))}
               </CardContent>
-            </Card>
-          )}
+          </Card>
         </aside>
       </div>
 
       <InvoiceViewerDialog invoice={invoice} onClose={() => setInvoice(null)} />
       <PaidAtAlertDialog
-        open={paidAtDialogOpen}
+        open={statusDateDialogOpen}
         onOpenChange={(open) => {
-          setPaidAtDialogOpen(open);
-          if (!open && order.status !== "PAID") setStatus(order.status as OrderStatus);
+          setStatusDateDialogOpen(open);
+          if (!open) setStatus(order.status as OrderStatus);
         }}
-        initialValue={order.paidAt}
+        eventLabel={orderStatusDateLabel(status as OrderStatus)}
+        minimumDateTime={order.placedAt}
+        initialValue={
+          orderStatusDateField(status as OrderStatus)
+            ? order[orderStatusDateField(status as OrderStatus)!]
+            : null
+        }
         busy={saving}
-        onConfirm={async (paidAt) => {
-          if (await saveStatus(paidAt)) setPaidAtDialogOpen(false);
+        onConfirm={async (statusAt) => {
+          if (await saveStatus(statusAt)) setStatusDateDialogOpen(false);
         }}
       />
-    </main>
+    </section>
   );
 }
 

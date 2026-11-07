@@ -659,20 +659,20 @@ function TilePanel() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-        <label style={{
+        <span style={{
 
           fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
         }}>
           Design
 
 
-        </label>
-        <label style={{
+        </span>
+        <label htmlFor="floor-tile-design-upload" style={{
           padding: '8px 16px', border: '1px solid gray',
           fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
-        }}>
+        }} className="focus-within:outline focus-within:outline-2 focus-within:outline-primary">
           Upload Your Tile Design
-          <Input type="file" accept="image/*" style={{ display: 'none' }}
+          <Input id="floor-tile-design-upload" type="file" accept="image/*" className="sr-only"
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) { handleUpload(f) }

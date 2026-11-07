@@ -5,6 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
 import { syncOrderPayment } from "@/lib/payments/sync";
+import {
+  canTransitionPaymentStatus,
+  EDITABLE_PAYMENT_STATUSES,
+} from "@/lib/payments/status";
 import { blankToNull } from "@/lib/variant";
 import { sendPaymentStatusEmail } from "@/lib/email";
 
@@ -24,7 +28,7 @@ const fileUrl = z
   .optional();
 
 const schema = z.object({
-  status: z.enum(["PENDING", "AUTHORIZED", "PAID", "FAILED"]).optional(), // refunds go through /refund
+  status: z.enum(EDITABLE_PAYMENT_STATUSES).optional(), // refunds go through /refund
   providerRef: text(150),
   payerPhone: text(20),
   provider: text(50),
@@ -56,6 +60,7 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
           order: {
             select: {
               orderNumber: true,
+              placedAt: true,
               currency: true,
               guestEmail: true,
               shipFullName: true,
@@ -78,11 +83,23 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
       )
         return { code: 410 } as const;
       if (
+        rest.status &&
+        !canTransitionPaymentStatus(current.status, rest.status)
+      )
+        return { code: "INVALID_TRANSITION" } as const;
+      if (
         rest.status === "PAID" &&
         current.status !== "PAID" &&
         !paidAt
       )
         return { code: 400 } as const;
+      const receivedAt =
+        paidAt ? new Date(paidAt) : (current.paidAt ?? new Date());
+      if (
+        rest.status === "PAID" &&
+        receivedAt < current.order.placedAt
+      )
+        return { code: 422 } as const;
 
       const data: Prisma.PaymentUncheckedUpdateInput = {
         ...rest,
@@ -93,7 +110,7 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
           ? new Date(paidAt)
           : (current.paidAt ?? new Date());
         data.failureReason = null;
-      } else if (rest.status && rest.status !== "PAID") {
+      } else if (rest.status) {
         data.paidAt = null;
         if (rest.status === "FAILED" && !rest.failureReason)
           data.failureReason = "Marked as failed by staff";
@@ -158,9 +175,22 @@ export const PUT = withPermission(PERM.PAYMENTS_RECORD)(
         },
         { status: 409 },
       );
+    if (result.code === "INVALID_TRANSITION")
+      return NextResponse.json(
+        {
+          error:
+            "This payment status transition is not allowed. Failed attempts cannot be reopened; record a new payment to retry.",
+        },
+        { status: 409 },
+      );
     if (result.code === 400)
       return NextResponse.json(
         { error: "Enter when the payment was received before confirming it" },
+        { status: 400 },
+      );
+    if (result.code === 422)
+      return NextResponse.json(
+        { error: "The payment time cannot be before the order was placed" },
         { status: 400 },
       );
     if (result.notification?.to) {

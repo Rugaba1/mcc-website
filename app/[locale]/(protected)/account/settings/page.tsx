@@ -225,7 +225,7 @@ export default function SettingsPage() {
                             onChange={(e) => setTwoFactorPassword(e.target.value)}
                         />
                     </div>
-                    <div className="flex flex-wrap gap-2" aria-label="Two-factor method">
+                    <div className="flex flex-wrap gap-2" role="group" aria-label="Two-factor method">
                         <Button
                             type="button"
                             variant={twoFactorMethod === "email" ? "default" : "outline"}
@@ -322,7 +322,7 @@ export default function SettingsPage() {
                 <div className="space-y-4 border border-destructive/40 bg-background p-6">
                     <h2 className="font-semibold text-destructive">Delete account</h2>
                     <p className="text-sm text-muted-foreground">
-                        Permanently removes your profile, addresses, cart, wishlist, reviews and saved designs.
+                        Permanently removes your profile, addresses, selected items, wishlist, reviews and saved designs.
                         Completed orders are kept for our accounting records but are no longer linked to you.
                         This cannot be undone.
                     </p>

@@ -45,7 +45,7 @@ function VerifyEmailContent() {
   }, [sent, token]);
 
   return (
-    <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-5 px-4 text-center">
+    <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-5 px-4 text-center">
       <h1 className="text-3xl font-bold">Email verification</h1>
       <p aria-live="polite">{message}</p>
       {sent && !token ? (
@@ -61,7 +61,7 @@ function VerifyEmailContent() {
           Return to sign in
         </Link>
       )}
-    </main>
+    </div>
   );
 }
 

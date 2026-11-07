@@ -10,8 +10,10 @@ import { useFormatters } from "@/contexts/format-context";
 import { Button } from "@/components/ui/button";
 import { ShareWidget } from "@/components/share-widget";
 import { MediaImage } from "@/components/media-image";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 export default function AccountDesignsPage() {
+    const { confirm, dialog } = useConfirmAction();
     const { date } = useFormatters();
     const [designs, setDesigns] = useState<SavedVisualizerDesign[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +31,10 @@ export default function AccountDesignsPage() {
     useEffect(() => { void load(); }, [load]);
 
     const remove = async (design: SavedVisualizerDesign) => {
-        if (!confirm(`Delete “${design.name || "Untitled design"}”?`)) return;
+        if (!(await confirm({
+            title: "Delete this saved design?",
+            description: `Delete “${design.name || "Untitled design"}”? This action cannot be undone.`,
+        }))) return;
         try {
             await api.deleteMyVisualizerDesign(design.id);
             setDesigns((current) => current.filter((item) => item.id !== design.id));
@@ -40,7 +45,7 @@ export default function AccountDesignsPage() {
     };
 
     return (
-        <main className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
+        <section className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
             <header className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-semibold">My Designs</h1>
@@ -83,6 +88,7 @@ export default function AccountDesignsPage() {
                     ))}
                 </div>
             )}
-        </main>
+            {dialog}
+        </section>
     );
 }

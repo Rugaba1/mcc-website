@@ -8,6 +8,7 @@ const bank = {
 
 export const COMPANY = {
   name: siteConfig.companyName,
+  foundedYear: 2019,
   phone: siteConfig.companyPhone,
   alternatePhone: siteConfig.companyPhoneAlternate,
   email: siteConfig.companyEmail,

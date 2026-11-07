@@ -136,7 +136,7 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
         const createPayload = {
           ...payload,
           stockSqm: Number(form.stockSqm) || 0,
-          lowStockThreshold: Number(form.reorderLevel) || 0,
+          reorderLevel: Number(form.reorderLevel) || 0,
         };
         await api.createVariant(product.id, createPayload);
       }
@@ -230,11 +230,20 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
                             </Badge>
                             {reserved > 0 && <span className="block text-xs text-muted-foreground">{number(reserved, { maximumFractionDigits: 2 })} m² reserved</span>}
                           </TableCell>
-                          <TableCell><Checkbox className="rounded-none" checked={v.active} onCheckedChange={(c) => toggleActive(v, c === true)} aria-label="Active" /></TableCell>
+                          <TableCell>
+                            <div className="flex min-h-11 items-center justify-center">
+                              <Checkbox
+                                checked={v.active}
+                                onCheckedChange={(checked) => toggleActive(v, checked === true)}
+                                aria-label={`Active for ${v.sku}`}
+                                className="size-11 p-3"
+                              />
+                            </div>
+                          </TableCell>
                           <TableCell>
                             <div className="flex justify-end">
-                              <Button variant="ghost" size="icon" className="size-8 rounded-none" onClick={() => startEdit(v)} aria-label="Edit"><Pencil /></Button>
-                              <Button variant="ghost" size="icon" className="size-8 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(v)} aria-label="Delete"><Trash2 /></Button>
+                              <Button variant="ghost" size="icon" className="size-11 rounded-none" onClick={() => startEdit(v)} aria-label={`Edit ${v.sku}`}><Pencil /></Button>
+                              <Button variant="ghost" size="icon" className="size-11 rounded-none text-destructive hover:text-destructive" onClick={() => setDeleting(v)} aria-label={`Delete ${v.sku}`}><Trash2 /></Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -326,9 +335,15 @@ export function VariantsSheet({ product, onOpenChange, onChanged }: { product: P
 
               <Field label="Swatch image"><ImageField value={form.image} onChange={(v) => set("image", v)} /></Field>
               <Field label="Seamless texture (for the room visualizer)"><ImageField value={form.textureUrl} onChange={(v) => set("textureUrl", v)} /></Field>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox className="rounded-none" checked={form.active} onCheckedChange={(c) => set("active", c === true)} /> Available to buy
-              </label>
+              <div className="flex min-h-11 items-center gap-2 text-sm">
+                <Checkbox
+                  checked={form.active}
+                  onCheckedChange={(checked) => set("active", checked === true)}
+                  aria-label="Available to buy"
+                  className="size-11 p-3"
+                />
+                <span>Available to buy</span>
+              </div>
               <div className="flex justify-end gap-2 border-t pt-4">
                 <Button variant="outline" className="rounded-none" onClick={() => setForm(null)} disabled={saving}>Back</Button>
                 <Button className="rounded-none" onClick={submit} disabled={saving}>{saving && <Loader2 className="animate-spin" />}{editId ? "Save changes" : "Add variant"}</Button>

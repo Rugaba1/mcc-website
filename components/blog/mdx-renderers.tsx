@@ -13,11 +13,15 @@ const linkClass =
   "text-primary underline decoration-primary decoration-2 underline-offset-4 hover:bg-secondary";
 
 export const mdxComponents = {
-  h2: (props: ComponentProps<"h2">) => (
-    <h2 className="mt-12 mb-4 scroll-mt-24 text-3xl" {...props} />
+  h2: ({ children, ...props }: ComponentProps<"h2">) => (
+    <h2 className="mt-12 mb-4 scroll-mt-24 text-3xl" {...props}>
+      {children}
+    </h2>
   ),
-  h3: (props: ComponentProps<"h3">) => (
-    <h3 className="mt-8 mb-3 scroll-mt-24 text-2xl" {...props} />
+  h3: ({ children, ...props }: ComponentProps<"h3">) => (
+    <h3 className="mt-8 mb-3 scroll-mt-24 text-2xl" {...props}>
+      {children}
+    </h3>
   ),
   p: (props: ComponentProps<"p">) => (
     <p className="leading-8 [&:not(:first-child)]:mt-5" {...props} />
@@ -35,9 +39,9 @@ export const mdxComponents = {
     />
   ),
   hr: () => <Separator className="my-10" />,
-  a: ({ href = "", ...props }: ComponentProps<"a">) =>
+  a: ({ href = "", children, ...props }: ComponentProps<"a">) =>
     href.startsWith("/") ? (
-      <Link href={href} className={linkClass} {...props} />
+      <Link href={href} className={linkClass} {...props}>{children}</Link>
     ) : (
       <a
         href={href}
@@ -45,11 +49,15 @@ export const mdxComponents = {
         rel="noopener noreferrer"
         className={linkClass}
         {...props}
-      />
+      >
+        {children}
+      </a>
     ),
-  img: ({ src, alt }: ComponentProps<"img">) => (
-      typeof src === "string" ? <MediaPreviewImage src={src} alt={alt ?? ""} /> : null
-  ),
+  img: ({ src, alt, title }: ComponentProps<"img">) => {
+    if (typeof src !== "string") return null;
+    const caption = typeof title === "string" && title.trim() ? title.trim() : undefined;
+    return <MediaPreviewImage src={src} alt={alt ?? ""} caption={caption} />;
+  },
   table: (props: ComponentProps<"table">) => (
     <div className="my-8 overflow-x-auto border">
       <table className="w-full border-collapse text-sm" {...props} />

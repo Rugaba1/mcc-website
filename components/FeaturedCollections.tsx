@@ -1,7 +1,6 @@
 import { MediaImage } from "@/components/media-image";
 
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/app/i18n/routing";
 import { serverApi, type Product } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
@@ -21,16 +20,23 @@ export default async function FeaturedCollections() {
     })
 
   } catch (error) {
-
+    console.error("Failed to load homepage collections:", error);
   }
   if (!collections) {
     return (
-      <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">collections not found</p>
-
+      <section id="collections-home" className="py-24">
+        <div className="mx-auto max-w-7xl px-6 text-center">
+          <h2 className="font-playfair text-4xl font-bold md:text-5xl">
+            Curated Tile Collections
+          </h2>
+          <p className="mt-4 text-muted-foreground" role="status">
+            Collections are temporarily unavailable. Please try again later.
+          </p>
+          <Link href="/collections" className="mt-5 inline-block underline">
+            View all collections
+          </Link>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -89,7 +95,7 @@ export default async function FeaturedCollections() {
                 {/* Cover image */}
                 <div className="relative h-64 overflow-hidden">
                   {cover ? (
-                    <Image
+                    <MediaImage
                       src={cover}
                       alt={col.name}
                       fill

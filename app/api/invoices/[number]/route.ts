@@ -2,7 +2,9 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { readInvoicePdf, verifyInvoiceSignature } from "@/lib/invoices/invoice";
-import { withOptionalAuth } from "@/lib/middleware/withAuth";
+import { withOptionalAuth, type AuthUser } from "@/lib/middleware/withAuth";
+import { hasPermissions } from "@/lib/permissions/core";
+import { PERM } from "@/lib/permissions/catalog";
 
 export const runtime = "nodejs"; // needs fs
 export const dynamic = "force-dynamic";
@@ -11,7 +13,7 @@ const notFound = () => new NextResponse("Not found", { status: 404 });
 
 export const GET = withOptionalAuth(async (
   req: NextRequest,
-  { user, params }: { user: { id: number } | null; params: Promise<{ number: string }> },
+  { user, params }: { user: AuthUser | null; params: Promise<{ number: string }> },
 ) => {
     
   const { number } = await params;
@@ -28,7 +30,8 @@ export const GET = withOptionalAuth(async (
   if (!allowed) {
     allowed =
       !!user &&
-      invoice.order.userId === user.id;
+      (invoice.order.userId === user.id ||
+        hasPermissions(user.permissions, PERM.INVOICES_VIEW));
   }
   if (!allowed) return notFound();
 

@@ -13,6 +13,8 @@ const staticPaths = [
   "/collections",
   "/projects",
   "/blog",
+  "/publications",
+  "/visualizer",
   "/contact",
 ];
 
@@ -31,23 +33,36 @@ function localizedEntries(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [productsResult, postsResult, legalResult] = await Promise.allSettled([
-    prisma.product.findMany({
-      where: { status: "ACTIVE" },
-      select: { slug: true, updatedAt: true },
-      orderBy: { updatedAt: "desc" },
-    }),
-    prisma.blogPost.findMany({
-      where: { status: "PUBLISHED", publishedAt: { lte: new Date() } },
-      select: { slug: true, locale: true, updatedAt: true },
-      orderBy: { publishedAt: "desc" },
-    }),
-    prisma.legalDocumentVersion.findMany({
-      where: { publishedAt: { not: null } },
-      select: { documentType: true, publishedAt: true },
-      orderBy: { publishedAt: "desc" },
-    }),
-  ]);
+  const now = new Date();
+  const [productsResult, postsResult, legalResult, publicationsResult] =
+    await Promise.allSettled([
+      prisma.product.findMany({
+        where: { status: "ACTIVE" },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.blogPost.findMany({
+        where: { status: "PUBLISHED", publishedAt: { lte: now } },
+        select: { slug: true, locale: true, updatedAt: true },
+        orderBy: { publishedAt: "desc" },
+      }),
+      prisma.legalDocumentVersion.findMany({
+        where: { publishedAt: { not: null } },
+        select: { documentType: true, publishedAt: true },
+        orderBy: { publishedAt: "desc" },
+      }),
+      prisma.publication.findMany({
+        where: {
+          active: true,
+          AND: [
+            { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+            { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+          ],
+        },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+    ]);
 
   if (productsResult.status === "rejected") {
     console.error("Could not load products for sitemap:", productsResult.reason);
@@ -58,12 +73,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (legalResult.status === "rejected") {
     console.error("Could not load legal documents for sitemap:", legalResult.reason);
   }
+  if (publicationsResult.status === "rejected") {
+    console.error("Could not load publications for sitemap:", publicationsResult.reason);
+  }
 
   const products =
     productsResult.status === "fulfilled" ? productsResult.value : [];
   const posts = postsResult.status === "fulfilled" ? postsResult.value : [];
   const legalDocuments =
     legalResult.status === "fulfilled" ? legalResult.value : [];
+  const publications =
+    publicationsResult.status === "fulfilled" ? publicationsResult.value : [];
 
   const staticEntries = staticPaths.flatMap((path) =>
     localizedEntries(path, new Date(), path === "/" ? 1 : 0.7),
@@ -83,6 +103,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? localizedEntries(`/legal/${document.slug}`, publishedAt ?? new Date(), 0.3)
       : [];
   });
+  const publicationEntries = publications.flatMap(({ slug, updatedAt }) =>
+    localizedEntries(`/publications/${slug}`, updatedAt, 0.6),
+  );
 
-  return [...staticEntries, ...productEntries, ...blogEntries, ...legalEntries];
+  return [
+    ...staticEntries,
+    ...productEntries,
+    ...blogEntries,
+    ...publicationEntries,
+    ...legalEntries,
+  ];
 }

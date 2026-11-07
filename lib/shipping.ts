@@ -1,38 +1,31 @@
-export const SHIPPING_IDS = ["pickup", "muhanga", "kigali", "rusizi"] as const;
+export const SHIPPING_IDS = ["pickup", "delivery"] as const;
 export type ShippingId = (typeof SHIPPING_IDS)[number];
 
-// Fees are placeholders from your old cart. Edit them here only.
+export const DELIVERY_FEE_PER_SQM = 500;
+
 export const SHIPPING_OPTIONS: {
   id: ShippingId;
   label: string;
-  fee: number;
   fulfillment: "PICKUP" | "DELIVERY";
 }[] = [
   {
     id: "pickup",
     label: "Pick up at the factory, Muhanga",
-    fee: 0,
     fulfillment: "PICKUP",
   },
   {
-    id: "muhanga",
-    label: "Delivery in Muhanga",
-    fee: 0,
-    fulfillment: "DELIVERY",
-  },
-  {
-    id: "kigali",
-    label: "Delivery in Kigali",
-    fee: 0,
-    fulfillment: "DELIVERY",
-  },
-  {
-    id: "rusizi",
-    label: "Delivery to Rusizi",
-    fee: 5000,
+    id: "delivery",
+    label: "Delivery",
     fulfillment: "DELIVERY",
   },
 ];
 
 export const getShipping = (id: ShippingId) =>
   SHIPPING_OPTIONS.find((o) => o.id === id) ?? SHIPPING_OPTIONS[0];
+
+export function calculateDeliveryFee(totalSqm: number) {
+  if (!Number.isFinite(totalSqm) || totalSqm < 0) {
+    throw new RangeError("Total delivery area must be a non-negative number");
+  }
+  return Math.round(totalSqm * DELIVERY_FEE_PER_SQM * 100) / 100;
+}

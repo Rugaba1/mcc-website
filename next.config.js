@@ -8,7 +8,7 @@ const imageSources = (process.env.NEXT_PUBLIC_IMAGE_DOMAINS || "")
   .split(",")
   .map((h) => h.trim())
   .filter(Boolean);
-const imagePatterns = imageSources.map((source) => {
+const imagePatterns = [...new Set([...imageSources, "https://images.unsplash.com"])].map((source) => {
   const url = new URL(source.includes("://") ? source : `https://${source}`);
   if (url.protocol !== "https:" && url.protocol !== "http:") {
     throw new Error(`Unsupported image source protocol: ${url.protocol}`);
@@ -19,7 +19,6 @@ const imagePatterns = imageSources.map((source) => {
     ...(url.port ? { port: url.port } : {}),
   };
 });
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -36,11 +35,6 @@ const nextConfig = {
   },
 
   compress: true,
-  sassOptions: { implementation: {} },
-
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -66,6 +60,10 @@ const nextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Content-Signal",
+            value: "ai-train=yes, search=yes, ai-input=yes",
+          },
           {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin-allow-popups",

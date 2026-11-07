@@ -1,5 +1,5 @@
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { type CatalogueDoc, type Product, serverApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { PublicCatalogueDocuments } from "@/components/public-catalogue-document
 import { headers } from "next/headers";
 import { siteConfig } from "@/config/site.config";
 import { localizedUrl } from "@/lib/alternates";
+import { ProductStartingPrice } from "@/components/product-starting-price";
 
 const BADGE_FILTERS = ["All", "Bestseller", "New", "Premium"] as const;
 
@@ -145,7 +146,7 @@ export default async function CataloguePage({
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {featured.slice(0, 4).map((p) => (
-                <FeaturedCard key={p.id} product={p} />
+                <FeaturedCard key={p.id} product={p} locale={locale} />
               ))}
             </div>
           </div>
@@ -189,11 +190,11 @@ export default async function CataloguePage({
           </div>
         ) : viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {products.map((p) => <GridCard key={p.id} product={p} />)}
+            {products.map((p) => <GridCard key={p.id} product={p} locale={locale} />)}
           </div>
         ) : (
           <div className="space-y-3">
-            {products.map((p) => <ListCard key={p.id} product={p} />)}
+            {products.map((p) => <ListCard key={p.id} product={p} locale={locale} />)}
           </div>
         )}
         <PaginationControls
@@ -264,13 +265,13 @@ export default async function CataloguePage({
 
 // ─── Card components ──────────────────────────────────────────────────────────
 
-function FeaturedCard({ product: p }: { product: Product }) {
+function FeaturedCard({ product: p, locale }: { product: Product; locale: string }) {
   const surface = p.category === "wall" || p.category === "special" ? "wall" : "floor";
   return (
     <div className="group block overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 bg-background  -lg border  ">
       <div className="relative h-48 overflow-hidden">
         {p.image && (
-          <Image
+          <MediaImage
             src={p.image}
             alt={p.name}
             fill
@@ -312,6 +313,7 @@ function FeaturedCard({ product: p }: { product: Product }) {
         <Link href={`/products/${p.slug ?? p.id}`}>
           <h3 className="font-bold text-sm text-foreground hover:text-primary transition-colors">{p.name}</h3>
         </Link>
+        <ProductStartingPrice variants={p.variants} locale={locale} />
         <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
           <span>{p.sizes}</span>
           <Link
@@ -326,13 +328,13 @@ function FeaturedCard({ product: p }: { product: Product }) {
   );
 }
 
-function GridCard({ product: p }: { product: Product }) {
+function GridCard({ product: p, locale }: { product: Product; locale: string }) {
   const surface = p.category === "wall" || p.category === "special" ? "wall" : "floor";
   return (
     <div className="group overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 block bg-background  -lg border  ">
       <div className="relative h-52 overflow-hidden">
         {p.image ? (
-          <Image
+          <MediaImage
             src={p.image}
             alt={p.name}
             fill
@@ -377,6 +379,7 @@ function GridCard({ product: p }: { product: Product }) {
         <Link href={`/products/${p.slug ?? p.id}`}>
           <h3 className="font-bold text-base mb-1 text-foreground hover:text-primary transition-colors">{p.name}</h3>
         </Link>
+        <ProductStartingPrice variants={p.variants} locale={locale} />
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">{p.description}</p>
         <div className="flex items-center justify-between pt-3 border-t border-border">
           <span className="text-xs text-muted-foreground">{p.sizes}</span>
@@ -406,13 +409,13 @@ function GridCard({ product: p }: { product: Product }) {
   );
 }
 
-function ListCard({ product: p }: { product: Product }) {
+function ListCard({ product: p, locale }: { product: Product; locale: string }) {
   const surface = p.category === "wall" || p.category === "special" ? "wall" : "floor";
   return (
     <div className="shadow-sm hover:shadow-md transition-all group flex gap-4 p-4 bg-background  -lg border  ">
       <div className="relative w-24 h-24 shrink-0 overflow-hidden  ">
         {p.image ? (
-          <Image
+          <MediaImage
             src={p.image}
             alt={p.name}
             fill
@@ -436,6 +439,7 @@ function ListCard({ product: p }: { product: Product }) {
             <Link href={`/products/${p.slug ?? p.id}`}>
               <h3 className="font-bold text-base truncate text-foreground hover:text-primary transition-colors">{p.name}</h3>
             </Link>
+            <ProductStartingPrice variants={p.variants} locale={locale} />
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link

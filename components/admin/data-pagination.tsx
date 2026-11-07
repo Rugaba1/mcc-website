@@ -39,11 +39,11 @@ export function DataPagination({
         Showing <span className="font-medium text-foreground">{from}–{to}</span> of{" "}
         <span className="font-medium text-foreground">{total}</span>
       </p>
-      <div className="flex items-center gap-1">
-        <Button variant="outline" size="icon" className="size-8 rounded-none" disabled={disabled || page <= 1} onClick={() => onPageChange(1)} aria-label="First page">
+      <nav aria-label="Pagination" className="flex max-w-full items-center gap-1 overflow-x-auto">
+        <Button variant="outline" size="icon" className="size-11 rounded-none" disabled={disabled || page <= 1} onClick={() => onPageChange(1)} aria-label="First page">
           <ChevronsLeft />
         </Button>
-        <Button variant="outline" size="icon" className="size-8 rounded-none" disabled={disabled || page <= 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">
+        <Button variant="outline" size="icon" className="size-11 rounded-none" disabled={disabled || page <= 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">
           <ChevronLeft />
         </Button>
         {pageList(page, totalPages).map((p, i) =>
@@ -54,7 +54,7 @@ export function DataPagination({
               key={p}
               variant={p === page ? "default" : "outline"}
               size="icon"
-              className="size-8 rounded-none"
+              className="size-11 rounded-none"
               disabled={disabled}
               onClick={() => onPageChange(p)}
               aria-current={p === page ? "page" : undefined}
@@ -63,13 +63,13 @@ export function DataPagination({
             </Button>
           ),
         )}
-        <Button variant="outline" size="icon" className="size-8 rounded-none" disabled={disabled || page >= totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">
+        <Button variant="outline" size="icon" className="size-11 rounded-none" disabled={disabled || page >= totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">
           <ChevronRight />
         </Button>
-        <Button variant="outline" size="icon" className="size-8 rounded-none" disabled={disabled || page >= totalPages} onClick={() => onPageChange(totalPages)} aria-label="Last page">
+        <Button variant="outline" size="icon" className="size-11 rounded-none" disabled={disabled || page >= totalPages} onClick={() => onPageChange(totalPages)} aria-label="Last page">
           <ChevronsRight />
         </Button>
-      </div>
+      </nav>
     </div>
   );
 }

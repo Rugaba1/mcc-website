@@ -4,7 +4,11 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withOptionalAuth } from "@/lib/middleware/withAuth";
 import { computeTotals } from "@/lib/pricing";
-import { getShipping, SHIPPING_IDS } from "@/lib/shipping";
+import {
+  calculateDeliveryFee,
+  getShipping,
+  SHIPPING_IDS,
+} from "@/lib/shipping";
 import { PaymentMethod, PaymentStatus } from "@/lib/generated/prisma";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { isValidLocation } from "@/lib/locations";
@@ -139,7 +143,7 @@ async (request: NextRequest, { user, locale }) => {
       });
       if (variants.length !== ids.length) {
         throw new CheckoutError(
-          "Some items in your cart are no longer available",
+          "Some selected items are no longer available",
         );
       }
       if (variants.some((variant) => variant.currency !== baseCurrency.code)) {
@@ -206,7 +210,7 @@ async (request: NextRequest, { user, locale }) => {
               Math.abs((reserved.get(variantId) ?? -1) - sqm) > 0.005,
           )
         ) {
-          throw new CheckoutError("Your cart changed. Please refresh the stock reservation.");
+          throw new CheckoutError("Your selected items changed. Please refresh the stock reservation.");
         }
         reservationId = reservation.id;
       } else {
@@ -225,10 +229,15 @@ async (request: NextRequest, { user, locale }) => {
         }
       }
 
+      const delivery = ship.fulfillment === "DELIVERY";
+      const shippingFee = delivery
+        ? calculateDeliveryFee(lines.reduce((sum, line) => sum + line.line.sqm, 0))
+        : 0;
+
       // Each line total is already rounded, so feed them in as price × 1
       const totals = computeTotals(
         lines.map((l) => ({ price: l.line.total, qty: 1 })),
-        ship.fee,
+        shippingFee,
       );
       const coupon = d.couponCode
         ? await tx.coupon.findUnique({ where: { code: d.couponCode } })
@@ -263,9 +272,8 @@ async (request: NextRequest, { user, locale }) => {
       }
       const discountedTotals = computeTotals(
         [{ price: totals.subtotal - discountTotal, qty: 1 }],
-        ship.fee,
+        shippingFee,
       );
-      const delivery = ship.fulfillment === "DELIVERY";
       const orderNumber = `MCC-${new Date()
         .toISOString()
         .slice(0, 10)

@@ -502,7 +502,7 @@ export default function VisualizerClient({
     currentScene.surfaces[0];
 
   return (
-    <div className="flex flex-col sm:h-[90vh] w-screen    overflow-hidden ">
+    <div className="flex min-h-dvh w-full min-w-0 flex-col overflow-hidden sm:h-[90vh]">
       {/* 1. Top Navigation Bar */}
       <HeaderMenu
         sceneName={currentScene.name}
@@ -537,7 +537,7 @@ export default function VisualizerClient({
       {/* 3. Main Workspace: Canvas Stage + Product Catalog Sidebar */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Canvas Visualizer Stage (Left / Center) */}
-        <main className="flex-1 h-full min-h-87.5 relative bg-inverse flex items-center justify-center p-2 lg:p-4">
+        <div className="flex-1 h-full min-h-87.5 relative  flex items-center justify-center p-2 lg:p-4">
           <div className="w-full h-full max-w-350 max-h-212.5 relative  overflow-hidden shadow-2xl border ">
             {isCompareMode ? (
               <CompareSlider
@@ -560,7 +560,7 @@ export default function VisualizerClient({
               />
             )}
           </div>
-        </main>
+        </div>
 
         {/* Product Catalog & Finishes Drawer (Right) */}
         <aside className="w-full lg:w-95 xl:w-105 sm:h-[60vh] h-full lg:h-full shrink-0 flex flex-col bg-inverse z-20   ">

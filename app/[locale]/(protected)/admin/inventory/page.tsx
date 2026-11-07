@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Swatch } from "@/components/color-field";
 import { PermissionGate } from "@/components/permission-gate";
@@ -101,7 +101,7 @@ export default function AdminInventoryPage() {
   ];
 
   return (
-    <main className="flex-1 space-y-5 p-4 md:p-6">
+    <section className="flex-1 space-y-5 p-4 md:p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
@@ -128,7 +128,7 @@ export default function AdminInventoryPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-60 flex-1 sm:max-w-sm">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-          <Input className="rounded-none pl-8" placeholder="Search product, SKU, size, color…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input id="inventory-search" aria-label="Search inventory by product, SKU, size, or color" className="rounded-none pl-8" placeholder="Search product, SKU, size, color…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
           <TabsList className="rounded-none">
@@ -138,7 +138,7 @@ export default function AdminInventoryPage() {
           </TabsList>
         </Tabs>
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-[170px] rounded-none"><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Sort inventory" className="w-[170px] rounded-none"><SelectValue /></SelectTrigger>
           <SelectContent className="rounded-none">
             <SelectItem value="product" className="rounded-none">Product A–Z</SelectItem>
             <SelectItem value="stock-asc" className="rounded-none">Stock: low to high</SelectItem>
@@ -150,6 +150,7 @@ export default function AdminInventoryPage() {
 
       <div className="border bg-card">
         <Table>
+          <TableCaption className="sr-only">Inventory by product variant, including current stock, alert threshold, availability, and adjustment action.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Product</TableHead><TableHead>SKU</TableHead><TableHead>Variant</TableHead>
@@ -185,7 +186,7 @@ export default function AdminInventoryPage() {
       <PermissionGate required={PERM.INVENTORY_ADJUST}>
         <AdjustDialog item={adjusting} onClose={() => setAdjusting(null)} onSaved={load} />
       </PermissionGate>
-    </main>
+    </section>
   );
 }
 
@@ -228,8 +229,8 @@ function AdjustDialog({ item, onClose, onSaved }: { item: InventoryItem | null; 
               <TabsTrigger value="set" className="flex-1 rounded-none">Set to</TabsTrigger>
             </TabsList>
           </Tabs>
-          <div className="space-y-1.5"><Label>m²</Label><Input className="rounded-none" type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} autoFocus /></div>
-          <div className="space-y-1.5"><Label>Alert me when stock is at or below</Label><Input className="rounded-none" type="number" min={0} value={threshold} onChange={(e) => setThreshold(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label htmlFor="inventory-adjustment-quantity">m²</Label><Input id="inventory-adjustment-quantity" className="rounded-none" type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label htmlFor="inventory-adjustment-threshold">Alert me when stock is at or below</Label><Input id="inventory-adjustment-threshold" className="rounded-none" type="number" min={0} value={threshold} onChange={(e) => setThreshold(e.target.value)} /></div>
           <p className={`text-sm ${result < 0 ? "text-destructive" : "text-muted-foreground"}`}>
             {result < 0 ? "You can’t remove more m² than are in stock." : <>New stock: <span className="font-semibold text-foreground">{result} m²</span></>}
           </p>

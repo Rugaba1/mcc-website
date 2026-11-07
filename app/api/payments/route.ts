@@ -56,6 +56,7 @@ export const GET = withPermission(PERM.PAYMENTS_VIEW)(
         order: {
           select: {
             orderNumber: true,
+            placedAt: true,
             shipFullName: true,
             user: { select: userNameSelect },
             grandTotal: true,
@@ -68,6 +69,7 @@ export const GET = withPermission(PERM.PAYMENTS_VIEW)(
         id: p.id,
         orderId: p.orderId,
         orderNumber: p.order.orderNumber,
+        orderPlacedAt: p.order.placedAt.toISOString(),
         customerName: customerName(p.order),
         status: p.status,
         method: p.method,

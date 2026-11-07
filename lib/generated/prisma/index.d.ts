@@ -184,6 +184,11 @@ export type Coupon = $Result.DefaultSelection<Prisma.$CouponPayload>
  */
 export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
 /**
+ * Model SavedCustomer
+ * 
+ */
+export type SavedCustomer = $Result.DefaultSelection<Prisma.$SavedCustomerPayload>
+/**
  * Model OrderItem
  * 
  */
@@ -268,6 +273,11 @@ export type ContactEmailDelivery = $Result.DefaultSelection<Prisma.$ContactEmail
  * 
  */
 export type MediaFile = $Result.DefaultSelection<Prisma.$MediaFilePayload>
+/**
+ * Model MediaFolder
+ * 
+ */
+export type MediaFolder = $Result.DefaultSelection<Prisma.$MediaFolderPayload>
 
 /**
  * Enums
@@ -927,6 +937,16 @@ export class PrismaClient<
   get order(): Prisma.OrderDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.savedCustomer`: Exposes CRUD operations for the **SavedCustomer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SavedCustomers
+    * const savedCustomers = await prisma.savedCustomer.findMany()
+    * ```
+    */
+  get savedCustomer(): Prisma.SavedCustomerDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.orderItem`: Exposes CRUD operations for the **OrderItem** model.
     * Example usage:
     * ```ts
@@ -1095,6 +1115,16 @@ export class PrismaClient<
     * ```
     */
   get mediaFile(): Prisma.MediaFileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mediaFolder`: Exposes CRUD operations for the **MediaFolder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MediaFolders
+    * const mediaFolders = await prisma.mediaFolder.findMany()
+    * ```
+    */
+  get mediaFolder(): Prisma.MediaFolderDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1576,6 +1606,7 @@ export namespace Prisma {
     DeliveryZone: 'DeliveryZone',
     Coupon: 'Coupon',
     Order: 'Order',
+    SavedCustomer: 'SavedCustomer',
     OrderItem: 'OrderItem',
     Invoice: 'Invoice',
     OrderStatusHistory: 'OrderStatusHistory',
@@ -1592,7 +1623,8 @@ export namespace Prisma {
     Role: 'Role',
     ContactMessage: 'ContactMessage',
     ContactEmailDelivery: 'ContactEmailDelivery',
-    MediaFile: 'MediaFile'
+    MediaFile: 'MediaFile',
+    MediaFolder: 'MediaFolder'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1608,7 +1640,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "currency" | "user" | "blogPost" | "refreshToken" | "emailBlocklist" | "emailBlocklistEvent" | "newsletterSubscription" | "newsletterCampaign" | "newsletterCampaignRecipient" | "publication" | "checkoutReservation" | "checkoutReservationItem" | "adminNotification" | "adminNotificationRead" | "legalDocumentVersion" | "legalAcceptance" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "orderItem" | "invoice" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "contactEmailDelivery" | "mediaFile"
+      modelProps: "currency" | "user" | "blogPost" | "refreshToken" | "emailBlocklist" | "emailBlocklistEvent" | "newsletterSubscription" | "newsletterCampaign" | "newsletterCampaignRecipient" | "publication" | "checkoutReservation" | "checkoutReservationItem" | "adminNotification" | "adminNotificationRead" | "legalDocumentVersion" | "legalAcceptance" | "permission" | "userPermission" | "permissionLog" | "address" | "category" | "product" | "productImage" | "productVariant" | "collection" | "collectionItem" | "inventory" | "stockMovement" | "cart" | "cartItem" | "wishlistItem" | "deliveryZone" | "coupon" | "order" | "savedCustomer" | "orderItem" | "invoice" | "orderStatusHistory" | "payment" | "review" | "visualizerScene" | "visualizerDesign" | "forgetPasswordRequest" | "visualizerDesignItem" | "project" | "projectTile" | "testimonial" | "catalogue" | "role" | "contactMessage" | "contactEmailDelivery" | "mediaFile" | "mediaFolder"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3856,6 +3888,72 @@ export namespace Prisma {
           }
         }
       }
+      SavedCustomer: {
+        payload: Prisma.$SavedCustomerPayload<ExtArgs>
+        fields: Prisma.SavedCustomerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SavedCustomerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SavedCustomerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          findFirst: {
+            args: Prisma.SavedCustomerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SavedCustomerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          findMany: {
+            args: Prisma.SavedCustomerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>[]
+          }
+          create: {
+            args: Prisma.SavedCustomerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          createMany: {
+            args: Prisma.SavedCustomerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.SavedCustomerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          update: {
+            args: Prisma.SavedCustomerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          deleteMany: {
+            args: Prisma.SavedCustomerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SavedCustomerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SavedCustomerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedCustomerPayload>
+          }
+          aggregate: {
+            args: Prisma.SavedCustomerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSavedCustomer>
+          }
+          groupBy: {
+            args: Prisma.SavedCustomerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SavedCustomerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SavedCustomerCountArgs<ExtArgs>
+            result: $Utils.Optional<SavedCustomerCountAggregateOutputType> | number
+          }
+        }
+      }
       OrderItem: {
         payload: Prisma.$OrderItemPayload<ExtArgs>
         fields: Prisma.OrderItemFieldRefs
@@ -4978,6 +5076,72 @@ export namespace Prisma {
           }
         }
       }
+      MediaFolder: {
+        payload: Prisma.$MediaFolderPayload<ExtArgs>
+        fields: Prisma.MediaFolderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MediaFolderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MediaFolderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          findFirst: {
+            args: Prisma.MediaFolderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MediaFolderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          findMany: {
+            args: Prisma.MediaFolderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>[]
+          }
+          create: {
+            args: Prisma.MediaFolderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          createMany: {
+            args: Prisma.MediaFolderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MediaFolderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          update: {
+            args: Prisma.MediaFolderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          deleteMany: {
+            args: Prisma.MediaFolderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MediaFolderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MediaFolderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MediaFolderPayload>
+          }
+          aggregate: {
+            args: Prisma.MediaFolderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMediaFolder>
+          }
+          groupBy: {
+            args: Prisma.MediaFolderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MediaFolderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MediaFolderCountArgs<ExtArgs>
+            result: $Utils.Optional<MediaFolderCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -5135,6 +5299,7 @@ export namespace Prisma {
     deliveryZone?: DeliveryZoneOmit
     coupon?: CouponOmit
     order?: OrderOmit
+    savedCustomer?: SavedCustomerOmit
     orderItem?: OrderItemOmit
     invoice?: InvoiceOmit
     orderStatusHistory?: OrderStatusHistoryOmit
@@ -5152,6 +5317,7 @@ export namespace Prisma {
     contactMessage?: ContactMessageOmit
     contactEmailDelivery?: ContactEmailDeliveryOmit
     mediaFile?: MediaFileOmit
+    mediaFolder?: MediaFolderOmit
   }
 
   /* Types for Logging */
@@ -6008,6 +6174,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type SavedCustomerCountOutputType
+   */
+
+  export type SavedCustomerCountOutputType = {
+    orders: number
+  }
+
+  export type SavedCustomerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | SavedCustomerCountOutputTypeCountOrdersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SavedCustomerCountOutputType without action
+   */
+  export type SavedCustomerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomerCountOutputType
+     */
+    select?: SavedCustomerCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SavedCustomerCountOutputType without action
+   */
+  export type SavedCustomerCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
+
+  /**
    * Count Type VisualizerSceneCountOutputType
    */
 
@@ -6159,6 +6356,37 @@ export namespace Prisma {
    */
   export type ContactMessageCountOutputTypeCountEmailDeliveriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ContactEmailDeliveryWhereInput
+  }
+
+
+  /**
+   * Count Type MediaFolderCountOutputType
+   */
+
+  export type MediaFolderCountOutputType = {
+    files: number
+  }
+
+  export type MediaFolderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    files?: boolean | MediaFolderCountOutputTypeCountFilesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MediaFolderCountOutputType without action
+   */
+  export type MediaFolderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolderCountOutputType
+     */
+    select?: MediaFolderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MediaFolderCountOutputType without action
+   */
+  export type MediaFolderCountOutputTypeCountFilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MediaFileWhereInput
   }
 
 
@@ -41415,6 +41643,7 @@ export namespace Prisma {
   export type OrderAvgAggregateOutputType = {
     id: number | null
     userId: number | null
+    savedCustomerId: number | null
     subtotal: Decimal | null
     discountTotal: Decimal | null
     shippingFee: Decimal | null
@@ -41427,6 +41656,7 @@ export namespace Prisma {
   export type OrderSumAggregateOutputType = {
     id: number | null
     userId: number | null
+    savedCustomerId: number | null
     subtotal: Decimal | null
     discountTotal: Decimal | null
     shippingFee: Decimal | null
@@ -41440,6 +41670,7 @@ export namespace Prisma {
     id: number | null
     orderNumber: string | null
     userId: number | null
+    savedCustomerId: number | null
     guestEmail: string | null
     guestPhone: string | null
     tin: string | null
@@ -41475,6 +41706,7 @@ export namespace Prisma {
     id: number | null
     orderNumber: string | null
     userId: number | null
+    savedCustomerId: number | null
     guestEmail: string | null
     guestPhone: string | null
     tin: string | null
@@ -41510,6 +41742,7 @@ export namespace Prisma {
     id: number
     orderNumber: number
     userId: number
+    savedCustomerId: number
     guestEmail: number
     guestPhone: number
     tin: number
@@ -41546,6 +41779,7 @@ export namespace Prisma {
   export type OrderAvgAggregateInputType = {
     id?: true
     userId?: true
+    savedCustomerId?: true
     subtotal?: true
     discountTotal?: true
     shippingFee?: true
@@ -41558,6 +41792,7 @@ export namespace Prisma {
   export type OrderSumAggregateInputType = {
     id?: true
     userId?: true
+    savedCustomerId?: true
     subtotal?: true
     discountTotal?: true
     shippingFee?: true
@@ -41571,6 +41806,7 @@ export namespace Prisma {
     id?: true
     orderNumber?: true
     userId?: true
+    savedCustomerId?: true
     guestEmail?: true
     guestPhone?: true
     tin?: true
@@ -41606,6 +41842,7 @@ export namespace Prisma {
     id?: true
     orderNumber?: true
     userId?: true
+    savedCustomerId?: true
     guestEmail?: true
     guestPhone?: true
     tin?: true
@@ -41641,6 +41878,7 @@ export namespace Prisma {
     id?: true
     orderNumber?: true
     userId?: true
+    savedCustomerId?: true
     guestEmail?: true
     guestPhone?: true
     tin?: true
@@ -41763,6 +42001,7 @@ export namespace Prisma {
     id: number
     orderNumber: string
     userId: number | null
+    savedCustomerId: number | null
     guestEmail: string | null
     guestPhone: string | null
     tin: string | null
@@ -41817,6 +42056,7 @@ export namespace Prisma {
     id?: boolean
     orderNumber?: boolean
     userId?: boolean
+    savedCustomerId?: boolean
     guestEmail?: boolean
     guestPhone?: boolean
     tin?: boolean
@@ -41847,6 +42087,7 @@ export namespace Prisma {
     cancelledAt?: boolean
     updatedAt?: boolean
     user?: boolean | Order$userArgs<ExtArgs>
+    savedCustomer?: boolean | Order$savedCustomerArgs<ExtArgs>
     coupon?: boolean | Order$couponArgs<ExtArgs>
     deliveryZone?: boolean | Order$deliveryZoneArgs<ExtArgs>
     items?: boolean | Order$itemsArgs<ExtArgs>
@@ -41862,6 +42103,7 @@ export namespace Prisma {
     id?: boolean
     orderNumber?: boolean
     userId?: boolean
+    savedCustomerId?: boolean
     guestEmail?: boolean
     guestPhone?: boolean
     tin?: boolean
@@ -41893,9 +42135,10 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "userId" | "guestEmail" | "guestPhone" | "tin" | "status" | "paymentStatus" | "fulfillment" | "subtotal" | "discountTotal" | "shippingFee" | "taxTotal" | "grandTotal" | "currency" | "couponId" | "deliveryZoneId" | "shipFullName" | "shipPhone" | "shipProvince" | "shipDistrict" | "shipSector" | "shipStreet" | "shipNotes" | "customerNote" | "internalNote" | "placedAt" | "paidAt" | "shippedAt" | "deliveredAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "userId" | "savedCustomerId" | "guestEmail" | "guestPhone" | "tin" | "status" | "paymentStatus" | "fulfillment" | "subtotal" | "discountTotal" | "shippingFee" | "taxTotal" | "grandTotal" | "currency" | "couponId" | "deliveryZoneId" | "shipFullName" | "shipPhone" | "shipProvince" | "shipDistrict" | "shipSector" | "shipStreet" | "shipNotes" | "customerNote" | "internalNote" | "placedAt" | "paidAt" | "shippedAt" | "deliveredAt" | "cancelledAt" | "updatedAt", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Order$userArgs<ExtArgs>
+    savedCustomer?: boolean | Order$savedCustomerArgs<ExtArgs>
     coupon?: boolean | Order$couponArgs<ExtArgs>
     deliveryZone?: boolean | Order$deliveryZoneArgs<ExtArgs>
     items?: boolean | Order$itemsArgs<ExtArgs>
@@ -41909,6 +42152,7 @@ export namespace Prisma {
     name: "Order"
     objects: {
       user: Prisma.$UserPayload<ExtArgs> | null
+      savedCustomer: Prisma.$SavedCustomerPayload<ExtArgs> | null
       coupon: Prisma.$CouponPayload<ExtArgs> | null
       deliveryZone: Prisma.$DeliveryZonePayload<ExtArgs> | null
       items: Prisma.$OrderItemPayload<ExtArgs>[]
@@ -41920,6 +42164,7 @@ export namespace Prisma {
       id: number
       orderNumber: string
       userId: number | null
+      savedCustomerId: number | null
       guestEmail: string | null
       guestPhone: string | null
       tin: string | null
@@ -42290,6 +42535,7 @@ export namespace Prisma {
   export interface Prisma__OrderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends Order$userArgs<ExtArgs> = {}>(args?: Subset<T, Order$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    savedCustomer<T extends Order$savedCustomerArgs<ExtArgs> = {}>(args?: Subset<T, Order$savedCustomerArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     coupon<T extends Order$couponArgs<ExtArgs> = {}>(args?: Subset<T, Order$couponArgs<ExtArgs>>): Prisma__CouponClient<$Result.GetResult<Prisma.$CouponPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     deliveryZone<T extends Order$deliveryZoneArgs<ExtArgs> = {}>(args?: Subset<T, Order$deliveryZoneArgs<ExtArgs>>): Prisma__DeliveryZoneClient<$Result.GetResult<Prisma.$DeliveryZonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     items<T extends Order$itemsArgs<ExtArgs> = {}>(args?: Subset<T, Order$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -42328,6 +42574,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Order", 'Int'>
     readonly orderNumber: FieldRef<"Order", 'String'>
     readonly userId: FieldRef<"Order", 'Int'>
+    readonly savedCustomerId: FieldRef<"Order", 'Int'>
     readonly guestEmail: FieldRef<"Order", 'String'>
     readonly guestPhone: FieldRef<"Order", 'String'>
     readonly tin: FieldRef<"Order", 'String'>
@@ -42724,6 +42971,25 @@ export namespace Prisma {
   }
 
   /**
+   * Order.savedCustomer
+   */
+  export type Order$savedCustomerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    where?: SavedCustomerWhereInput
+  }
+
+  /**
    * Order.coupon
    */
   export type Order$couponArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -42873,6 +43139,1033 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: OrderInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SavedCustomer
+   */
+
+  export type AggregateSavedCustomer = {
+    _count: SavedCustomerCountAggregateOutputType | null
+    _avg: SavedCustomerAvgAggregateOutputType | null
+    _sum: SavedCustomerSumAggregateOutputType | null
+    _min: SavedCustomerMinAggregateOutputType | null
+    _max: SavedCustomerMaxAggregateOutputType | null
+  }
+
+  export type SavedCustomerAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type SavedCustomerSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type SavedCustomerMinAggregateOutputType = {
+    id: number | null
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    phoneNumber: string | null
+    tin: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SavedCustomerMaxAggregateOutputType = {
+    id: number | null
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    phoneNumber: string | null
+    tin: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SavedCustomerCountAggregateOutputType = {
+    id: number
+    firstName: number
+    lastName: number
+    email: number
+    phoneNumber: number
+    tin: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SavedCustomerAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type SavedCustomerSumAggregateInputType = {
+    id?: true
+  }
+
+  export type SavedCustomerMinAggregateInputType = {
+    id?: true
+    firstName?: true
+    lastName?: true
+    email?: true
+    phoneNumber?: true
+    tin?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SavedCustomerMaxAggregateInputType = {
+    id?: true
+    firstName?: true
+    lastName?: true
+    email?: true
+    phoneNumber?: true
+    tin?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SavedCustomerCountAggregateInputType = {
+    id?: true
+    firstName?: true
+    lastName?: true
+    email?: true
+    phoneNumber?: true
+    tin?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SavedCustomerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedCustomer to aggregate.
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedCustomers to fetch.
+     */
+    orderBy?: SavedCustomerOrderByWithRelationInput | SavedCustomerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SavedCustomerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedCustomers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedCustomers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SavedCustomers
+    **/
+    _count?: true | SavedCustomerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SavedCustomerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SavedCustomerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SavedCustomerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SavedCustomerMaxAggregateInputType
+  }
+
+  export type GetSavedCustomerAggregateType<T extends SavedCustomerAggregateArgs> = {
+        [P in keyof T & keyof AggregateSavedCustomer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSavedCustomer[P]>
+      : GetScalarType<T[P], AggregateSavedCustomer[P]>
+  }
+
+
+
+
+  export type SavedCustomerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedCustomerWhereInput
+    orderBy?: SavedCustomerOrderByWithAggregationInput | SavedCustomerOrderByWithAggregationInput[]
+    by: SavedCustomerScalarFieldEnum[] | SavedCustomerScalarFieldEnum
+    having?: SavedCustomerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SavedCustomerCountAggregateInputType | true
+    _avg?: SavedCustomerAvgAggregateInputType
+    _sum?: SavedCustomerSumAggregateInputType
+    _min?: SavedCustomerMinAggregateInputType
+    _max?: SavedCustomerMaxAggregateInputType
+  }
+
+  export type SavedCustomerGroupByOutputType = {
+    id: number
+    firstName: string
+    lastName: string | null
+    email: string | null
+    phoneNumber: string
+    tin: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SavedCustomerCountAggregateOutputType | null
+    _avg: SavedCustomerAvgAggregateOutputType | null
+    _sum: SavedCustomerSumAggregateOutputType | null
+    _min: SavedCustomerMinAggregateOutputType | null
+    _max: SavedCustomerMaxAggregateOutputType | null
+  }
+
+  type GetSavedCustomerGroupByPayload<T extends SavedCustomerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SavedCustomerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SavedCustomerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SavedCustomerGroupByOutputType[P]>
+            : GetScalarType<T[P], SavedCustomerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SavedCustomerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    email?: boolean
+    phoneNumber?: boolean
+    tin?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    orders?: boolean | SavedCustomer$ordersArgs<ExtArgs>
+    _count?: boolean | SavedCustomerCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedCustomer"]>
+
+
+
+  export type SavedCustomerSelectScalar = {
+    id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    email?: boolean
+    phoneNumber?: boolean
+    tin?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SavedCustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "phoneNumber" | "tin" | "createdAt" | "updatedAt", ExtArgs["result"]["savedCustomer"]>
+  export type SavedCustomerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | SavedCustomer$ordersArgs<ExtArgs>
+    _count?: boolean | SavedCustomerCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $SavedCustomerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SavedCustomer"
+    objects: {
+      orders: Prisma.$OrderPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      firstName: string
+      lastName: string | null
+      email: string | null
+      phoneNumber: string
+      tin: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["savedCustomer"]>
+    composites: {}
+  }
+
+  type SavedCustomerGetPayload<S extends boolean | null | undefined | SavedCustomerDefaultArgs> = $Result.GetResult<Prisma.$SavedCustomerPayload, S>
+
+  type SavedCustomerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SavedCustomerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SavedCustomerCountAggregateInputType | true
+    }
+
+  export interface SavedCustomerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SavedCustomer'], meta: { name: 'SavedCustomer' } }
+    /**
+     * Find zero or one SavedCustomer that matches the filter.
+     * @param {SavedCustomerFindUniqueArgs} args - Arguments to find a SavedCustomer
+     * @example
+     * // Get one SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SavedCustomerFindUniqueArgs>(args: SelectSubset<T, SavedCustomerFindUniqueArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SavedCustomer that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SavedCustomerFindUniqueOrThrowArgs} args - Arguments to find a SavedCustomer
+     * @example
+     * // Get one SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SavedCustomerFindUniqueOrThrowArgs>(args: SelectSubset<T, SavedCustomerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedCustomer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerFindFirstArgs} args - Arguments to find a SavedCustomer
+     * @example
+     * // Get one SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SavedCustomerFindFirstArgs>(args?: SelectSubset<T, SavedCustomerFindFirstArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedCustomer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerFindFirstOrThrowArgs} args - Arguments to find a SavedCustomer
+     * @example
+     * // Get one SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SavedCustomerFindFirstOrThrowArgs>(args?: SelectSubset<T, SavedCustomerFindFirstOrThrowArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SavedCustomers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SavedCustomers
+     * const savedCustomers = await prisma.savedCustomer.findMany()
+     * 
+     * // Get first 10 SavedCustomers
+     * const savedCustomers = await prisma.savedCustomer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const savedCustomerWithIdOnly = await prisma.savedCustomer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SavedCustomerFindManyArgs>(args?: SelectSubset<T, SavedCustomerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SavedCustomer.
+     * @param {SavedCustomerCreateArgs} args - Arguments to create a SavedCustomer.
+     * @example
+     * // Create one SavedCustomer
+     * const SavedCustomer = await prisma.savedCustomer.create({
+     *   data: {
+     *     // ... data to create a SavedCustomer
+     *   }
+     * })
+     * 
+     */
+    create<T extends SavedCustomerCreateArgs>(args: SelectSubset<T, SavedCustomerCreateArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SavedCustomers.
+     * @param {SavedCustomerCreateManyArgs} args - Arguments to create many SavedCustomers.
+     * @example
+     * // Create many SavedCustomers
+     * const savedCustomer = await prisma.savedCustomer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SavedCustomerCreateManyArgs>(args?: SelectSubset<T, SavedCustomerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a SavedCustomer.
+     * @param {SavedCustomerDeleteArgs} args - Arguments to delete one SavedCustomer.
+     * @example
+     * // Delete one SavedCustomer
+     * const SavedCustomer = await prisma.savedCustomer.delete({
+     *   where: {
+     *     // ... filter to delete one SavedCustomer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SavedCustomerDeleteArgs>(args: SelectSubset<T, SavedCustomerDeleteArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SavedCustomer.
+     * @param {SavedCustomerUpdateArgs} args - Arguments to update one SavedCustomer.
+     * @example
+     * // Update one SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SavedCustomerUpdateArgs>(args: SelectSubset<T, SavedCustomerUpdateArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SavedCustomers.
+     * @param {SavedCustomerDeleteManyArgs} args - Arguments to filter SavedCustomers to delete.
+     * @example
+     * // Delete a few SavedCustomers
+     * const { count } = await prisma.savedCustomer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SavedCustomerDeleteManyArgs>(args?: SelectSubset<T, SavedCustomerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SavedCustomers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SavedCustomers
+     * const savedCustomer = await prisma.savedCustomer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SavedCustomerUpdateManyArgs>(args: SelectSubset<T, SavedCustomerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one SavedCustomer.
+     * @param {SavedCustomerUpsertArgs} args - Arguments to update or create a SavedCustomer.
+     * @example
+     * // Update or create a SavedCustomer
+     * const savedCustomer = await prisma.savedCustomer.upsert({
+     *   create: {
+     *     // ... data to create a SavedCustomer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SavedCustomer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SavedCustomerUpsertArgs>(args: SelectSubset<T, SavedCustomerUpsertArgs<ExtArgs>>): Prisma__SavedCustomerClient<$Result.GetResult<Prisma.$SavedCustomerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SavedCustomers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerCountArgs} args - Arguments to filter SavedCustomers to count.
+     * @example
+     * // Count the number of SavedCustomers
+     * const count = await prisma.savedCustomer.count({
+     *   where: {
+     *     // ... the filter for the SavedCustomers we want to count
+     *   }
+     * })
+    **/
+    count<T extends SavedCustomerCountArgs>(
+      args?: Subset<T, SavedCustomerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SavedCustomerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SavedCustomer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SavedCustomerAggregateArgs>(args: Subset<T, SavedCustomerAggregateArgs>): Prisma.PrismaPromise<GetSavedCustomerAggregateType<T>>
+
+    /**
+     * Group by SavedCustomer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedCustomerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SavedCustomerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SavedCustomerGroupByArgs['orderBy'] }
+        : { orderBy?: SavedCustomerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SavedCustomerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSavedCustomerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SavedCustomer model
+   */
+  readonly fields: SavedCustomerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SavedCustomer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SavedCustomerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    orders<T extends SavedCustomer$ordersArgs<ExtArgs> = {}>(args?: Subset<T, SavedCustomer$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SavedCustomer model
+   */
+  interface SavedCustomerFieldRefs {
+    readonly id: FieldRef<"SavedCustomer", 'Int'>
+    readonly firstName: FieldRef<"SavedCustomer", 'String'>
+    readonly lastName: FieldRef<"SavedCustomer", 'String'>
+    readonly email: FieldRef<"SavedCustomer", 'String'>
+    readonly phoneNumber: FieldRef<"SavedCustomer", 'String'>
+    readonly tin: FieldRef<"SavedCustomer", 'String'>
+    readonly createdAt: FieldRef<"SavedCustomer", 'DateTime'>
+    readonly updatedAt: FieldRef<"SavedCustomer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SavedCustomer findUnique
+   */
+  export type SavedCustomerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedCustomer to fetch.
+     */
+    where: SavedCustomerWhereUniqueInput
+  }
+
+  /**
+   * SavedCustomer findUniqueOrThrow
+   */
+  export type SavedCustomerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedCustomer to fetch.
+     */
+    where: SavedCustomerWhereUniqueInput
+  }
+
+  /**
+   * SavedCustomer findFirst
+   */
+  export type SavedCustomerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedCustomer to fetch.
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedCustomers to fetch.
+     */
+    orderBy?: SavedCustomerOrderByWithRelationInput | SavedCustomerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedCustomers.
+     */
+    cursor?: SavedCustomerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedCustomers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedCustomers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedCustomers.
+     */
+    distinct?: SavedCustomerScalarFieldEnum | SavedCustomerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedCustomer findFirstOrThrow
+   */
+  export type SavedCustomerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedCustomer to fetch.
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedCustomers to fetch.
+     */
+    orderBy?: SavedCustomerOrderByWithRelationInput | SavedCustomerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedCustomers.
+     */
+    cursor?: SavedCustomerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedCustomers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedCustomers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedCustomers.
+     */
+    distinct?: SavedCustomerScalarFieldEnum | SavedCustomerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedCustomer findMany
+   */
+  export type SavedCustomerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedCustomers to fetch.
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedCustomers to fetch.
+     */
+    orderBy?: SavedCustomerOrderByWithRelationInput | SavedCustomerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SavedCustomers.
+     */
+    cursor?: SavedCustomerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedCustomers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedCustomers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedCustomers.
+     */
+    distinct?: SavedCustomerScalarFieldEnum | SavedCustomerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedCustomer create
+   */
+  export type SavedCustomerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SavedCustomer.
+     */
+    data: XOR<SavedCustomerCreateInput, SavedCustomerUncheckedCreateInput>
+  }
+
+  /**
+   * SavedCustomer createMany
+   */
+  export type SavedCustomerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SavedCustomers.
+     */
+    data: SavedCustomerCreateManyInput | SavedCustomerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SavedCustomer update
+   */
+  export type SavedCustomerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SavedCustomer.
+     */
+    data: XOR<SavedCustomerUpdateInput, SavedCustomerUncheckedUpdateInput>
+    /**
+     * Choose, which SavedCustomer to update.
+     */
+    where: SavedCustomerWhereUniqueInput
+  }
+
+  /**
+   * SavedCustomer updateMany
+   */
+  export type SavedCustomerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SavedCustomers.
+     */
+    data: XOR<SavedCustomerUpdateManyMutationInput, SavedCustomerUncheckedUpdateManyInput>
+    /**
+     * Filter which SavedCustomers to update
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * Limit how many SavedCustomers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedCustomer upsert
+   */
+  export type SavedCustomerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SavedCustomer to update in case it exists.
+     */
+    where: SavedCustomerWhereUniqueInput
+    /**
+     * In case the SavedCustomer found by the `where` argument doesn't exist, create a new SavedCustomer with this data.
+     */
+    create: XOR<SavedCustomerCreateInput, SavedCustomerUncheckedCreateInput>
+    /**
+     * In case the SavedCustomer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SavedCustomerUpdateInput, SavedCustomerUncheckedUpdateInput>
+  }
+
+  /**
+   * SavedCustomer delete
+   */
+  export type SavedCustomerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
+    /**
+     * Filter which SavedCustomer to delete.
+     */
+    where: SavedCustomerWhereUniqueInput
+  }
+
+  /**
+   * SavedCustomer deleteMany
+   */
+  export type SavedCustomerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedCustomers to delete
+     */
+    where?: SavedCustomerWhereInput
+    /**
+     * Limit how many SavedCustomers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedCustomer.orders
+   */
+  export type SavedCustomer$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * SavedCustomer without action
+   */
+  export type SavedCustomerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedCustomer
+     */
+    select?: SavedCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedCustomer
+     */
+    omit?: SavedCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedCustomerInclude<ExtArgs> | null
   }
 
 
@@ -59465,12 +60758,14 @@ export namespace Prisma {
   export type MediaFileAvgAggregateOutputType = {
     id: number | null
     size: number | null
+    folderId: number | null
     uploadedById: number | null
   }
 
   export type MediaFileSumAggregateOutputType = {
     id: number | null
     size: number | null
+    folderId: number | null
     uploadedById: number | null
   }
 
@@ -59483,6 +60778,8 @@ export namespace Prisma {
     mimeType: string | null
     size: number | null
     alt: string | null
+    isPublic: boolean | null
+    folderId: number | null
     uploadedById: number | null
     createdAt: Date | null
   }
@@ -59496,6 +60793,8 @@ export namespace Prisma {
     mimeType: string | null
     size: number | null
     alt: string | null
+    isPublic: boolean | null
+    folderId: number | null
     uploadedById: number | null
     createdAt: Date | null
   }
@@ -59509,6 +60808,8 @@ export namespace Prisma {
     mimeType: number
     size: number
     alt: number
+    isPublic: number
+    folderId: number
     uploadedById: number
     createdAt: number
     _all: number
@@ -59518,12 +60819,14 @@ export namespace Prisma {
   export type MediaFileAvgAggregateInputType = {
     id?: true
     size?: true
+    folderId?: true
     uploadedById?: true
   }
 
   export type MediaFileSumAggregateInputType = {
     id?: true
     size?: true
+    folderId?: true
     uploadedById?: true
   }
 
@@ -59536,6 +60839,8 @@ export namespace Prisma {
     mimeType?: true
     size?: true
     alt?: true
+    isPublic?: true
+    folderId?: true
     uploadedById?: true
     createdAt?: true
   }
@@ -59549,6 +60854,8 @@ export namespace Prisma {
     mimeType?: true
     size?: true
     alt?: true
+    isPublic?: true
+    folderId?: true
     uploadedById?: true
     createdAt?: true
   }
@@ -59562,6 +60869,8 @@ export namespace Prisma {
     mimeType?: true
     size?: true
     alt?: true
+    isPublic?: true
+    folderId?: true
     uploadedById?: true
     createdAt?: true
     _all?: true
@@ -59662,6 +60971,8 @@ export namespace Prisma {
     mimeType: string
     size: number
     alt: string | null
+    isPublic: boolean
+    folderId: number | null
     uploadedById: number | null
     createdAt: Date
     _count: MediaFileCountAggregateOutputType | null
@@ -59694,8 +61005,11 @@ export namespace Prisma {
     mimeType?: boolean
     size?: boolean
     alt?: boolean
+    isPublic?: boolean
+    folderId?: boolean
     uploadedById?: boolean
     createdAt?: boolean
+    folder?: boolean | MediaFile$folderArgs<ExtArgs>
   }, ExtArgs["result"]["mediaFile"]>
 
 
@@ -59709,15 +61023,22 @@ export namespace Prisma {
     mimeType?: boolean
     size?: boolean
     alt?: boolean
+    isPublic?: boolean
+    folderId?: boolean
     uploadedById?: boolean
     createdAt?: boolean
   }
 
-  export type MediaFileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "originalName" | "url" | "kind" | "mimeType" | "size" | "alt" | "uploadedById" | "createdAt", ExtArgs["result"]["mediaFile"]>
+  export type MediaFileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "originalName" | "url" | "kind" | "mimeType" | "size" | "alt" | "isPublic" | "folderId" | "uploadedById" | "createdAt", ExtArgs["result"]["mediaFile"]>
+  export type MediaFileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    folder?: boolean | MediaFile$folderArgs<ExtArgs>
+  }
 
   export type $MediaFilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "MediaFile"
-    objects: {}
+    objects: {
+      folder: Prisma.$MediaFolderPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       name: string
@@ -59727,6 +61048,8 @@ export namespace Prisma {
       mimeType: string
       size: number
       alt: string | null
+      isPublic: boolean
+      folderId: number | null
       uploadedById: number | null
       createdAt: Date
     }, ExtArgs["result"]["mediaFile"]>
@@ -60069,6 +61392,7 @@ export namespace Prisma {
    */
   export interface Prisma__MediaFileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    folder<T extends MediaFile$folderArgs<ExtArgs> = {}>(args?: Subset<T, MediaFile$folderArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -60106,6 +61430,8 @@ export namespace Prisma {
     readonly mimeType: FieldRef<"MediaFile", 'String'>
     readonly size: FieldRef<"MediaFile", 'Int'>
     readonly alt: FieldRef<"MediaFile", 'String'>
+    readonly isPublic: FieldRef<"MediaFile", 'Boolean'>
+    readonly folderId: FieldRef<"MediaFile", 'Int'>
     readonly uploadedById: FieldRef<"MediaFile", 'Int'>
     readonly createdAt: FieldRef<"MediaFile", 'DateTime'>
   }
@@ -60125,6 +61451,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * Filter, which MediaFile to fetch.
      */
     where: MediaFileWhereUniqueInput
@@ -60143,6 +61473,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * Filter, which MediaFile to fetch.
      */
     where: MediaFileWhereUniqueInput
@@ -60160,6 +61494,10 @@ export namespace Prisma {
      * Omit specific fields from the MediaFile
      */
     omit?: MediaFileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
     /**
      * Filter, which MediaFile to fetch.
      */
@@ -60209,6 +61547,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * Filter, which MediaFile to fetch.
      */
     where?: MediaFileWhereInput
@@ -60256,6 +61598,10 @@ export namespace Prisma {
      * Omit specific fields from the MediaFile
      */
     omit?: MediaFileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
     /**
      * Filter, which MediaFiles to fetch.
      */
@@ -60305,6 +61651,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * The data needed to create a MediaFile.
      */
     data: XOR<MediaFileCreateInput, MediaFileUncheckedCreateInput>
@@ -60333,6 +61683,10 @@ export namespace Prisma {
      * Omit specific fields from the MediaFile
      */
     omit?: MediaFileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
     /**
      * The data needed to update a MediaFile.
      */
@@ -60374,6 +61728,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * The filter to search for the MediaFile to update in case it exists.
      */
     where: MediaFileWhereUniqueInput
@@ -60400,6 +61758,10 @@ export namespace Prisma {
      */
     omit?: MediaFileOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    /**
      * Filter which MediaFile to delete.
      */
     where: MediaFileWhereUniqueInput
@@ -60420,6 +61782,25 @@ export namespace Prisma {
   }
 
   /**
+   * MediaFile.folder
+   */
+  export type MediaFile$folderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    where?: MediaFolderWhereInput
+  }
+
+  /**
    * MediaFile without action
    */
   export type MediaFileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -60431,6 +61812,982 @@ export namespace Prisma {
      * Omit specific fields from the MediaFile
      */
     omit?: MediaFileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MediaFolder
+   */
+
+  export type AggregateMediaFolder = {
+    _count: MediaFolderCountAggregateOutputType | null
+    _avg: MediaFolderAvgAggregateOutputType | null
+    _sum: MediaFolderSumAggregateOutputType | null
+    _min: MediaFolderMinAggregateOutputType | null
+    _max: MediaFolderMaxAggregateOutputType | null
+  }
+
+  export type MediaFolderAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MediaFolderSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MediaFolderMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type MediaFolderMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type MediaFolderCountAggregateOutputType = {
+    id: number
+    name: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MediaFolderAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type MediaFolderSumAggregateInputType = {
+    id?: true
+  }
+
+  export type MediaFolderMinAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type MediaFolderMaxAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type MediaFolderCountAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MediaFolderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MediaFolder to aggregate.
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MediaFolders to fetch.
+     */
+    orderBy?: MediaFolderOrderByWithRelationInput | MediaFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MediaFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MediaFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MediaFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MediaFolders
+    **/
+    _count?: true | MediaFolderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MediaFolderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MediaFolderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MediaFolderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MediaFolderMaxAggregateInputType
+  }
+
+  export type GetMediaFolderAggregateType<T extends MediaFolderAggregateArgs> = {
+        [P in keyof T & keyof AggregateMediaFolder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMediaFolder[P]>
+      : GetScalarType<T[P], AggregateMediaFolder[P]>
+  }
+
+
+
+
+  export type MediaFolderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MediaFolderWhereInput
+    orderBy?: MediaFolderOrderByWithAggregationInput | MediaFolderOrderByWithAggregationInput[]
+    by: MediaFolderScalarFieldEnum[] | MediaFolderScalarFieldEnum
+    having?: MediaFolderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MediaFolderCountAggregateInputType | true
+    _avg?: MediaFolderAvgAggregateInputType
+    _sum?: MediaFolderSumAggregateInputType
+    _min?: MediaFolderMinAggregateInputType
+    _max?: MediaFolderMaxAggregateInputType
+  }
+
+  export type MediaFolderGroupByOutputType = {
+    id: number
+    name: string
+    createdAt: Date
+    _count: MediaFolderCountAggregateOutputType | null
+    _avg: MediaFolderAvgAggregateOutputType | null
+    _sum: MediaFolderSumAggregateOutputType | null
+    _min: MediaFolderMinAggregateOutputType | null
+    _max: MediaFolderMaxAggregateOutputType | null
+  }
+
+  type GetMediaFolderGroupByPayload<T extends MediaFolderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MediaFolderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MediaFolderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MediaFolderGroupByOutputType[P]>
+            : GetScalarType<T[P], MediaFolderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MediaFolderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    files?: boolean | MediaFolder$filesArgs<ExtArgs>
+    _count?: boolean | MediaFolderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mediaFolder"]>
+
+
+
+  export type MediaFolderSelectScalar = {
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+  }
+
+  export type MediaFolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "createdAt", ExtArgs["result"]["mediaFolder"]>
+  export type MediaFolderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    files?: boolean | MediaFolder$filesArgs<ExtArgs>
+    _count?: boolean | MediaFolderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $MediaFolderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MediaFolder"
+    objects: {
+      files: Prisma.$MediaFilePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      createdAt: Date
+    }, ExtArgs["result"]["mediaFolder"]>
+    composites: {}
+  }
+
+  type MediaFolderGetPayload<S extends boolean | null | undefined | MediaFolderDefaultArgs> = $Result.GetResult<Prisma.$MediaFolderPayload, S>
+
+  type MediaFolderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MediaFolderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MediaFolderCountAggregateInputType | true
+    }
+
+  export interface MediaFolderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MediaFolder'], meta: { name: 'MediaFolder' } }
+    /**
+     * Find zero or one MediaFolder that matches the filter.
+     * @param {MediaFolderFindUniqueArgs} args - Arguments to find a MediaFolder
+     * @example
+     * // Get one MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MediaFolderFindUniqueArgs>(args: SelectSubset<T, MediaFolderFindUniqueArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MediaFolder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MediaFolderFindUniqueOrThrowArgs} args - Arguments to find a MediaFolder
+     * @example
+     * // Get one MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MediaFolderFindUniqueOrThrowArgs>(args: SelectSubset<T, MediaFolderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MediaFolder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderFindFirstArgs} args - Arguments to find a MediaFolder
+     * @example
+     * // Get one MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MediaFolderFindFirstArgs>(args?: SelectSubset<T, MediaFolderFindFirstArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MediaFolder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderFindFirstOrThrowArgs} args - Arguments to find a MediaFolder
+     * @example
+     * // Get one MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MediaFolderFindFirstOrThrowArgs>(args?: SelectSubset<T, MediaFolderFindFirstOrThrowArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MediaFolders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MediaFolders
+     * const mediaFolders = await prisma.mediaFolder.findMany()
+     * 
+     * // Get first 10 MediaFolders
+     * const mediaFolders = await prisma.mediaFolder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mediaFolderWithIdOnly = await prisma.mediaFolder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MediaFolderFindManyArgs>(args?: SelectSubset<T, MediaFolderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MediaFolder.
+     * @param {MediaFolderCreateArgs} args - Arguments to create a MediaFolder.
+     * @example
+     * // Create one MediaFolder
+     * const MediaFolder = await prisma.mediaFolder.create({
+     *   data: {
+     *     // ... data to create a MediaFolder
+     *   }
+     * })
+     * 
+     */
+    create<T extends MediaFolderCreateArgs>(args: SelectSubset<T, MediaFolderCreateArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MediaFolders.
+     * @param {MediaFolderCreateManyArgs} args - Arguments to create many MediaFolders.
+     * @example
+     * // Create many MediaFolders
+     * const mediaFolder = await prisma.mediaFolder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MediaFolderCreateManyArgs>(args?: SelectSubset<T, MediaFolderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a MediaFolder.
+     * @param {MediaFolderDeleteArgs} args - Arguments to delete one MediaFolder.
+     * @example
+     * // Delete one MediaFolder
+     * const MediaFolder = await prisma.mediaFolder.delete({
+     *   where: {
+     *     // ... filter to delete one MediaFolder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MediaFolderDeleteArgs>(args: SelectSubset<T, MediaFolderDeleteArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MediaFolder.
+     * @param {MediaFolderUpdateArgs} args - Arguments to update one MediaFolder.
+     * @example
+     * // Update one MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MediaFolderUpdateArgs>(args: SelectSubset<T, MediaFolderUpdateArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MediaFolders.
+     * @param {MediaFolderDeleteManyArgs} args - Arguments to filter MediaFolders to delete.
+     * @example
+     * // Delete a few MediaFolders
+     * const { count } = await prisma.mediaFolder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MediaFolderDeleteManyArgs>(args?: SelectSubset<T, MediaFolderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MediaFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MediaFolders
+     * const mediaFolder = await prisma.mediaFolder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MediaFolderUpdateManyArgs>(args: SelectSubset<T, MediaFolderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MediaFolder.
+     * @param {MediaFolderUpsertArgs} args - Arguments to update or create a MediaFolder.
+     * @example
+     * // Update or create a MediaFolder
+     * const mediaFolder = await prisma.mediaFolder.upsert({
+     *   create: {
+     *     // ... data to create a MediaFolder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MediaFolder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MediaFolderUpsertArgs>(args: SelectSubset<T, MediaFolderUpsertArgs<ExtArgs>>): Prisma__MediaFolderClient<$Result.GetResult<Prisma.$MediaFolderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MediaFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderCountArgs} args - Arguments to filter MediaFolders to count.
+     * @example
+     * // Count the number of MediaFolders
+     * const count = await prisma.mediaFolder.count({
+     *   where: {
+     *     // ... the filter for the MediaFolders we want to count
+     *   }
+     * })
+    **/
+    count<T extends MediaFolderCountArgs>(
+      args?: Subset<T, MediaFolderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MediaFolderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MediaFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MediaFolderAggregateArgs>(args: Subset<T, MediaFolderAggregateArgs>): Prisma.PrismaPromise<GetMediaFolderAggregateType<T>>
+
+    /**
+     * Group by MediaFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MediaFolderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MediaFolderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MediaFolderGroupByArgs['orderBy'] }
+        : { orderBy?: MediaFolderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MediaFolderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMediaFolderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MediaFolder model
+   */
+  readonly fields: MediaFolderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MediaFolder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MediaFolderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    files<T extends MediaFolder$filesArgs<ExtArgs> = {}>(args?: Subset<T, MediaFolder$filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MediaFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MediaFolder model
+   */
+  interface MediaFolderFieldRefs {
+    readonly id: FieldRef<"MediaFolder", 'Int'>
+    readonly name: FieldRef<"MediaFolder", 'String'>
+    readonly createdAt: FieldRef<"MediaFolder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MediaFolder findUnique
+   */
+  export type MediaFolderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which MediaFolder to fetch.
+     */
+    where: MediaFolderWhereUniqueInput
+  }
+
+  /**
+   * MediaFolder findUniqueOrThrow
+   */
+  export type MediaFolderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which MediaFolder to fetch.
+     */
+    where: MediaFolderWhereUniqueInput
+  }
+
+  /**
+   * MediaFolder findFirst
+   */
+  export type MediaFolderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which MediaFolder to fetch.
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MediaFolders to fetch.
+     */
+    orderBy?: MediaFolderOrderByWithRelationInput | MediaFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MediaFolders.
+     */
+    cursor?: MediaFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MediaFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MediaFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MediaFolders.
+     */
+    distinct?: MediaFolderScalarFieldEnum | MediaFolderScalarFieldEnum[]
+  }
+
+  /**
+   * MediaFolder findFirstOrThrow
+   */
+  export type MediaFolderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which MediaFolder to fetch.
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MediaFolders to fetch.
+     */
+    orderBy?: MediaFolderOrderByWithRelationInput | MediaFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MediaFolders.
+     */
+    cursor?: MediaFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MediaFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MediaFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MediaFolders.
+     */
+    distinct?: MediaFolderScalarFieldEnum | MediaFolderScalarFieldEnum[]
+  }
+
+  /**
+   * MediaFolder findMany
+   */
+  export type MediaFolderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which MediaFolders to fetch.
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MediaFolders to fetch.
+     */
+    orderBy?: MediaFolderOrderByWithRelationInput | MediaFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MediaFolders.
+     */
+    cursor?: MediaFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MediaFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MediaFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MediaFolders.
+     */
+    distinct?: MediaFolderScalarFieldEnum | MediaFolderScalarFieldEnum[]
+  }
+
+  /**
+   * MediaFolder create
+   */
+  export type MediaFolderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MediaFolder.
+     */
+    data: XOR<MediaFolderCreateInput, MediaFolderUncheckedCreateInput>
+  }
+
+  /**
+   * MediaFolder createMany
+   */
+  export type MediaFolderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MediaFolders.
+     */
+    data: MediaFolderCreateManyInput | MediaFolderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MediaFolder update
+   */
+  export type MediaFolderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MediaFolder.
+     */
+    data: XOR<MediaFolderUpdateInput, MediaFolderUncheckedUpdateInput>
+    /**
+     * Choose, which MediaFolder to update.
+     */
+    where: MediaFolderWhereUniqueInput
+  }
+
+  /**
+   * MediaFolder updateMany
+   */
+  export type MediaFolderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MediaFolders.
+     */
+    data: XOR<MediaFolderUpdateManyMutationInput, MediaFolderUncheckedUpdateManyInput>
+    /**
+     * Filter which MediaFolders to update
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * Limit how many MediaFolders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MediaFolder upsert
+   */
+  export type MediaFolderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MediaFolder to update in case it exists.
+     */
+    where: MediaFolderWhereUniqueInput
+    /**
+     * In case the MediaFolder found by the `where` argument doesn't exist, create a new MediaFolder with this data.
+     */
+    create: XOR<MediaFolderCreateInput, MediaFolderUncheckedCreateInput>
+    /**
+     * In case the MediaFolder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MediaFolderUpdateInput, MediaFolderUncheckedUpdateInput>
+  }
+
+  /**
+   * MediaFolder delete
+   */
+  export type MediaFolderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
+    /**
+     * Filter which MediaFolder to delete.
+     */
+    where: MediaFolderWhereUniqueInput
+  }
+
+  /**
+   * MediaFolder deleteMany
+   */
+  export type MediaFolderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MediaFolders to delete
+     */
+    where?: MediaFolderWhereInput
+    /**
+     * Limit how many MediaFolders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MediaFolder.files
+   */
+  export type MediaFolder$filesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFile
+     */
+    select?: MediaFileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFile
+     */
+    omit?: MediaFileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFileInclude<ExtArgs> | null
+    where?: MediaFileWhereInput
+    orderBy?: MediaFileOrderByWithRelationInput | MediaFileOrderByWithRelationInput[]
+    cursor?: MediaFileWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MediaFileScalarFieldEnum | MediaFileScalarFieldEnum[]
+  }
+
+  /**
+   * MediaFolder without action
+   */
+  export type MediaFolderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MediaFolder
+     */
+    select?: MediaFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MediaFolder
+     */
+    omit?: MediaFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MediaFolderInclude<ExtArgs> | null
   }
 
 
@@ -60953,6 +63310,7 @@ export namespace Prisma {
     id: 'id',
     orderNumber: 'orderNumber',
     userId: 'userId',
+    savedCustomerId: 'savedCustomerId',
     guestEmail: 'guestEmail',
     guestPhone: 'guestPhone',
     tin: 'tin',
@@ -60985,6 +63343,20 @@ export namespace Prisma {
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+  export const SavedCustomerScalarFieldEnum: {
+    id: 'id',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    email: 'email',
+    phoneNumber: 'phoneNumber',
+    tin: 'tin',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SavedCustomerScalarFieldEnum = (typeof SavedCustomerScalarFieldEnum)[keyof typeof SavedCustomerScalarFieldEnum]
 
 
   export const OrderItemScalarFieldEnum: {
@@ -61245,11 +63617,22 @@ export namespace Prisma {
     mimeType: 'mimeType',
     size: 'size',
     alt: 'alt',
+    isPublic: 'isPublic',
+    folderId: 'folderId',
     uploadedById: 'uploadedById',
     createdAt: 'createdAt'
   };
 
   export type MediaFileScalarFieldEnum = (typeof MediaFileScalarFieldEnum)[keyof typeof MediaFileScalarFieldEnum]
+
+
+  export const MediaFolderScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    createdAt: 'createdAt'
+  };
+
+  export type MediaFolderScalarFieldEnum = (typeof MediaFolderScalarFieldEnum)[keyof typeof MediaFolderScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -61579,6 +63962,17 @@ export namespace Prisma {
   export type OrderOrderByRelevanceFieldEnum = (typeof OrderOrderByRelevanceFieldEnum)[keyof typeof OrderOrderByRelevanceFieldEnum]
 
 
+  export const SavedCustomerOrderByRelevanceFieldEnum: {
+    firstName: 'firstName',
+    lastName: 'lastName',
+    email: 'email',
+    phoneNumber: 'phoneNumber',
+    tin: 'tin'
+  };
+
+  export type SavedCustomerOrderByRelevanceFieldEnum = (typeof SavedCustomerOrderByRelevanceFieldEnum)[keyof typeof SavedCustomerOrderByRelevanceFieldEnum]
+
+
   export const OrderItemOrderByRelevanceFieldEnum: {
     productName: 'productName',
     sku: 'sku',
@@ -61757,6 +64151,13 @@ export namespace Prisma {
   };
 
   export type MediaFileOrderByRelevanceFieldEnum = (typeof MediaFileOrderByRelevanceFieldEnum)[keyof typeof MediaFileOrderByRelevanceFieldEnum]
+
+
+  export const MediaFolderOrderByRelevanceFieldEnum: {
+    name: 'name'
+  };
+
+  export type MediaFolderOrderByRelevanceFieldEnum = (typeof MediaFolderOrderByRelevanceFieldEnum)[keyof typeof MediaFolderOrderByRelevanceFieldEnum]
 
 
   /**
@@ -64684,6 +67085,7 @@ export namespace Prisma {
     id?: IntFilter<"Order"> | number
     orderNumber?: StringFilter<"Order"> | string
     userId?: IntNullableFilter<"Order"> | number | null
+    savedCustomerId?: IntNullableFilter<"Order"> | number | null
     guestEmail?: StringNullableFilter<"Order"> | string | null
     guestPhone?: StringNullableFilter<"Order"> | string | null
     tin?: StringNullableFilter<"Order"> | string | null
@@ -64714,6 +67116,7 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    savedCustomer?: XOR<SavedCustomerNullableScalarRelationFilter, SavedCustomerWhereInput> | null
     coupon?: XOR<CouponNullableScalarRelationFilter, CouponWhereInput> | null
     deliveryZone?: XOR<DeliveryZoneNullableScalarRelationFilter, DeliveryZoneWhereInput> | null
     items?: OrderItemListRelationFilter
@@ -64726,6 +67129,7 @@ export namespace Prisma {
     id?: SortOrder
     orderNumber?: SortOrder
     userId?: SortOrderInput | SortOrder
+    savedCustomerId?: SortOrderInput | SortOrder
     guestEmail?: SortOrderInput | SortOrder
     guestPhone?: SortOrderInput | SortOrder
     tin?: SortOrderInput | SortOrder
@@ -64756,6 +67160,7 @@ export namespace Prisma {
     cancelledAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    savedCustomer?: SavedCustomerOrderByWithRelationInput
     coupon?: CouponOrderByWithRelationInput
     deliveryZone?: DeliveryZoneOrderByWithRelationInput
     items?: OrderItemOrderByRelationAggregateInput
@@ -64772,6 +67177,7 @@ export namespace Prisma {
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
     userId?: IntNullableFilter<"Order"> | number | null
+    savedCustomerId?: IntNullableFilter<"Order"> | number | null
     guestEmail?: StringNullableFilter<"Order"> | string | null
     guestPhone?: StringNullableFilter<"Order"> | string | null
     tin?: StringNullableFilter<"Order"> | string | null
@@ -64802,6 +67208,7 @@ export namespace Prisma {
     cancelledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    savedCustomer?: XOR<SavedCustomerNullableScalarRelationFilter, SavedCustomerWhereInput> | null
     coupon?: XOR<CouponNullableScalarRelationFilter, CouponWhereInput> | null
     deliveryZone?: XOR<DeliveryZoneNullableScalarRelationFilter, DeliveryZoneWhereInput> | null
     items?: OrderItemListRelationFilter
@@ -64814,6 +67221,7 @@ export namespace Prisma {
     id?: SortOrder
     orderNumber?: SortOrder
     userId?: SortOrderInput | SortOrder
+    savedCustomerId?: SortOrderInput | SortOrder
     guestEmail?: SortOrderInput | SortOrder
     guestPhone?: SortOrderInput | SortOrder
     tin?: SortOrderInput | SortOrder
@@ -64857,6 +67265,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Order"> | number
     orderNumber?: StringWithAggregatesFilter<"Order"> | string
     userId?: IntNullableWithAggregatesFilter<"Order"> | number | null
+    savedCustomerId?: IntNullableWithAggregatesFilter<"Order"> | number | null
     guestEmail?: StringNullableWithAggregatesFilter<"Order"> | string | null
     guestPhone?: StringNullableWithAggregatesFilter<"Order"> | string | null
     tin?: StringNullableWithAggregatesFilter<"Order"> | string | null
@@ -64886,6 +67295,79 @@ export namespace Prisma {
     deliveredAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
+  }
+
+  export type SavedCustomerWhereInput = {
+    AND?: SavedCustomerWhereInput | SavedCustomerWhereInput[]
+    OR?: SavedCustomerWhereInput[]
+    NOT?: SavedCustomerWhereInput | SavedCustomerWhereInput[]
+    id?: IntFilter<"SavedCustomer"> | number
+    firstName?: StringFilter<"SavedCustomer"> | string
+    lastName?: StringNullableFilter<"SavedCustomer"> | string | null
+    email?: StringNullableFilter<"SavedCustomer"> | string | null
+    phoneNumber?: StringFilter<"SavedCustomer"> | string
+    tin?: StringNullableFilter<"SavedCustomer"> | string | null
+    createdAt?: DateTimeFilter<"SavedCustomer"> | Date | string
+    updatedAt?: DateTimeFilter<"SavedCustomer"> | Date | string
+    orders?: OrderListRelationFilter
+  }
+
+  export type SavedCustomerOrderByWithRelationInput = {
+    id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    phoneNumber?: SortOrder
+    tin?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    orders?: OrderOrderByRelationAggregateInput
+    _relevance?: SavedCustomerOrderByRelevanceInput
+  }
+
+  export type SavedCustomerWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: SavedCustomerWhereInput | SavedCustomerWhereInput[]
+    OR?: SavedCustomerWhereInput[]
+    NOT?: SavedCustomerWhereInput | SavedCustomerWhereInput[]
+    firstName?: StringFilter<"SavedCustomer"> | string
+    lastName?: StringNullableFilter<"SavedCustomer"> | string | null
+    email?: StringNullableFilter<"SavedCustomer"> | string | null
+    phoneNumber?: StringFilter<"SavedCustomer"> | string
+    tin?: StringNullableFilter<"SavedCustomer"> | string | null
+    createdAt?: DateTimeFilter<"SavedCustomer"> | Date | string
+    updatedAt?: DateTimeFilter<"SavedCustomer"> | Date | string
+    orders?: OrderListRelationFilter
+  }, "id">
+
+  export type SavedCustomerOrderByWithAggregationInput = {
+    id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    phoneNumber?: SortOrder
+    tin?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SavedCustomerCountOrderByAggregateInput
+    _avg?: SavedCustomerAvgOrderByAggregateInput
+    _max?: SavedCustomerMaxOrderByAggregateInput
+    _min?: SavedCustomerMinOrderByAggregateInput
+    _sum?: SavedCustomerSumOrderByAggregateInput
+  }
+
+  export type SavedCustomerScalarWhereWithAggregatesInput = {
+    AND?: SavedCustomerScalarWhereWithAggregatesInput | SavedCustomerScalarWhereWithAggregatesInput[]
+    OR?: SavedCustomerScalarWhereWithAggregatesInput[]
+    NOT?: SavedCustomerScalarWhereWithAggregatesInput | SavedCustomerScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"SavedCustomer"> | number
+    firstName?: StringWithAggregatesFilter<"SavedCustomer"> | string
+    lastName?: StringNullableWithAggregatesFilter<"SavedCustomer"> | string | null
+    email?: StringNullableWithAggregatesFilter<"SavedCustomer"> | string | null
+    phoneNumber?: StringWithAggregatesFilter<"SavedCustomer"> | string
+    tin?: StringNullableWithAggregatesFilter<"SavedCustomer"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SavedCustomer"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SavedCustomer"> | Date | string
   }
 
   export type OrderItemWhereInput = {
@@ -66215,8 +68697,11 @@ export namespace Prisma {
     mimeType?: StringFilter<"MediaFile"> | string
     size?: IntFilter<"MediaFile"> | number
     alt?: StringNullableFilter<"MediaFile"> | string | null
+    isPublic?: BoolFilter<"MediaFile"> | boolean
+    folderId?: IntNullableFilter<"MediaFile"> | number | null
     uploadedById?: IntNullableFilter<"MediaFile"> | number | null
     createdAt?: DateTimeFilter<"MediaFile"> | Date | string
+    folder?: XOR<MediaFolderNullableScalarRelationFilter, MediaFolderWhereInput> | null
   }
 
   export type MediaFileOrderByWithRelationInput = {
@@ -66228,8 +68713,11 @@ export namespace Prisma {
     mimeType?: SortOrder
     size?: SortOrder
     alt?: SortOrderInput | SortOrder
+    isPublic?: SortOrder
+    folderId?: SortOrderInput | SortOrder
     uploadedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    folder?: MediaFolderOrderByWithRelationInput
     _relevance?: MediaFileOrderByRelevanceInput
   }
 
@@ -66245,8 +68733,11 @@ export namespace Prisma {
     mimeType?: StringFilter<"MediaFile"> | string
     size?: IntFilter<"MediaFile"> | number
     alt?: StringNullableFilter<"MediaFile"> | string | null
+    isPublic?: BoolFilter<"MediaFile"> | boolean
+    folderId?: IntNullableFilter<"MediaFile"> | number | null
     uploadedById?: IntNullableFilter<"MediaFile"> | number | null
     createdAt?: DateTimeFilter<"MediaFile"> | Date | string
+    folder?: XOR<MediaFolderNullableScalarRelationFilter, MediaFolderWhereInput> | null
   }, "id" | "url">
 
   export type MediaFileOrderByWithAggregationInput = {
@@ -66258,6 +68749,8 @@ export namespace Prisma {
     mimeType?: SortOrder
     size?: SortOrder
     alt?: SortOrderInput | SortOrder
+    isPublic?: SortOrder
+    folderId?: SortOrderInput | SortOrder
     uploadedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: MediaFileCountOrderByAggregateInput
@@ -66279,8 +68772,58 @@ export namespace Prisma {
     mimeType?: StringWithAggregatesFilter<"MediaFile"> | string
     size?: IntWithAggregatesFilter<"MediaFile"> | number
     alt?: StringNullableWithAggregatesFilter<"MediaFile"> | string | null
+    isPublic?: BoolWithAggregatesFilter<"MediaFile"> | boolean
+    folderId?: IntNullableWithAggregatesFilter<"MediaFile"> | number | null
     uploadedById?: IntNullableWithAggregatesFilter<"MediaFile"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"MediaFile"> | Date | string
+  }
+
+  export type MediaFolderWhereInput = {
+    AND?: MediaFolderWhereInput | MediaFolderWhereInput[]
+    OR?: MediaFolderWhereInput[]
+    NOT?: MediaFolderWhereInput | MediaFolderWhereInput[]
+    id?: IntFilter<"MediaFolder"> | number
+    name?: StringFilter<"MediaFolder"> | string
+    createdAt?: DateTimeFilter<"MediaFolder"> | Date | string
+    files?: MediaFileListRelationFilter
+  }
+
+  export type MediaFolderOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    files?: MediaFileOrderByRelationAggregateInput
+    _relevance?: MediaFolderOrderByRelevanceInput
+  }
+
+  export type MediaFolderWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    name?: string
+    AND?: MediaFolderWhereInput | MediaFolderWhereInput[]
+    OR?: MediaFolderWhereInput[]
+    NOT?: MediaFolderWhereInput | MediaFolderWhereInput[]
+    createdAt?: DateTimeFilter<"MediaFolder"> | Date | string
+    files?: MediaFileListRelationFilter
+  }, "id" | "name">
+
+  export type MediaFolderOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    _count?: MediaFolderCountOrderByAggregateInput
+    _avg?: MediaFolderAvgOrderByAggregateInput
+    _max?: MediaFolderMaxOrderByAggregateInput
+    _min?: MediaFolderMinOrderByAggregateInput
+    _sum?: MediaFolderSumOrderByAggregateInput
+  }
+
+  export type MediaFolderScalarWhereWithAggregatesInput = {
+    AND?: MediaFolderScalarWhereWithAggregatesInput | MediaFolderScalarWhereWithAggregatesInput[]
+    OR?: MediaFolderScalarWhereWithAggregatesInput[]
+    NOT?: MediaFolderScalarWhereWithAggregatesInput | MediaFolderScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MediaFolder"> | number
+    name?: StringWithAggregatesFilter<"MediaFolder"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"MediaFolder"> | Date | string
   }
 
   export type CurrencyCreateInput = {
@@ -69195,6 +71738,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
@@ -69207,6 +71751,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -69272,6 +71817,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
@@ -69284,6 +71830,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69323,6 +71870,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -69389,6 +71937,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69417,6 +71966,84 @@ export namespace Prisma {
     shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedCustomerCreateInput = {
+    firstName: string
+    lastName?: string | null
+    email?: string | null
+    phoneNumber: string
+    tin?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderCreateNestedManyWithoutSavedCustomerInput
+  }
+
+  export type SavedCustomerUncheckedCreateInput = {
+    id?: number
+    firstName: string
+    lastName?: string | null
+    email?: string | null
+    phoneNumber: string
+    tin?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutSavedCustomerInput
+  }
+
+  export type SavedCustomerUpdateInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUpdateManyWithoutSavedCustomerNestedInput
+  }
+
+  export type SavedCustomerUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutSavedCustomerNestedInput
+  }
+
+  export type SavedCustomerCreateManyInput = {
+    id?: number
+    firstName: string
+    lastName?: string | null
+    email?: string | null
+    phoneNumber: string
+    tin?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedCustomerUpdateManyMutationInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedCustomerUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -70794,8 +73421,10 @@ export namespace Prisma {
     mimeType: string
     size: number
     alt?: string | null
+    isPublic?: boolean
     uploadedById?: number | null
     createdAt?: Date | string
+    folder?: MediaFolderCreateNestedOneWithoutFilesInput
   }
 
   export type MediaFileUncheckedCreateInput = {
@@ -70807,6 +73436,8 @@ export namespace Prisma {
     mimeType: string
     size: number
     alt?: string | null
+    isPublic?: boolean
+    folderId?: number | null
     uploadedById?: number | null
     createdAt?: Date | string
   }
@@ -70819,8 +73450,10 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     size?: IntFieldUpdateOperationsInput | number
     alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
     uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folder?: MediaFolderUpdateOneWithoutFilesNestedInput
   }
 
   export type MediaFileUncheckedUpdateInput = {
@@ -70832,6 +73465,8 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     size?: IntFieldUpdateOperationsInput | number
     alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70845,6 +73480,8 @@ export namespace Prisma {
     mimeType: string
     size: number
     alt?: string | null
+    isPublic?: boolean
+    folderId?: number | null
     uploadedById?: number | null
     createdAt?: Date | string
   }
@@ -70857,6 +73494,7 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     size?: IntFieldUpdateOperationsInput | number
     alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
     uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70870,7 +73508,52 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     size?: IntFieldUpdateOperationsInput | number
     alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFolderCreateInput = {
+    name: string
+    createdAt?: Date | string
+    files?: MediaFileCreateNestedManyWithoutFolderInput
+  }
+
+  export type MediaFolderUncheckedCreateInput = {
+    id?: number
+    name: string
+    createdAt?: Date | string
+    files?: MediaFileUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type MediaFolderUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    files?: MediaFileUpdateManyWithoutFolderNestedInput
+  }
+
+  export type MediaFolderUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    files?: MediaFileUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type MediaFolderCreateManyInput = {
+    id?: number
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type MediaFolderUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFolderUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -73441,6 +76124,11 @@ export namespace Prisma {
     not?: NestedEnumFulfillmentMethodFilter<$PrismaModel> | $Enums.FulfillmentMethod
   }
 
+  export type SavedCustomerNullableScalarRelationFilter = {
+    is?: SavedCustomerWhereInput | null
+    isNot?: SavedCustomerWhereInput | null
+  }
+
   export type DeliveryZoneNullableScalarRelationFilter = {
     is?: DeliveryZoneWhereInput | null
     isNot?: DeliveryZoneWhereInput | null
@@ -73466,6 +76154,7 @@ export namespace Prisma {
     id?: SortOrder
     orderNumber?: SortOrder
     userId?: SortOrder
+    savedCustomerId?: SortOrder
     guestEmail?: SortOrder
     guestPhone?: SortOrder
     tin?: SortOrder
@@ -73500,6 +76189,7 @@ export namespace Prisma {
   export type OrderAvgOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    savedCustomerId?: SortOrder
     subtotal?: SortOrder
     discountTotal?: SortOrder
     shippingFee?: SortOrder
@@ -73513,6 +76203,7 @@ export namespace Prisma {
     id?: SortOrder
     orderNumber?: SortOrder
     userId?: SortOrder
+    savedCustomerId?: SortOrder
     guestEmail?: SortOrder
     guestPhone?: SortOrder
     tin?: SortOrder
@@ -73548,6 +76239,7 @@ export namespace Prisma {
     id?: SortOrder
     orderNumber?: SortOrder
     userId?: SortOrder
+    savedCustomerId?: SortOrder
     guestEmail?: SortOrder
     guestPhone?: SortOrder
     tin?: SortOrder
@@ -73582,6 +76274,7 @@ export namespace Prisma {
   export type OrderSumOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    savedCustomerId?: SortOrder
     subtotal?: SortOrder
     discountTotal?: SortOrder
     shippingFee?: SortOrder
@@ -73619,6 +76312,53 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumFulfillmentMethodFilter<$PrismaModel>
     _max?: NestedEnumFulfillmentMethodFilter<$PrismaModel>
+  }
+
+  export type SavedCustomerOrderByRelevanceInput = {
+    fields: SavedCustomerOrderByRelevanceFieldEnum | SavedCustomerOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type SavedCustomerCountOrderByAggregateInput = {
+    id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    email?: SortOrder
+    phoneNumber?: SortOrder
+    tin?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedCustomerAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type SavedCustomerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    email?: SortOrder
+    phoneNumber?: SortOrder
+    tin?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedCustomerMinOrderByAggregateInput = {
+    id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    email?: SortOrder
+    phoneNumber?: SortOrder
+    tin?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedCustomerSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type OrderScalarRelationFilter = {
@@ -74760,6 +77500,11 @@ export namespace Prisma {
     _max?: NestedEnumContactEmailDeliveryStatusFilter<$PrismaModel>
   }
 
+  export type MediaFolderNullableScalarRelationFilter = {
+    is?: MediaFolderWhereInput | null
+    isNot?: MediaFolderWhereInput | null
+  }
+
   export type MediaFileOrderByRelevanceInput = {
     fields: MediaFileOrderByRelevanceFieldEnum | MediaFileOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -74775,6 +77520,8 @@ export namespace Prisma {
     mimeType?: SortOrder
     size?: SortOrder
     alt?: SortOrder
+    isPublic?: SortOrder
+    folderId?: SortOrder
     uploadedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -74782,6 +77529,7 @@ export namespace Prisma {
   export type MediaFileAvgOrderByAggregateInput = {
     id?: SortOrder
     size?: SortOrder
+    folderId?: SortOrder
     uploadedById?: SortOrder
   }
 
@@ -74794,6 +77542,8 @@ export namespace Prisma {
     mimeType?: SortOrder
     size?: SortOrder
     alt?: SortOrder
+    isPublic?: SortOrder
+    folderId?: SortOrder
     uploadedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -74807,6 +77557,8 @@ export namespace Prisma {
     mimeType?: SortOrder
     size?: SortOrder
     alt?: SortOrder
+    isPublic?: SortOrder
+    folderId?: SortOrder
     uploadedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -74814,7 +77566,50 @@ export namespace Prisma {
   export type MediaFileSumOrderByAggregateInput = {
     id?: SortOrder
     size?: SortOrder
+    folderId?: SortOrder
     uploadedById?: SortOrder
+  }
+
+  export type MediaFileListRelationFilter = {
+    every?: MediaFileWhereInput
+    some?: MediaFileWhereInput
+    none?: MediaFileWhereInput
+  }
+
+  export type MediaFileOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MediaFolderOrderByRelevanceInput = {
+    fields: MediaFolderOrderByRelevanceFieldEnum | MediaFolderOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MediaFolderCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MediaFolderAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MediaFolderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MediaFolderMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MediaFolderSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -77405,6 +80200,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type SavedCustomerCreateNestedOneWithoutOrdersInput = {
+    create?: XOR<SavedCustomerCreateWithoutOrdersInput, SavedCustomerUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: SavedCustomerCreateOrConnectWithoutOrdersInput
+    connect?: SavedCustomerWhereUniqueInput
+  }
+
   export type CouponCreateNestedOneWithoutOrdersInput = {
     create?: XOR<CouponCreateWithoutOrdersInput, CouponUncheckedCreateWithoutOrdersInput>
     connectOrCreate?: CouponCreateOrConnectWithoutOrdersInput
@@ -77493,6 +80294,16 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOrdersInput, UserUpdateWithoutOrdersInput>, UserUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type SavedCustomerUpdateOneWithoutOrdersNestedInput = {
+    create?: XOR<SavedCustomerCreateWithoutOrdersInput, SavedCustomerUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: SavedCustomerCreateOrConnectWithoutOrdersInput
+    upsert?: SavedCustomerUpsertWithoutOrdersInput
+    disconnect?: SavedCustomerWhereInput | boolean
+    delete?: SavedCustomerWhereInput | boolean
+    connect?: SavedCustomerWhereUniqueInput
+    update?: XOR<XOR<SavedCustomerUpdateToOneWithWhereWithoutOrdersInput, SavedCustomerUpdateWithoutOrdersInput>, SavedCustomerUncheckedUpdateWithoutOrdersInput>
   }
 
   export type CouponUpdateOneWithoutOrdersNestedInput = {
@@ -77625,6 +80436,48 @@ export namespace Prisma {
     update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
     updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type OrderCreateNestedManyWithoutSavedCustomerInput = {
+    create?: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput> | OrderCreateWithoutSavedCustomerInput[] | OrderUncheckedCreateWithoutSavedCustomerInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutSavedCustomerInput | OrderCreateOrConnectWithoutSavedCustomerInput[]
+    createMany?: OrderCreateManySavedCustomerInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutSavedCustomerInput = {
+    create?: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput> | OrderCreateWithoutSavedCustomerInput[] | OrderUncheckedCreateWithoutSavedCustomerInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutSavedCustomerInput | OrderCreateOrConnectWithoutSavedCustomerInput[]
+    createMany?: OrderCreateManySavedCustomerInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type OrderUpdateManyWithoutSavedCustomerNestedInput = {
+    create?: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput> | OrderCreateWithoutSavedCustomerInput[] | OrderUncheckedCreateWithoutSavedCustomerInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutSavedCustomerInput | OrderCreateOrConnectWithoutSavedCustomerInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutSavedCustomerInput | OrderUpsertWithWhereUniqueWithoutSavedCustomerInput[]
+    createMany?: OrderCreateManySavedCustomerInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutSavedCustomerInput | OrderUpdateWithWhereUniqueWithoutSavedCustomerInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutSavedCustomerInput | OrderUpdateManyWithWhereWithoutSavedCustomerInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type OrderUncheckedUpdateManyWithoutSavedCustomerNestedInput = {
+    create?: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput> | OrderCreateWithoutSavedCustomerInput[] | OrderUncheckedCreateWithoutSavedCustomerInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutSavedCustomerInput | OrderCreateOrConnectWithoutSavedCustomerInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutSavedCustomerInput | OrderUpsertWithWhereUniqueWithoutSavedCustomerInput[]
+    createMany?: OrderCreateManySavedCustomerInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutSavedCustomerInput | OrderUpdateWithWhereUniqueWithoutSavedCustomerInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutSavedCustomerInput | OrderUpdateManyWithWhereWithoutSavedCustomerInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
   export type OrderCreateNestedOneWithoutItemsInput = {
@@ -78099,6 +80952,64 @@ export namespace Prisma {
     upsert?: ContactMessageUpsertWithoutEmailDeliveriesInput
     connect?: ContactMessageWhereUniqueInput
     update?: XOR<XOR<ContactMessageUpdateToOneWithWhereWithoutEmailDeliveriesInput, ContactMessageUpdateWithoutEmailDeliveriesInput>, ContactMessageUncheckedUpdateWithoutEmailDeliveriesInput>
+  }
+
+  export type MediaFolderCreateNestedOneWithoutFilesInput = {
+    create?: XOR<MediaFolderCreateWithoutFilesInput, MediaFolderUncheckedCreateWithoutFilesInput>
+    connectOrCreate?: MediaFolderCreateOrConnectWithoutFilesInput
+    connect?: MediaFolderWhereUniqueInput
+  }
+
+  export type MediaFolderUpdateOneWithoutFilesNestedInput = {
+    create?: XOR<MediaFolderCreateWithoutFilesInput, MediaFolderUncheckedCreateWithoutFilesInput>
+    connectOrCreate?: MediaFolderCreateOrConnectWithoutFilesInput
+    upsert?: MediaFolderUpsertWithoutFilesInput
+    disconnect?: MediaFolderWhereInput | boolean
+    delete?: MediaFolderWhereInput | boolean
+    connect?: MediaFolderWhereUniqueInput
+    update?: XOR<XOR<MediaFolderUpdateToOneWithWhereWithoutFilesInput, MediaFolderUpdateWithoutFilesInput>, MediaFolderUncheckedUpdateWithoutFilesInput>
+  }
+
+  export type MediaFileCreateNestedManyWithoutFolderInput = {
+    create?: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput> | MediaFileCreateWithoutFolderInput[] | MediaFileUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: MediaFileCreateOrConnectWithoutFolderInput | MediaFileCreateOrConnectWithoutFolderInput[]
+    createMany?: MediaFileCreateManyFolderInputEnvelope
+    connect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+  }
+
+  export type MediaFileUncheckedCreateNestedManyWithoutFolderInput = {
+    create?: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput> | MediaFileCreateWithoutFolderInput[] | MediaFileUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: MediaFileCreateOrConnectWithoutFolderInput | MediaFileCreateOrConnectWithoutFolderInput[]
+    createMany?: MediaFileCreateManyFolderInputEnvelope
+    connect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+  }
+
+  export type MediaFileUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput> | MediaFileCreateWithoutFolderInput[] | MediaFileUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: MediaFileCreateOrConnectWithoutFolderInput | MediaFileCreateOrConnectWithoutFolderInput[]
+    upsert?: MediaFileUpsertWithWhereUniqueWithoutFolderInput | MediaFileUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: MediaFileCreateManyFolderInputEnvelope
+    set?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    disconnect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    delete?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    connect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    update?: MediaFileUpdateWithWhereUniqueWithoutFolderInput | MediaFileUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: MediaFileUpdateManyWithWhereWithoutFolderInput | MediaFileUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: MediaFileScalarWhereInput | MediaFileScalarWhereInput[]
+  }
+
+  export type MediaFileUncheckedUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput> | MediaFileCreateWithoutFolderInput[] | MediaFileUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: MediaFileCreateOrConnectWithoutFolderInput | MediaFileCreateOrConnectWithoutFolderInput[]
+    upsert?: MediaFileUpsertWithWhereUniqueWithoutFolderInput | MediaFileUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: MediaFileCreateManyFolderInputEnvelope
+    set?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    disconnect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    delete?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    connect?: MediaFileWhereUniqueInput | MediaFileWhereUniqueInput[]
+    update?: MediaFileUpdateWithWhereUniqueWithoutFolderInput | MediaFileUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: MediaFileUpdateManyWithWhereWithoutFolderInput | MediaFileUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: MediaFileScalarWhereInput | MediaFileScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -78838,6 +81749,7 @@ export namespace Prisma {
     deliveredAt?: Date | string | null
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
@@ -78849,6 +81761,7 @@ export namespace Prisma {
   export type OrderUncheckedCreateWithoutUserInput = {
     id?: number
     orderNumber: string
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -79564,6 +82477,7 @@ export namespace Prisma {
     id?: IntFilter<"Order"> | number
     orderNumber?: StringFilter<"Order"> | string
     userId?: IntNullableFilter<"Order"> | number | null
+    savedCustomerId?: IntNullableFilter<"Order"> | number | null
     guestEmail?: StringNullableFilter<"Order"> | string | null
     guestPhone?: StringNullableFilter<"Order"> | string | null
     tin?: StringNullableFilter<"Order"> | string | null
@@ -86186,6 +89100,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -86197,6 +89112,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -86314,6 +89230,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -86325,6 +89242,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -86505,6 +89423,32 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutOrdersInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
+  }
+
+  export type SavedCustomerCreateWithoutOrdersInput = {
+    firstName: string
+    lastName?: string | null
+    email?: string | null
+    phoneNumber: string
+    tin?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedCustomerUncheckedCreateWithoutOrdersInput = {
+    id?: number
+    firstName: string
+    lastName?: string | null
+    email?: string | null
+    phoneNumber: string
+    tin?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedCustomerCreateOrConnectWithoutOrdersInput = {
+    where: SavedCustomerWhereUniqueInput
+    create: XOR<SavedCustomerCreateWithoutOrdersInput, SavedCustomerUncheckedCreateWithoutOrdersInput>
   }
 
   export type CouponCreateWithoutOrdersInput = {
@@ -86823,6 +89767,38 @@ export namespace Prisma {
     legalAcceptances?: LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type SavedCustomerUpsertWithoutOrdersInput = {
+    update: XOR<SavedCustomerUpdateWithoutOrdersInput, SavedCustomerUncheckedUpdateWithoutOrdersInput>
+    create: XOR<SavedCustomerCreateWithoutOrdersInput, SavedCustomerUncheckedCreateWithoutOrdersInput>
+    where?: SavedCustomerWhereInput
+  }
+
+  export type SavedCustomerUpdateToOneWithWhereWithoutOrdersInput = {
+    where?: SavedCustomerWhereInput
+    data: XOR<SavedCustomerUpdateWithoutOrdersInput, SavedCustomerUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type SavedCustomerUpdateWithoutOrdersInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedCustomerUncheckedUpdateWithoutOrdersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CouponUpsertWithoutOrdersInput = {
     update: XOR<CouponUpdateWithoutOrdersInput, CouponUncheckedUpdateWithoutOrdersInput>
     create: XOR<CouponCreateWithoutOrdersInput, CouponUncheckedCreateWithoutOrdersInput>
@@ -86977,7 +89953,7 @@ export namespace Prisma {
     issuedAt?: DateTimeFilter<"Invoice"> | Date | string
   }
 
-  export type OrderCreateWithoutItemsInput = {
+  export type OrderCreateWithoutSavedCustomerInput = {
     orderNumber: string
     guestEmail?: string | null
     guestPhone?: string | null
@@ -87009,6 +89985,110 @@ export namespace Prisma {
     user?: UserCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
+    items?: OrderItemCreateNestedManyWithoutOrderInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutSavedCustomerInput = {
+    id?: number
+    orderNumber: string
+    userId?: number | null
+    guestEmail?: string | null
+    guestPhone?: string | null
+    tin?: string | null
+    status?: $Enums.OrderStatus
+    paymentStatus?: $Enums.PaymentStatus
+    fulfillment?: $Enums.FulfillmentMethod
+    subtotal: Decimal | DecimalJsLike | number | string
+    discountTotal?: Decimal | DecimalJsLike | number | string
+    shippingFee?: Decimal | DecimalJsLike | number | string
+    taxTotal?: Decimal | DecimalJsLike | number | string
+    grandTotal: Decimal | DecimalJsLike | number | string
+    currency: string
+    couponId?: number | null
+    deliveryZoneId?: number | null
+    shipFullName?: string | null
+    shipPhone: string
+    shipProvince?: string | null
+    shipDistrict?: string | null
+    shipSector?: string | null
+    shipStreet?: string | null
+    shipNotes?: string | null
+    customerNote?: string | null
+    internalNote?: string | null
+    placedAt?: Date | string
+    paidAt?: Date | string | null
+    shippedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    updatedAt?: Date | string
+    items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    history?: OrderStatusHistoryUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutSavedCustomerInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput>
+  }
+
+  export type OrderCreateManySavedCustomerInputEnvelope = {
+    data: OrderCreateManySavedCustomerInput | OrderCreateManySavedCustomerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutSavedCustomerInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutSavedCustomerInput, OrderUncheckedUpdateWithoutSavedCustomerInput>
+    create: XOR<OrderCreateWithoutSavedCustomerInput, OrderUncheckedCreateWithoutSavedCustomerInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutSavedCustomerInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutSavedCustomerInput, OrderUncheckedUpdateWithoutSavedCustomerInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutSavedCustomerInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutSavedCustomerInput>
+  }
+
+  export type OrderCreateWithoutItemsInput = {
+    orderNumber: string
+    guestEmail?: string | null
+    guestPhone?: string | null
+    tin?: string | null
+    status?: $Enums.OrderStatus
+    paymentStatus?: $Enums.PaymentStatus
+    fulfillment?: $Enums.FulfillmentMethod
+    subtotal: Decimal | DecimalJsLike | number | string
+    discountTotal?: Decimal | DecimalJsLike | number | string
+    shippingFee?: Decimal | DecimalJsLike | number | string
+    taxTotal?: Decimal | DecimalJsLike | number | string
+    grandTotal: Decimal | DecimalJsLike | number | string
+    currency: string
+    shipFullName?: string | null
+    shipPhone: string
+    shipProvince?: string | null
+    shipDistrict?: string | null
+    shipSector?: string | null
+    shipStreet?: string | null
+    shipNotes?: string | null
+    customerNote?: string | null
+    internalNote?: string | null
+    placedAt?: Date | string
+    paidAt?: Date | string | null
+    shippedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
+    coupon?: CouponCreateNestedOneWithoutOrdersInput
+    deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     history?: OrderStatusHistoryCreateNestedManyWithoutOrderInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
@@ -87018,6 +90098,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -87162,6 +90243,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -87173,6 +90255,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87307,6 +90390,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
@@ -87318,6 +90402,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -87398,6 +90483,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
@@ -87409,6 +90495,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87473,6 +90560,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
@@ -87484,6 +90572,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -87658,6 +90747,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
@@ -87669,6 +90759,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87927,6 +91018,7 @@ export namespace Prisma {
     cancelledAt?: Date | string | null
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOrdersInput
+    savedCustomer?: SavedCustomerCreateNestedOneWithoutOrdersInput
     coupon?: CouponCreateNestedOneWithoutOrdersInput
     deliveryZone?: DeliveryZoneCreateNestedOneWithoutOrdersInput
     items?: OrderItemCreateNestedManyWithoutOrderInput
@@ -87938,6 +91030,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -88118,6 +91211,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
@@ -88129,6 +91223,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -89789,6 +92884,115 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MediaFolderCreateWithoutFilesInput = {
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type MediaFolderUncheckedCreateWithoutFilesInput = {
+    id?: number
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type MediaFolderCreateOrConnectWithoutFilesInput = {
+    where: MediaFolderWhereUniqueInput
+    create: XOR<MediaFolderCreateWithoutFilesInput, MediaFolderUncheckedCreateWithoutFilesInput>
+  }
+
+  export type MediaFolderUpsertWithoutFilesInput = {
+    update: XOR<MediaFolderUpdateWithoutFilesInput, MediaFolderUncheckedUpdateWithoutFilesInput>
+    create: XOR<MediaFolderCreateWithoutFilesInput, MediaFolderUncheckedCreateWithoutFilesInput>
+    where?: MediaFolderWhereInput
+  }
+
+  export type MediaFolderUpdateToOneWithWhereWithoutFilesInput = {
+    where?: MediaFolderWhereInput
+    data: XOR<MediaFolderUpdateWithoutFilesInput, MediaFolderUncheckedUpdateWithoutFilesInput>
+  }
+
+  export type MediaFolderUpdateWithoutFilesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFolderUncheckedUpdateWithoutFilesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFileCreateWithoutFolderInput = {
+    name: string
+    originalName: string
+    url: string
+    kind: string
+    mimeType: string
+    size: number
+    alt?: string | null
+    isPublic?: boolean
+    uploadedById?: number | null
+    createdAt?: Date | string
+  }
+
+  export type MediaFileUncheckedCreateWithoutFolderInput = {
+    id?: number
+    name: string
+    originalName: string
+    url: string
+    kind: string
+    mimeType: string
+    size: number
+    alt?: string | null
+    isPublic?: boolean
+    uploadedById?: number | null
+    createdAt?: Date | string
+  }
+
+  export type MediaFileCreateOrConnectWithoutFolderInput = {
+    where: MediaFileWhereUniqueInput
+    create: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput>
+  }
+
+  export type MediaFileCreateManyFolderInputEnvelope = {
+    data: MediaFileCreateManyFolderInput | MediaFileCreateManyFolderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MediaFileUpsertWithWhereUniqueWithoutFolderInput = {
+    where: MediaFileWhereUniqueInput
+    update: XOR<MediaFileUpdateWithoutFolderInput, MediaFileUncheckedUpdateWithoutFolderInput>
+    create: XOR<MediaFileCreateWithoutFolderInput, MediaFileUncheckedCreateWithoutFolderInput>
+  }
+
+  export type MediaFileUpdateWithWhereUniqueWithoutFolderInput = {
+    where: MediaFileWhereUniqueInput
+    data: XOR<MediaFileUpdateWithoutFolderInput, MediaFileUncheckedUpdateWithoutFolderInput>
+  }
+
+  export type MediaFileUpdateManyWithWhereWithoutFolderInput = {
+    where: MediaFileScalarWhereInput
+    data: XOR<MediaFileUpdateManyMutationInput, MediaFileUncheckedUpdateManyWithoutFolderInput>
+  }
+
+  export type MediaFileScalarWhereInput = {
+    AND?: MediaFileScalarWhereInput | MediaFileScalarWhereInput[]
+    OR?: MediaFileScalarWhereInput[]
+    NOT?: MediaFileScalarWhereInput | MediaFileScalarWhereInput[]
+    id?: IntFilter<"MediaFile"> | number
+    name?: StringFilter<"MediaFile"> | string
+    originalName?: StringFilter<"MediaFile"> | string
+    url?: StringFilter<"MediaFile"> | string
+    kind?: StringFilter<"MediaFile"> | string
+    mimeType?: StringFilter<"MediaFile"> | string
+    size?: IntFilter<"MediaFile"> | number
+    alt?: StringNullableFilter<"MediaFile"> | string | null
+    isPublic?: BoolFilter<"MediaFile"> | boolean
+    folderId?: IntNullableFilter<"MediaFile"> | number | null
+    uploadedById?: IntNullableFilter<"MediaFile"> | number | null
+    createdAt?: DateTimeFilter<"MediaFile"> | Date | string
+  }
+
   export type UserPermissionCreateManyUserInput = {
     permissionId: number
     grantedById?: number | null
@@ -89840,6 +93044,7 @@ export namespace Prisma {
   export type OrderCreateManyUserInput = {
     id?: number
     orderNumber: string
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -90203,6 +93408,7 @@ export namespace Prisma {
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
@@ -90214,6 +93420,7 @@ export namespace Prisma {
   export type OrderUncheckedUpdateWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -90252,6 +93459,7 @@ export namespace Prisma {
   export type OrderUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -91613,6 +94821,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -91673,6 +94882,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     coupon?: CouponUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -91684,6 +94894,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -91722,6 +94933,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -91764,6 +94976,7 @@ export namespace Prisma {
     id?: number
     orderNumber: string
     userId?: number | null
+    savedCustomerId?: number | null
     guestEmail?: string | null
     guestPhone?: string | null
     tin?: string | null
@@ -91849,6 +95062,7 @@ export namespace Prisma {
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    savedCustomer?: SavedCustomerUpdateOneWithoutOrdersNestedInput
     deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -91860,6 +95074,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -91898,6 +95113,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     orderNumber?: StringFieldUpdateOperationsInput | string
     userId?: NullableIntFieldUpdateOperationsInput | number | null
+    savedCustomerId?: NullableIntFieldUpdateOperationsInput | number | null
     guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
     guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     tin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -92158,6 +95374,153 @@ export namespace Prisma {
     total?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
     issuedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderCreateManySavedCustomerInput = {
+    id?: number
+    orderNumber: string
+    userId?: number | null
+    guestEmail?: string | null
+    guestPhone?: string | null
+    tin?: string | null
+    status?: $Enums.OrderStatus
+    paymentStatus?: $Enums.PaymentStatus
+    fulfillment?: $Enums.FulfillmentMethod
+    subtotal: Decimal | DecimalJsLike | number | string
+    discountTotal?: Decimal | DecimalJsLike | number | string
+    shippingFee?: Decimal | DecimalJsLike | number | string
+    taxTotal?: Decimal | DecimalJsLike | number | string
+    grandTotal: Decimal | DecimalJsLike | number | string
+    currency: string
+    couponId?: number | null
+    deliveryZoneId?: number | null
+    shipFullName?: string | null
+    shipPhone: string
+    shipProvince?: string | null
+    shipDistrict?: string | null
+    shipSector?: string | null
+    shipStreet?: string | null
+    shipNotes?: string | null
+    customerNote?: string | null
+    internalNote?: string | null
+    placedAt?: Date | string
+    paidAt?: Date | string | null
+    shippedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type OrderUpdateWithoutSavedCustomerInput = {
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    fulfillment?: EnumFulfillmentMethodFieldUpdateOperationsInput | $Enums.FulfillmentMethod
+    subtotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shippingFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
+    shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
+    shipSector?: NullableStringFieldUpdateOperationsInput | string | null
+    shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
+    shipNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    customerNote?: NullableStringFieldUpdateOperationsInput | string | null
+    internalNote?: NullableStringFieldUpdateOperationsInput | string | null
+    placedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutOrdersNestedInput
+    coupon?: CouponUpdateOneWithoutOrdersNestedInput
+    deliveryZone?: DeliveryZoneUpdateOneWithoutOrdersNestedInput
+    items?: OrderItemUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    history?: OrderStatusHistoryUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutSavedCustomerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    fulfillment?: EnumFulfillmentMethodFieldUpdateOperationsInput | $Enums.FulfillmentMethod
+    subtotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shippingFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    couponId?: NullableIntFieldUpdateOperationsInput | number | null
+    deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
+    shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
+    shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
+    shipSector?: NullableStringFieldUpdateOperationsInput | string | null
+    shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
+    shipNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    customerNote?: NullableStringFieldUpdateOperationsInput | string | null
+    internalNote?: NullableStringFieldUpdateOperationsInput | string | null
+    placedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    history?: OrderStatusHistoryUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateManyWithoutSavedCustomerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    guestEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    tin?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    fulfillment?: EnumFulfillmentMethodFieldUpdateOperationsInput | $Enums.FulfillmentMethod
+    subtotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shippingFee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grandTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    couponId?: NullableIntFieldUpdateOperationsInput | number | null
+    deliveryZoneId?: NullableIntFieldUpdateOperationsInput | number | null
+    shipFullName?: NullableStringFieldUpdateOperationsInput | string | null
+    shipPhone?: StringFieldUpdateOperationsInput | string
+    shipProvince?: NullableStringFieldUpdateOperationsInput | string | null
+    shipDistrict?: NullableStringFieldUpdateOperationsInput | string | null
+    shipSector?: NullableStringFieldUpdateOperationsInput | string | null
+    shipStreet?: NullableStringFieldUpdateOperationsInput | string | null
+    shipNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    customerNote?: NullableStringFieldUpdateOperationsInput | string | null
+    internalNote?: NullableStringFieldUpdateOperationsInput | string | null
+    placedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shippedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VisualizerDesignCreateManySceneInput = {
@@ -92424,6 +95787,61 @@ export namespace Prisma {
     lastError?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFileCreateManyFolderInput = {
+    id?: number
+    name: string
+    originalName: string
+    url: string
+    kind: string
+    mimeType: string
+    size: number
+    alt?: string | null
+    isPublic?: boolean
+    uploadedById?: number | null
+    createdAt?: Date | string
+  }
+
+  export type MediaFileUpdateWithoutFolderInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    originalName?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFileUncheckedUpdateWithoutFolderInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    originalName?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MediaFileUncheckedUpdateManyWithoutFolderInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    originalName?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    alt?: NullableStringFieldUpdateOperationsInput | string | null
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    uploadedById?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

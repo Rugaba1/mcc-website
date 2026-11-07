@@ -59,7 +59,7 @@ export function NewsletterSignup() {
           type="checkbox"
           checked={consent}
           onChange={(event) => setConsent(event.target.checked)}
-          className="mt-0.5 accent-primary"
+          className="newsletter-consent-checkbox mt-0.5 size-4 shrink-0 accent-primary"
           required
         />
         <span>

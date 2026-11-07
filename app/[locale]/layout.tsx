@@ -10,10 +10,8 @@ import CartProvider from "@/contexts/cart-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import ThemeProvider from "@/components/theme-provider";
 import localFont from "next/font/local";
-import { Suspense } from "react";
 import { siteConfig } from "@/config/site.config";
 import { FormatProvider } from "@/contexts/format-context";
-import { LuxuryLoading } from "@/components/luxury-loading";
 import BackToTop from "@/components/BackToTop";
 import { MediaPreviewProvider } from "@/components/media-preview-provider";
 
@@ -40,6 +38,16 @@ export const metadata: Metadata = {
     metadataBase: new URL(siteConfig.siteUrl),
     title: siteConfig.metadata.title,
     description: siteConfig.metadata.description,
+    icons: {
+        icon: [
+            { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+            { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+            { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+        ],
+        apple: [
+            { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+        ],
+    },
     keywords: [
         "tiles Rwanda",
         "ceramic tiles Kigali",
@@ -55,13 +63,13 @@ export const metadata: Metadata = {
         description: siteConfig.metadata.description,
         type: "website",
         siteName: siteConfig.siteName,
-        images: [{ url: "/logo.png", width: 1200, height: 630, alt: siteConfig.siteName }],
+        images: [{ url: "/images/mcc-inside-factory-machinery.jpg", width: 1200, height: 630, alt: siteConfig.siteName }],
     },
     twitter: {
         card: "summary_large_image",
         title: siteConfig.metadata.title,
         description: siteConfig.metadata.description,
-        images: ["/logo.png"],
+        images: ["/images/mcc-inside-factory-machinery.jpg"],
     },
 };
 
@@ -88,9 +96,19 @@ export default async function LocaleLayout({
         "@context": "https://schema.org",
         "@graph": [
             {
+                "@type": "WebSite",
+                "@id": `${siteConfig.siteUrl}/#website`,
+                url: siteConfig.siteUrl,
+                name: siteConfig.siteName,
+                alternateName: [siteConfig.companyName, "MCC"],
+                publisher: { "@id": `${siteConfig.siteUrl}/#organization` },
+            },
+            {
                 "@type": "Organization",
                 "@id": `${siteConfig.siteUrl}/#organization`,
                 name: siteConfig.siteName,
+                legalName: siteConfig.companyName,
+                alternateName: "MCC",
                 url: siteConfig.siteUrl,
                 logo: new URL("/logo.png", siteConfig.siteUrl).toString(),
             },
@@ -99,7 +117,7 @@ export default async function LocaleLayout({
                 "@id": `${siteConfig.siteUrl}/#localbusiness`,
                 name: siteConfig.siteName,
                 url: siteConfig.siteUrl,
-                image: new URL("/logo.png", siteConfig.siteUrl).toString(),
+                image: new URL("/images/mcc-factory.jpg", siteConfig.siteUrl).toString(),
                 parentOrganization: { "@id": `${siteConfig.siteUrl}/#organization` },
                 telephone: [
                     siteConfig.companyPhone,
@@ -127,32 +145,28 @@ export default async function LocaleLayout({
                         __html: JSON.stringify(companyJsonLd).replace(/</g, "\\u003c"),
                     }}
                 />
-                <Suspense fallback={<LuxuryLoading fullScreen />}>
-                    <NextIntlClientProvider locale={locale} messages={messages}>
-                        <ThemeProvider
-                            nonce={nonce}
-                            attribute="class"
-                            defaultTheme="system"
-                            enableSystem
-                            disableTransitionOnChange
+                <NextIntlClientProvider locale={locale} messages={messages}>
+                    <ThemeProvider
+                        nonce={nonce}
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <FormatProvider
+                            initialTimeZone={timeZone}
+                            secureCookie={siteConfig.isProduction}
                         >
-                            <FormatProvider
-                                initialTimeZone={timeZone}
-                                secureCookie={siteConfig.isProduction}
-                            >
-                                <AuthProvider>
-                                    <MediaPreviewProvider>
-                                        <CartProvider>
-                                            {children}
-                                        </CartProvider>
-                                    </MediaPreviewProvider>
-                                </AuthProvider>
-                            </FormatProvider>
-                            <Toaster position="top-right" richColors closeButton theme="system" />
-                            <BackToTop />
-                        </ThemeProvider>
-                    </NextIntlClientProvider>
-                </Suspense>
+                            <AuthProvider>
+                                <MediaPreviewProvider>
+                                    <CartProvider>{children}</CartProvider>
+                                </MediaPreviewProvider>
+                            </AuthProvider>
+                        </FormatProvider>
+                        <Toaster position="top-right" richColors closeButton theme="system" />
+                        <BackToTop />
+                    </ThemeProvider>
+                </NextIntlClientProvider>
             </body>
         </html>
     );

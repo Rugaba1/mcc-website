@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/app/i18n/routing";
@@ -26,6 +26,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         path: n > 1 ? `/blog?page=${n}` : "/blog",
         title: n > 1 ? `${title} – Page ${n}` : title,
         description,
+        image:"/images/mcc-factory.jpg"
     });
 }
 
@@ -38,7 +39,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
     const { posts, totalPages } = await getPublishedPosts({ page, locale, tag: sp.tag });
 
     return (
-        <main className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16">
             <Breadcrumbs items={[
                 { label: "Home", href: "/" },
                 { label: "Blog" },
@@ -46,12 +47,12 @@ export default async function BlogPage({ params, searchParams }: Props) {
             <h1 className="text-4xl font-bold tracking-tight">{t("title")}</h1>
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.map((p) => (
-                    <Link key={p.id} href={`/blog/${p.slug}`}>
-                        <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
+                    <Link key={p.id} href={`/blog/${p.slug}`} aria-label={`Read ${p.title}`} className="block h-full">
+                        <article className="h-full overflow-hidden rounded-md border bg-card transition-shadow hover:shadow-md">
                             {p.coverImage && (
-                                <div className="relative aspect-video">
-                                    <Image src={p.coverImage} alt={p.coverAlt ?? p.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover" />
-                                </div>
+                                <figure className="relative aspect-video overflow-hidden">
+                                    <MediaImage src={p.coverImage} alt={p.coverAlt ?? p.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover" />
+                                </figure>
                             )}
                             <CardHeader>
                                 <CardTitle className="line-clamp-2">{p.title}</CardTitle>
@@ -62,7 +63,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
                                 <span>· {p.readingMinutes} min</span>
                                 {p.tags?.split(",").slice(0, 2).map((tg) => <Badge key={tg} variant="secondary">{tg}</Badge>)}
                             </CardContent>
-                        </Card>
+                        </article>
                     </Link>
                 ))}
             </div>
@@ -71,6 +72,6 @@ export default async function BlogPage({ params, searchParams }: Props) {
                 prevLabel={t("prev")} nextLabel={t("next")} pageLabel={`${page} / ${totalPages}`}
                 extraQuery={sp.tag ? { tag: sp.tag } : {}}
             />
-        </main>
+        </div>
     );
 }

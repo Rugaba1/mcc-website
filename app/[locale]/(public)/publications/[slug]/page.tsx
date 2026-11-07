@@ -91,7 +91,22 @@ export default async function PublicationDetailPage({ params }: PageProps) {
           { label: publication.title },
         ]}
       />
-      <main className="mx-auto min-h-[60vh] max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto min-h-[60vh] max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+        <header className="mx-auto mb-10 max-w-3xl text-center">
+          <span className="mb-4 inline-flex items-center gap-3 text-xs font-bold tracking-[0.25em] text-primary uppercase">
+            <span className="h-px w-8 bg-primary" />
+            Company publication
+            <span className="h-px w-8 bg-primary" />
+          </span>
+          <h1 className="font-playfair text-4xl font-normal tracking-tight sm:text-5xl">
+            {publication.title}
+          </h1>
+          {publication.summary && (
+            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {publication.summary}
+            </p>
+          )}
+        </header>
         <PublicationContent
           publication={{
             ...publication,
@@ -101,8 +116,9 @@ export default async function PublicationDetailPage({ params }: PageProps) {
             updatedAt: publication.updatedAt.toISOString(),
           }}
           showPdfInline
+          showTitle={false}
         />
-      </main>
+      </div>
     </>
   );
 }

@@ -48,36 +48,36 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-5xl *:max-w-full bg-background">
-        <DialogHeader>
+      <DialogContent className="flex h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none flex-col gap-3 overflow-hidden p-3 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-full sm:max-w-5xl sm:gap-4 sm:overflow-y-auto sm:p-6 *:max-w-full bg-background">
+        <DialogHeader className="pr-8 sm:pr-0">
           <DialogTitle>
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8   bg-primary/20  flex items-center justify-center text-primary">
                 <Home className="w-4 h-4" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-foreground">
+                <span className="text-xl font-semibold text-foreground sm:text-2xl">
                   Select Room Scene
-                </h1>
+                </span>
 
               </div>
             </div>
           </DialogTitle>
           <DialogDescription>
-            <p className="text-md ">
+            <span className="text-sm sm:text-base">
               Choose from 15 authentic spaces (Bathrooms, Kitchens, Living Room, etc.)
-            </p>
+            </span>
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="w-full max-h-[80vh]  overflow-hidden flex flex-col">
+        <ScrollArea className="min-h-0 w-full max-h-[80vh] flex-1 overflow-hidden flex flex-col">
           {/* Modal Header */}
 
 
           {/* Category Filters Bar */}
-          <div className="px-5 py-3 border-b border-border bg-muted flex gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="flex gap-1.5 overflow-x-auto border-b border-border bg-muted px-3 py-3 no-scrollbar sm:px-5">
             {categories.map((cat) => {
               const isCatActive = activeCategory === cat;
-              const count = ALL_ROOM_SCENES.filter(s =>
+              const count = scenesList.filter(s =>
                 cat === "All" ? true : (s.category.toLowerCase().includes(cat.toLowerCase()) || s.name.toLowerCase().includes(cat.toLowerCase()))
               ).length;
 
@@ -85,9 +85,10 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
                 <Button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`text-xs px-3 py-1.5  font-medium whitespace-nowrap transition-all  ${isCatActive
-                    ? "bg-primary text-primary-foreground border border-primary font-semibold shadow-sm"
-                    : "bg-background/80 text-foreground border border-border hover:bg-background"
+                    aria-pressed={isCatActive}
+                    className={`min-h-11 text-xs px-3 py-1.5 font-medium whitespace-nowrap transition-all ${isCatActive
+                      ? "bg-primary text-primary-foreground border border-primary font-semibold shadow-sm"
+                      : "bg-background/80 text-foreground border border-border hover:bg-background"
                     }`}
                 >
                   <span>{cat}</span>
@@ -98,62 +99,65 @@ export const RoomScenesModal: React.FC<RoomScenesModalProps> = ({
           </div>
 
           {/* Room Scenes Grid */}
-          <div className="flex-1 overflow-y-auto p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <ul className="grid min-w-0 grid-cols-1 gap-4 p-3 sm:grid-cols-2 sm:p-5 md:grid-cols-3">
             {filteredScenes.map((scene) => {
               const isSelected = scene.id === currentSceneId;
               return (
-                <div
-                  key={scene.id}
+                <li key={scene.id} className="min-w-0">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
                   onClick={() => {
                     onSelectScene(scene);
                     onClose();
                   }}
-                  className={`group relative   overflow-hidden  cursor-pointer transition-all duration-200 text-left ${isSelected
+                  className={`group relative block min-h-11 w-full overflow-hidden cursor-pointer transition-all duration-200 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected
                     ? "border border-primary ring-2 ring-primary/50 bg-background/90 shadow-xl"
                     : "border border-border bg-card hover:bg-background"
                     }`}
                 >
                   {/* Scene Preview Image */}
-                  <div className="relative w-full h-40 bg-inverse overflow-hidden">
+                  <span className="relative block h-40 w-full overflow-hidden bg-inverse">
                     <Image
                       src={scene.baseImage}
-                      alt={scene.name}
+                      alt=""
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
 
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-muted via-transparent to-transparent opacity-80" />
+                    <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-muted via-transparent to-transparent opacity-80" />
 
                     {/* Surface count pill */}
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-overlay/70 text-overlay-foreground border border-overlay/70 text-[11px] font-medium backdrop-blur-sm">
+                    <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-overlay/70 text-overlay-foreground border border-overlay/70 text-[11px] font-medium backdrop-blur-sm">
                       {scene.surfaces.length} Surfaces
-                    </div>
+                    </span>
 
                     {isSelected && (
-                      <div className="absolute top-2 right-2 px-2 py-0.5   bg-primary  text-[11px] font-bold flex items-center gap-1 shadow-md">
-                        <Check className="w-3 h-3" />
+                      <span className="absolute top-2 right-2 px-2 py-0.5 bg-primary text-[11px] font-bold flex items-center gap-1 shadow-md">
+                        <Check aria-hidden="true" className="w-3 h-3" />
                         <span>CURRENT</span>
-                      </div>
+                      </span>
                     )}
-                  </div>
+                  </span>
 
                   {/* Card Meta */}
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold  group-hover:text-primary transition-colors">
+                  <span className="block p-3">
+                    <span className="block text-sm font-semibold group-hover:text-primary transition-colors">
                       {scene.name}
-                    </h3>
-                    <div className="flex items-center justify-between text-xs  mt-1">
+                    </span>
+                    <span className="mt-1 flex items-center justify-between text-xs">
                       <span>{scene.category}</span>
                       <span className="text-[10px]  uppercase tracking-wider font-mono">
                         {scene.originalSize.width}x{scene.originalSize.height}
                       </span>
-                    </div>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </button>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </ScrollArea>
       </DialogContent>
 

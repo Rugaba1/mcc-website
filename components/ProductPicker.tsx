@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import {
   PAINTS_CATALOG,
   COUNTERS_CATALOG,
@@ -22,7 +22,6 @@ import { useCart } from "../contexts/cart-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Checkbox } from "./ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PurchaseOptions } from "./purchase-option";
 import { Product } from "@/lib/api";
@@ -210,7 +209,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
   };
 
   return (
-    <div className="w-full sm:h-full h-[70vh] flex flex-col bg-card text-card-foreground border-l border-border px-3 select-none">
+    <div className="w-full min-w-0 sm:h-full h-[70dvh] flex flex-col bg-card text-card-foreground border-l border-border px-3 select-none">
       {/* Header Info */}
       <div className="p-4 border-b border-border bg-muted flex items-center justify-between">
         <div>
@@ -260,7 +259,8 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           <Button
             onClick={() => setActiveTab("tile")}
             variant={activeTab === "tile" ? "default" : "outline"}
-            className={`py-2.5 flex items-center justify-center gap-1.5  transition-colors `}
+          aria-pressed={activeTab === "tile"}
+          className={`min-h-11 py-2.5 flex items-center justify-center gap-1.5 transition-colors`}
           >
             <Layers className="w-3.5 h-3.5" />
             <span>Tiles ({filteredTiles.length})</span>
@@ -268,7 +268,8 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           <Button
             onClick={() => setActiveTab("grout")}
             variant={activeTab === "grout" ? "default" : "outline"}
-            className={`py-2.5 flex items-center justify-center gap-1.5  transition-colors`}
+            aria-pressed={activeTab === "grout"}
+            className={`min-h-11 py-2.5 flex items-center justify-center gap-1.5 transition-colors`}
           >
             <Palette className="w-3.5 h-3.5" />
             <span>Grout</span>
@@ -276,7 +277,8 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           <Button
             onClick={() => setActiveTab("pattern")}
             variant={activeTab === "pattern" ? "default" : "outline"}
-            className={`py-2.5 flex items-center justify-center gap-1.5  transition-colors `}
+            aria-pressed={activeTab === "pattern"}
+            className={`min-h-11 py-2.5 flex items-center justify-center gap-1.5 transition-colors`}
           >
             <Grid className="w-3.5 h-3.5" />
             <span>Pattern</span>
@@ -291,6 +293,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
             <Input
               type="text"
+              aria-label={isPaintSurface ? "Search paints by name or SKU" : "Search tiles by name, SKU, or size"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isPaintSurface ? "Search paints by name or SKU..." : "Search Mountain Ceramic tiles by name, SKU..."}
@@ -350,7 +353,8 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 <Button
                   key={cat}
                   onClick={() => setSelectedTileCategory(cat)}
-                  className={`text-[11px] px-2.5 py-1  whitespace-nowrap transition-colors ${selectedTileCategory === cat
+                  aria-pressed={selectedTileCategory === cat}
+                  className={`min-h-11 text-[11px] px-2.5 py-1 whitespace-nowrap transition-colors ${selectedTileCategory === cat
                     ? "bg-primary text-primary-foreground font-semibold"
                     : "bg-background/70 text-muted-foreground hover:bg-muted"
                     }`}
@@ -366,8 +370,9 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 <Button
                   key={cat}
                   onClick={() => setSelectedColorCategory(cat)}
+                  aria-pressed={selectedColorCategory === cat}
                   variant={selectedColorCategory === cat ? "default" : "outline"}
-                  className={`text-[10px] px-2 py-0.5  whitespace-nowrap border transition-colors `}
+                  className="min-h-11 text-[10px] px-2 whitespace-nowrap border transition-colors"
                 >
                   {cat}
                 </Button>
@@ -375,12 +380,15 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             </div>
 
             {/* Tile Cards Grid */}
-            <div className="grid grid-cols-2 gap-2.5 pt-1">
+            <ul className="grid grid-cols-2 gap-2.5 pt-1">
               {filteredTiles.map((tile, idx) => {
                 const isSelected = pickedTile?.id === tile.id;
                 return (
-                  <div
-                    key={tile.id}
+                  <li key={tile.id} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`Choose ${tile.name}`}
                     onClick={() => {
                       const product = tileList.find((item) => item.id === tile.id);
                       if (!product) return;
@@ -389,15 +397,15 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                         setSelectedSizeId(tile.availableSizes[0].id);
                       }
                     }}
-                    className={`relative p-2  border text-left cursor-pointer transition-all duration-150 group ${isSelected
+                    className={`relative block min-h-11 w-full p-2 border text-left cursor-pointer transition-all duration-150 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected
                       ? "bg-background/90 border-primary shadow-md ring-1 ring-primary/50"
                       : "bg-muted text-foreground hover:border-primary/50 hover:bg-accent"
                       }`}
                   >
-                    <div className="w-full h-24  bg-background overflow-hidden mb-2 relative">
-                      <Image
+                    <span className="relative mb-2 block h-24 w-full overflow-hidden bg-background">
+                      <MediaImage
                         src={tile.swatchUrl}
-                        alt={tile.name}
+                        alt=""
                         fill
                         sizes="(max-width: 768px) 50vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-200"
@@ -406,25 +414,26 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-5 h-5  bg-primary text-primary-foreground flex items-center justify-center shadow">
-                          <Check className="w-3.5 h-3.5" />
-                        </div>
+                        <span className="absolute right-1 top-1 flex size-5 items-center justify-center bg-primary text-primary-foreground shadow">
+                          <Check aria-hidden="true" className="size-3.5" />
+                        </span>
                       )}
-                    </div>
-                    <h3 className="text-xs font-semibold text-foreground line-clamp-1">{tile.name}</h3>
-                    <p className="text-[11px] text-muted-foreground line-clamp-1">{tile.material || tile.color}</p>
-                    <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1">
+                    </span>
+                    <span className="block truncate text-xs font-semibold text-foreground">{tile.name}</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">{tile.material || tile.color}</span>
+                    <span className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
                       <span>{tile.size}</span>
                       {tile.pricePerBox ? (
                         <span className="text-primary font-bold">{displayMoney(tile.pricePerBox)}</span>
                       ) : (
                         <span>{tile.availableSizes.length > 1 ? `${tile.availableSizes.length} sizes` : ""}</span>
                       )}
-                    </div>
-                  </div>
+                    </span>
+                  </button>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -437,18 +446,20 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 const isSelected = pickedGrout.id === grout.id;
                 return (
                   <Button
+                    type="button"
                     key={grout.id}
                     variant={"ghost"}
                     onClick={() => setPickedGrout(grout)}
-                    className={`flex items-center justify-between p-2.5  border text-left transition-all `}
+                    aria-pressed={isSelected}
+                    className="min-h-11 w-full justify-start border p-2.5 text-left"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Checkbox checked={isSelected} className="w-5 h-5 bg-muted border shadow-sm" />
-                      <div>
-                        <div className="text-xs">{grout.color}</div>
-                        <div className="text-[10px] text-muted-foreground">{grout.brand} • SKU {grout.sku}</div>
-                      </div>
-                    </div>
+                    <span aria-hidden="true" className={`mr-2 flex size-5 shrink-0 items-center justify-center border ${isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted"}`}>
+                      {isSelected && <Check className="size-3.5" />}
+                    </span>
+                    <span className="min-w-0 text-left">
+                      <span className="block text-xs">{grout.color}</span>
+                      <span className="block text-[10px] text-muted-foreground">{grout.brand} • SKU {grout.sku}</span>
+                    </span>
                   </Button>
                 );
               })}
@@ -465,17 +476,20 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 const isSelected = pickedPattern.id === pat.id;
                 return (
                   <Button
+                    type="button"
                     key={pat.id}
                     variant={"ghost"}
                     onClick={() => setPickedPattern(pat)}
-                    className={`flex items-center justify-between p-3  border text-left transition-all `}
+                    aria-pressed={isSelected}
+                    className="min-h-11 w-full justify-start border p-3 text-left"
                   >
-                    <div className="flex items-center gap-2.5"><Checkbox checked={isSelected} className="w-5 h-5 bg-muted border shadow-sm" />
-                      <div>
-                        <div className="text-xs">{pat.name}</div>
-                        <div className="text-[10px] text-muted-foreground">Ratio {pat.ratio}</div>
-                      </div>
-                    </div>
+                    <span aria-hidden="true" className={`mr-2 flex size-5 shrink-0 items-center justify-center border ${isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted"}`}>
+                      {isSelected && <Check className="size-3.5" />}
+                    </span>
+                    <span className="min-w-0 text-left">
+                      <span className="block text-xs">{pat.name}</span>
+                      <span className="block text-[10px] text-muted-foreground">Ratio {pat.ratio}</span>
+                    </span>
 
                   </Button>
                 );
@@ -504,22 +518,25 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             <p className="text-xs text-muted-foreground">
               Wall paint colors ({filteredPaints.length}):
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-2 gap-2">
               {filteredPaints.map((paint, idx) => {
                 const isSelected = pickedPaint.id === paint.id;
                 return (
-                  <div
-                    key={paint.id}
+                  <li key={paint.id} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`Choose ${paint.name}`}
                     onClick={() => setPickedPaint(paint)}
-                    className={`p-2  border text-left cursor-pointer transition-all ${isSelected
+                    className={`block min-h-11 w-full p-2 border text-left cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
                       : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
-                    <div className="w-full h-16  overflow-hidden mb-1.5 relative border ">
-                      <Image
+                    <span className="relative mb-1.5 block h-16 w-full overflow-hidden border">
+                      <MediaImage
                         src={paint.swatchUrl}
-                        alt={paint.name}
+                        alt=""
                         fill
                         sizes="100px"
                         className="object-cover"
@@ -527,17 +544,18 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">
-                          <Check className="w-3 h-3" />
-                        </div>
+                        <span className="absolute right-1 top-1 flex size-4 items-center justify-center bg-primary text-primary-foreground">
+                          <Check aria-hidden="true" className="size-3" />
+                        </span>
                       )}
-                    </div>
-                    <div className="text-xs font-semibold text-foreground line-clamp-1">{paint.name}</div>
-                    <div className="text-[10px] text-muted-foreground">{paint.sku || paint.family}</div>
-                  </div>
+                    </span>
+                    <span className="block truncate text-xs font-semibold text-foreground">{paint.name}</span>
+                    <span className="block truncate text-[10px] text-muted-foreground">{paint.sku || paint.family}</span>
+                  </button>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -547,22 +565,25 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             <p className="text-xs text-muted-foreground">
               Quartz & Natural Stone Slabs ({COUNTERS_CATALOG.length}):
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-2 gap-2">
               {COUNTERS_CATALOG.map((counter, idx) => {
                 const isSelected = pickedCounter.id === counter.id;
                 return (
-                  <div
-                    key={counter.id}
+                  <li key={counter.id} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`Choose ${counter.name}`}
                     onClick={() => setPickedCounter(counter)}
-                    className={`p-2 border text-left cursor-pointer transition-all ${isSelected
+                    className={`block min-h-11 w-full p-2 border text-left cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
                       : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
-                    <div className="w-full h-20  overflow-hidden mb-1.5 relative border  ">
-                      <Image
+                    <span className="relative mb-1.5 block h-20 w-full overflow-hidden border">
+                      <MediaImage
                         src={counter.swatchUrl}
-                        alt={counter.name}
+                        alt=""
                         fill
                         sizes="120px"
                         className="object-cover"
@@ -570,17 +591,18 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground flex items-center justify-center">
-                          <Check className="w-3 h-3" />
-                        </div>
+                        <span className="absolute right-1 top-1 flex size-4 items-center justify-center bg-primary text-primary-foreground">
+                          <Check aria-hidden="true" className="size-3" />
+                        </span>
                       )}
-                    </div>
-                    <div className="text-xs font-semibold text-foreground line-clamp-1">{counter.name}</div>
-                    <div className="text-[10px] text-muted-foreground">{counter.finish}</div>
-                  </div>
+                    </span>
+                    <span className="block truncate text-xs font-semibold text-foreground">{counter.name}</span>
+                    <span className="block truncate text-[10px] text-muted-foreground">{counter.finish}</span>
+                  </button>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -590,22 +612,25 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
             <p className="text-xs text-muted-foreground">
               Cabinet finishes ({CABINETS_CATALOG.length}):
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-2 gap-2">
               {CABINETS_CATALOG.map((cab, idx) => {
                 const isSelected = pickedCabinet.id === cab.id;
                 return (
-                  <div
-                    key={cab.id}
+                  <li key={cab.id} className="min-w-0">
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`Choose ${cab.name}`}
                     onClick={() => setPickedCabinet(cab)}
-                    className={`p-2  border text-left cursor-pointer transition-all ${isSelected
+                    className={`block min-h-11 w-full p-2 border text-left cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected
                       ? "bg-background border-primary shadow-md ring-1 ring-primary/50"
                       : "bg-muted text-foreground hover:bg-accent"
                       }`}
                   >
-                    <div className="w-full h-16  overflow-hidden mb-1.5 relative border ">
-                      <Image
+                    <span className="relative mb-1.5 block h-16 w-full overflow-hidden border">
+                      <MediaImage
                         src={cab.swatchUrl}
-                        alt={cab.name}
+                        alt=""
                         fill
                         sizes="100px"
                         className="object-cover"
@@ -613,16 +638,17 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
                       />
                       {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4  bg-primary text-primary-foreground flex items-center justify-center">
-                          <Check className="w-3 h-3" />
-                        </div>
+                        <span className="absolute right-1 top-1 flex size-4 items-center justify-center bg-primary text-primary-foreground">
+                          <Check aria-hidden="true" className="size-3" />
+                        </span>
                       )}
-                    </div>
-                    <div className="text-xs font-semibold text-foreground line-clamp-1">{cab.name}</div>
-                  </div>
+                    </span>
+                    <span className="block truncate text-xs font-semibold text-foreground">{cab.name}</span>
+                  </button>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         )}
       </div>

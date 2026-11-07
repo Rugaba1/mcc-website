@@ -17,6 +17,7 @@ import { validatePermissionAssignment } from "@/lib/permissions/assignment";
 import { DEFAULT_STAFF_PERMISSIONS } from "@/lib/permissions/catalog";
 import { isEmailBlocklisted } from "@/lib/auth/email-blocklist";
 import { ROLE_IDS, STAFF_ROLES } from "@/lib/constants";
+import { STAFF_BIO_MAX_LENGTH } from "@/lib/users/constants";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -185,7 +186,7 @@ export const POST = withPermission([PERM.USERS_CREATE, PERM.USERS_PERMISSIONS])(
           bio:
             String(b.bio ?? "")
               .trim()
-              .slice(0, 500) || null,
+              .slice(0, STAFF_BIO_MAX_LENGTH) || null,
           showOnHomepage: !!b.showOnHomepage,
           displayOrder: Number.isFinite(b.displayOrder)
             ? Number(b.displayOrder)

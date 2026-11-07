@@ -27,6 +27,7 @@ export function MediaImage({
       src={src}
       alt={alt}
       sizes={sizes}
+      unoptimized={src.startsWith("data:")}
       {...dimensions}
       {...props}
     />

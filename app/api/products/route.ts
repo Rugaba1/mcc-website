@@ -91,6 +91,7 @@ export const GET = withRateLimit({
         { categoryLabel: { contains: query } },
         { description: { contains: query } },
         { sizes: { contains: query } },
+        { variants: { some: { active: true, sku: { contains: query } } } },
       ];
     }
 

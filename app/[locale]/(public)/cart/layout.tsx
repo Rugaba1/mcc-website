@@ -17,6 +17,7 @@ export async function generateMetadata({
         title: `My Order | ${siteConfig.siteName}`,
         description: "Review the tile products in your order.",
         noIndex: true,
+        image: "/images/mcc-products.jpg"
     });
 }
 
@@ -25,7 +26,7 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
     return <>
         <Breadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Cart", href: "/cart" },
+            { label: "My order", href: "/cart" },
 
         ]} />
         {children}

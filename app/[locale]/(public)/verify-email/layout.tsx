@@ -14,6 +14,7 @@ export async function generateMetadata({
     title: `Email Verification | ${siteConfig.siteName}`,
     description: "Verify your email address to finish setting up your account.",
     noIndex: true,
+    image:"/images/mcc-factory-right-angle.jpg"
   });
 }
 

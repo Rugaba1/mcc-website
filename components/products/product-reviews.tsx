@@ -18,12 +18,16 @@ import { useFormatters } from "@/contexts/format-context";
 
 const emptyData: ProductReviewData = {
     reviews: [], total: 0, page: 1, pageSize: 5, totalPages: 1,
-    averageRating: null, canReview: false, authenticated: false, myReview: null,
+    averageRating: null, ratingDistribution: {}, canReview: false, authenticated: false, myReview: null,
 };
 
 function Stars({ rating }: { rating: number }) {
     return (
-        <span className="inline-flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+        <span
+            className="inline-flex items-center gap-0.5"
+            role="img"
+            aria-label={`${rating} out of 5 stars`}
+        >
             {Array.from({ length: 5 }, (_, index) => (
                 <Star key={index} className={`size-4 ${index < rating ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />
             ))}
@@ -86,7 +90,7 @@ export function ProductReviews({
     };
 
     return (
-        <section id="reviews" className="mt-20 border-t border-border pt-12">
+        <section id="reviews" aria-busy={loading} className="mt-20 border-t border-border pt-12">
             <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h2 className="font-playfair text-3xl font-bold">Customer reviews</h2>
@@ -97,14 +101,36 @@ export function ProductReviews({
                 <div className="flex items-center gap-2">
                     <Stars rating={Math.round(data.averageRating ?? 0)} />
                     <span className="font-semibold">{data.averageRating?.toFixed(1) ?? "—"}</span>
-                    <span className="text-sm text-muted-foreground">({data.total})</span>
+                    <span className="text-sm text-muted-foreground">
+                        {data.total} {data.total === 1 ? "verified review" : "verified reviews"}
+                    </span>
                 </div>
             </header>
 
             <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
                 <div className="space-y-5">
+                    <section aria-label="Ratings breakdown" className="max-w-md space-y-1.5 border-b border-border pb-5">
+                        {[5, 4, 3, 2, 1].map((stars) => {
+                            const count = data.ratingDistribution[stars] ?? 0;
+                            const percentage = data.total ? (count / data.total) * 100 : 0;
+                            return (
+                                <div key={stars} className="grid grid-cols-[3.5rem_minmax(0,1fr)_2rem] items-center gap-2 text-sm">
+                                    <span>{stars} {stars === 1 ? "star" : "stars"}</span>
+                                    <span className="h-2 overflow-hidden bg-muted" aria-hidden="true">
+                                        <span className="block h-full bg-primary" style={{ width: `${percentage}%` }} />
+                                    </span>
+                                    <span className="text-right text-muted-foreground">{count}</span>
+                                </div>
+                            );
+                        })}
+                    </section>
+                    {loading && data.reviews.length > 0 && (
+                        <p role="status" className="text-sm text-muted-foreground">
+                            Refreshing review access…
+                        </p>
+                    )}
                     {loading && data.reviews.length === 0 ? (
-                        <p className="py-8 text-sm text-muted-foreground">Loading reviews…</p>
+                        <p role="status" className="py-8 text-sm text-muted-foreground">Loading reviews…</p>
                     ) : data.reviews.length === 0 ? (
                         <p className="border border-dashed border-border p-8 text-sm text-muted-foreground">No approved reviews yet.</p>
                     ) : (
@@ -127,9 +153,9 @@ export function ProductReviews({
 
                     {data.totalPages > 1 && (
                         <nav className="flex items-center justify-between pt-2" aria-label="Review pages">
-                            <Button variant="outline" disabled={loading || page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</Button>
-                            <span className="text-sm text-muted-foreground">Page {page} of {data.totalPages}</span>
-                            <Button variant="outline" disabled={loading || page >= data.totalPages} onClick={() => setPage((current) => current + 1)}>Next</Button>
+                            <Button variant="outline" className="min-h-11" disabled={loading || page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</Button>
+                            <span className="text-sm text-muted-foreground" aria-live="polite">Page {page} of {data.totalPages}</span>
+                            <Button variant="outline" className="min-h-11" disabled={loading || page >= data.totalPages} onClick={() => setPage((current) => current + 1)}>Next</Button>
                         </nav>
                     )}
                 </div>
@@ -146,21 +172,25 @@ export function ProductReviews({
                         <form onSubmit={submit} className="mt-5 space-y-4">
                             <fieldset>
                                 <legend className="mb-2 text-sm font-medium">Rating</legend>
-                                <div className="flex gap-1" role="radiogroup" aria-label="Rating">
+                                <div className="flex gap-1">
                                     {Array.from({ length: 5 }, (_, index) => {
                                         const value = index + 1;
                                         return (
-                                            <button
+                                            <label
                                                 key={value}
-                                                type="button"
-                                                role="radio"
-                                                aria-checked={rating === value}
-                                                aria-label={`${value} star${value === 1 ? "" : "s"}`}
-                                                onClick={() => setRating(value)}
-                                                className="p-1"
+                                                className="flex size-11 cursor-pointer items-center justify-center has-[:focus-visible]:rounded-sm has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary"
                                             >
-                                                <Star className={`size-5 ${value <= rating ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />
-                                            </button>
+                                                <input
+                                                    type="radio"
+                                                    name={`review-rating-${productId}`}
+                                                    value={value}
+                                                    checked={rating === value}
+                                                    onChange={() => setRating(value)}
+                                                    className="sr-only"
+                                                    aria-label={`${value} star${value === 1 ? "" : "s"}`}
+                                                />
+                                                <Star aria-hidden="true" className={`size-5 ${value <= rating ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />
+                                            </label>
                                         );
                                     })}
                                 </div>
@@ -178,7 +208,7 @@ export function ProductReviews({
                                 />
                                 <p className="text-xs text-muted-foreground">Reviews are published after staff approval.</p>
                             </div>
-                            <Button type="submit" className="w-full" disabled={submitting || body.trim().length < 3}>
+                            <Button type="submit" className="min-h-11 w-full" disabled={submitting || body.trim().length < 3}>
                                 {submitting ? "Submitting…" : "Submit review"}
                             </Button>
                         </form>

@@ -16,6 +16,7 @@ export async function generateMetadata({
     description:
       "Contact Mountain Ceramics Company in Rwanda for product information, project support, and tile enquiries.",
   });
+  image: "/images/mcc-factory.jpg"
 }
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {

@@ -39,6 +39,15 @@ export interface MediaFile {
   mimeType: string;
   size: number;
   alt: string | null;
+  isPublic: boolean;
+  folderId: number | null;
+  folder: { id: number; name: string } | null;
+  createdAt: string;
+}
+export interface MediaFolder {
+  id: number;
+  name: string;
+  fileCount: number;
   createdAt: string;
 }
 
@@ -67,6 +76,10 @@ export interface ProductVariant {
   textureUrl: string | null;
   active: boolean;
   currency: string;
+  availability?:
+    | "https://schema.org/InStock"
+    | "https://schema.org/OutOfStock"
+    | "https://schema.org/BackOrder";
 
   // pricing (per m²)
   pricePerSqm: number;
@@ -184,6 +197,7 @@ export interface ProductReviewSummary {
   pageSize: number;
   totalPages: number;
   averageRating: number | null;
+  ratingDistribution: Record<number, number>;
 }
 export interface TileWithProduct extends TileProduct {
   product: Product;
@@ -317,6 +331,7 @@ export interface OrderDetail extends OrderSummary {
     status: string;
     method: string;
     amount: number;
+    refundedAmount?: number;
     currency: string;
     provider?: string | null;
     reference?: string | null;
@@ -329,6 +344,68 @@ export interface OrderDetail extends OrderSummary {
     note: string | null;
     createdAt: string;
   }[];
+}
+
+export interface AdminOrderCreationOptions {
+  currency: { code: string; decimalDigits: number };
+  customers: {
+    key: string;
+    kind: "ACCOUNT" | "SAVED";
+    id: number;
+    firstName: string;
+    lastName: string | null;
+    email: string | null;
+    phoneNumber: string | null;
+    tin: string | null;
+  }[];
+  variants: {
+    id: number;
+    productName: string;
+    sku: string;
+    size: string;
+    finish: string | null;
+    shadeCode: string | null;
+    image: string | null;
+    pricePerSqm: number;
+    containerPricePerSqm: number | null;
+    sqmPerContainer: number | null;
+    inventory: {
+      onHandSqm: number;
+      reservedSqm: number;
+      allowBackorder: boolean;
+    } | null;
+  }[];
+}
+
+export interface AdminOrderCreationInput {
+  customerKind: "ACCOUNT" | "SAVED" | "NEW";
+  customerId?: number;
+  customerName: string;
+  email?: string;
+  phone: string;
+  tin?: string;
+  fulfillment: "DELIVERY" | "PICKUP";
+  province?: string;
+  district?: string;
+  sector?: string;
+  street?: string;
+  shipNotes?: string;
+  customerNote?: string;
+  internalNote?: string;
+  items: {
+    variantId: number;
+    productName: string;
+    saleType: "SQM" | "CONTAINER";
+    quantity: number;
+  }[];
+  initialPayment?: {
+    amount: number;
+    method: string;
+    providerRef?: string;
+    payerPhone?: string;
+    note?: string;
+    paidAt: string;
+  };
 }
 
 export interface CustomerSummary {
@@ -347,6 +424,7 @@ export interface PaymentSummary {
   id: number;
   orderId: number;
   orderNumber: string;
+  orderPlacedAt: string;
   customerName: string;
   status: string;
   method: string;
@@ -586,6 +664,7 @@ export interface ProductReviewData {
   pageSize: number;
   totalPages: number;
   averageRating: number | null;
+  ratingDistribution: Record<number, number>;
   canReview: boolean;
   authenticated: boolean;
   myReview: {
@@ -1210,7 +1289,11 @@ export const api = {
     password: string;
     acceptedLegalVersionIds: number[];
     next?: string;
-  }) => post<unknown>("/api/auth/register", data),
+  }) =>
+    post<{ success: boolean; message: string; verificationEmailSent: boolean }>(
+      "/api/auth/register",
+      data,
+    ),
   authenticate: (data: {
     identifier: string;
     password: string;
@@ -1344,15 +1427,27 @@ export const api = {
     put<BlogPostDetail>(`/api/admin/blog/${id}`, d),
   deleteBlogPost: (id: number) => del(`/api/admin/blog/${id}`),
   getAdminOrder: (id: number) => get<OrderDetail>(`/api/admin/orders/${id}`),
+  getAdminOrderCreationOptions: () =>
+    get<AdminOrderCreationOptions>("/api/admin/orders/options"),
+  createAdminOrder: (data: AdminOrderCreationInput) =>
+    post<{ id: number; orderNumber: string; invoice: InvoiceRef | null }>(
+      "/api/admin/orders",
+      data,
+    ),
+  sendOrderInvoice: (id: number) =>
+    post<{
+      ok: boolean;
+      invoice: Pick<InvoiceRef, "id" | "number" | "kind" | "url">;
+    }>(`/api/admin/orders/${id}/invoice-email`, {}),
 
   updateOrderStatus: (
     id: number,
     status: string,
     note?: string,
-    paidAt?: string,
+    statusAt?: string,
   ) =>
     apiClient
-      .patch<Ok>(`/api/admin/orders/${id}`, { status, note, paidAt })
+      .patch<Ok>(`/api/admin/orders/${id}`, { status, note, statusAt })
       .then((r) => r.data),
   updatePayment: (
     id: number,
@@ -1504,22 +1599,56 @@ export const api = {
       }>("/api/admin/reviews", { id, approved })
       .then((r) => r.data),
   deleteReview: (id: number) => del(`/api/admin/reviews?id=${id}`),
-  getFiles: (p: { q?: string; kind?: string; page?: number; limit?: number }) =>
-    get<{ files: MediaFile[]; total: number; totalPages: number }>(
+  getFiles: (p: {
+    q?: string;
+    kind?: string;
+    folderId?: number | "root";
+    page?: number;
+    limit?: number;
+  }) =>
+    get<{
+      files: MediaFile[];
+      folders: MediaFolder[];
+      total: number;
+      totalPages: number;
+    }>(
       `/api/files${qs(p)}`,
     ),
-  uploadFiles: (files: File[], onProgress?: (pct: number) => void) => {
+  getMediaFolders: () =>
+    get<{ folders: MediaFolder[] }>("/api/media-folders"),
+  createMediaFolder: (name: string) =>
+    post<MediaFolder>("/api/media-folders", { name }),
+  deleteMediaFolder: (id: number) => del(`/api/media-folders/${id}`),
+  getPrivateMedia: (id: number) => getBlob(`/api/files/${id}/content`),
+  uploadFiles: (
+    files: File[],
+    options: {
+      folderId: number | null;
+      isPublic: boolean;
+      onProgress?: (pct: number) => void;
+    },
+  ) => {
     const fd = new FormData();
     files.forEach((f) => fd.append("file", f));
+    if (options.folderId !== null) fd.append("folderId", String(options.folderId));
+    fd.append("isPublic", String(options.isPublic));
     return apiClient
       .post<{ files: MediaFile[] }>("/api/upload", fd, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) =>
-          e.total && onProgress?.(Math.round((e.loaded * 100) / e.total)),
+          e.total && options.onProgress?.(Math.round((e.loaded * 100) / e.total)),
       })
       .then((r) => r.data.files);
   },
-  renameFile: (id: number, d: { name?: string; alt?: string | null }) =>
+  renameFile: (
+    id: number,
+    d: {
+      name?: string;
+      alt?: string | null;
+      folderId?: number | null;
+      isPublic?: boolean;
+    },
+  ) =>
     apiClient.patch<MediaFile>(`/api/files/${id}`, d).then((r) => r.data),
   deleteFile: (id: number) => del(`/api/files/${id}`),
   getVariants: (productId: number) =>
@@ -1635,6 +1764,7 @@ export const api = {
       status: string;
       internalNote: string | null;
       paidAt: string;
+      statusAt: string;
     }>,
   ) =>
     put<{ id: number; status: string; internalNote: string | null }>(

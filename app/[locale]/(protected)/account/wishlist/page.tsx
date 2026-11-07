@@ -41,7 +41,7 @@ export default function WishlistPage() {
       },
       MIN_SQM,
     );
-    toast.success(`${w.name} added to cart`);
+    toast.success(`${w.name} added to your order`);
   }
   return (
     <div className="space-y-5">
@@ -66,7 +66,7 @@ export default function WishlistPage() {
               </p>
               <div className="flex gap-2 pt-1">
                 <Button size="sm" className="flex-1" disabled={!w.variant} onClick={() => add(w)}>
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Add to cart
+                  <ShoppingCart className="mr-2 h-4 w-4" /> Add to order
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => void remove(w.productId)}>Remove</Button>
               </div>

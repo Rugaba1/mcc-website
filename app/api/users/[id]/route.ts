@@ -19,6 +19,7 @@ import {
   deleteUserAccount,
 } from "@/lib/users/delete-account";
 import { ROLE_IDS, STAFF_ROLES } from "@/lib/constants";
+import { STAFF_BIO_MAX_LENGTH } from "@/lib/users/constants";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Ctx = { params: Promise<{ id: string }> };
@@ -162,7 +163,8 @@ export const PUT = withPermission([PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS])(
     if (b.jobTitle !== undefined)
       data.jobTitle = String(b.jobTitle).trim() || null;
     if (b.bio !== undefined)
-      data.bio = String(b.bio).trim().slice(0, 500) || null;
+      data.bio =
+        String(b.bio).trim().slice(0, STAFF_BIO_MAX_LENGTH) || null;
     if (b.showOnHomepage !== undefined)
       data.showOnHomepage = !!b.showOnHomepage;
     if (b.displayOrder !== undefined && Number.isFinite(Number(b.displayOrder)))

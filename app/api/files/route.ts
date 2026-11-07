@@ -12,15 +12,44 @@ export const GET = withPermission(PERM.MEDIA_VIEW)(async (req: NextRequest) => {
   const page = Math.max(parseInt(sp.get("page") ?? "1", 10) || 1, 1);
   const q = sp.get("q")?.trim();
   const kind = sp.get("kind");
+  const folderParam = sp.get("folderId");
 
   const where: Prisma.MediaFileWhereInput = {};
   if (kind === "image" || kind === "file") where.kind = kind;
+  if (folderParam === "root") {
+    where.folderId = null;
+  } else if (folderParam) {
+    const folderId = Number(folderParam);
+    if (!Number.isSafeInteger(folderId) || folderId < 1) {
+      return NextResponse.json({ error: "Invalid folder" }, { status: 400 });
+    }
+    where.folderId = folderId;
+  }
   if (q) where.OR = [{ name: { contains: q } }, { originalName: { contains: q } }];
 
-  const [total, files] = await Promise.all([
+  const [total, files, folders] = await Promise.all([
     prisma.mediaFile.count({ where }),
-    prisma.mediaFile.findMany({ where, orderBy: { createdAt: "desc" }, take: limit, skip: (page - 1) * limit }),
+    prisma.mediaFile.findMany({
+      where,
+      include: { folder: { select: { id: true, name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: (page - 1) * limit,
+    }),
+    prisma.mediaFolder.findMany({
+      orderBy: { name: "asc" },
+      include: { _count: { select: { files: true } } },
+    }),
   ]);
 
-  return NextResponse.json({ files, total, page, totalPages: Math.max(1, Math.ceil(total / limit)) });
+  return NextResponse.json({
+    files,
+    folders: folders.map(({ _count, ...folder }) => ({
+      ...folder,
+      fileCount: _count.files,
+    })),
+    total,
+    page,
+    totalPages: Math.max(1, Math.ceil(total / limit)),
+  });
 });

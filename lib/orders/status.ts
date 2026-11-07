@@ -10,6 +10,35 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
+type OrderStatusDateField = "paidAt" | "shippedAt" | "deliveredAt" | "cancelledAt";
+
+export const ORDER_STATUS_DATE_FIELDS: Partial<
+  Record<OrderStatus, OrderStatusDateField>
+> = {
+  PAID: "paidAt",
+  SHIPPED: "shippedAt",
+  DELIVERED: "deliveredAt",
+  CANCELLED: "cancelledAt",
+} as const;
+
+export const ORDER_STATUS_DATE_LABELS = {
+  PENDING: "order created",
+  PAID: "payment received",
+  PROCESSING: "order processing started",
+  SHIPPED: "order shipped",
+  DELIVERED: "order delivered",
+  CANCELLED: "order cancelled",
+  REFUNDED: "order refunded",
+} as const;
+
+export function orderStatusDateField(status: OrderStatus) {
+  return ORDER_STATUS_DATE_FIELDS[status];
+}
+
+export function orderStatusDateLabel(status: OrderStatus) {
+  return ORDER_STATUS_DATE_LABELS[status];
+}
+
 const PROGRESS: Partial<Record<OrderStatus, number>> = {
   PENDING: 0,
   PAID: 1,

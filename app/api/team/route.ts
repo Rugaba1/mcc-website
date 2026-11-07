@@ -26,7 +26,7 @@ export const GET = withRateLimit({
       id: u.id,
       name: `${u.firstName} ${u.lastName || ""}`.trim(),
       jobTitle: u.jobTitle,
-      bio: u.bio,
+      bio: u.bio ?? "",
       image: u.profilePicture,
     })),
   );

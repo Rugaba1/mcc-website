@@ -22,10 +22,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PhoneInput } from "../ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 type UserForm = { name: string; email: string; phoneNumber: string; password: string; profilePicture: string; active: boolean; emailVerified: boolean; permissions: string[] };
 const EMPTY_FORM: UserForm = { name: "", email: "", phoneNumber: "", password: "", profilePicture: "", active: true, emailVerified: false, permissions: [] };
 
 export function RegularUsersPage() {
+    const { confirm, dialog } = useConfirmAction();
     const { date } = useFormatters();
     const [users, setUsers] = useState<RegularUser[]>([]);
     const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export function RegularUsersPage() {
     };
 
     const remove = async (user: RegularUser) => {
-        if (!confirm(`Delete ${user.name} (${user.email})?`)) return;
+        if (!(await confirm({ title: "Delete this user?", description: `${user.name} (${user.email}) will be permanently deleted.` }))) return;
         try {
             await api.deleteUser(user.id);
             toast.success("User deleted");
@@ -167,6 +169,7 @@ export function RegularUsersPage() {
                     </tbody>
                 </table>
             </div>
+            {dialog}
 
             <PermissionGate
                 required={editing ? [PERM.USERS_UPDATE, PERM.USERS_PERMISSIONS] : [PERM.USERS_CREATE, PERM.USERS_PERMISSIONS]}
@@ -178,7 +181,7 @@ export function RegularUsersPage() {
                             <DialogDescription>Manage a regular account. Staff access is managed separately.</DialogDescription>
                         </DialogHeader>
                         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
-                            <div className="space-y-1.5"><Label>Profile photo</Label><ImageField value={form.profilePicture} onChange={(profilePicture) => setForm((current) => ({ ...current, profilePicture }))} /></div>
+                            <div className="space-y-1.5"><span className="text-sm font-medium">Profile photo</span><ImageField ariaLabel="Profile photo URL" value={form.profilePicture} onChange={(profilePicture) => setForm((current) => ({ ...current, profilePicture }))} /></div>
                             <div className="space-y-1.5"><Label htmlFor="regular-user-name">Full name</Label><Input id="regular-user-name" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} /></div>
                             <div className="space-y-1.5"><Label htmlFor="regular-user-email">Email</Label><Input id="regular-user-email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></div>
                             <div className="space-y-1.5"><Label htmlFor="regular-user-phone">Phone number (optional)</Label>
@@ -215,8 +218,10 @@ export function RegularUsersPage() {
                                                 <fieldset key={group.group} className="space-y-2">
                                                     <legend className="text-sm font-semibold">{group.group}</legend>
                                                     {group.items.map((permission) => (
-                                                        <label key={permission.code} className="flex items-start gap-2 text-sm">
+                                                        <div key={permission.code} className="flex min-h-11 items-start gap-2 text-sm">
                                                             <input
+                                                                id={`customer-permission-${permission.code}`}
+                                                                aria-describedby={`customer-permission-description-${permission.code}`}
                                                                 type="checkbox"
                                                                 checked={form.permissions.includes(permission.code)}
                                                                 onChange={(event) =>
@@ -229,11 +234,11 @@ export function RegularUsersPage() {
                                                                 }
                                                                 className="mt-1 accent-primary"
                                                             />
-                                                            <span>
-                                                                <span className="block">{permission.label}</span>
-                                                                <span className="block text-xs text-muted-foreground">{permission.description}</span>
+                                                            <span className="min-w-0">
+                                                                <Label htmlFor={`customer-permission-${permission.code}`} className="block cursor-pointer">{permission.label}</Label>
+                                                                <span id={`customer-permission-description-${permission.code}`} className="block text-xs text-muted-foreground">{permission.description}</span>
                                                             </span>
-                                                        </label>
+                                                        </div>
                                                     ))}
                                                 </fieldset>
                                             );

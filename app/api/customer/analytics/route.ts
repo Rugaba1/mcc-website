@@ -343,13 +343,13 @@ export const GET = withAuth(async (request, { user }) => {
         num(spentAll._avg.grandTotal),
         "currency",
       ),
-      card("cartBoxes", "Boxes In Cart", cartBoxes),
-      card("cartValue", "Cart Value", cartSubtotal, "currency"),
+      card("cartBoxes", "Boxes In Your Order", cartBoxes),
+      card("cartValue", "Order Value", cartSubtotal, "currency"),
       card("wishlist", "Wishlist", wishlistCount),
       card("designs", "Saved Designs", designsCount),
       card("reviews", "My Reviews", reviewsCount),
       card("addresses", "Saved Addresses", addressesCount),
-      card("cartSqm", "Area In Cart (m²)", cartSqm),
+      card("cartSqm", "Area In Your Order (m²)", cartSqm),
     ];
 
     return NextResponse.json({

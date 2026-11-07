@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { SceneDefinition, SurfaceDefinition } from "../data/scenes";
 import { SelectionMap } from "../types/visualizer";
 import { LuxuryLoading } from "@/components/luxury-loading";
+import { Button } from "@/components/ui/button";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, LocateFixed } from "lucide-react";
 
 interface VisualizerCanvasProps {
   scene: SceneDefinition;
@@ -50,6 +52,8 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
   const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragMovedRef = useRef(false);
+  const suppressClickRef = useRef(false);
 
   // Preload base image, masks, and sample layers on mount
   useEffect(() => {
@@ -372,13 +376,14 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
   };
 
   // Mouse event handlers
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
 
     if (isZoomMode && isDragging) {
       const deltaX = (e.clientX - dragStartRef.current.x) / zoomScale;
       const deltaY = (e.clientY - dragStartRef.current.y) / zoomScale;
+      if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) dragMovedRef.current = true;
       setPanOffset((prev) => ({ x: prev.x + deltaX, y: prev.y + deltaY }));
       dragStartRef.current = { x: e.clientX, y: e.clientY };
       return;
@@ -390,28 +395,40 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
     }
   };
 
-  const handleMouseLeave = () => {
+  const handlePointerLeave = () => {
     setHoveredSurface(null);
     setCursorPos(null);
-    setIsDragging(false);
   };
 
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isZoomMode && isDragging) return;
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
     const hit = hitTestSurface(e.clientX, e.clientY);
     if (hit) {
       onSelectSurface(hit.sortOrder);
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isZoomMode) {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      dragMovedRef.current = false;
       setIsDragging(true);
       dragStartRef.current = { x: e.clientX, y: e.clientY };
     }
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
+    suppressClickRef.current = dragMovedRef.current;
+    setIsDragging(false);
+  };
+
+  const handlePointerCancel = () => {
+    dragMovedRef.current = false;
+    suppressClickRef.current = false;
     setIsDragging(false);
   };
 
@@ -421,6 +438,10 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
     const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
     setZoomScale((prev) => Math.min(Math.max(prev + zoomDelta, 1), 3.5));
   };
+  const adjustZoom = (delta: number) =>
+    setZoomScale((current) => Math.min(3.5, Math.max(1, current + delta)));
+  const pan = (x: number, y: number) =>
+    setPanOffset((current) => ({ x: current.x + x, y: current.y + y }));
 
   return (
     <div
@@ -438,21 +459,78 @@ export const VisualizerCanvas: React.FC<VisualizerCanvasProps> = ({
 
       <canvas
         ref={setCanvasRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        role="img"
+        aria-label={`${scene.name} room visualization. Use the surface buttons and product controls to choose and apply finishes.`}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
         onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         onWheel={handleWheel}
-        className={`w-full  object-contain transition-all duration-75 ${isZoomMode ? (isDragging ? "cursor-grabbing" : "cursor-grab") : "cursor-crosshair"
+        className={`w-full object-contain transition-all duration-75 ${isZoomMode ? (isDragging ? "cursor-grabbing touch-none" : "cursor-grab touch-none") : "cursor-crosshair"
           }`}
         style={{ aspectRatio: "2000 / 1150" }}
       />
 
+      {isZoomMode && (
+        <div className="absolute right-3 top-3 z-40 flex flex-col gap-2 border border-inverse-border bg-inverse/90 p-2 text-inverse-foreground shadow-lg">
+          <div className="flex items-center gap-1" role="group" aria-label="Zoom controls">
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => adjustZoom(-0.2)} disabled={zoomScale <= 1} aria-label="Zoom out">
+              <span aria-hidden="true">−</span>
+            </Button>
+            <span className="min-w-14 text-center text-xs" aria-live="polite">{Math.round(zoomScale * 100)}% zoom</span>
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => adjustZoom(0.2)} disabled={zoomScale >= 3.5} aria-label="Zoom in">
+              <span aria-hidden="true">+</span>
+            </Button>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full rounded-none"
+            onClick={() => {
+              setZoomScale(1);
+              setPanOffset({ x: 0, y: 0 });
+            }}
+          >
+            Reset view
+          </Button>
+          <div className="grid grid-cols-3 gap-1" role="group" aria-label="Pan controls">
+            <span aria-hidden="true" />
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => pan(0, -40)} disabled={zoomScale <= 1} aria-label="Pan up">
+              <ArrowUp aria-hidden="true" />
+            </Button>
+            <span aria-hidden="true" />
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => pan(-40, 0)} disabled={zoomScale <= 1} aria-label="Pan left">
+              <ArrowLeft aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="size-11 rounded-none"
+              onClick={() => setPanOffset({ x: 0, y: 0 })}
+              disabled={zoomScale <= 1}
+              aria-label="Center the view"
+            >
+              <LocateFixed aria-hidden="true" />
+            </Button>
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => pan(40, 0)} disabled={zoomScale <= 1} aria-label="Pan right">
+              <ArrowRight aria-hidden="true" />
+            </Button>
+            <span aria-hidden="true" />
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-none" onClick={() => pan(0, 40)} disabled={zoomScale <= 1} aria-label="Pan down">
+              <ArrowDown aria-hidden="true" />
+            </Button>
+            <span aria-hidden="true" />
+          </div>
+        </div>
+      )}
+
       {/* Surface Name Tooltip near cursor */}
       {hoveredSurface && cursorPos && !isDragging && (
         <div
-          className="pointer-events-none absolute z-30 px-3 py-1.5 bg-inverse/90 text-inverse-foreground border border-inverse-border shadow-xl text-xs font-semibold backdrop-blur-md transition-opacity"
+          className="pointer-events-none absolute z-30 px-3 py-1.5 bg-inverse/90 text-inverse-foreground border border-inverse-border shadow-xl text-xs font-semibold transition-opacity"
           style={{
             left: `${cursorPos.x + 16}px`,
             top: `${cursorPos.y + 16}px`,

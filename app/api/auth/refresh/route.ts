@@ -27,7 +27,7 @@ export const POST = withRateLimit({
 
   try {
     const refreshToken = request.cookies.get("refresh_token")?.value;
-    if (!refreshToken) return unauthorized();
+    if (!refreshToken) return new NextResponse(null, { status: 204 });
 
     const result = await rotateRefreshSession(refreshToken, request);
     if (result.status === "invalid") return unauthorized();

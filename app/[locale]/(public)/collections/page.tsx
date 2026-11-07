@@ -1,8 +1,9 @@
 
-import Image from "next/image";
-import Link from "next/link";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
 import { api, serverApi, type Collection, type Product } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
+import { ProductStartingPrice } from "@/components/product-starting-price";
 const PAGE_SIZE = 12
 export default async function CollectionsPage({
   params,
@@ -11,9 +12,10 @@ export default async function CollectionsPage({
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ search?: string; category?: string, page?: string; viewMode?: string; sort?: string, badgeFilter?: string }>;
 }) {
+  const { locale } = await params;
   let totalPages = 1;
   const { search, badgeFilter, category, page: pageParam, viewMode, sort, } = await searchParams
-  const page = Math.max(1, parseInt(pageParam ?? "1", PAGE_SIZE) || 1);
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   let collections = null
   let products: Product[] = []
   try {
@@ -27,13 +29,16 @@ export default async function CollectionsPage({
     })
 
   } catch (error) {
-
+    console.error("Could not load collections for the public catalogue:", error);
   }
   if (!collections) {
     return (
       <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">collections not found</p>
+        <div className="text-center" role="alert">
+          <h1 className="font-semibold text-lg">Collections are temporarily unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Please try again later or contact us for help.
+          </p>
           <Link href="/catalogue" className=" hover:underline text-sm mt-2 inline-block">
             ← Back to home
           </Link>
@@ -80,6 +85,7 @@ export default async function CollectionsPage({
                   key={col.id}
                   collection={col}
                   products={products}
+                  locale={locale}
                   large
                 />
               ))}
@@ -99,6 +105,7 @@ export default async function CollectionsPage({
                   key={col.id}
                   collection={col}
                   products={products}
+                  locale={locale}
                 />
               ))}
             </div>
@@ -107,10 +114,9 @@ export default async function CollectionsPage({
 
         {collections.length === 0 && (
           <div className="text-center py-24 ">
-            <p className="text-lg mb-3">No collections yet.</p>
-            <Link href="/admin" className=" hover:underline text-sm font-semibold">
-              Add collections in the Admin Portal →
-            </Link>
+            <p className="text-lg mb-3">
+              New tile collections are coming soon. Please check back later.
+            </p>
           </div>
         )}
       </div>
@@ -125,10 +131,12 @@ export default async function CollectionsPage({
 function CollectionCard({
   collection,
   products,
+  locale,
   large = false,
 }: {
   collection: Collection;
   products: Product[];
+  locale: string;
   large?: boolean;
 }) {
   const tiles = products.filter((p) => collection.tileIds.includes(p.id));
@@ -147,7 +155,7 @@ function CollectionCard({
 
       {/* Image */}
       <div className={`relative overflow-hidden ${large ? "md:w-1/2 min-h-70" : "min-h-55"}`}>
-        <Image
+        <MediaImage
           src={collection.image}
           alt={collection.name}
           fill
@@ -182,6 +190,10 @@ function CollectionCard({
           <p className=" text-sm leading-relaxed mb-5">
             {collection.description}
           </p>
+          <ProductStartingPrice
+            variants={tiles.flatMap((tile) => tile.variants ?? [])}
+            locale={locale}
+          />
 
           {/* Surface badges */}
           <div className="flex flex-wrap gap-2 mb-5">
@@ -208,7 +220,7 @@ function CollectionCard({
             <div className="flex gap-2 mb-6 flex-wrap">
               {tiles.slice(0, 5).map((t) => (
                 <div key={t.id} className="relative w-10 h-10 overflow-hidden -2  hover:-primary transition-colors" title={t.name}>
-                  <Image
+                  <MediaImage
                     src={t.image}
                     alt={t.name}
                     fill

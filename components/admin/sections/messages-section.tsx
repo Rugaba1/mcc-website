@@ -9,6 +9,7 @@ import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
 import { Modal } from "../modal";
 import { useFormatters } from "@/contexts/format-context";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 const STATUSES: ContactStatus[] = ["NEW", "READ", "REPLIED", "ARCHIVED"];
 
@@ -19,6 +20,7 @@ export function MessagesSection({
   messages: ContactMessage[];
   reload: () => void;
 }) {
+  const { confirm, dialog } = useConfirmAction();
   const { dateTime } = useFormatters();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"ALL" | ContactStatus>("ALL");
@@ -71,7 +73,7 @@ export function MessagesSection({
   }
 
   async function remove(m: ContactMessage) {
-    if (!confirm("Delete this message permanently?")) return;
+    if (!(await confirm({ title: "Delete this message permanently?", description: "This action cannot be undone." }))) return;
     try {
       await api.deleteContactMessage(m.id);
       toast.success("Deleted");
@@ -183,6 +185,7 @@ export function MessagesSection({
           </div>
         </Modal>
       )}
+      {dialog}
     </div>
   );
 }

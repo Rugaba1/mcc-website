@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PermissionGate } from "@/components/permission-gate";
 import { PERM } from "@/lib/permissions/catalog";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 export default function AdminReviewsPage() {
+    const { confirm, dialog } = useConfirmAction();
     const { dateTime } = useFormatters();
     const [reviews, setReviews] = useState<AdminReview[]>([]);
     const [status, setStatus] = useState<"pending" | "approved" | "all">("pending");
@@ -53,7 +55,10 @@ export default function AdminReviewsPage() {
     };
 
     const remove = async (review: AdminReview) => {
-        if (!confirm(`Permanently delete this review for ${review.product.name}?`)) return;
+        if (!(await confirm({
+            title: "Permanently delete this review?",
+            description: `This will permanently delete the review for ${review.product.name}.`,
+        }))) return;
         setBusyId(review.id);
         try {
             await api.deleteReview(review.id);
@@ -67,7 +72,7 @@ export default function AdminReviewsPage() {
     };
 
     return (
-        <main className="space-y-5 p-4 md:p-6">
+        <section className="space-y-5 p-4 md:p-6">
             <header className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Product reviews</h1>
@@ -108,7 +113,7 @@ export default function AdminReviewsPage() {
                                     <a href={`/products/${review.productId}#reviews`} className="font-semibold text-primary underline-offset-4 hover:underline">{review.product.name}</a>
                                     <p className="text-xs text-muted-foreground">{review.author} · {review.user.email} · {dateTime(review.createdAt)}</p>
                                 </div>
-                                <div className="flex items-center gap-1" aria-label={`${review.rating} out of 5 stars`}>
+                                <div className="flex items-center gap-1" role="img" aria-label={`${review.rating} out of 5 stars`}>
                                     {Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-4 ${index < review.rating ? "fill-primary text-primary" : "text-muted-foreground/40"}`} />)}
                                 </div>
                             </div>
@@ -136,6 +141,7 @@ export default function AdminReviewsPage() {
                     <Button variant="outline" disabled={loading || page >= totalPages} onClick={() => setPage((current) => current + 1)}>Next</Button>
                 </nav>
             )}
-        </main>
+            {dialog}
+        </section>
     );
 }

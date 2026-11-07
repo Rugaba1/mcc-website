@@ -179,7 +179,7 @@ export default function AdminNewsletterPage() {
             </div>
             <div className="space-y-2">
               <div>
-                <Label>Message</Label>
+                <Label htmlFor="newsletter-message">Message</Label>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Use the image button to add campaign images, or the paperclip button
                   to feature active products, collections, catalogues, publications,
@@ -188,6 +188,7 @@ export default function AdminNewsletterPage() {
                 </p>
               </div>
               <MarkdownEditor
+                id="newsletter-message"
                 value={bodyMarkdown}
                 onChange={setBodyMarkdown}
                 enableImages

@@ -124,7 +124,7 @@ export default function AdminProductsPage() {
   const hasFilters = !!search || category !== "all";
 
   return (<>
-    <main className="flex-1 space-y-5 p-4 md:p-6">
+    <section className="flex-1 space-y-5 p-4 md:p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Products</h1>
@@ -335,7 +335,7 @@ export default function AdminProductsPage() {
         onConfirm={confirmDelete}
       />
     </PermissionGate>
-  </main >
+  </section>
     <PermissionGate required={PERM.VARIANTS_MANAGE}>
       <VariantsSheet product={variantsFor} onOpenChange={(o) => !o && setVariantsFor(null)} onChanged={refresh} />
     </PermissionGate>

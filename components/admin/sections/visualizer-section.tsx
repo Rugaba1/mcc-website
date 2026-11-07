@@ -58,8 +58,9 @@ export function VisualizerSection({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-sm">
+          <label htmlFor="visualizer-missing-only" className="flex min-h-11 items-center gap-2 text-sm">
             <Input
+              id="visualizer-missing-only"
               type="checkbox"
               checked={missingOnly}
               onChange={(e) => setMissingOnly(e.target.checked)}

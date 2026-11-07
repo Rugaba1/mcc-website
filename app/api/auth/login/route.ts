@@ -97,6 +97,7 @@ export const POST = withRateLimit({
       user?.password ?? getDummyHash(),
     );
     if (!user || !passwordOk) return invalid();
+    const isRegular = user.role.some((role) => role.id === ROLE_IDS.CUSTOMER);
 
     // Only reveal "inactive" after the password is verified
     if (!user.isActive || (await isEmailBlocklisted(user.email))) {
@@ -110,7 +111,7 @@ export const POST = withRateLimit({
       );
     }
 
-    if (!user.emailVerifiedAt) {
+    if (!user.emailVerifiedAt && !isRegular) {
       try {
         const token = createEmailVerificationToken(user.id, user.email);
         const origin = siteConfig.configuredSiteUrl
@@ -145,7 +146,6 @@ export const POST = withRateLimit({
       );
     }
 
-    const isRegular = user.role.some((role) => role.id === ROLE_IDS.CUSTOMER);
     const permissions = [
       ...permissionsForAccount(
         user.permissions.map(({ permission }) => permission.code),

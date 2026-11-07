@@ -1,6 +1,6 @@
 
-import Image from "next/image";
-import Link from "next/link";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
 import { serverApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import AddToCartButton from "@/components/add-cart-button";
 import { PaginationControls } from "@/components/pagination-controls";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { WishlistButton } from "@/components/wishlist-button";
+import { ProductStartingPrice } from "@/components/product-starting-price";
 
 const filters = [
     { key: "all", label: "All Collections" },
@@ -27,27 +28,36 @@ export default async function Products({
     searchParams: Promise<{ category?: string, search?: string; page?: string; }>;
 }) {
 
+    const { locale } = await params;
     const { category, page: pageParam, search } = await searchParams;
-    const page = Math.max(1, parseInt(pageParam ?? "1", PAGE_SIZE) || 1);
+    const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
     let totalPages = 1;
     let products = null
     try {
-        const data = (await serverApi.getProducts({ skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, category: encodeURIComponent(category || "") }))
+        const data = await serverApi.getProducts({
+            skip: (page - 1) * PAGE_SIZE,
+            limit: PAGE_SIZE,
+            category: category || undefined,
+            search,
+        });
         products = data.products
 
         totalPages = data.totalPages
 
     } catch (error) {
-
+        console.error("Could not load products for the public catalogue:", error);
     }
 
     if (!products) {
         return (
             <div className="min-h-screen  flex items-center justify-center">
-                <div className="text-center">
-                    <p className=" font-semibold text-lg">Tiles not found</p>
+                <div className="text-center" role="alert">
+                    <h1 className="font-semibold text-lg">Products are temporarily unavailable</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        Please try again later or contact us for help.
+                    </p>
                     <Link href="/catalogue" className=" hover:underline text-sm mt-2 inline-block">
-                        ← Back to home
+                        Browse the catalogue
                     </Link>
                 </div>
             </div>
@@ -101,12 +111,13 @@ export default async function Products({
                 {/* Product grid */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.map((p) => (
-                        < div
+                        <div
+                            key={p.id}
                             className=" group overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 block"
                         >
                             {/* Image */}
                             <div className="relative h-56 overflow-hidden ">
-                                <Image
+                                <MediaImage
                                     src={p.image}
                                     alt={p.name}
                                     fill
@@ -152,6 +163,7 @@ export default async function Products({
                                 <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-200">
                                     {p.name}
                                 </h3>
+                                <ProductStartingPrice variants={p.variants} locale={locale} />
                                 <p className=" text-sm leading-relaxed mb-5 line-clamp-2">{p.description}</p>
                                 <div className="flex items-center justify-between pt-4 border-t border-border">
                                     <AddToCartButton product={p} sm /> <WishlistButton productId={p.id} />

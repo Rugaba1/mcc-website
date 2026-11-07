@@ -7,7 +7,13 @@ import { useAuth } from "@/contexts/auth-context";
 import { api, apiErrorMessage } from "@/lib/api";
 import { Button } from "./ui/button";
 
-export function WishlistButton({ productId }: { productId: number }) {
+export function WishlistButton({
+  productId,
+  showLabel = false,
+}: {
+  productId: number;
+  showLabel?: boolean;
+}) {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -22,8 +28,15 @@ export function WishlistButton({ productId }: { productId: number }) {
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={() => void save()} aria-label="Save to wishlist">
-      <Heart className="h-4 w-4" />
+    <Button
+      variant="outline"
+      size={showLabel ? "default" : "icon"}
+      onClick={() => void save()}
+      aria-label="Save to wishlist"
+      className={showLabel ? "min-h-11 gap-2 whitespace-nowrap" : "min-h-11 min-w-11"}
+    >
+      <Heart className="h-4 w-4" aria-hidden="true" />
+      {showLabel && <span>Wishlist</span>}
     </Button>
   );
 }

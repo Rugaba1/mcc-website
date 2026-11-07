@@ -45,6 +45,13 @@ export const GET = withRateLimit({
             image: true,
             textureUrl: true,
             active: true,
+            inventory: {
+              select: {
+                onHandSqm: true,
+                reservedSqm: true,
+                allowBackorder: true,
+              },
+            },
           },
         },
         collections: {
@@ -94,8 +101,15 @@ export const GET = withRateLimit({
           ? JSON.parse(product.colors || "[]")
           : product.colors || [],
       variants: product.variants
-        ? product.variants.map((v) => ({
+        ? product.variants.map(({ inventory, ...v }) => ({
             ...v,
+            availability: inventory
+              ? Number(inventory.onHandSqm) > Number(inventory.reservedSqm)
+                ? "https://schema.org/InStock"
+                : inventory.allowBackorder
+                  ? "https://schema.org/BackOrder"
+                  : "https://schema.org/OutOfStock"
+              : "https://schema.org/OutOfStock",
             pricePerSqm: Number(v.pricePerSqm),
             pricePerBox: Number(v.pricePerBox),
             sqmPerBox: Number(v.sqmPerBox),

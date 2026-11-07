@@ -3760,5 +3760,10 @@
     "removedTitle": "Uru rupapuro ntirukiboneka",
     "removedDescription": "Iyi serivisi yakuweho kandi ntikiboneka.",
     "contactSupport": "Hamagara ubufasha"
+  },
+  "blog": {
+    "title": "Blog",
+    "prev": "Ibibanziriza",
+    "next": "Ibikurikira"
   }
 }

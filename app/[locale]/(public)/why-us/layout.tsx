@@ -15,6 +15,7 @@ export async function generateMetadata({
     title: `Why Choose Our Tiles | ${siteConfig.siteName}`,
     description:
       "Learn about Mountain Ceramics Company's tile manufacturing quality, standards, product durability, and regional project experience.",
+    image:"/images/mcc-machinely.jpg"
   });
 }
 

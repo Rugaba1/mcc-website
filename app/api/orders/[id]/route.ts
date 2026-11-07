@@ -4,7 +4,12 @@ import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
 import { invoicePath, issueInvoiceSafely } from "@/lib/invoices/invoice";
 import { sendOrderStatusEmail } from "@/lib/email";
-import { canTransitionOrderStatus, type OrderStatus } from "@/lib/orders/status";
+import {
+  canTransitionOrderStatus,
+  orderStatusDateField,
+  orderStatusDateLabel,
+  type OrderStatus,
+} from "@/lib/orders/status";
 
 const ORDER_STATUSES = [
   "PENDING",
@@ -114,6 +119,10 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
     const hasNote = Object.hasOwn(data, "internalNote");
     const paidAt =
       typeof data.paidAt === "string" ? data.paidAt : undefined;
+    const statusAt =
+      typeof data.statusAt === "string" ? data.statusAt : undefined;
+    const eventAt = statusAt ?? paidAt;
+    const statusDate = eventAt ? new Date(eventAt) : null;
     if (!hasStatus && !hasNote)
       return NextResponse.json(
         { error: "No editable fields provided" },
@@ -151,11 +160,22 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         { status: 400 },
       );
     }
+    if (
+      Object.hasOwn(data, "statusAt") &&
+      (typeof data.statusAt !== "string" ||
+        Number.isNaN(new Date(data.statusAt).getTime()))
+    ) {
+      return NextResponse.json(
+        { error: "Invalid order status date" },
+        { status: 400 },
+      );
+    }
 
     const existing = await prisma.order.findUnique({
       where: { id },
       select: {
         status: true,
+        placedAt: true,
         orderNumber: true,
         guestEmail: true,
         shipFullName: true,
@@ -168,6 +188,7 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
     const status = hasStatus
       ? (data.status as (typeof ORDER_STATUSES)[number])
       : undefined;
+    const statusChanged = status !== undefined && status !== existing.status;
     if (
       status &&
       !canTransitionOrderStatus(
@@ -180,22 +201,39 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         { status: 409 },
       );
     }
-    if (status === "PAID" && existing.status !== "PAID" && !paidAt) {
+    if (
+      status &&
+      status !== existing.status &&
+      !statusDate
+    ) {
       return NextResponse.json(
-        { error: "Enter when payment was received before marking the order paid" },
+        { error: `Select a date and time for the ${orderStatusDateLabel(status)} status` },
+        { status: 400 },
+      );
+    }
+    if (statusDate && statusDate < existing.placedAt) {
+      return NextResponse.json(
+        { error: "The payment or status time cannot be before the order was placed" },
         { status: 400 },
       );
     }
     const now = new Date();
+    const eventDate = statusDate ?? now;
     const updateData = {
       ...(status ? { status } : {}),
       ...(hasNote ? { internalNote: data.internalNote as string | null } : {}),
-      ...(status === "PAID"
-        ? { paymentStatus: "PAID" as const, paidAt: paidAt ? new Date(paidAt) : existing.status === "PAID" ? undefined : null }
+      ...(status === "PAID" && (statusChanged || statusDate)
+        ? { paymentStatus: "PAID" as const, paidAt: eventDate }
         : {}),
-      ...(status === "SHIPPED" ? { shippedAt: now } : {}),
-      ...(status === "DELIVERED" ? { deliveredAt: now } : {}),
-      ...(status === "CANCELLED" ? { cancelledAt: now } : {}),
+      ...(status === "SHIPPED" && (statusChanged || statusDate)
+        ? { shippedAt: eventDate }
+        : {}),
+      ...(status === "DELIVERED" && (statusChanged || statusDate)
+        ? { deliveredAt: eventDate }
+        : {}),
+      ...(status === "CANCELLED" && (statusChanged || statusDate)
+        ? { cancelledAt: eventDate }
+        : {}),
     };
 
     const updateResult = await prisma.$transaction(async (tx) => {
@@ -209,12 +247,12 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         !canTransitionOrderStatus(current.status as OrderStatus, status as OrderStatus)
       )
         return "invalid-transition";
-      if (status === "PAID" && current.status !== "PAID" && !paidAt)
-        return "missing-paid-at";
+      if (status && current.status !== status && !statusDate)
+        return "missing-status-date";
 
       await tx.order.update({ where: { id }, data: updateData });
-      if (status === "PAID") {
-        const receivedAt = paidAt ? new Date(paidAt) : new Date();
+      if (status === "PAID" && statusChanged) {
+        const receivedAt = eventDate;
         await tx.payment.updateMany({
           where: { orderId: id, status: "PENDING" },
           data: { status: "PAID", paidAt: receivedAt, recordedById: context.user.id },
@@ -227,6 +265,7 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
             status,
             changedById: context.user.id,
             note: `Status changed from ${existing.status} to ${status}`,
+            createdAt: eventDate,
           },
         });
       }
@@ -237,9 +276,9 @@ export const PUT = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         { error: "The order status changed while saving. Reload and try again." },
         { status: 409 },
       );
-    if (updateResult === "missing-paid-at")
+    if (updateResult === "missing-status-date")
       return NextResponse.json(
-        { error: "Enter when payment was received before marking the order paid" },
+        { error: `Select a date and time for the ${orderStatusDateLabel(status!)} status` },
         { status: 400 },
       );
     if (updateResult === "missing")

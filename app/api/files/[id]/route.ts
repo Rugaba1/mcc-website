@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unlink } from "fs/promises";
-import { join, normalize, sep } from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
+import { deleteUploadedFile } from "@/lib/uploads/storage";
 
 export const runtime = "nodejs";
 
@@ -12,6 +11,8 @@ type Ctx = { params: Promise<{ id: string }> };
 const schema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   alt: z.string().trim().max(255).nullable().optional(),
+  folderId: z.number().int().positive().nullable().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 const parseId = async (ctx: Ctx) => {
@@ -43,9 +44,7 @@ export const DELETE = withPermission(PERM.MEDIA_DELETE)(
 
   try {
     const row = await prisma.mediaFile.delete({ where: { id } });
-    const root = join(process.cwd(), "public", "uploads");
-    const full = normalize(join(process.cwd(), "public", row.url));
-    if (full.startsWith(root + sep)) await unlink(full).catch(() => {}); // already gone is fine
+    await deleteUploadedFile(row.url);
     return NextResponse.json({ ok: true });
   } catch (e) {
     if ((e as { code?: string })?.code === "P2025") return NextResponse.json({ error: "File not found" }, { status: 404 });

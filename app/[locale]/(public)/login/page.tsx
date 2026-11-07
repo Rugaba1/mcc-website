@@ -18,12 +18,17 @@ import { Label } from "@/components/ui/label";
 function LoginForm() {
     const { login, isAuthenticated, isInitializing } = useAuth();
     const router = useRouter();
-    const next = safeNext(useSearchParams().get("next"));
+    const searchParams = useSearchParams();
+    const next = safeNext(searchParams.get("next"));
 
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [notice, setNotice] = useState("");
+    const [notice, setNotice] = useState(
+        searchParams.get("registered") === "1"
+            ? "Account created. You can sign in now; email verification is optional."
+            : "",
+    );
     const [submitting, setSubmitting] = useState(false);
     const [challenge, setChallenge] = useState("");
     const [method, setMethod] = useState<"email" | "authenticator" | null>(null);
@@ -128,7 +133,6 @@ function LoginForm() {
                                 <Input
                                     id="identifier"
                                     autoComplete="username"
-                                    autoFocus
                                     required
                                     value={identifier}
                                     onChange={(e) => setIdentifier(e.target.value)}
@@ -156,7 +160,6 @@ function LoginForm() {
                             <Label htmlFor="two-factor-code">6-digit verification code</Label>
                             <OtpInput
                                 id="two-factor-code"
-                                autoFocus
                                 value={code}
                                 onChange={setCode}
                             />

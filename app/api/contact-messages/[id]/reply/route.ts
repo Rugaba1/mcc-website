@@ -37,7 +37,7 @@ export const POST = withPermission(PERM.MESSAGES_REPLY)(
     });
     if (!sent) {
       return NextResponse.json(
-        { error: "The email could not be sent. Check the SMTP settings." },
+        { error: "The email could not be sent. Check the Resend API key and verified sender domain." },
         { status: 502 },
       );
     }

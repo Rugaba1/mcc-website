@@ -4,7 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { withPermission } from "@/lib/middleware/withPermission";
 import { PERM } from "@/lib/permissions/catalog";
 import { sendOrderStatusEmail } from "@/lib/email";
-import { canTransitionOrderStatus } from "@/lib/orders/status";
+import {
+  canTransitionOrderStatus,
+  orderStatusDateField,
+  orderStatusDateLabel,
+  type OrderStatus,
+} from "@/lib/orders/status";
 
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
@@ -95,6 +100,7 @@ export const GET = withPermission(PERM.ORDERS_VIEW)(async (_req, context) => {
       status: p.status,
       method: p.method,
       amount: n(p.amount),
+      refundedAmount: n(p.refundedAmount),
       currency: p.currency,
       provider: p.provider,
       reference: p.providerRef,
@@ -129,8 +135,10 @@ const statusSchema = z.object({
   ]),
   note: z.string().trim().max(255).optional(),
   paidAt: z.string().datetime().optional(),
+  statusAt: z.string().datetime().optional(),
 });
 class OrderError extends Error {}
+class OrderInputError extends Error {}
 
 type StockState = "RESERVED" | "SOLD" | "NONE";
 const stockState = (s: string): StockState =>
@@ -146,8 +154,9 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
   if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
-    const { status, note, paidAt } = statusSchema.parse(await req.json());
-    const receivedAt = paidAt ? new Date(paidAt) : null;
+    const { status, note, paidAt, statusAt } = statusSchema.parse(await req.json());
+    const eventAt = statusAt ?? paidAt;
+    const statusDate = eventAt ? new Date(eventAt) : null;
     const now = new Date();
 
     const notification = await prisma.$transaction(async (tx) => {
@@ -155,6 +164,7 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         where: { id },
         select: {
           status: true,
+          placedAt: true,
           orderNumber: true,
           guestEmail: true,
           shipFullName: true,
@@ -171,10 +181,12 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         throw new OrderError(
           `Order status cannot move from ${current.status} back to ${status}`,
         );
-      if (status === "PAID" && !receivedAt)
-        throw new OrderError(
-          "Enter when payment was received before marking the order paid",
+      if (!statusDate)
+        throw new OrderInputError(
+          `Select a date and time for the ${orderStatusDateLabel(status)} status`,
         );
+      if (statusDate && statusDate < current.placedAt)
+        throw new OrderInputError("The payment or status time cannot be before the order was placed");
 
       const from = stockState(current.status);
       const to = stockState(status);
@@ -236,17 +248,19 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
         }
       }
 
+      const eventDate = statusDate ?? now;
+      const dateField = orderStatusDateField(status);
       await tx.order.update({
         where: { id },
         data: {
           status,
           ...(status === "PAID" && {
             paymentStatus: "PAID",
-            paidAt: receivedAt,
+            paidAt: eventDate,
           }),
-          ...(status === "SHIPPED" && { shippedAt: now }),
-          ...(status === "DELIVERED" && { deliveredAt: now }),
-          ...(status === "CANCELLED" && { cancelledAt: now }),
+          ...(status === "SHIPPED" && { shippedAt: eventDate }),
+          ...(status === "DELIVERED" && { deliveredAt: eventDate }),
+          ...(status === "CANCELLED" && { cancelledAt: eventDate }),
         },
       });
       await tx.orderStatusHistory.create({
@@ -255,6 +269,7 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
           status,
           note: note || null,
           changedById: context.user.id,
+          createdAt: eventDate,
         },
       });
       return {
@@ -278,6 +293,8 @@ export const PATCH = withPermission(PERM.ORDERS_UPDATE_STATUS)(
   } catch (e) {
     if (e instanceof z.ZodError)
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    if (e instanceof OrderInputError)
+      return NextResponse.json({ error: e.message }, { status: 400 });
     if (e instanceof OrderError)
       return NextResponse.json({ error: e.message }, { status: 409 });
     if ((e as { code?: string })?.code === "NOT_FOUND")

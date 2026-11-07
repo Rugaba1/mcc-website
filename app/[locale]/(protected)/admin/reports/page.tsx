@@ -104,7 +104,7 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <main className="flex-1 space-y-5 p-4 md:p-6">
+    <section className="flex-1 space-y-5 p-4 md:p-6">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
         <p className="text-sm text-muted-foreground">
@@ -236,6 +236,6 @@ export default function AdminReportsPage() {
           </Card>
         </>
       )}
-    </main>
+    </section>
   );
 }

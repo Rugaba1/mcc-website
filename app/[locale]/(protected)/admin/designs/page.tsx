@@ -15,9 +15,11 @@ import { PERM } from "@/lib/permissions/catalog";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { DataPagination } from "@/components/admin/data-pagination";
 import { MediaImage } from "@/components/media-image";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 const PAGE_SIZE = 18;
 export default function AdminSavedDesignsPage() {
+  const { confirm, dialog } = useConfirmAction();
   const { dateTime } = useFormatters();
     const [designs, setDesigns] = useState<SavedVisualizerDesign[]>([]);
     const [loading, setLoading] = useState(true);
@@ -46,7 +48,10 @@ export default function AdminSavedDesignsPage() {
     useEffect(() => { setPage(1); }, [q]);
 
     const remove = async (design: SavedVisualizerDesign) => {
-        if (!confirm(`Delete “${design.name || "Untitled design"}”?`)) return;
+        if (!(await confirm({
+            title: "Delete this design?",
+            description: `Delete “${design.name || "Untitled design"}”? This action cannot be undone.`,
+        }))) return;
         try {
             await api.deleteAdminVisualizerDesign(design.id);
             toast.success("Design deleted");
@@ -59,7 +64,7 @@ export default function AdminSavedDesignsPage() {
     const visible = designs;
 
     return (
-        <main className="space-y-6">
+        <section className="space-y-6">
             <header>
                 <h1 className="text-2xl font-semibold">Saved Designs</h1>
                 <p className="text-sm text-muted-foreground">Browse customer and guest room visualizer designs.</p>
@@ -121,6 +126,7 @@ export default function AdminSavedDesignsPage() {
                     disabled={loading}
                 />
             )}
-        </main>
+            {dialog}
+        </section>
     );
 }

@@ -18,6 +18,7 @@ export async function generateMetadata({
     title: `Reset Your Password | ${siteConfig.siteName}`,
     description: "Request a secure password reset link for your Mountain Ceramics Company account.",
     noIndex: true,
+    image: "/images/mcc-factory.jpg"
   });
 }
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {

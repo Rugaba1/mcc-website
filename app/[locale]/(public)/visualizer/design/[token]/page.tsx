@@ -79,5 +79,10 @@ export default async function SharedVisualizerDesignPage({ params }: PageProps) 
   const { token } = await params;
   const design = await getDesign(token);
   if (!design) notFound();
-  return <VisualizerClient initialDesignToken={token} />;
+  return (
+    <>
+      <h1 className="sr-only">{design.name || "Shared room design"}</h1>
+      <VisualizerClient initialDesignToken={token} />
+    </>
+  );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { headers } from "next/headers";
@@ -90,7 +90,7 @@ export default async function PostPage({ params }: Props) {
             </div>
             {post.coverImage && (
                 <div className="relative my-8 aspect-video overflow-hidden rounded-md">
-                    <Image src={post.coverImage} alt={post.coverAlt ?? post.title} fill priority sizes="768px" className="object-cover" />
+                    <MediaImage src={post.coverImage} alt={post.coverAlt ?? post.title} fill priority sizes="768px" className="object-cover" />
                 </div>
             )}
             <MdxContent source={post.content} />

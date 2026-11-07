@@ -44,6 +44,7 @@ export const POST = withPermission(PERM.PAYMENTS_RECORD)(
           grandTotal: true,
           currency: true,
           status: true,
+          placedAt: true,
           orderNumber: true,
           guestEmail: true,
           shipFullName: true,
@@ -53,6 +54,12 @@ export const POST = withPermission(PERM.PAYMENTS_RECORD)(
       });
       if (!order) return { code: 404 } as const;
       if (order.status === "CANCELLED" || order.status === "REFUNDED") return { code: 409 } as const;
+      if (
+        body.status === "PAID" &&
+        paidAt &&
+        new Date(paidAt) < order.placedAt
+      )
+        return { code: 422 } as const;
 
       const { balanceDue } = totalsOf(order.payments, Number(order.grandTotal));
       if (body.status === "PAID" && body.amount > balanceDue + 0.005) return { code: 400, balanceDue } as const;
@@ -98,6 +105,11 @@ export const POST = withPermission(PERM.PAYMENTS_RECORD)(
 
     if (result.code === 404) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     if (result.code === 409) return NextResponse.json({ error: "This order is cancelled or refunded" }, { status: 409 });
+    if (result.code === 422)
+      return NextResponse.json(
+        { error: "The payment time cannot be before the order was placed" },
+        { status: 400 },
+      );
     if (result.code === 400) return NextResponse.json({ error: `That is more than the remaining balance of ${result.balanceDue}` }, { status: 400 });
     await issueInvoiceSafely(result.payment.orderId);
     if (result.payment.status === "PAID" && result.notification.to) {

@@ -51,13 +51,13 @@ export default function Footer() {
             <div className="flex flex-wrap items-start ">
               <div className="flex flex-col  group">
                 <div className="flex flex-row items-center gap-2 flex-wrap">
-                  <div className="relative h-10 w-10 shrink-0">
+                  <div className="relative h-20 w-20 shrink-0">
                     <Image
-                      src="/logo.png"
+                      src="/logo-trans.png"
                       alt="Mountain Ceramics Company"
                       fill
                       className="object-contain"
-                      sizes="40px"
+                      sizes="120px"
                     />
                   </div>
                   <div className="flex gap-2 flex-wrap">
@@ -78,14 +78,14 @@ export default function Footer() {
 
                 </div>
                 <div className="flex flex-wrap gap-1 items-center">
-                  <a href={`tel:${COMPANY.phone}`} className="text-[10px] tracking-[0.25em] uppercase">{COMPANY.phone}</a> | <a className="text-[10px] tracking-[0.25em] uppercase" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+                  <a href={`tel:${COMPANY.phone}`} className="inline-flex min-h-11 items-center text-[10px] tracking-[0.25em] uppercase">{COMPANY.phone}</a> | <a className="inline-flex min-h-11 items-center text-[10px] tracking-[0.25em] uppercase" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
                 </div>
 
 
 
 
                 <p className="mb-6 max-w-xs text-sm leading-relaxed text-inverse-foreground/80">
-                  Rwanda&apos;s ceramic tile manufacturer since 2009. Building better spaces, one tile at a time.
+                  Rwanda&apos;s ceramic tile manufacturer since {COMPANY.foundedYear}. Building better spaces, one tile at a time.
                 </p>
                 <NewsletterSignup />
               </div>
@@ -111,14 +111,14 @@ export default function Footer() {
 
           {/* Link columns */}
           {footerLinks.map(({ title, items }) => (
-            <div key={title}>
+            <nav key={title} aria-label={`${title} links`}>
               <h4 className="mb-5 text-xs font-bold tracking-[0.2em] uppercase">{title}</h4>
               <ul className="space-y-3">
                 {items.map(({ label, href }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="group flex items-center gap-2 text-sm text-inverse-foreground/75 transition-colors duration-200 hover:text-inverse-foreground"
+                      className="group flex min-h-11 items-center gap-2 text-sm text-inverse-foreground/75 transition-colors duration-200 hover:text-inverse-foreground"
                     >
                       <span className="h-1 w-1 shrink-0 bg-primary/40 transition-colors group-hover:bg-primary" />
                       {label}
@@ -127,7 +127,7 @@ export default function Footer() {
                 ))}
               </ul>
 
-            </div>
+            </nav>
           ))}
 
         </div>
@@ -147,13 +147,13 @@ export default function Footer() {
             /></div>
 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link href="/legal/terms-and-conditions" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+            <Link href="/legal/terms-and-conditions" className="flex min-h-11 items-center text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
               Terms and Conditions
             </Link>
-            <Link href="/legal/terms-of-service" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+            <Link href="/legal/terms-of-service" className="flex min-h-11 items-center text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
               Terms of Service
             </Link>
-            <Link href="/legal/privacy-policy" className="text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
+            <Link href="/legal/privacy-policy" className="flex min-h-11 items-center text-xs text-inverse-foreground/75 transition-colors hover:text-inverse-foreground">
               Privacy Policy
             </Link>
           </div>

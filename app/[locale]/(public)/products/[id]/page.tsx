@@ -1,6 +1,6 @@
 
-import Image from "next/image";
-import Link from "next/link";
+import { MediaImage } from "@/components/media-image";
+import { Link } from "@/app/i18n/routing";
 import { type Product, serverApi, type ProductReviewSummary } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { headers } from "next/headers";
@@ -13,6 +13,8 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 import { WishlistButton } from "@/components/wishlist-button";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { ProductPurchase } from "@/components/product-purchase";
+import { ProductStartingPrice } from "@/components/product-starting-price";
+import { notFound } from "next/navigation";
 
 function badgeStyle(badge: Product["badge"]) {
   if (badge === "New") return "bg-success text-success-foreground";
@@ -34,8 +36,8 @@ export async function generateMetadata({
   try {
     tile = await serverApi.getProduct(id);
     reviews = await serverApi.getProductReviews(String(tile.id));
-  } catch {
-    // Product metadata remains available if review lookup fails.
+  } catch (error) {
+    console.error(`Could not load product metadata for ${id}:`, error);
   }
   const reviewSummary = reviews?.total && reviews.averageRating !== null
     ? ` Rated ${reviews.averageRating.toFixed(1)} out of 5 from ${reviews.total} customer reviews.`
@@ -59,29 +61,31 @@ export default async function TileDetailPage({
   params: Promise<{ locale: string, id: string }>;
   searchParams: Promise<{ active?: string }>;
 }) {
-  const { id } = await params
+  const { id, locale } = await params
 
   let tile = null;
   let reviews: ProductReviewSummary | null = null;
+  let productFetchFailed = false;
   try {
     tile = await serverApi.getProduct(id);
     reviews = await serverApi.getProductReviews(String(tile.id));
-  } catch {
-    // Keep the product page available when review data is temporarily unavailable.
+  } catch (error) {
+    console.error(`Could not load product page data for ${id}:`, error);
+    productFetchFailed = true;
   }
 
-
-
-
+  if (!tile && !productFetchFailed) {
+    notFound();
+  }
 
   if (!tile) {
     return (
-      <div className="min-h-screen  flex items-center justify-center">
-        <div className="text-center">
-          <p className=" font-semibold text-lg">Tile not found</p>
-          <Link href="/catalogue" className=" hover:underline text-sm mt-2 inline-block">
-            ← Back to catalogue
-          </Link>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center" role="alert">
+          <h1 className="font-semibold text-lg">Product details are temporarily unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Please try again later or contact us for help.
+          </p>
         </div>
       </div>
     );
@@ -109,15 +113,8 @@ export default async function TileDetailPage({
           priceCurrency: primaryVariant.currency,
           price: String(primaryVariant.pricePerSqm),
           sku: primaryVariant.sku,
-          ...(primaryVariant.inventory
-            ? {
-              availability:
-                primaryVariant.inventory.onHandSqm >
-                  primaryVariant.inventory.reservedSqm
-                  ? "https://schema.org/InStock"
-                  : "https://schema.org/OutOfStock",
-            }
-            : {}),
+          availability:
+            primaryVariant.availability ?? "https://schema.org/OutOfStock",
         },
       }
       : {}),
@@ -170,7 +167,7 @@ export default async function TileDetailPage({
             <div>
               <div className="relative aspect-square overflow-hidden border border-border bg-muted shadow-sm">
                 {tile.image ? (
-                  <Image
+                  <MediaImage
                     src={tile.image}
                     alt={tile.name}
                     fill
@@ -224,6 +221,7 @@ export default async function TileDetailPage({
                 <h1 className="font-playfair text-3xl font-bold leading-tight sm:text-4xl">
                   {tile.name}
                 </h1>
+                <ProductStartingPrice variants={tile.variants} locale={locale} />
               </div>
 
               {/* Description */}
@@ -269,7 +267,7 @@ export default async function TileDetailPage({
                       {/* Collection thumbnail */}
                       <div className="relative w-16 h-16 shrink-0 overflow-hidden bg-background">
                         {collection.image ? (
-                          <Image
+                          <MediaImage
                             src={collection.image}
                             alt={collection.name}
                             fill
@@ -315,7 +313,7 @@ export default async function TileDetailPage({
                               className="relative w-12 h-12 shrink-0 overflow-hidden  hover:ring-2 hover:ring-primary transition-all"
                             >
                               {t.image ? (
-                                <Image
+                                <MediaImage
                                   src={t.image}
                                   alt={t.name}
                                   fill
@@ -346,7 +344,7 @@ export default async function TileDetailPage({
 
               {/* CTAs */}
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                <WishlistButton productId={tile.id} />
+                <WishlistButton productId={tile.id} showLabel />
                 <Link
                   href={`/visualizer?tile=${tile.id}&autoApply=1&surface=${tile.category === "wall" || tile.category === "special" ? "wall" : "floor"}`}
                   className="flex flex-1 items-center justify-center gap-2 bg-secondary px-6 py-4 text-center text-sm font-bold uppercase tracking-widest text-secondary-foreground transition-colors hover:bg-secondary/80"
@@ -389,7 +387,7 @@ export default async function TileDetailPage({
                     >
                       <div className="relative h-44 overflow-hidden ">
                         {r.image ? (
-                          <Image
+                          <MediaImage
                             src={r.image}
                             alt={r.name}
                             fill

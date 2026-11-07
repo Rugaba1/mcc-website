@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import { api, apiErrorMessage, type PublicationDoc } from "@/lib/api";
 import { PERM } from "@/lib/permissions/catalog";
+import { useConfirmAction } from "@/components/admin/confirm-action";
 
 type PublicationDraft = Omit<
   PublicationDoc,
@@ -71,6 +72,7 @@ function fromDateInput(value: string) {
 }
 
 export default function AdminPublicationsPage() {
+  const { confirm, dialog } = useConfirmAction();
   const [publications, setPublications] = useState<PublicationDoc[]>([]);
   const [draft, setDraft] = useState<PublicationDraft>(emptyDraft);
   const [editing, setEditing] = useState<PublicationDoc | null>(null);
@@ -140,7 +142,10 @@ export default function AdminPublicationsPage() {
   }
 
   async function remove(publication: PublicationDoc) {
-    if (!window.confirm(`Delete “${publication.title}”?`)) return;
+    if (!(await confirm({
+      title: "Delete this publication?",
+      description: `Delete “${publication.title}”? This action cannot be undone.`,
+    }))) return;
     try {
       await api.deletePublication(publication.id);
       toast.success("Publication deleted.");
@@ -152,7 +157,7 @@ export default function AdminPublicationsPage() {
 
   return (
     <PermissionGate required={PERM.PUBLICATIONS_MANAGE} mode="message">
-      <main className="space-y-8">
+      <section className="space-y-8">
         <header>
           <h1 className="text-2xl font-semibold">Publications & promotions</h1>
           <p className="text-sm text-muted-foreground">
@@ -171,12 +176,12 @@ export default function AdminPublicationsPage() {
               <Input id="publication-title" required maxLength={200} value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>Placement</Label>
+              <span id="publication-placement-label" className="text-sm font-medium">Placement</span>
               <Select
                 value={draft.placement}
                 onValueChange={(value) => setDraft({ ...draft, placement: value as PublicationDraft["placement"] })}
               >
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-labelledby="publication-placement-label"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {Object.entries(placementLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>{label}</SelectItem>
@@ -189,12 +194,12 @@ export default function AdminPublicationsPage() {
               <Input id="publication-summary" maxLength={500} value={draft.summary} onChange={(event) => setDraft({ ...draft, summary: event.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>Cover image</Label>
-              <ImageField value={draft.coverImage ?? ""} onChange={(value) => setDraft({ ...draft, coverImage: value || null })} kind="image" />
+              <span className="text-sm font-medium">Cover image</span>
+              <ImageField ariaLabel="Publication cover image URL" value={draft.coverImage ?? ""} onChange={(value) => setDraft({ ...draft, coverImage: value || null })} kind="image" />
             </div>
             <div className="space-y-2">
-              <Label>PDF / announcement attachment</Label>
-              <ImageField value={draft.fileUrl ?? ""} onChange={(value) => setDraft({ ...draft, fileUrl: value || null })} kind="file" />
+              <span className="text-sm font-medium">PDF / announcement attachment</span>
+              <ImageField ariaLabel="Publication PDF or announcement file URL" value={draft.fileUrl ?? ""} onChange={(value) => setDraft({ ...draft, fileUrl: value || null })} kind="file" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="publication-start">Starts at</Label>
@@ -239,8 +244,8 @@ export default function AdminPublicationsPage() {
               <Label htmlFor="publication-active">Active during the selected schedule</Label>
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Publication content</Label>
-              <MarkdownEditor value={draft.contentMarkdown} onChange={(contentMarkdown) => setDraft({ ...draft, contentMarkdown })} maxLength={100_000} />
+              <Label htmlFor="publication-content">Publication content</Label>
+              <MarkdownEditor id="publication-content" value={draft.contentMarkdown} onChange={(contentMarkdown) => setDraft({ ...draft, contentMarkdown })} maxLength={100_000} />
             </div>
           </div>
           <Button type="submit" disabled={saving || !draft.title.trim()}>
@@ -295,7 +300,8 @@ export default function AdminPublicationsPage() {
             </Table>
           </div>
         </section>
-      </main>
+        {dialog}
+      </section>
     </PermissionGate>
   );
 }

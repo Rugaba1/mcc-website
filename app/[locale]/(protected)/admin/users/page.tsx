@@ -29,6 +29,8 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { RegularUsersPage } from "@/components/admin/regular-users-page";
+import { useConfirmAction } from "@/components/admin/confirm-action";
+import { STAFF_BIO_MAX_LENGTH } from "@/lib/users/constants";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Form = {
@@ -81,6 +83,7 @@ function Field({
   );
 }
 function StaffManagementPage() {
+  const { confirm, dialog } = useConfirmAction();
   const { date } = useFormatters();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +165,10 @@ function StaffManagementPage() {
   };
 
   const remove = async (u: AdminUser) => {
-    if (!confirm(`${u.name} (${u.email}) will lose access. If they have placed orders, consider disabling the account instead.\n\nDelete this user?`)) return;
+    if (!(await confirm({
+      title: "Delete this staff account?",
+      description: `${u.name} (${u.email}) will lose access. If they have placed orders, consider disabling the account instead.`,
+    }))) return;
     try {
       await api.deleteStaff(u.id);
       toast.success("User deleted");
@@ -338,8 +344,8 @@ function StaffManagementPage() {
                   </Field>
                 </div>
 
-                <Field id="user-bio" label="Short bio" hint={`${form.bio.length}/500`}>
-                  <Textarea id="user-bio" className="min-h-20 rounded-none" maxLength={500} value={form.bio} onChange={(e) => set("bio", e.target.value)} />
+                <Field id="user-bio" label="Staff bio" hint={`${form.bio.length}/${STAFF_BIO_MAX_LENGTH}`}>
+                  <Textarea id="user-bio" className="min-h-20 rounded-none" maxLength={STAFF_BIO_MAX_LENGTH} value={form.bio} onChange={(e) => set("bio", e.target.value)} />
                 </Field>
               </section>
 
@@ -411,6 +417,7 @@ function StaffManagementPage() {
         </DialogContent>
       </Dialog>
       </PermissionGate>
+      {dialog}
     </div>
   );
 }

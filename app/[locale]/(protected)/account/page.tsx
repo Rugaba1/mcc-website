@@ -119,7 +119,7 @@ export default function CustomerDashboardPage() {
   const firstName = data?.customer.name.split(" ")[0];
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
+    <section className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{firstName ? `Hello, ${firstName}` : "My dashboard"}</h1>
@@ -157,7 +157,7 @@ export default function CustomerDashboardPage() {
       ) : (
         <Dashboard data={data} days={Number(days)} refreshing={loading} />
       )}
-    </main>
+    </section>
   );
 }
 
@@ -188,7 +188,7 @@ function Dashboard({ data, days, refreshing }: { data: CustomerAnalytics; days: 
         })}
       </section>
 
-      {/* Orders in progress + cart */}
+      {/* Orders in progress + selected items */}
       <section className="grid gap-4 lg:grid-cols-3">
         <ActiveOrders orders={tables.activeOrders} currency={currency} />
         <CartCard currency={currency} />
@@ -427,9 +427,9 @@ function CartCard({ currency }: { currency: string }) {
   return (
     <Card className="flex h-fit flex-col self-start">
       <CardHeader>
-        <CardTitle>Your cart</CardTitle>
+        <CardTitle>Your order</CardTitle>
         <CardDescription>
-          {!ready ? "Loading your cart…" : items.length === 0 ? "Nothing here yet" : `${items.length} item(s) ready to order`}
+          {!ready ? "Loading your selected items…" : items.length === 0 ? "Nothing here yet" : `${items.length} item(s) ready to order`}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col">
@@ -437,7 +437,7 @@ function CartCard({ currency }: { currency: string }) {
           <div className="py-8 text-center text-sm text-muted-foreground">Loading…</div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-8">
-            <Empty icon={ShoppingCart} text="Your cart is empty" />
+            <Empty icon={ShoppingCart} text="No items selected yet" />
             <Button asChild variant="outline">
               <Link href="/products">Browse tiles</Link>
             </Button>
@@ -467,7 +467,7 @@ function CartCard({ currency }: { currency: string }) {
               })}
             </ul>
             {items.length > 4 && (
-              <p className="pt-1 text-xs text-muted-foreground">+ {items.length - 4} more in your cart</p>
+              <p className="pt-1 text-xs text-muted-foreground">+ {items.length - 4} more selected items</p>
             )}
             <div className="mt-4 space-y-3 border-t pt-4">
               <div className="flex items-center justify-between">

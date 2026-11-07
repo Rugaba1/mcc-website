@@ -323,10 +323,15 @@ export function ProductSheet({
             </Field>
 
             <PermissionGate required={PERM.PRODUCTS_PUBLISH}>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox className="rounded-none" checked={form.featured} onCheckedChange={(c) => set("featured", c === true)} />
-                Feature this product on the home page
-              </label>
+              <div className="flex min-h-11 items-center gap-2 text-sm">
+                <Checkbox
+                  checked={form.featured}
+                  onCheckedChange={(checked) => set("featured", checked === true)}
+                  aria-label="Feature this product on the home page"
+                  className="size-11 p-3"
+                />
+                <span>Feature this product on the home page</span>
+              </div>
             </PermissionGate>
 
             <Section title="Tile specs (shared by all variants)">
@@ -344,10 +349,15 @@ export function ProductSheet({
                   <Input className="rounded-none" value={form.waterAbsorption} onChange={(e) => set("waterAbsorption", e.target.value)} placeholder="< 0.5%" />
                 </Field>
               </div>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox className="rounded-none" checked={form.isRectified} onCheckedChange={(c) => set("isRectified", c === true)} />
-                Rectified edges
-              </label>
+              <div className="flex min-h-11 items-center gap-2 text-sm">
+                <Checkbox
+                  checked={form.isRectified}
+                  onCheckedChange={(checked) => set("isRectified", checked === true)}
+                  aria-label="Rectified edges"
+                  className="size-11 p-3"
+                />
+                <span>Rectified edges</span>
+              </div>
             </Section>
 
             <Section title="SEO (optional)">

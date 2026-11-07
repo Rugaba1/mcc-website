@@ -106,7 +106,7 @@ export const POST = withRateLimit({
           error:
             error instanceof Error
               ? error.message
-              : "Some cart items cannot be priced",
+              : "Some selected items cannot be priced",
         },
         { status: 400 },
       );

@@ -18,19 +18,27 @@ const Dot = () => (
 );
 
 export default function Ticker() {
-  const content = items.map((item, i) => (
-    <span key={i} className="inline-flex items-center">
-      <span className=" font-semibold text-sm tracking-wide">{item}</span>
-      <Dot />
-    </span>
-  ));
-
   return (
-    <div className="bg-primary py-3.5 overflow-hidden -y -[#a07830]/40">
-      <div className="flex whitespace-nowrap animate-ticker">
-        <span className="inline-flex items-center">{content}</span>
-        <span className="inline-flex items-center">{content}</span>
-        <span className="inline-flex items-center">{content}</span>
+    <div
+      className="ticker overflow-hidden border-y border-primary-foreground/20 bg-primary py-3.5"
+      role="region"
+      aria-label="Company highlights"
+    >
+      <div className="ticker-track flex w-max whitespace-nowrap">
+        {[0, 1].map((copy) => (
+          <div
+            key={copy}
+            className="inline-flex shrink-0 items-center"
+            aria-hidden={copy === 1}
+          >
+            {items.map((item) => (
+              <span key={item} className="inline-flex items-center">
+                <span className="text-sm font-semibold tracking-wide">{item}</span>
+                <Dot />
+              </span>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

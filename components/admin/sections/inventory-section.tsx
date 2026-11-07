@@ -57,8 +57,9 @@ export function InventorySection({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm">
+          <label htmlFor="inventory-low-stock-only" className="flex min-h-11 items-center gap-2 text-sm">
             <Input
+              id="inventory-low-stock-only"
               type="checkbox"
               checked={lowOnly}
               onChange={(e) => setLowOnly(e.target.checked)}
@@ -132,8 +133,9 @@ export function InventorySection({
           saving={saving}
         >
           <div>
-            <Label>Stock (m²)</Label>
+            <Label htmlFor="stock-level">Stock (m²)</Label>
             <Input
+              id="stock-level"
               type="number"
               min={0}
               value={editing.stockSqm}
@@ -143,8 +145,9 @@ export function InventorySection({
             />
           </div>
           <div>
-            <Label>Low-stock alert at</Label>
+            <Label htmlFor="low-stock-threshold">Low-stock alert at</Label>
             <Input
+              id="low-stock-threshold"
               type="number"
               min={0}
               value={editing.lowStockThreshold}

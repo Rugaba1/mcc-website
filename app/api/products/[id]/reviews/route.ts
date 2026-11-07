@@ -34,9 +34,14 @@ export const GET = withOptionalAuth(
   const page = Number.isSafeInteger(pageParam) && pageParam > 0 ? pageParam : 1;
   try {
     const where = { productId, approved: true };
-    const [total, aggregate, reviews, myReview, purchase] = await Promise.all([
+    const [total, aggregate, ratingGroups, reviews, myReview, purchase] = await Promise.all([
       prisma.review.count({ where }),
       prisma.review.aggregate({ where, _avg: { rating: true } }),
+      prisma.review.groupBy({
+        by: ["rating"],
+        where,
+        _count: { _all: true },
+      }),
       prisma.review.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -87,6 +92,9 @@ export const GET = withOptionalAuth(
       pageSize: PAGE_SIZE,
       totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
       averageRating: aggregate._avg.rating ?? null,
+      ratingDistribution: Object.fromEntries(
+        ratingGroups.map(({ rating, _count }) => [rating, _count._all]),
+      ),
       authenticated: Boolean(user),
       canReview: Boolean(
         user &&

@@ -31,15 +31,16 @@ const parseAddress = (value: string) => {
   if (!/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(address)) return null;
   return { name: companyName, address };
 };
-const sender = () =>
-  parseAddress(siteConfig.emailFrom || serverConfig.smtp.user) ?? undefined;
+const sender = () => {
+  const address = parseAddress(siteConfig.emailFrom || siteConfig.companyEmail);
+  return address ? `${address.name} <${address.address}>` : undefined;
+};
 const supportAddress = () =>
   parseAddress(siteConfig.emailReplyTo) ||
   parseAddress(siteConfig.companyEmail);
 const adminEmail = () =>
   parseAddress(serverConfig.adminEmail)?.address ||
   supportAddress()?.address ||
-  parseAddress(serverConfig.smtp.user)?.address ||
   null;
 
 const footerDetails = [
@@ -200,16 +201,16 @@ async function safeSendMail(mailOptions: SendMailOptions) {
   const from = sender();
   if (!from) {
     console.error(
-      "Email delivery skipped because EMAIL_FROM or the authenticated SMTP account is not a valid sender address.",
+      "Email delivery skipped because EMAIL_FROM is not a valid sender address.",
     );
     return false;
   }
   if (!siteConfig.emailFrom) {
     console.warn(
-      "EMAIL_FROM is not configured; using EMAIL_USER. Configure an address on a domain with valid SPF, DKIM, and DMARC.",
+      "EMAIL_FROM is not configured; using the company email address. Verify its domain with Resend and configure SPF, DKIM, and DMARC.",
     );
   }
-  const defaultReplyTo = supportAddress();
+  const defaultReplyTo = supportAddress()?.address;
   return deliverMail({
     ...mailOptions,
     from,
@@ -230,7 +231,7 @@ export async function sendContactStaffAlert(p: {
   const recipient = adminEmail();
   if (!recipient) {
     console.error(
-      "Staff email notification skipped because no valid ADMIN_EMAIL, support email, or SMTP user is configured.",
+      "Staff email notification skipped because no valid ADMIN_EMAIL or support email is configured.",
     );
     return false;
   }
@@ -412,7 +413,7 @@ export async function sendAdminNotificationEmail({
   const recipient = to?.trim() || adminEmail();
   if (!recipient) {
     console.error(
-      "Staff email notification skipped because no valid ADMIN_EMAIL, support email, or SMTP user is configured.",
+      "Staff email notification skipped because no valid ADMIN_EMAIL or support email is configured.",
     );
     return false;
   }
@@ -544,6 +545,39 @@ export async function sendOrderStatusEmail(p: {
     firstName: p.firstName,
     subject: `Order ${oneLine(p.orderNumber)} update`,
     message: `Your order ${p.orderNumber} is now ${p.status.toLowerCase().replace(/_/g, " ")}.`,
+  });
+}
+
+export async function sendInvoiceEmail(p: {
+  to: string;
+  firstName: string;
+  orderNumber: string;
+  invoiceNumber: string;
+  total: string;
+  currency: string;
+  invoiceUrl: string;
+}) {
+  return safeSendMail({
+    from: sender(),
+    to: p.to,
+    subject: oneLine(`Invoice ${p.invoiceNumber} for order ${p.orderNumber}`),
+    html: shell(
+      "Your invoice",
+      `<p>Hi ${esc(p.firstName)},</p>
+       <p>Please find the invoice for order <strong>${esc(p.orderNumber)}</strong>.</p>
+       <p><strong>Invoice:</strong> ${esc(p.invoiceNumber)}<br>
+       <strong>Total:</strong> ${esc(p.total)} ${esc(p.currency)}</p>
+       <p><a href="${esc(p.invoiceUrl)}" style="display:inline-block;padding:12px 18px;background:#004f46;color:#ffffff;text-decoration:none;">View and download invoice</a></p>
+       <p>This secure invoice link expires in 7 days.</p>`,
+    ),
+    text: `Hi ${p.firstName},
+
+Please find the invoice for order ${p.orderNumber}.
+Invoice: ${p.invoiceNumber}
+Total: ${p.total} ${p.currency}
+
+View and download your invoice: ${p.invoiceUrl}
+This secure invoice link expires in 7 days.`,
   });
 }
 

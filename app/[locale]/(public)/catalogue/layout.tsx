@@ -16,7 +16,7 @@ export async function generateMetadata({
         title: `${count ? `${count} ` : ""}Tile Catalogue | ${siteConfig.siteName}`,
         description:
             "Browse floor, wall, outdoor, and specialty tiles manufactured by Mountain Ceramics Company in Rwanda.",
-        image: "/logo.png",
+        image: "/images/mcc-factory.jpg",
     });
 }
 

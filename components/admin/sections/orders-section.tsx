@@ -8,7 +8,13 @@ import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Input, Label, Select, Textarea } from "../fields";
 import { PaidAtAlertDialog } from "@/components/admin/paid-at-alert-dialog";
-import { canTransitionOrderStatus, ORDER_STATUSES, type OrderStatus } from "@/lib/orders/status";
+import {
+  canTransitionOrderStatus,
+  ORDER_STATUSES,
+  orderStatusDateField,
+  orderStatusDateLabel,
+  type OrderStatus,
+} from "@/lib/orders/status";
 
 export function OrdersSection({
   orders,
@@ -25,7 +31,7 @@ export function OrdersSection({
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [paidAtDialogOpen, setPaidAtDialogOpen] = useState(false);
+  const [statusDateDialogOpen, setStatusDateDialogOpen] = useState(false);
 
   const visible = orders.filter(
     (o) =>
@@ -47,10 +53,10 @@ export function OrdersSection({
     }
   }
 
-  async function save(paidAt?: string): Promise<boolean> {
+  async function save(statusAt?: string): Promise<boolean> {
     if (!selected) return false;
-    if (status === "PAID" && selected.status !== "PAID" && !paidAt) {
-      setPaidAtDialogOpen(true);
+    if (status !== selected.status && !statusAt) {
+      setStatusDateDialogOpen(true);
       return false;
     }
     setSaving(true);
@@ -58,7 +64,7 @@ export function OrdersSection({
       await api.updateOrder(selected.id, {
         status,
         internalNote: note || null,
-        ...(paidAt ? { paidAt } : {}),
+        ...(statusAt ? { statusAt } : {}),
       });
       setSelected(await api.getOrder(selected.id));
       toast.success("Order updated");
@@ -85,7 +91,7 @@ export function OrdersSection({
           <Input aria-label="Search orders" placeholder="Search order or customer" value={search} onChange={(e) => setSearch(e.target.value)} className="sm:w-64" />
           <Select aria-label="Filter by status" value={filter} onChange={(e) => setFilter(e.target.value)} className="sm:w-44">
             <option value="ALL">All statuses</option>
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+            {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </Select>
         </div>
       </div>
@@ -180,8 +186,8 @@ export function OrdersSection({
 
             <div className="space-y-4 rounded-md bg-muted/50 p-4">
               <div>
-                <Label>Order status</Label>
-                <Select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <Label htmlFor="order-status">Order status</Label>
+                <Select id="order-status" value={status} onChange={(e) => setStatus(e.target.value)}>
                   {ORDER_STATUSES.filter((candidate) =>
                     candidate === selected.status ||
                     canTransitionOrderStatus(selected.status as OrderStatus, candidate)
@@ -189,8 +195,8 @@ export function OrdersSection({
                 </Select>
               </div>
               <div>
-                <Label>Internal note</Label>
-                <Textarea rows={4} maxLength={5000} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Staff-only order note" />
+                <Label htmlFor="order-internal-note">Internal note</Label>
+                <Textarea id="order-internal-note" rows={4} maxLength={5000} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Staff-only order note" />
               </div>
               <div className="space-y-1 text-sm text-muted-foreground">
                 <p>Subtotal: {money(selected.subtotal, selected.currency)}</p>
@@ -207,15 +213,21 @@ export function OrdersSection({
       )}
       {selected && (
         <PaidAtAlertDialog
-          open={paidAtDialogOpen}
+          open={statusDateDialogOpen}
           onOpenChange={(open) => {
-            setPaidAtDialogOpen(open);
-            if (!open && selected.status !== "PAID") setStatus(selected.status as OrderStatus);
+            setStatusDateDialogOpen(open);
+            if (!open) setStatus(selected.status as OrderStatus);
           }}
-          initialValue={selected.paidAt}
+          eventLabel={orderStatusDateLabel(status as OrderStatus)}
+          minimumDateTime={selected.placedAt}
+          initialValue={
+            orderStatusDateField(status as OrderStatus)
+              ? selected[orderStatusDateField(status as OrderStatus)!]
+              : null
+          }
           busy={saving}
-          onConfirm={async (paidAt) => {
-            if (await save(paidAt)) setPaidAtDialogOpen(false);
+          onConfirm={async (statusAt) => {
+            if (await save(statusAt)) setStatusDateDialogOpen(false);
           }}
         />
       )}

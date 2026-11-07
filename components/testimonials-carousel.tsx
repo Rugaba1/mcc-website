@@ -88,7 +88,11 @@ export default function TestimonialsCarousel({
             <div className="pointer-events-none absolute right-10 top-6 font-playfair text-9xl leading-none">
               &rdquo;
             </div>
-            <div className="mb-6 flex gap-1" aria-label="5 out of 5 stars">
+            <div
+              className="mb-6 flex gap-1"
+              role="img"
+              aria-label="5 out of 5 stars"
+            >
               {Array.from({ length: 5 }, (_, index) => (
                 <svg key={index} className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -112,16 +116,25 @@ export default function TestimonialsCarousel({
           </div>
 
           <div className="mt-8 flex items-center justify-between">
-            <div className="flex gap-2">
+            <div className="flex gap-0">
               {testimonials.map((item, index) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => goTo(index)}
-                  aria-label={`Testimonial ${index + 1}`}
-                  aria-current={index === current}
-                  className={`h-2 rounded-full transition-all ${index === current ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"}`}
-                />
+                  aria-label={`Show testimonial ${index + 1} of ${total}`}
+                  aria-current={index === current ? "true" : undefined}
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-2.5 rounded-full transition-all ${
+                      index === current
+                        ? "w-6 bg-primary"
+                        : "w-2.5 bg-muted-foreground/30"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
             <div className="flex gap-3">
